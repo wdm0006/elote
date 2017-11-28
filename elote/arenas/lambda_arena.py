@@ -1,7 +1,8 @@
 from elote import EloCompetitor
+from elote.arenas.base import BaseArena
 
 
-class LambdaArena:
+class LambdaArena(BaseArena):
     def __init__(self, func, base_competitor=EloCompetitor, base_competitor_kwargs=None):
         self.func = func
         self.competitors = dict()
@@ -23,7 +24,7 @@ class LambdaArena:
             self.competitors[a] = self.base_competitor(**self.base_competitor_kwargs)
         if b not in self.competitors:
             self.competitors[b] = self.base_competitor(**self.base_competitor_kwargs)
-        
+
         res = self.func(a, b)
         if res is None:
             self.competitors[a].tied(self.competitors[b])
