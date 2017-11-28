@@ -3,7 +3,9 @@ Elote
 
 [![Coverage Status](https://coveralls.io/repos/wdm0006/elote/badge.svg?branch=master&service=github)](https://coveralls.io/github/wdm0006/elote?branch=master)  ![travis status](https://travis-ci.org/wdm0006/elote.svg?branch=master) 
 
-A python package for rating competitors based on bouts. Primarily with the Elo Rating System.
+A python package for rating competitors based on bouts. The classical example of this would be rating chess players based
+on repeated head to head matches between different players. The first rating system implemented in elote, the Elo rating
+system, was made for just that.
 
 Work in progress, currently implemented rating systems are:
 

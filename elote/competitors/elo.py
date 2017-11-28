@@ -8,6 +8,12 @@ class EloCompetitor(BaseCompetitor):
     def __init__(self, initial_rating=400):
         self.rating = initial_rating
 
+    def __repr__(self):
+        return '<EloCompetitor: %s>' % (self.__hash__())
+
+    def __str__(self):
+        return '<EloCompetitor>'
+
     @property
     def transformed_rating(self):
         return 10 ** (self.rating / self._base_rating)
