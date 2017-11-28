@@ -17,3 +17,7 @@ class BaseArena:
     @abc.abstractmethod
     def leaderboard(self):
         pass
+
+    @abc.abstractmethod
+    def export_state(self):
+        pass

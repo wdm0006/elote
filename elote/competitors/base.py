@@ -16,3 +16,7 @@ class BaseCompetitor:
     @abc.abstractmethod
     def tied(self, competitor):
         pass
+
+    @abc.abstractmethod
+    def export_state(self):
+        pass

@@ -5,9 +5,12 @@ Elote
 
 A python package for rating competitors based on bouts. The classical example of this would be rating chess players based
 on repeated head to head matches between different players. The first rating system implemented in elote, the Elo rating
-system, was made for just that.
+system, was made for just that. Another well known use case would be for college football rankings.
 
-Work in progress, currently implemented rating systems are:
+There are a whole bunch of other use-cases for this sort of system other than sports though, including collaborative
+ranking from a group (for voting, prioritizing, or other similar activities).
+
+Currently implemented rating systems are:
 
  * Elo
  * Glicko [1]
@@ -17,7 +20,7 @@ Usage
 
 There are a bunch of examples in the examples directory if you want to dive a little deeper, but 
 Elote is pretty simple to use. The two objects we care about are Competitors and Arenas. Competitors 
-are the things you are rating, and an Arena is a mechanism to schedule bouts between them. First, Competitors:
+are the things you are rating, and an Arena is a mechanism to schedule Bouts between them. First, Competitors:
 
 Competitors
 -----------
@@ -129,6 +132,12 @@ Installation
 ============
 
 Soon to be on PyPI, but for now you can fork the repo or install from git.
+
+Contributing
+============
+
+This is very much still a work in progress, so if you're interested in contributing, there is lots to do. Open up an
+issue or a PR and we can coordinate efforts.
 
 References
 ==========

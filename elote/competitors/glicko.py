@@ -17,6 +17,12 @@ class GlickoCompetitor(BaseCompetitor):
     def __str__(self):
         return '<GlickoCompetitor>'
 
+    def export_state(self):
+        return {
+            "initial_rating": self.rating,
+            "initial_rd": self.rd
+        }
+
     @property
     def tranformed_rd(self):
         return min([350, math.sqrt(self.rd ** 2 + self._c ** 2)])

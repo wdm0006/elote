@@ -14,6 +14,11 @@ class EloCompetitor(BaseCompetitor):
     def __str__(self):
         return '<EloCompetitor>'
 
+    def export_state(self):
+        return {
+            "initial_rating": self.rating
+        }
+
     @property
     def transformed_rating(self):
         return 10 ** (self.rating / self._base_rating)

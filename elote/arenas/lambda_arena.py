@@ -3,7 +3,7 @@ from elote.arenas.base import BaseArena
 
 
 class LambdaArena(BaseArena):
-    def __init__(self, func, base_competitor=EloCompetitor, base_competitor_kwargs=None):
+    def __init__(self, func, base_competitor=EloCompetitor, base_competitor_kwargs=None, initial_state=None):
         self.func = func
         self.competitors = dict()
         self.base_competitor = base_competitor
@@ -11,6 +11,11 @@ class LambdaArena(BaseArena):
             self.base_competitor_kwargs = dict()
         else:
             self.base_competitor_kwargs = base_competitor_kwargs
+
+        # if some initial state is passed in, we can seed the population
+        if initial_state is not None:
+            for k, v in initial_state.items():
+                self.competitors[k] = self.base_competitor(**v)
 
     def set_competitor_class_var(self, name, value):
         setattr(self.base_competitor, name, value)
@@ -32,6 +37,12 @@ class LambdaArena(BaseArena):
             self.competitors[a].beat(self.competitors[b])
         else:
             self.competitors[b].beat(self.competitors[a])
+
+    def export_state(self):
+        out = dict()
+        for k, v in self.competitors.items():
+            out[k] = v.export_state()
+        return out
 
     def leaderboard(self):
         lb = [
