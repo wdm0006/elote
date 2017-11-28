@@ -5,7 +5,10 @@ Elote
 
 A python package for rating competitors based on bouts. Primarily with the Elo Rating System.
 
-Work in progress
+Work in progress, currently implemented rating systems are:
+
+ * Elo
+ * Glicko (1)
 
 Usage
 =====
