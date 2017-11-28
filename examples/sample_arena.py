@@ -13,6 +13,7 @@ def func(a, b):
 matchups = [(random.randint(1, 10), random.randint(1, 10)) for _ in range(1000)]
 
 arena = LambdaArena(func)
+arena.set_competitor_class_var('_k_factor', 50)
 arena.tournament(matchups)
 
 print(json.dumps(arena.leaderboard(), indent=4))

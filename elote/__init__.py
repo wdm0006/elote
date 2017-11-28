@@ -1,4 +1,5 @@
-from elote.competitors import EloCompetitor, GlickoCompetitor
+from elote.competitors.elo import EloCompetitor
+from elote.competitors.glicko import GlickoCompetitor
 from elote.arenas import LambdaArena
 
 __all__ = [

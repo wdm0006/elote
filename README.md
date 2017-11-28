@@ -8,7 +8,7 @@ A python package for rating competitors based on bouts. Primarily with the Elo R
 Work in progress, currently implemented rating systems are:
 
  * Elo
- * Glicko (1)
+ * Glicko [1]
 
 Usage
 =====
@@ -126,4 +126,9 @@ The final leaderboard looks like:
 Installation
 ============
 
-Soon to be on PyPI, but for now you can fork the repo or install from git. 
+Soon to be on PyPI, but for now you can fork the repo or install from git.
+
+References
+==========
+
+ [1] - http://www.glicko.net/glicko/glicko.pdf

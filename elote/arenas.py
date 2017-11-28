@@ -1,4 +1,4 @@
-from elote.competitors import EloCompetitor
+from elote import EloCompetitor
 
 
 class LambdaArena:
@@ -10,6 +10,9 @@ class LambdaArena:
             self.base_competitor_kwargs = dict()
         else:
             self.base_competitor_kwargs = base_competitor_kwargs
+
+    def set_competitor_class_var(self, name, value):
+        setattr(self.base_competitor, name, value)
 
     def tournament(self, matchups):
         for a, b in matchups:

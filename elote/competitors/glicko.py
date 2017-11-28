@@ -1,47 +1,8 @@
 import math
+from elote.competitors.base import BaseCompetitor
 
-class EloCompetitor:
-    _base_rating = 400
-    _k_factor = 32
 
-    def __init__(self, initial_rating=400):
-        self.rating = initial_rating
-
-    @property
-    def transformed_rating(self):
-        return 10 ** (self.rating / self._base_rating)
-
-    def expected_score(self, competitor):
-        return self.transformed_rating / (competitor.transformed_rating + self.transformed_rating)
-
-    def beat(self, competitor):
-        """
-        takes in a competitor object that lost, updates both's scores.
-        """
-
-        win_es = self.expected_score(competitor)
-        lose_es = competitor.expected_score(self)
-
-        # update the winner's rating
-        self.rating = self.rating + self._k_factor * (1 - win_es)
-
-        # update the loser's rating
-        competitor._rating = competitor.rating + self._k_factor * (0 - lose_es)
-
-    def lost_to(self, competitor):
-        competitor.beat(self)
-
-    def tied(self, competitor):
-        win_es = self.expected_score(competitor)
-        lose_es = competitor.expected_score(self)
-
-        # update the winner's rating
-        self.rating = self.rating + self._k_factor * (0.5 - win_es)
-
-        # update the loser's rating
-        competitor._rating = competitor.rating + self._k_factor * (0.5 - lose_es)
-
-class GlickoCompetitor:
+class GlickoCompetitor(BaseCompetitor):
     """ from http://www.glicko.net/glicko/glicko.pdf"""
     _c = 1
     _q = 0.0057565
@@ -51,7 +12,7 @@ class GlickoCompetitor:
         self.rd = initial_rd
 
     @property
-    def tranformed_rd():
+    def tranformed_rd(self):
         return min([350, math.sqrt(self.rd ** 2 + self._c ** 2)])
 
     @classmethod
@@ -88,9 +49,6 @@ class GlickoCompetitor:
         competitor.rating = c_new_r
         competitor.rd = c_new_rd
 
-    def lost_to(self, competitor):
-        competitor.beat(self)
-
     def tied(self, competitor):
         # first we update ourselves
         s = 0.5
@@ -111,4 +69,3 @@ class GlickoCompetitor:
         self.rd = s_new_rd
         competitor.rating = c_new_r
         competitor.rd = c_new_rd
-
