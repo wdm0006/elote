@@ -127,6 +127,11 @@ The final leaderboard looks like:
     ]
 
 
+Examples
+========
+
+In the examples directory there are a bunch of basic examples using generated data to show different features of elote,
+as well as some use cases using real data, so far all from MasseyRatings.com, but transformed into JSON [2].
 
 Installation
 ============
@@ -143,3 +148,4 @@ References
 ==========
 
  [1] - http://www.glicko.net/glicko/glicko.pdf
+ [2] - MasseyRatings.com
