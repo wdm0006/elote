@@ -5,15 +5,17 @@ Elote
 
 A python package for rating competitors based on bouts. The classical example of this would be rating chess players based
 on repeated head to head matches between different players. The first rating system implemented in elote, the Elo rating
-system, was made for just that. Another well known use case would be for college football rankings.
+system, was made for just that [3]. Another well known use case would be for college football rankings.
 
 There are a whole bunch of other use-cases for this sort of system other than sports though, including collaborative
 ranking from a group (for voting, prioritizing, or other similar activities).
 
 Currently implemented rating systems are:
 
- * Elo
- * Glicko [1]
+ * Elo [3]
+ * Glicko-1 [1]
+ * ECF [4]
+ * DWZ [5]
 
 Usage
 =====
@@ -138,6 +140,8 @@ Installation
 
 Soon to be on PyPI, but for now you can fork the repo or install from git.
 
+Supporting only python 3.4+
+
 Contributing
 ============
 
@@ -149,3 +153,6 @@ References
 
  [1] - http://www.glicko.net/glicko/glicko.pdf
  [2] - MasseyRatings.com
+ [3] - Elo, Arpad (1978). The Rating of Chessplayers, Past and Present. Arco. ISBN 0-668-04721-6.
+ [4] - http://www.ecfgrading.org.uk/new/help.php#elo
+ [5] - https://en.wikipedia.org/wiki/Deutsche_Wertungszahl
