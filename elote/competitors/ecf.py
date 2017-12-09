@@ -49,7 +49,7 @@ class ECFCompetitor(BaseCompetitor):
         return 10 ** (self.elo_conversion / 400)
 
     def expected_score(self, competitor):
-        return self.transformed_elo_rating / (competitor.transformed_rating + self.transformed_elo_rating)
+        return self.transformed_elo_rating / (competitor.transformed_elo_rating + self.transformed_elo_rating)
 
     def beat(self, competitor):
         """

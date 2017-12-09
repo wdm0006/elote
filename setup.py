@@ -24,7 +24,7 @@ setup(
       'Programming Language :: Python :: 3',
     ],
     keywords='elo scoring rating',
-    packages=find_packages(exclude=['tests*']),
+    packages=find_packages(exclude=['tests*', 'examples*']),
     include_package_data=True,
     author='Will McGinnis',
     install_requires=[],

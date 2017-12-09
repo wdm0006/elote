@@ -38,6 +38,15 @@ class LambdaArena(BaseArena):
         else:
             self.competitors[b].beat(self.competitors[a])
 
+    def expected_score(self, a, b):
+        """expected liklihood of a beating b"""
+        if a not in self.competitors:
+            self.competitors[a] = self.base_competitor(**self.base_competitor_kwargs)
+        if b not in self.competitors:
+            self.competitors[b] = self.base_competitor(**self.base_competitor_kwargs)
+
+        return self.competitors[a].expected_score(self.competitors[b])
+
     def export_state(self):
         out = dict()
         for k, v in self.competitors.items():
