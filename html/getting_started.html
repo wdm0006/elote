@@ -157,7 +157,52 @@
 <p>Installation: TODO</p>
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
+<p>The most basic object in <code class="docutils literal notranslate"><span class="pre">elote</span></code> is a competitor. To start with, let’s take a look at <code class="docutils literal notranslate"><span class="pre">EloCompetitor</span></code>. Let’s make 3
+objects, one for each of 3 players in a game:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">elote</span> <span class="kn">import</span> <span class="n">EloCompetitor</span>
+
+<span class="n">good_player</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">()</span>
+<span class="n">better_player</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">()</span>
+<span class="n">best_player</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Starting ratings:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
+</pre></div>
+</div>
+<p>All we do is initialize them, and print out their starting ratings. Rating is our measure of how good we think a
+competitor is with the information at hand. Here we don’t really have any information, so they are all rated the same:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Starting</span> <span class="n">ratings</span><span class="p">:</span>
+<span class="mf">400.00</span><span class="p">,</span>  <span class="mf">400.00</span><span class="p">,</span>  <span class="mf">400.00</span>
+</pre></div>
+</div>
+<p>To make things a little more interesting, let’s do 20 <code class="docutils literal notranslate"><span class="pre">matches</span></code>. A <code class="docutils literal notranslate"><span class="pre">match</span></code> is an instance where two players compete,
+and one of them wins. This gives us some new information to update our ratings with. For each of the matches we simulate
+we will have <code class="docutils literal notranslate"><span class="pre">better_player</span></code> beat <code class="docutils literal notranslate"><span class="pre">good_player</span></code> or <code class="docutils literal notranslate"><span class="pre">best_player</span></code> beat <code class="docutils literal notranslate"><span class="pre">better_player</span></code>. At each iteration, we will
+print out the ratings to get an idea of how they change over time.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">After matches&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">better</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">good</span><span class="p">)</span>
+    <span class="n">best</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">better</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">After</span> <span class="n">matches</span>
+<span class="n">good</span><span class="p">,</span>    <span class="n">better</span><span class="p">,</span>  <span class="n">best</span>
+<span class="mf">384.00</span><span class="p">,</span>  <span class="mf">399.26</span><span class="p">,</span>  <span class="mf">416.74</span>
+<span class="mf">368.70</span><span class="p">,</span>  <span class="mf">398.66</span><span class="p">,</span>  <span class="mf">432.64</span>
+<span class="mf">354.08</span><span class="p">,</span>  <span class="mf">398.18</span><span class="p">,</span>  <span class="mf">447.75</span>
+<span class="mf">340.10</span><span class="p">,</span>  <span class="mf">397.79</span><span class="p">,</span>  <span class="mf">462.11</span>
+<span class="mf">326.73</span><span class="p">,</span>  <span class="mf">397.49</span><span class="p">,</span>  <span class="mf">475.78</span>
+<span class="mf">313.95</span><span class="p">,</span>  <span class="mf">397.25</span><span class="p">,</span>  <span class="mf">488.80</span>
+<span class="mf">301.71</span><span class="p">,</span>  <span class="mf">397.08</span><span class="p">,</span>  <span class="mf">501.21</span>
+<span class="mf">289.99</span><span class="p">,</span>  <span class="mf">396.95</span><span class="p">,</span>  <span class="mf">513.05</span>
+<span class="mf">278.77</span><span class="p">,</span>  <span class="mf">396.87</span><span class="p">,</span>  <span class="mf">524.36</span>
+<span class="mf">268.01</span><span class="p">,</span>  <span class="mf">396.81</span><span class="p">,</span>  <span class="mf">535.18</span>
+</pre></div>
+</div>
+<p>So as you can see, over time, the scores gradually update to reflect our hierarchy.</p>
+<p>For more infromation on types of competitors we have, or different configuraiton options, please see the detailed API
+docs on the competitors page.</p>
 </div>
 </div>
 
