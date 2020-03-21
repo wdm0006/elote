@@ -2,4 +2,5 @@ import unittest
 
 
 class TestCompetitors(unittest.TestCase):
-    pass
+    def test_Dummy(self):
+        self.assertTrue(True)

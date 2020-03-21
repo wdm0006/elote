@@ -2,5 +2,6 @@ import unittest
 
 
 class TestArenas(unittest.TestCase):
-    pass
+    def test_Dummy(self):
+        self.assertTrue(True)
 
