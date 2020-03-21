@@ -1,3 +1,8 @@
+v0.0.3
+======
+
+ * No change, debugging CI
+ 
 v0.0.2
 ======
 
