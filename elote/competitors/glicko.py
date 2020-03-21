@@ -32,8 +32,8 @@ class GlickoCompetitor(BaseCompetitor):
         return 1 / (math.sqrt(1 + 3 * cls._q ** 2 * (x ** 2) / math.pi ** 2))
 
     def expected_score(self, competitor):
-        g_term = self._g(math.sqrt(self.rd ** 2 + competitor.rd ** 2) * (self.rating - competitor.rating) / 400)
-        E = 1 / (1 + 10 ** (-1 * g_term))
+        g_term = self._g(self.rd ** 2)
+        E = 1 / (1 + 10 ** ((-1 * g_term * (self.rating - competitor.rating))/400))
         return E
 
     def beat(self, competitor):
