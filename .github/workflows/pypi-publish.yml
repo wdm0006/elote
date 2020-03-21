@@ -1,7 +1,7 @@
 name: "PyPI Packaging"
 on:
   release:
-    types: [published]
+    types: [published, created]
 
 jobs:
   publish:
