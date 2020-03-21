@@ -37,7 +37,7 @@ class EloCompetitor(BaseCompetitor):
         self.rating = self.rating + self._k_factor * (1 - win_es)
 
         # update the loser's rating
-        competitor._rating = competitor.rating + self._k_factor * (0 - lose_es)
+        competitor.rating = competitor.rating + self._k_factor * (0 - lose_es)
 
     def tied(self, competitor):
         win_es = self.expected_score(competitor)
@@ -47,4 +47,4 @@ class EloCompetitor(BaseCompetitor):
         self.rating = self.rating + self._k_factor * (0.5 - win_es)
 
         # update the loser's rating
-        competitor._rating = competitor.rating + self._k_factor * (0.5 - lose_es)
+        competitor.rating = competitor.rating + self._k_factor * (0.5 - lose_es)
