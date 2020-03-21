@@ -1,8 +1,7 @@
 from setuptools import setup, find_packages
 from codecs import open
 from os import path
-
-VERSION = '0.0.1'
+from version import __version__
 
 here = path.abspath(path.dirname(__file__))
 
@@ -12,11 +11,11 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='elote',
-    version=VERSION,
+    version=__version__,
     description='Python module for rating bouts (like with Elo Rating)',
     long_description=long_description,
-    url='https://github.com/wdm0006/elote',
-    download_url='https://github.com/wdm0006/elote/tarball/' + VERSION,
+    url='https://github.com/helton-tech/elote',
+    download_url='https://github.com/helton-tech/elote/tarball/' + VERSION,
     license='MIT',
     classifiers=[
       'Development Status :: 3 - Alpha',

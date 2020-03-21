@@ -151,8 +151,8 @@ issue or a PR and we can coordinate efforts.
 References
 ==========
 
- [1] - http://www.glicko.net/glicko/glicko.pdf
- [2] - MasseyRatings.com
- [3] - Elo, Arpad (1978). The Rating of Chessplayers, Past and Present. Arco. ISBN 0-668-04721-6.
- [4] - http://www.ecfgrading.org.uk/new/help.php#elo
- [5] - https://en.wikipedia.org/wiki/Deutsche_Wertungszahl
+ - [1] http://www.glicko.net/glicko/glicko.pdf
+ - [2] MasseyRatings.com
+ - [3] Elo, Arpad (1978). The Rating of Chessplayers, Past and Present. Arco. ISBN 0-668-04721-6.
+ - [4] http://www.ecfgrading.org.uk/new/help.php#elo
+ - [5] https://en.wikipedia.org/wiki/Deutsche_Wertungszahl
