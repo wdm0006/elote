@@ -28,5 +28,5 @@ setup(
     long_description_content_type="text/markdown",
     author='Will McGinnis',
     install_requires=[],
-    author_email='will@pedalwrencher.com'
+    author_email='will@helton.io'
 )
