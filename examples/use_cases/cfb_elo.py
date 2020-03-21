@@ -24,30 +24,57 @@ for idx, item in enumerate(rankings):
 
 # Top 25 Teams on Dec 6, 2017 according to this:
 # 1) Clemson
-# 2) Georgia
-# 3) Oklahoma
-# 4) Ohio_St
+# 2) Oklahoma
+# 3) Ohio_St
+# 4) Georgia
 # 5) Auburn
-# 6) USC
-# 7) Stanford
-# 8) Alabama
-# 9) TCU
-# 10) Miami_FL
-# 11) Wisconsin
-# 12) Oklahoma_St
-# 13) LSU
-# 14) Washington
-# 15) Boise_St
-# 16) Penn_St
-# 17) Washington_St
-# 18) Memphis
-# 19) Notre_Dame
-# 20) UCLA
-# 21) UCF
-# 22) Northwestern
-# 23) South_Carolina
-# 24) Michigan_St
-# 25) Arizona_St
+# 6) Alabama
+# 7) UCF
+# 8) USC
+# 9) Miami_FL
+# 10) LSU
+# 11) Memphis
+# 12) Penn_St
+# 13) Wisconsin
+# 14) TCU
+# 15) Oklahoma_St
+# 16) Northwestern
+# 17) Washington
+# 18) Stanford
+# 19) Washington_St
+# 20) Michigan_St
+# 21) Houston
+# 22) Notre_Dame
+# 23) Boise_St
+# 24) South_Carolina
+# 25) Missouri
+
+# Final AP Poll that year
+# 1. Alabama (57) (13-1) 1521
+# 2. Georgia (13-2) 1454
+# 3. Oklahoma (12-1) 1374
+# 4. Clemson (12-2) 1292
+# 5. Ohio State (12-2) 1286
+# 6. UCF (4) (13-0) 1248
+# 7. Wisconsin (13-1) 1194
+# 8. Penn State (11-2) 1120
+# 9. TCU (11-3) 974
+# 10. Auburn (10-4)
+# 11. Notre Dame (10-3) 857
+# 12. USC (11-3) 839
+# 13. Miami (10-3) 769
+# 14. Oklahoma State (10-3) 758
+# 15. Michigan State (10-3) 705
+# 16. Washington (10-3) 668
+# 17. Northwestern (10-3) 528
+# 18. LSU (9-4) 368
+# 19. Mississippi State (9-4) 359
+# 20. Stanford (9-5) 336
+# 21. USF (10-2) 267
+# 22. Boise State (11-3) 251
+# 23. NC State (9-4) 232
+# 24. Virginia Tech (9-4) 125
+# 25. Memphis (10-3) 119
 
 
 

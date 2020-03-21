@@ -7,7 +7,7 @@ Competitors
 .. autoclass:: elote.competitors.ecf.ECFCompetitor
     :members:
 
-.. autoclass:: elote.competitors.elo.ELOCompetitor
+.. autoclass:: elote.competitors.elo.EloCompetitor
     :members:
 
 .. autoclass:: elote.competitors.glicko.GlickoCompetitor
