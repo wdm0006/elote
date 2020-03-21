@@ -25,6 +25,7 @@ setup(
     keywords='elo scoring rating',
     packages=find_packages(exclude=['tests*', 'examples*']),
     include_package_data=True,
+    long_description_content_type="text/markdown",
     author='Will McGinnis',
     install_requires=[],
     author_email='will@pedalwrencher.com'
