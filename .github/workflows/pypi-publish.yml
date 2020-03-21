@@ -1,7 +1,7 @@
 name: "PyPI Packaging"
 on:
-  push:
-    branches: [ master ]
+  release:
+    types: [published]
 
 jobs:
   publish:
@@ -16,7 +16,6 @@ jobs:
           pip install -r requirements-dev.txt
           python setup.py bdist_wheel sdist
       - name: Publish package
-        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
         uses: pypa/gh-action-pypi-publish@master
         with:
           user: willmcg4132
