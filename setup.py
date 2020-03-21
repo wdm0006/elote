@@ -15,7 +15,7 @@ setup(
     description='Python module for rating bouts (like with Elo Rating)',
     long_description=long_description,
     url='https://github.com/helton-tech/elote',
-    download_url='https://github.com/helton-tech/elote/tarball/' + VERSION,
+    download_url='https://github.com/helton-tech/elote/tarball/' + __version__,
     license='MIT',
     classifiers=[
       'Development Status :: 3 - Alpha',
