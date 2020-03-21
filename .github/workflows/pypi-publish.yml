@@ -1,0 +1,21 @@
+name: "PyPI Packaging"
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build package
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+          python setup.py bdist_wheel sdist
+      - name: Publish package
+        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          user: willmcg4132
+          password: ${{ secrets.pypi_password }}
