@@ -4,7 +4,7 @@
 # You can set these variables from the command line, and also
 # from the environment for the first two.
 SPHINXOPTS    =
-SPHINXBUILD   = /Users/willmcginnis/.pyenv/versions/3.8.2/bin/sphinx-build
+SPHINXBUILD   = sphinx-build
 SOURCEDIR     = source
 BUILDDIR      = build
 
