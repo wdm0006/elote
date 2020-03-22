@@ -61,7 +61,7 @@ class LambdaArena(BaseArena):
 
         predicted_outcome = self.expected_score(a, b)
 
-        res = self.func(a, b)
+        res = self.func(a, b, attributes=attributes)
         if res is None:
             self.competitors[a].tied(self.competitors[b])
             self.history.add_bout(Bout(a, b, predicted_outcome, outcome='tie', attributes=attributes))

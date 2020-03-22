@@ -1,5 +1,6 @@
 from elote import LambdaArena
 import datetime
+import random
 import json
 
 # split into train/test
@@ -24,14 +25,16 @@ test_dates = [x.strftime('%Y%m%d') for x in dates[55:]]
 
 # then form matchup objects (winner first). First sort the data so the matchups happen in true date order
 data = sorted(data, key=lambda x: datetime.datetime.strptime(x.get('date'), '%Y%m%d'))
-train_matchups = [(x.get('winner'), x.get('loser'), x) for x in data if x.get('date') in train_dates]
-test_matchups = [(x.get('winner'), x.get('loser'), x) for x in data if x.get('date') in test_dates]
+train_matchups = [(x.get('winner'), x.get('loser'), x) if random.random() > 0.5 else (x.get('loser'), x.get('winner'), x) for x in data if x.get('date') in train_dates]
+test_matchups = [(x.get('winner'), x.get('loser'), x) if random.random() > 0.5 else (x.get('loser'), x.get('winner'), x) for x in data if x.get('date') in test_dates]
 
 
 # we already know the winner, so the lambda here is trivial
-def func(a, b):
-    return True
-
+def func(a, b, attributes=None):
+    if a == attributes.get('winner'):
+        return True
+    else:
+        return False
 
 # we use the default EloCompetitor, but adjust the k_factor to 50 before running the tournament
 arena = LambdaArena(func)
@@ -40,6 +43,12 @@ arena.tournament(train_matchups)
 
 # do a threshold search and clear the history for validation
 _, thresholds = arena.history.random_search(trials=10_000)
+tp, fp, tn, fn, do_nothing = arena.history.confusion_matrix(*thresholds)
+print('train set numbers: %s' % (str(thresholds), ))
+print('wins: %s' % (tp + tn, ))
+print('losses: %s' % (fp + fn, ))
+print('do_nothing: %s' % (do_nothing, ))
+print('win pct: %s%%' % (100 * ((tp + tn)/(tp + tn + fp + fn + do_nothing))))
 arena.clear_history()
 
 # then we print out the top 25 as of the end of our training dataset
@@ -51,22 +60,24 @@ for idx, item in enumerate(rankings):
 print('Validation Step')
 arena.tournament(test_matchups)
 arena.history.report_results()
+
 tp, fp, tn, fn, do_nothing = arena.history.confusion_matrix(0.4, 0.6)
 print('All data')
 print('wins: %s' % (tp + tn, ))
 print('losses: %s' % (fp + fn, ))
 print('do_nothing: %s' % (do_nothing, ))
-
+print('win pct: %s%%' % (100 * ((tp + tn)/(tp + tn + fp + fn + do_nothing))))
 
 tp, fp, tn, fn, do_nothing = arena.history.confusion_matrix(0.4, 0.6, attribute_filter={'neutral_site': True})
 print('only neutral sites')
 print('wins: %s' % (tp + tn, ))
 print('losses: %s' % (fp + fn, ))
 print('do_nothing: %s' % (do_nothing, ))
+print('win pct: %s%%' % (100 * ((tp + tn)/(tp + tn + fp + fn + do_nothing))))
 
-
-tp, fp, tn, fn, do_nothing = arena.history.confusion_matrix(*thresholds, attribute_filter={'neutral_site': True})
+tp, fp, tn, fn, do_nothing = arena.history.confusion_matrix(*thresholds)
 print('using learned thresholds: %s' % (str(thresholds), ))
 print('wins: %s' % (tp + tn, ))
 print('losses: %s' % (fp + fn, ))
 print('do_nothing: %s' % (do_nothing, ))
+print('win pct: %s%%' % (100 * ((tp + tn)/(tp + tn + fp + fn + do_nothing))))

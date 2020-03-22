@@ -31,14 +31,15 @@ class History:
     def add_bout(self, bout):
         self.bouts.append(bout)
 
-    def report_results(self):
+    def report_results(self, lower_threshold=0.5, upper_threshold=0.5):
+        print('predicted_winner,predicted_loser,probability,actual_winner,correct')
         for bout in self.bouts:
-            print('Predicted: %4.2f%% that %s beat %s, actual outcome: %s %s' % (
+            print('%s,%s,%s,%s,%s' % (
+                bout.predicted_winner(lower_threshold, upper_threshold),
+                bout.predicted_loser(lower_threshold, upper_threshold),
                 bout.predicted_outcome * 100,
-                bout.a,
-                bout.b,
-                bout.a,
-                bout.outcome
+                bout.actual_winner(),
+                bout.predicted_winner(lower_threshold, upper_threshold) == bout.actual_winner()
             ))
 
     def confusion_matrix(self, lower_threshold=0.5, upper_threshold=0.5, attribute_filter=None):
@@ -107,3 +108,27 @@ class Bout:
             return True
         else:
             return False
+
+    def predicted_winner(self, lower_treshold=0.5, upper_threshold=0.5):
+        if self.predicted_outcome > upper_threshold:
+            return self.a
+        elif self.predicted_outcome < lower_treshold:
+            return self.b
+        else:
+            return None
+
+    def predicted_loser(self, lower_treshold=0.5, upper_threshold=0.5):
+        if self.predicted_outcome > upper_threshold:
+            return self.b
+        elif self.predicted_outcome < lower_treshold:
+            return self.a
+        else:
+            return None
+
+    def actual_winner(self):
+        if self.outcome == 'win':
+            return self.a
+        elif self.outcome == 'loss':
+            return self.b
+        else:
+            return None
