@@ -3,11 +3,15 @@ from elote.competitors.base import BaseCompetitor
 
 
 class GlickoCompetitor(BaseCompetitor):
-    """ from http://www.glicko.net/glicko/glicko.pdf"""
     _c = 1
     _q = 0.0057565
 
     def __init__(self, initial_rating=1500, initial_rd=350):
+        """
+         from http://www.glicko.net/glicko/glicko.pdf
+        :param initial_rating:
+        :param initial_rd:
+        """
         self.rating = initial_rating
         self.rd = initial_rd
 
@@ -18,6 +22,10 @@ class GlickoCompetitor(BaseCompetitor):
         return '<GlickoCompetitor>'
 
     def export_state(self):
+        """
+
+        :return:
+        """
         return {
             "initial_rating": self.rating,
             "initial_rd": self.rd
@@ -32,6 +40,11 @@ class GlickoCompetitor(BaseCompetitor):
         return 1 / (math.sqrt(1 + 3 * cls._q ** 2 * (x ** 2) / math.pi ** 2))
 
     def expected_score(self, competitor):
+        """
+
+        :param competitor:
+        :return:
+        """
         g_term = self._g(self.rd ** 2)
         E = 1 / (1 + 10 ** ((-1 * g_term * (self.rating - competitor.rating))/400))
         return E
@@ -63,6 +76,11 @@ class GlickoCompetitor(BaseCompetitor):
         competitor.rd = c_new_rd
 
     def tied(self, competitor):
+        """
+
+        :param competitor:
+        :return:
+        """
         # first we update ourselves
         s = 0.5
         E_term = self.expected_score(competitor)

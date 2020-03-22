@@ -8,6 +8,10 @@ class ECFCompetitor(BaseCompetitor):
     _n_periods = 30
 
     def __init__(self, initial_rating=40):
+        """
+
+        :param initial_rating:
+        """
         self.__initial_rating = initial_rating
         self.scores = None
 
@@ -27,6 +31,10 @@ class ECFCompetitor(BaseCompetitor):
 
     @property
     def rating(self):
+        """
+
+        :return:
+        """
         if self.scores is None:
             self.__initialize_ratings()
 
@@ -40,6 +48,10 @@ class ECFCompetitor(BaseCompetitor):
         _ = self.scores.popleft()
 
     def export_state(self):
+        """
+
+        :return:
+        """
         return {
             "initial_rating": self.rating
         }
@@ -49,6 +61,11 @@ class ECFCompetitor(BaseCompetitor):
         return 10 ** (self.elo_conversion / 400)
 
     def expected_score(self, competitor):
+        """
+
+        :param competitor:
+        :return:
+        """
         return self.transformed_elo_rating / (competitor.transformed_elo_rating + self.transformed_elo_rating)
 
     def beat(self, competitor):
@@ -74,6 +91,11 @@ class ECFCompetitor(BaseCompetitor):
         competitor._update(self_rating - self._delta)
 
     def tied(self, competitor):
+        """
+
+        :param competitor:
+        :return:
+        """
         if self.scores is None:
             self.__initialize_ratings()
 

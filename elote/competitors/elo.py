@@ -6,6 +6,13 @@ class EloCompetitor(BaseCompetitor):
     _k_factor = 32
 
     def __init__(self, initial_rating=400):
+        """
+        Elo rating is a rating system based on pairwise comparisons. Ratings are given to competitors based on their
+        comparisons (bouts) with peers, in which they can win, lose or tie. The change in a players rating is scaled by
+        the rating difference between them and their competitor.
+
+        :param initial_rating:
+        """
         self.rating = initial_rating
 
     def __repr__(self):
@@ -15,6 +22,10 @@ class EloCompetitor(BaseCompetitor):
         return '<EloCompetitor>'
 
     def export_state(self):
+        """
+
+        :return:
+        """
         return {
             "initial_rating": self.rating
         }
@@ -24,6 +35,14 @@ class EloCompetitor(BaseCompetitor):
         return 10 ** (self.rating / self._base_rating)
 
     def expected_score(self, competitor):
+        """
+        In Elo rating, a player's expected score is their probability of winning plus half their probability of drawing.
+        This is because in Elo rating a draw is not explicitly accounted for, but rather counted as half of a win and
+        half of a loss. It can make the expected score a bit difficult to reason about, so be careful.
+
+        :param competitor:
+        :return:
+        """
         return self.transformed_rating / (competitor.transformed_rating + self.transformed_rating)
 
     def beat(self, competitor):
@@ -40,6 +59,11 @@ class EloCompetitor(BaseCompetitor):
         competitor.rating = competitor.rating + self._k_factor * (0 - lose_es)
 
     def tied(self, competitor):
+        """
+
+        :param competitor:
+        :return:
+        """
         win_es = self.expected_score(competitor)
         lose_es = competitor.expected_score(self)
 

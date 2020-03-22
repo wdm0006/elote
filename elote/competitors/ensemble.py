@@ -11,6 +11,11 @@ competitor_types = {
 
 class BlendedCompetitor(BaseCompetitor):
     def __init__(self, competitors, blend_mode="mean"):
+        """
+
+        :param competitors:
+        :param blend_mode:
+        """
         self._sub_competitors = []
         for competitor in competitors:
             comp_type = competitor_types.get(competitor.get('type', 'EloCompetitor'))
@@ -26,6 +31,10 @@ class BlendedCompetitor(BaseCompetitor):
         return '<BlendedCompetitor>'
 
     def export_state(self):
+        """
+
+        :return:
+        """
         return {
             "blend_mode": self.blend_mode,
             "competitors": [
@@ -38,6 +47,11 @@ class BlendedCompetitor(BaseCompetitor):
         }
 
     def expected_score(self, competitor):
+        """
+
+        :param competitor:
+        :return:
+        """
         if self.blend_mode == 'mean':
             return sum([x.expected_score(competitor) for x in self._sub_competitors]) / len(self._sub_competitors)
         else:
@@ -51,5 +65,10 @@ class BlendedCompetitor(BaseCompetitor):
             c.beat(competitor)
 
     def tied(self, competitor):
+        """
+
+        :param competitor:
+        :return:
+        """
         for c in self._sub_competitors:
             c.tied(competitor)

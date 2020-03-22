@@ -6,6 +6,10 @@ class DWZCompetitor(BaseCompetitor):
     _J = 10
 
     def __init__(self, initial_rating=400):
+        """
+
+        :param initial_rating:
+        """
         self._count = 0
         self.rating = initial_rating
 
@@ -16,11 +20,20 @@ class DWZCompetitor(BaseCompetitor):
         return '<DWZCompetitor>'
 
     def export_state(self):
+        """
+
+        :return:
+        """
         return {
             "initial_rating": self.rating
         }
 
     def expected_score(self, competitor):
+        """
+
+        :param competitor:
+        :return:
+        """
         return 1 / (1 + 10 ** ((competitor.rating - self.rating) / 400 ))
 
     @property
@@ -57,6 +70,11 @@ class DWZCompetitor(BaseCompetitor):
         competitor._count += 1
 
     def tied(self, competitor):
+        """
+
+        :param competitor:
+        :return:
+        """
         self_rating = self._new_rating(competitor, 0.5)
         competitor_rating = competitor._new_rating(self, 0.5)
 
