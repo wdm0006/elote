@@ -160,6 +160,42 @@
 <dd><p>takes in a competitor object that lost, updates both’s scores.</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="elote.competitors.dwz.DWZCompetitor.expected_score">
+<code class="sig-name descname">expected_score</code><span class="sig-paren">(</span><em class="sig-param">competitor</em><span class="sig-paren">)</span><a class="headerlink" href="#elote.competitors.dwz.DWZCompetitor.expected_score" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>competitor</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="elote.competitors.dwz.DWZCompetitor.export_state">
+<code class="sig-name descname">export_state</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#elote.competitors.dwz.DWZCompetitor.export_state" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="elote.competitors.dwz.DWZCompetitor.tied">
+<code class="sig-name descname">tied</code><span class="sig-paren">(</span><em class="sig-param">competitor</em><span class="sig-paren">)</span><a class="headerlink" href="#elote.competitors.dwz.DWZCompetitor.tied" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>competitor</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -169,6 +205,52 @@
 <dt id="elote.competitors.ecf.ECFCompetitor.beat">
 <code class="sig-name descname">beat</code><span class="sig-paren">(</span><em class="sig-param">competitor</em><span class="sig-paren">)</span><a class="headerlink" href="#elote.competitors.ecf.ECFCompetitor.beat" title="Permalink to this definition">¶</a></dt>
 <dd><p>takes in a competitor object that lost, updates both’s scores.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="elote.competitors.ecf.ECFCompetitor.expected_score">
+<code class="sig-name descname">expected_score</code><span class="sig-paren">(</span><em class="sig-param">competitor</em><span class="sig-paren">)</span><a class="headerlink" href="#elote.competitors.ecf.ECFCompetitor.expected_score" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>competitor</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="elote.competitors.ecf.ECFCompetitor.export_state">
+<code class="sig-name descname">export_state</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#elote.competitors.ecf.ECFCompetitor.export_state" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="elote.competitors.ecf.ECFCompetitor.rating">
+<em class="property">property </em><code class="sig-name descname">rating</code><a class="headerlink" href="#elote.competitors.ecf.ECFCompetitor.rating" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="elote.competitors.ecf.ECFCompetitor.tied">
+<code class="sig-name descname">tied</code><span class="sig-paren">(</span><em class="sig-param">competitor</em><span class="sig-paren">)</span><a class="headerlink" href="#elote.competitors.ecf.ECFCompetitor.tied" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>competitor</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -182,16 +264,90 @@
 <dd><p>takes in a competitor object that lost, updates both’s scores.</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="elote.competitors.elo.EloCompetitor.expected_score">
+<code class="sig-name descname">expected_score</code><span class="sig-paren">(</span><em class="sig-param">competitor</em><span class="sig-paren">)</span><a class="headerlink" href="#elote.competitors.elo.EloCompetitor.expected_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>In Elo rating, a player’s expected score is their probability of winning plus half their probability of drawing.
+This is because in Elo rating a draw is not explicitly accounted for, but rather counted as half of a win and
+half of a loss. It can make the expected score a bit difficult to reason about, so be careful.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>competitor</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="elote.competitors.elo.EloCompetitor.export_state">
+<code class="sig-name descname">export_state</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#elote.competitors.elo.EloCompetitor.export_state" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="elote.competitors.elo.EloCompetitor.tied">
+<code class="sig-name descname">tied</code><span class="sig-paren">(</span><em class="sig-param">competitor</em><span class="sig-paren">)</span><a class="headerlink" href="#elote.competitors.elo.EloCompetitor.tied" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>competitor</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
 <dt id="elote.competitors.glicko.GlickoCompetitor">
 <em class="property">class </em><code class="sig-prename descclassname">elote.competitors.glicko.</code><code class="sig-name descname">GlickoCompetitor</code><span class="sig-paren">(</span><em class="sig-param">initial_rating=1500</em>, <em class="sig-param">initial_rd=350</em><span class="sig-paren">)</span><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor" title="Permalink to this definition">¶</a></dt>
-<dd><p>from <a class="reference external" href="http://www.glicko.net/glicko/glicko.pdf">http://www.glicko.net/glicko/glicko.pdf</a></p>
-<dl class="method">
+<dd><dl class="method">
 <dt id="elote.competitors.glicko.GlickoCompetitor.beat">
 <code class="sig-name descname">beat</code><span class="sig-paren">(</span><em class="sig-param">competitor</em><span class="sig-paren">)</span><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.beat" title="Permalink to this definition">¶</a></dt>
 <dd><p>takes in a competitor object that lost, updates both’s scores.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="elote.competitors.glicko.GlickoCompetitor.expected_score">
+<code class="sig-name descname">expected_score</code><span class="sig-paren">(</span><em class="sig-param">competitor</em><span class="sig-paren">)</span><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.expected_score" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>competitor</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="elote.competitors.glicko.GlickoCompetitor.export_state">
+<code class="sig-name descname">export_state</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.export_state" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="elote.competitors.glicko.GlickoCompetitor.tied">
+<code class="sig-name descname">tied</code><span class="sig-paren">(</span><em class="sig-param">competitor</em><span class="sig-paren">)</span><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.tied" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>competitor</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -203,6 +359,42 @@
 <dt id="elote.competitors.ensemble.BlendedCompetitor.beat">
 <code class="sig-name descname">beat</code><span class="sig-paren">(</span><em class="sig-param">competitor</em><span class="sig-paren">)</span><a class="headerlink" href="#elote.competitors.ensemble.BlendedCompetitor.beat" title="Permalink to this definition">¶</a></dt>
 <dd><p>takes in a competitor object that lost, updates both’s scores.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="elote.competitors.ensemble.BlendedCompetitor.expected_score">
+<code class="sig-name descname">expected_score</code><span class="sig-paren">(</span><em class="sig-param">competitor</em><span class="sig-paren">)</span><a class="headerlink" href="#elote.competitors.ensemble.BlendedCompetitor.expected_score" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>competitor</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="elote.competitors.ensemble.BlendedCompetitor.export_state">
+<code class="sig-name descname">export_state</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#elote.competitors.ensemble.BlendedCompetitor.export_state" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="elote.competitors.ensemble.BlendedCompetitor.tied">
+<code class="sig-name descname">tied</code><span class="sig-paren">(</span><em class="sig-param">competitor</em><span class="sig-paren">)</span><a class="headerlink" href="#elote.competitors.ensemble.BlendedCompetitor.tied" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>competitor</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
