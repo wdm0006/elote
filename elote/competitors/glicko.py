@@ -6,7 +6,7 @@ class GlickoCompetitor(BaseCompetitor):
     _c = 1
     _q = 0.0057565
 
-    def __init__(self, initial_rating=1500, initial_rd=350):
+    def __init__(self, initial_rating: float = 1500, initial_rd: float = 350):
         """from http://www.glicko.net/glicko/glicko.pdf
 
         class vars:
@@ -49,11 +49,13 @@ class GlickoCompetitor(BaseCompetitor):
     def _g(cls, x):
         return 1 / (math.sqrt(1 + 3 * cls._q ** 2 * (x ** 2) / math.pi ** 2))
 
-    def expected_score(self, competitor):
+    def expected_score(self, competitor: BaseCompetitor):
         """
+        The expected outcome of a match between this competitor and one passed in. Scaled between 0-1, where 1 is a strong
+        likelihood of this competitor winning and 0 is a strong likelihood of this competitor losing.
 
-        :param competitor:
-        :return:
+        :param competitor: another EloCompetitor to compare this competitor to.
+        :return: likelihood to beat the passed competitor, as a float 0-1.
         """
 
         self.verify_competitor_types(competitor)
@@ -62,9 +64,12 @@ class GlickoCompetitor(BaseCompetitor):
         E = 1 / (1 + 10 ** ((-1 * g_term * (self.rating - competitor.rating))/400))
         return E
 
-    def beat(self, competitor):
+    def beat(self, competitor: BaseCompetitor):
         """
-        takes in a competitor object that lost, updates both's scores.
+        Takes in a competitor object that lost a match to this competitor, updates the ratings for both.
+
+        :param competitor: the competitor that lost thr bout
+        :type competitor: GlickoCompetitor
         """
 
         self.verify_competitor_types(competitor)
@@ -90,11 +95,12 @@ class GlickoCompetitor(BaseCompetitor):
         competitor.rating = c_new_r
         competitor.rd = c_new_rd
 
-    def tied(self, competitor):
+    def tied(self, competitor: BaseCompetitor):
         """
+        Takes in a competitor object that tied in a match to this competitor, updates the ratings for both.
 
-        :param competitor:
-        :return:
+        :param competitor: the competitor that tied with this one
+        :type competitor: GlickoCompetitor
         """
 
         self.verify_competitor_types(competitor)

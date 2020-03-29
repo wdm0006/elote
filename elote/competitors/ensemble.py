@@ -10,7 +10,7 @@ competitor_types = {
 
 
 class BlendedCompetitor(BaseCompetitor):
-    def __init__(self, competitors, blend_mode="mean"):
+    def __init__(self, competitors: list, blend_mode: str = "mean"):
         """
 
         :param competitors:
@@ -47,11 +47,13 @@ class BlendedCompetitor(BaseCompetitor):
             ]
         }
 
-    def expected_score(self, competitor):
+    def expected_score(self, competitor: BaseCompetitor):
         """
+        The expected outcome of a match between this competitor and one passed in. Scaled between 0-1, where 1 is a strong
+        likelihood of this competitor winning and 0 is a strong likelihood of this competitor losing.
 
-        :param competitor:
-        :return:
+        :param competitor: another EloCompetitor to compare this competitor to.
+        :return: likelihood to beat the passed competitor, as a float 0-1.
         """
 
         self.verify_competitor_types(competitor)
@@ -61,11 +63,12 @@ class BlendedCompetitor(BaseCompetitor):
         else:
             raise NotImplementedError('Blend mode %s not supported' % (self.blend_mode, ))
 
-    def beat(self, competitor):
+    def beat(self, competitor: BaseCompetitor):
         """
-        takes in a competitor object that lost, updates both's scores.
+        Takes in a competitor object that lost a match to this competitor, updates the ratings for both.
 
-        :param competitor:
+        :param competitor: the competitor that lost their bout
+        :type competitor: BlendedCompetitor
         """
 
         self.verify_competitor_types(competitor)
@@ -73,11 +76,12 @@ class BlendedCompetitor(BaseCompetitor):
         for c in self._sub_competitors:
             c.beat(competitor)
 
-    def tied(self, competitor):
+    def tied(self, competitor: BaseCompetitor):
         """
+        Takes in a competitor object that tied in a match to this competitor, updates the ratings for both.
 
-        :param competitor:
-        :return:
+        :param competitor: the competitor that tied with this one
+        :type competitor: BlendedCompetitor
         """
 
         self.verify_competitor_types(competitor)

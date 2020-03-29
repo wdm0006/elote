@@ -5,18 +5,43 @@ class EloCompetitor(BaseCompetitor):
     _base_rating = 400
     _k_factor = 32
 
-    def __init__(self, initial_rating=400):
+    def __init__(self, initial_rating: float = 400):
         """
+        Overview
+        ========
+
         Elo rating is a rating system based on pairwise comparisons. Ratings are given to competitors based on their
         comparisons (bouts) with peers, in which they can win, lose or tie. The change in a players rating is scaled by
         the rating difference between them and their competitor.
 
-        class vars:
+        [1] Elo, Arpad (1978). The Rating of Chessplayers, Past and Present. Arco. ISBN 0-668-04721-6.
+
+        Basic Usage
+        -----------
+
+        .. code-block:: python
+
+            from elote import EloCompetitor
+            good = EloCompetitor(initial_rating=400)
+            better = EloCompetitor(initial_rating=500)
+            better.beat(good)
+            print('probability of better beating good: %5.2f%%' % (better.expected_score(good) * 100, ))
+
+
+        Class Variables
+        ---------------
+
+        Class variables are configured for all competitors in a population, not on a per-competitor basis. See the
+        documentation on ``Arenas`` to see how to set these safely.
 
          * _base_rating: defaults to 400.
          * _k_factor: tunes the speed of response to new information, higher is faster response. Default=32
 
+        Configuration Options
+        ---------------------
+
         :param initial_rating: the initial rating to use for a new competitor who has no history.  Default 400
+        :type initial_rating: int
         """
         self.rating = initial_rating
 
@@ -44,7 +69,7 @@ class EloCompetitor(BaseCompetitor):
     def transformed_rating(self):
         return 10 ** (self.rating / self._base_rating)
 
-    def expected_score(self, competitor):
+    def expected_score(self, competitor: BaseCompetitor):
         """
         In Elo rating, a player's expected score is their probability of winning plus half their probability of drawing.
         This is because in Elo rating a draw is not explicitly accounted for, but rather counted as half of a win and
@@ -58,9 +83,12 @@ class EloCompetitor(BaseCompetitor):
 
         return self.transformed_rating / (competitor.transformed_rating + self.transformed_rating)
 
-    def beat(self, competitor):
+    def beat(self, competitor: BaseCompetitor):
         """
-        takes in a competitor object that lost, updates both's scores.
+        Takes in a competitor object that lost a match to this competitor, updates the ratings for both.
+
+        :param competitor: the competitor that lost their bout
+        :type competitor: EloCompetitor
         """
 
         self.verify_competitor_types(competitor)
@@ -74,11 +102,12 @@ class EloCompetitor(BaseCompetitor):
         # update the loser's rating
         competitor.rating = competitor.rating + self._k_factor * (0 - lose_es)
 
-    def tied(self, competitor):
+    def tied(self, competitor: BaseCompetitor):
         """
+        Takes in a competitor object that tied in a match to this competitor, updates the ratings for both.
 
-        :param competitor:
-        :return:
+        :param competitor: the competitor that tied with this one
+        :type competitor: EloCompetitor
         """
 
         self.verify_competitor_types(competitor)

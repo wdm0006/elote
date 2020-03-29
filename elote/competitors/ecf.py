@@ -7,7 +7,7 @@ class ECFCompetitor(BaseCompetitor):
     _delta = 50
     _n_periods = 30
 
-    def __init__(self, initial_rating=40):
+    def __init__(self, initial_rating: float = 40):
         """
 
         class vars:
@@ -45,7 +45,7 @@ class ECFCompetitor(BaseCompetitor):
 
         return statistics.mean([_ for _ in self.scores if _ is not None])
 
-    def _update(self, rating):
+    def _update(self, rating: float):
         if self.scores is None:
             self.__initialize_ratings()
 
@@ -70,19 +70,24 @@ class ECFCompetitor(BaseCompetitor):
     def transformed_elo_rating(self):
         return 10 ** (self.elo_conversion / 400)
 
-    def expected_score(self, competitor):
+    def expected_score(self, competitor: BaseCompetitor):
         """
+        The expected outcome of a match between this competitor and one passed in. Scaled between 0-1, where 1 is a strong
+        likelihood of this competitor winning and 0 is a strong likelihood of this competitor losing.
 
-        :param competitor:
-        :return:
+        :param competitor: another EloCompetitor to compare this competitor to.
+        :return: likelihood to beat the passed competitor, as a float 0-1.
         """
         self.verify_competitor_types(competitor)
 
         return self.transformed_elo_rating / (competitor.transformed_elo_rating + self.transformed_elo_rating)
 
-    def beat(self, competitor):
+    def beat(self, competitor: BaseCompetitor):
         """
-        takes in a competitor object that lost, updates both's scores.
+        Takes in a competitor object that lost a match to this competitor, updates the ratings for both.
+
+        :param competitor: the competitor that lost their bout
+        :type competitor: ECFCompetitor
         """
 
         self.verify_competitor_types(competitor)
@@ -105,11 +110,12 @@ class ECFCompetitor(BaseCompetitor):
         self._update(competitors_rating + self._delta)
         competitor._update(self_rating - self._delta)
 
-    def tied(self, competitor):
+    def tied(self, competitor: BaseCompetitor):
         """
+        Takes in a competitor object that tied in a match to this competitor, updates the ratings for both.
 
-        :param competitor:
-        :return:
+        :param competitor: the competitor that tied with this one
+        :type competitor: ECFCompetitor
         """
 
         self.verify_competitor_types(competitor)

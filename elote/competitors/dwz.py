@@ -5,7 +5,7 @@ import math
 class DWZCompetitor(BaseCompetitor):
     _J = 10
 
-    def __init__(self, initial_rating=400):
+    def __init__(self, initial_rating: float = 400):
         """
 
         class vars:
@@ -36,11 +36,13 @@ class DWZCompetitor(BaseCompetitor):
             }
         }
 
-    def expected_score(self, competitor):
+    def expected_score(self, competitor: BaseCompetitor):
         """
+        The expected outcome of a match between this competitor and one passed in. Scaled between 0-1, where 1 is a strong
+        likelihood of this competitor winning and 0 is a strong likelihood of this competitor losing.
 
-        :param competitor:
-        :return:
+        :param competitor: another EloCompetitor to compare this competitor to.
+        :return: likelihood to beat the passed competitor, as a float 0-1.
         """
         self.verify_competitor_types(competitor)
 
@@ -65,9 +67,12 @@ class DWZCompetitor(BaseCompetitor):
     def _new_rating(self, competitor, W_a):
         return self.rating + (800 / (self._E + self._count)) * (W_a - self.expected_score(competitor))
 
-    def beat(self, competitor):
+    def beat(self, competitor: BaseCompetitor):
         """
-        takes in a competitor object that lost, updates both's scores.
+        Takes in a competitor object that lost a match to this competitor, updates the ratings for both.
+
+        :param competitor: the competitor that lost thr bout
+        :type competitor: DWZCompetitor
         """
 
         self.verify_competitor_types(competitor)
@@ -81,11 +86,12 @@ class DWZCompetitor(BaseCompetitor):
         competitor.rating = competitor_rating
         competitor._count += 1
 
-    def tied(self, competitor):
+    def tied(self, competitor: BaseCompetitor):
         """
+        Takes in a competitor object that tied in a match to this competitor, updates the ratings for both.
 
-        :param competitor:
-        :return:
+        :param competitor: the competitor that tied with this one
+        :type competitor: DWZCompetitor
         """
         self.verify_competitor_types(competitor)
 
