@@ -1,0 +1,370 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Advanced Examples &mdash; elote 0.0.5 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> elote
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="competitors.html">Competitors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arenas.html">Arenas</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">elote</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Advanced Examples</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/advance_example.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="advanced-examples">
+<h1>Advanced Examples<a class="headerlink" href="#advanced-examples" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="college-football-ranking">
+<h2>College Football Ranking<a class="headerlink" href="#college-football-ranking" title="Permalink to this headline">¶</a></h2>
+<p>In this example we are going to use a <code class="docutils literal notranslate"><span class="pre">LambdaArena</span></code> and the <code class="docutils literal notranslate"><span class="pre">CFPScrapy</span></code> library to build a rating system for college
+football and see how it performs.</p>
+<p>To start with we need historical data on games to seed our ratings with. Luckily there is a nice library/API for that:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">CFBScrapy</span> <span class="k">as</span> <span class="nn">cfb</span>
+<span class="kn">from</span> <span class="nn">elote</span> <span class="kn">import</span> <span class="n">LambdaArena</span>
+
+
+<span class="c1"># pull API data</span>
+<span class="n">train_df</span> <span class="o">=</span> <span class="n">cfb</span><span class="o">.</span><span class="n">get_game_info</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">18</span><span class="p">):</span>
+    <span class="n">train_df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cfb</span><span class="o">.</span><span class="n">get_game_info</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mi">2000</span> <span class="o">+</span> <span class="n">year</span><span class="p">))</span>
+<span class="n">test_df</span> <span class="o">=</span> <span class="n">cfb</span><span class="o">.</span><span class="n">get_game_info</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mi">2018</span><span class="p">)</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cfb</span><span class="o">.</span><span class="n">get_game_info</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mi">2019</span><span class="p">))</span>
+
+<span class="c1"># sort the dates and drop unneeded cols</span>
+<span class="n">train_df</span> <span class="o">=</span> <span class="n">train_df</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;start_date&#39;</span><span class="p">,</span> <span class="s1">&#39;home_team&#39;</span><span class="p">,</span> <span class="s1">&#39;away_team&#39;</span><span class="p">,</span> <span class="s1">&#39;home_points&#39;</span><span class="p">,</span> <span class="s1">&#39;away_points&#39;</span><span class="p">])</span>
+<span class="n">test_df</span> <span class="o">=</span> <span class="n">test_df</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;start_date&#39;</span><span class="p">,</span> <span class="s1">&#39;home_team&#39;</span><span class="p">,</span> <span class="s1">&#39;away_team&#39;</span><span class="p">,</span> <span class="s1">&#39;home_points&#39;</span><span class="p">,</span> <span class="s1">&#39;away_points&#39;</span><span class="p">])</span>
+<span class="n">train_df</span> <span class="o">=</span> <span class="n">train_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;start_date&#39;</span><span class="p">)</span>
+<span class="n">test_df</span> <span class="o">=</span> <span class="n">test_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;start_date&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># then form matchup objects (winner first). First sort the data so the matchups happen in true date order</span>
+<span class="n">train_matchups</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">train_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">train_matchups</span><span class="o">.</span><span class="n">append</span><span class="p">((</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">home_team</span><span class="p">,</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">away_team</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;home_points&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">home_points</span><span class="p">,</span> <span class="s2">&quot;away_points&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">away_points</span><span class="p">}</span>
+    <span class="p">))</span>
+
+<span class="n">test_matchups</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">test_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">test_matchups</span><span class="o">.</span><span class="n">append</span><span class="p">((</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">home_team</span><span class="p">,</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">away_team</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;home_points&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">home_points</span><span class="p">,</span> <span class="s2">&quot;away_points&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">away_points</span><span class="p">}</span>
+    <span class="p">))</span>
+</pre></div>
+</div>
+<p>Next we need to make a lamba to execute the matchups with. Since we have the scores available in the attributes of our
+matchup dataset, we can simply check the score to see if the first competitor won or lost:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>   # we already know the winner, so the lambda here is trivial
+   def func(a, b, attributes=None):
+       if attributes.get(&#39;home_points&#39;, 0.0) &gt; attributes.get(&#39;away_points&#39;, 0.0):
+           return True
+       else:
+           return False
+
+To start with we will use an Elo competitor with a ``_k_factor`` of 400. We will train the ratings with a tournament
+on the first couple of decades of data:
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># we use the default EloCompetitor, but adjust the k_factor to 400 before running the tournament</span>
+<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">set_competitor_class_var</span><span class="p">(</span><span class="s1">&#39;_k_factor&#39;</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">train_matchups</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Once we’ve developed some ratings, let’s take a look at the training set and how the ratings performed, and use that
+to select some potential thresholds:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># do a threshold search and clear the history for validation</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">thresholds</span> <span class="o">=</span> <span class="n">arena</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">random_search</span><span class="p">(</span><span class="n">trials</span><span class="o">=</span><span class="mi">10_000</span><span class="p">)</span>
+<span class="n">tp</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">tn</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">do_nothing</span> <span class="o">=</span> <span class="n">arena</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">confusion_matrix</span><span class="p">(</span><span class="o">*</span><span class="n">thresholds</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">Train Set: thresholds=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">thresholds</span><span class="p">),</span> <span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;wins: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">tn</span><span class="p">,</span> <span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;losses: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fp</span> <span class="o">+</span> <span class="n">fn</span><span class="p">,</span> <span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;do_nothing: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">do_nothing</span><span class="p">,</span> <span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;win pct: </span><span class="si">%s%%</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="p">((</span><span class="n">tp</span> <span class="o">+</span> <span class="n">tn</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">tn</span> <span class="o">+</span> <span class="n">fp</span> <span class="o">+</span> <span class="n">fn</span> <span class="o">+</span> <span class="n">do_nothing</span><span class="p">))))</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">clear_history</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This will return:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Train</span> <span class="n">Set</span><span class="p">:</span> <span class="n">thresholds</span><span class="o">=</span><span class="p">[</span><span class="mf">0.6350196774347375</span><span class="p">,</span> <span class="mf">0.9364243175248251</span><span class="p">]</span>
+<span class="n">wins</span><span class="p">:</span> <span class="mi">267</span>
+<span class="n">losses</span><span class="p">:</span> <span class="mi">236</span>
+<span class="n">do_nothing</span><span class="p">:</span> <span class="mi">171</span>
+<span class="n">win</span> <span class="n">pct</span><span class="p">:</span> <span class="mf">39.61424332344214</span><span class="o">%</span>
+</pre></div>
+</div>
+<p>And while we are here let’s also print out what the rankings would have been to start the 2018 season:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>   <span class="c1"># then we print out the top 25 as of the end of our training dataset</span>
+   <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">Top 25 as of start of validation:&#39;</span><span class="p">)</span>
+   <span class="n">rankings</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">(),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rating&#39;</span><span class="p">))[:</span><span class="mi">25</span><span class="p">]</span>
+   <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rankings</span><span class="p">):</span>
+       <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">%d</span><span class="s1">) </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;competitor&#39;</span><span class="p">)))</span>
+
+<span class="n">Which</span> <span class="n">will</span> <span class="nb">print</span><span class="p">:</span>
+
+<span class="o">..</span> <span class="n">code</span><span class="o">-</span><span class="n">block</span><span class="p">::</span>
+
+   <span class="n">Top</span> <span class="mi">25</span> <span class="k">as</span> <span class="n">of</span> <span class="n">start</span> <span class="n">of</span> <span class="n">validation</span><span class="p">:</span>
+   <span class="mi">1</span><span class="p">)</span> <span class="n">Miami</span>
+   <span class="mi">2</span><span class="p">)</span> <span class="n">Oklahoma</span>
+   <span class="mi">3</span><span class="p">)</span> <span class="n">Florida</span> <span class="n">State</span>
+   <span class="mi">4</span><span class="p">)</span> <span class="n">Oregon</span> <span class="n">State</span>
+   <span class="mi">5</span><span class="p">)</span> <span class="n">Texas</span>
+   <span class="mi">6</span><span class="p">)</span> <span class="n">Georgia</span> <span class="n">Tech</span>
+   <span class="mi">7</span><span class="p">)</span> <span class="n">Washington</span>
+   <span class="mi">8</span><span class="p">)</span> <span class="n">Virginia</span> <span class="n">Tech</span>
+   <span class="mi">9</span><span class="p">)</span> <span class="n">Kansas</span> <span class="n">State</span>
+   <span class="mi">10</span><span class="p">)</span> <span class="n">Notre</span> <span class="n">Dame</span>
+   <span class="mi">11</span><span class="p">)</span> <span class="n">Cincinnati</span>
+   <span class="mi">12</span><span class="p">)</span> <span class="n">TCU</span>
+   <span class="mi">13</span><span class="p">)</span> <span class="n">Michigan</span>
+   <span class="mi">14</span><span class="p">)</span> <span class="n">Arkansas</span>
+   <span class="mi">15</span><span class="p">)</span> <span class="n">Toledo</span>
+   <span class="mi">16</span><span class="p">)</span> <span class="n">Air</span> <span class="n">Force</span>
+   <span class="mi">17</span><span class="p">)</span> <span class="n">Tennessee</span>
+   <span class="mi">18</span><span class="p">)</span> <span class="n">Auburn</span>
+   <span class="mi">19</span><span class="p">)</span> <span class="n">Florida</span>
+   <span class="mi">20</span><span class="p">)</span> <span class="n">Boise</span> <span class="n">State</span>
+   <span class="mi">21</span><span class="p">)</span> <span class="n">Louisville</span>
+   <span class="mi">22</span><span class="p">)</span> <span class="n">Middle</span> <span class="n">Tennessee</span>
+   <span class="mi">23</span><span class="p">)</span> <span class="n">North</span> <span class="n">Carolina</span>
+   <span class="mi">24</span><span class="p">)</span> <span class="n">Pittsburgh</span>
+   <span class="mi">25</span><span class="p">)</span> <span class="n">Oregon</span>
+</pre></div>
+</div>
+<p>Now let’s take a look at some hold out validation by using these ratings to take a look at the 2018 and 2019 seasons. The
+ratings will of course still update as the games are evaluated:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># now validation</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">Starting Validation Step...&#39;</span><span class="p">)</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">test_matchups</span><span class="p">)</span>
+<span class="n">report</span> <span class="o">=</span> <span class="n">arena</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">report_results</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>We can then look at the results from just this set (notice we ran <code class="docutils literal notranslate"><span class="pre">clear_history()</span></code> up above to wipe out the train set
+results from our history tracker:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tp</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">tn</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">do_nothing</span> <span class="o">=</span> <span class="n">arena</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">confusion_matrix</span><span class="p">(</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">Test Set: using 0.4/0.6 thresholds&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;wins: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">tn</span><span class="p">,</span> <span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;losses: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fp</span> <span class="o">+</span> <span class="n">fn</span><span class="p">,</span> <span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;do_nothing: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">do_nothing</span><span class="p">,</span> <span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;win pct: </span><span class="si">%s%%</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="p">((</span><span class="n">tp</span> <span class="o">+</span> <span class="n">tn</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">tn</span> <span class="o">+</span> <span class="n">fp</span> <span class="o">+</span> <span class="n">fn</span> <span class="o">+</span> <span class="n">do_nothing</span><span class="p">))))</span>
+
+<span class="n">tp</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">tn</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">do_nothing</span> <span class="o">=</span> <span class="n">arena</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">confusion_matrix</span><span class="p">(</span><span class="o">*</span><span class="n">thresholds</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">Test Set: using learned thresholds: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">thresholds</span><span class="p">),</span> <span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;wins: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">tn</span><span class="p">,</span> <span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;losses: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fp</span> <span class="o">+</span> <span class="n">fn</span><span class="p">,</span> <span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;do_nothing: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">do_nothing</span><span class="p">,</span> <span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;win pct: </span><span class="si">%s%%</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="p">((</span><span class="n">tp</span> <span class="o">+</span> <span class="n">tn</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">tn</span> <span class="o">+</span> <span class="n">fp</span> <span class="o">+</span> <span class="n">fn</span> <span class="o">+</span> <span class="n">do_nothing</span><span class="p">))))</span>
+</pre></div>
+</div>
+<p>Which will print out:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Test</span> <span class="n">Set</span><span class="p">:</span> <span class="n">using</span> <span class="mf">0.4</span><span class="o">/</span><span class="mf">0.6</span> <span class="n">thresholds</span>
+<span class="n">wins</span><span class="p">:</span> <span class="mi">1045</span>
+<span class="n">losses</span><span class="p">:</span> <span class="mi">456</span>
+<span class="n">do_nothing</span><span class="p">:</span> <span class="mi">193</span>
+<span class="n">win</span> <span class="n">pct</span><span class="p">:</span> <span class="mf">61.68831168831169</span><span class="o">%</span>
+
+<span class="n">Test</span> <span class="n">Set</span><span class="p">:</span> <span class="n">using</span> <span class="n">learned</span> <span class="n">thresholds</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.6350196774347375</span><span class="p">,</span> <span class="mf">0.9364243175248251</span><span class="p">]</span>
+<span class="n">wins</span><span class="p">:</span> <span class="mi">804</span>
+<span class="n">losses</span><span class="p">:</span> <span class="mi">483</span>
+<span class="n">do_nothing</span><span class="p">:</span> <span class="mi">407</span>
+<span class="n">win</span> <span class="n">pct</span><span class="p">:</span> <span class="mf">47.4616292798111</span><span class="o">%</span>
+</pre></div>
+</div>
+<p>Not awesome. This is probably related to <code class="docutils literal notranslate"><span class="pre">k_factor</span></code> which tunes how quickly ratings will respond to new matchups. Let’s
+try doubling it to 800 and rerunning. Now you will see the final output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Test</span> <span class="n">Set</span><span class="p">:</span> <span class="n">using</span> <span class="mf">0.4</span><span class="o">/</span><span class="mf">0.6</span> <span class="n">thresholds</span>
+<span class="n">wins</span><span class="p">:</span> <span class="mi">1095</span>
+<span class="n">losses</span><span class="p">:</span> <span class="mi">503</span>
+<span class="n">do_nothing</span><span class="p">:</span> <span class="mi">96</span>
+<span class="n">win</span> <span class="n">pct</span><span class="p">:</span> <span class="mf">64.63990554899645</span><span class="o">%</span>
+
+
+<span class="n">Test</span> <span class="n">Set</span><span class="p">:</span> <span class="n">using</span> <span class="n">learned</span> <span class="n">thresholds</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5277889558418678</span><span class="p">,</span> <span class="mf">0.6981558136040092</span><span class="p">]</span>
+<span class="n">wins</span><span class="p">:</span> <span class="mi">1093</span>
+<span class="n">losses</span><span class="p">:</span> <span class="mi">526</span>
+<span class="n">do_nothing</span><span class="p">:</span> <span class="mi">75</span>
+<span class="n">win</span> <span class="n">pct</span><span class="p">:</span> <span class="mf">64.52184179456907</span><span class="o">%</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Will McGinnis
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
