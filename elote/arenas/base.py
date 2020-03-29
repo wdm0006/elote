@@ -32,15 +32,16 @@ class History:
         self.bouts.append(bout)
 
     def report_results(self, lower_threshold=0.5, upper_threshold=0.5):
-        print('predicted_winner,predicted_loser,probability,actual_winner,correct')
+        report = list()
         for bout in self.bouts:
-            print('%s,%s,%s,%s,%s' % (
-                bout.predicted_winner(lower_threshold, upper_threshold),
-                bout.predicted_loser(lower_threshold, upper_threshold),
-                bout.predicted_outcome * 100,
-                bout.actual_winner(),
-                bout.predicted_winner(lower_threshold, upper_threshold) == bout.actual_winner()
-            ))
+            report.append({
+                'predicted_winnder': bout.predicted_winner(lower_threshold, upper_threshold),
+                'predicted_loser': bout.predicted_loser(lower_threshold, upper_threshold),
+                'probability': bout.predicted_outcome * 100,
+                'actual_winner': bout.actual_winner(),
+                'correct': bout.predicted_winner(lower_threshold, upper_threshold) == bout.actual_winner()
+            })
+        return report
 
     def confusion_matrix(self, lower_threshold=0.5, upper_threshold=0.5, attribute_filter=None):
         tp, fp, tn, fn, do_nothing = 0, 0, 0, 0, 0
