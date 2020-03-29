@@ -7,10 +7,15 @@ class GlickoCompetitor(BaseCompetitor):
     _q = 0.0057565
 
     def __init__(self, initial_rating=1500, initial_rd=350):
-        """
-         from http://www.glicko.net/glicko/glicko.pdf
-        :param initial_rating:
-        :param initial_rd:
+        """from http://www.glicko.net/glicko/glicko.pdf
+
+        class vars:
+
+         * _c: default 1
+         * _q: default 0.0057565
+
+        :param initial_rating: the initial rating to use for a new competitor who has no history.  Default 1500
+        :param initial_rd: initial value of rd to use for new competitors with no history. Default 350
         """
         self.rating = initial_rating
         self.rd = initial_rd
@@ -23,12 +28,17 @@ class GlickoCompetitor(BaseCompetitor):
 
     def export_state(self):
         """
+        Exports all information needed to re-create this competitor from scratch later on.
 
-        :return:
+        :return: dictionary of kwargs and class-args to re-instantiate this object
         """
         return {
             "initial_rating": self.rating,
-            "initial_rd": self.rd
+            "initial_rd": self.rd,
+            "class_vars": {
+                "_c": self._c,
+                "_q": self._q
+            }
         }
 
     @property

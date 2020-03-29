@@ -10,7 +10,12 @@ class ECFCompetitor(BaseCompetitor):
     def __init__(self, initial_rating=40):
         """
 
-        :param initial_rating:
+        class vars:
+
+         * _delta: default 50
+         * _n_periods: default 30
+
+        :param initial_rating: the initial rating to use for a new competitor who has no history.  Default 40
         """
         self.__initial_rating = initial_rating
         self.scores = None
@@ -49,11 +54,16 @@ class ECFCompetitor(BaseCompetitor):
 
     def export_state(self):
         """
+        Exports all information needed to re-create this competitor from scratch later on.
 
-        :return:
+        :return: dictionary of kwargs and class-args to re-instantiate this object
         """
         return {
-            "initial_rating": self.rating
+            "initial_rating": self.rating,
+            "class_vars": {
+                "_delta": self._delta,
+                "_n_periods": self._n_periods
+            }
         }
 
     @property

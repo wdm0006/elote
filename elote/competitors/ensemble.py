@@ -32,8 +32,9 @@ class BlendedCompetitor(BaseCompetitor):
 
     def export_state(self):
         """
+        Exports all information needed to re-create this competitor from scratch later on.
 
-        :return:
+        :return: dictionary of kwargs and class-args to re-instantiate this object
         """
         return {
             "blend_mode": self.blend_mode,
@@ -63,6 +64,8 @@ class BlendedCompetitor(BaseCompetitor):
     def beat(self, competitor):
         """
         takes in a competitor object that lost, updates both's scores.
+
+        :param competitor:
         """
 
         self.verify_competitor_types(competitor)

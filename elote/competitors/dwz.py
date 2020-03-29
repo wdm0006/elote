@@ -8,7 +8,11 @@ class DWZCompetitor(BaseCompetitor):
     def __init__(self, initial_rating=400):
         """
 
-        :param initial_rating:
+        class vars:
+
+         * _J: default 10
+
+        :param initial_rating: the initial rating to use for a new competitor who has no history.  Default 400
         """
         self._count = 0
         self.rating = initial_rating
@@ -21,11 +25,15 @@ class DWZCompetitor(BaseCompetitor):
 
     def export_state(self):
         """
+        Exports all information needed to re-create this competitor from scratch later on.
 
-        :return:
+        :return: dictionary of kwargs and class-args to re-instantiate this object
         """
         return {
-            "initial_rating": self.rating
+            "initial_rating": self.rating,
+            "class_vars": {
+                "_J": self._J
+            }
         }
 
     def expected_score(self, competitor):
