@@ -155,7 +155,7 @@
 <div class="viewcode-block" id="DWZCompetitor"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.dwz.DWZCompetitor">[docs]</a><span class="k">class</span> <span class="nc">DWZCompetitor</span><span class="p">(</span><span class="n">BaseCompetitor</span><span class="p">):</span>
     <span class="n">_J</span> <span class="o">=</span> <span class="mi">10</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_rating</span><span class="o">=</span><span class="mi">400</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_rating</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">400</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        class vars:</span>
@@ -186,11 +186,13 @@
             <span class="p">}</span>
         <span class="p">}</span></div>
 
-<div class="viewcode-block" id="DWZCompetitor.expected_score"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.dwz.DWZCompetitor.expected_score">[docs]</a>    <span class="k">def</span> <span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">):</span>
+<div class="viewcode-block" id="DWZCompetitor.expected_score"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.dwz.DWZCompetitor.expected_score">[docs]</a>    <span class="k">def</span> <span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The expected outcome of a match between this competitor and one passed in. Scaled between 0-1, where 1 is a strong</span>
+<span class="sd">        likelihood of this competitor winning and 0 is a strong likelihood of this competitor losing.</span>
 
-<span class="sd">        :param competitor:</span>
-<span class="sd">        :return:</span>
+<span class="sd">        :param competitor: another EloCompetitor to compare this competitor to.</span>
+<span class="sd">        :return: likelihood to beat the passed competitor, as a float 0-1.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
 
@@ -215,9 +217,12 @@
     <span class="k">def</span> <span class="nf">_new_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">,</span> <span class="n">W_a</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">+</span> <span class="p">(</span><span class="mi">800</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_E</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">W_a</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">competitor</span><span class="p">))</span>
 
-<div class="viewcode-block" id="DWZCompetitor.beat"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.dwz.DWZCompetitor.beat">[docs]</a>    <span class="k">def</span> <span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">):</span>
+<div class="viewcode-block" id="DWZCompetitor.beat"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.dwz.DWZCompetitor.beat">[docs]</a>    <span class="k">def</span> <span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        takes in a competitor object that lost, updates both&#39;s scores.</span>
+<span class="sd">        Takes in a competitor object that lost a match to this competitor, updates the ratings for both.</span>
+
+<span class="sd">        :param competitor: the competitor that lost thr bout</span>
+<span class="sd">        :type competitor: DWZCompetitor</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
@@ -231,11 +236,12 @@
         <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">competitor_rating</span>
         <span class="n">competitor</span><span class="o">.</span><span class="n">_count</span> <span class="o">+=</span> <span class="mi">1</span></div>
 
-<div class="viewcode-block" id="DWZCompetitor.tied"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.dwz.DWZCompetitor.tied">[docs]</a>    <span class="k">def</span> <span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">):</span>
+<div class="viewcode-block" id="DWZCompetitor.tied"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.dwz.DWZCompetitor.tied">[docs]</a>    <span class="k">def</span> <span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes in a competitor object that tied in a match to this competitor, updates the ratings for both.</span>
 
-<span class="sd">        :param competitor:</span>
-<span class="sd">        :return:</span>
+<span class="sd">        :param competitor: the competitor that tied with this one</span>
+<span class="sd">        :type competitor: DWZCompetitor</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
 

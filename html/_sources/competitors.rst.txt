@@ -1,17 +1,17 @@
 Competitors
 ===========
 
-.. autoclass:: elote.competitors.dwz.DWZCompetitor
-    :members:
-
-.. autoclass:: elote.competitors.ecf.ECFCompetitor
-    :members:
-
 .. autoclass:: elote.competitors.elo.EloCompetitor
-    :members:
+    :members: export_state,expected_score,beat,tied
 
 .. autoclass:: elote.competitors.glicko.GlickoCompetitor
-    :members:
+    :members: export_state,expected_score,beat,tied
+
+.. autoclass:: elote.competitors.dwz.DWZCompetitor
+    :members: export_state,expected_score,beat,tied
+
+.. autoclass:: elote.competitors.ecf.ECFCompetitor
+    :members: export_state,expected_score,beat,tied
 
 .. autoclass:: elote.competitors.ensemble.BlendedCompetitor
-    :members:
+    :members: export_state,expected_score,beat,tied

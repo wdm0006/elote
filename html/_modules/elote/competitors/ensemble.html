@@ -160,7 +160,7 @@
 
 
 <div class="viewcode-block" id="BlendedCompetitor"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.ensemble.BlendedCompetitor">[docs]</a><span class="k">class</span> <span class="nc">BlendedCompetitor</span><span class="p">(</span><span class="n">BaseCompetitor</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitors</span><span class="p">,</span> <span class="n">blend_mode</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitors</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">blend_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param competitors:</span>
@@ -197,11 +197,13 @@
             <span class="p">]</span>
         <span class="p">}</span></div>
 
-<div class="viewcode-block" id="BlendedCompetitor.expected_score"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.ensemble.BlendedCompetitor.expected_score">[docs]</a>    <span class="k">def</span> <span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">):</span>
+<div class="viewcode-block" id="BlendedCompetitor.expected_score"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.ensemble.BlendedCompetitor.expected_score">[docs]</a>    <span class="k">def</span> <span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The expected outcome of a match between this competitor and one passed in. Scaled between 0-1, where 1 is a strong</span>
+<span class="sd">        likelihood of this competitor winning and 0 is a strong likelihood of this competitor losing.</span>
 
-<span class="sd">        :param competitor:</span>
-<span class="sd">        :return:</span>
+<span class="sd">        :param competitor: another EloCompetitor to compare this competitor to.</span>
+<span class="sd">        :return: likelihood to beat the passed competitor, as a float 0-1.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
@@ -211,11 +213,12 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Blend mode </span><span class="si">%s</span><span class="s1"> not supported&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blend_mode</span><span class="p">,</span> <span class="p">))</span></div>
 
-<div class="viewcode-block" id="BlendedCompetitor.beat"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.ensemble.BlendedCompetitor.beat">[docs]</a>    <span class="k">def</span> <span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">):</span>
+<div class="viewcode-block" id="BlendedCompetitor.beat"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.ensemble.BlendedCompetitor.beat">[docs]</a>    <span class="k">def</span> <span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        takes in a competitor object that lost, updates both&#39;s scores.</span>
+<span class="sd">        Takes in a competitor object that lost a match to this competitor, updates the ratings for both.</span>
 
-<span class="sd">        :param competitor:</span>
+<span class="sd">        :param competitor: the competitor that lost their bout</span>
+<span class="sd">        :type competitor: BlendedCompetitor</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
@@ -223,11 +226,12 @@
         <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sub_competitors</span><span class="p">:</span>
             <span class="n">c</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BlendedCompetitor.tied"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.ensemble.BlendedCompetitor.tied">[docs]</a>    <span class="k">def</span> <span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">):</span>
+<div class="viewcode-block" id="BlendedCompetitor.tied"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.ensemble.BlendedCompetitor.tied">[docs]</a>    <span class="k">def</span> <span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes in a competitor object that tied in a match to this competitor, updates the ratings for both.</span>
 
-<span class="sd">        :param competitor:</span>
-<span class="sd">        :return:</span>
+<span class="sd">        :param competitor: the competitor that tied with this one</span>
+<span class="sd">        :type competitor: BlendedCompetitor</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>

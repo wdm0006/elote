@@ -155,18 +155,43 @@
     <span class="n">_base_rating</span> <span class="o">=</span> <span class="mi">400</span>
     <span class="n">_k_factor</span> <span class="o">=</span> <span class="mi">32</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_rating</span><span class="o">=</span><span class="mi">400</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_rating</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">400</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overview</span>
+<span class="sd">        ========</span>
+
 <span class="sd">        Elo rating is a rating system based on pairwise comparisons. Ratings are given to competitors based on their</span>
 <span class="sd">        comparisons (bouts) with peers, in which they can win, lose or tie. The change in a players rating is scaled by</span>
 <span class="sd">        the rating difference between them and their competitor.</span>
 
-<span class="sd">        class vars:</span>
+<span class="sd">        [1] Elo, Arpad (1978). The Rating of Chessplayers, Past and Present. Arco. ISBN 0-668-04721-6.</span>
+
+<span class="sd">        Basic Usage</span>
+<span class="sd">        -----------</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            from elote import EloCompetitor</span>
+<span class="sd">            good = EloCompetitor(initial_rating=400)</span>
+<span class="sd">            better = EloCompetitor(initial_rating=500)</span>
+<span class="sd">            better.beat(good)</span>
+<span class="sd">            print(&#39;probability of better beating good: %5.2f%%&#39; % (better.expected_score(good) * 100, ))</span>
+
+
+<span class="sd">        Class Variables</span>
+<span class="sd">        ---------------</span>
+
+<span class="sd">        Class variables are configured for all competitors in a population, not on a per-competitor basis. See the</span>
+<span class="sd">        documentation on ``Arenas`` to see how to set these safely.</span>
 
 <span class="sd">         * _base_rating: defaults to 400.</span>
 <span class="sd">         * _k_factor: tunes the speed of response to new information, higher is faster response. Default=32</span>
 
+<span class="sd">        Configuration Options</span>
+<span class="sd">        ---------------------</span>
+
 <span class="sd">        :param initial_rating: the initial rating to use for a new competitor who has no history.  Default 400</span>
+<span class="sd">        :type initial_rating: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
 
@@ -194,7 +219,7 @@
     <span class="k">def</span> <span class="nf">transformed_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_rating</span><span class="p">)</span>
 
-<div class="viewcode-block" id="EloCompetitor.expected_score"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.elo.EloCompetitor.expected_score">[docs]</a>    <span class="k">def</span> <span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">):</span>
+<div class="viewcode-block" id="EloCompetitor.expected_score"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.elo.EloCompetitor.expected_score">[docs]</a>    <span class="k">def</span> <span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        In Elo rating, a player&#39;s expected score is their probability of winning plus half their probability of drawing.</span>
 <span class="sd">        This is because in Elo rating a draw is not explicitly accounted for, but rather counted as half of a win and</span>
@@ -208,9 +233,12 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformed_rating</span> <span class="o">/</span> <span class="p">(</span><span class="n">competitor</span><span class="o">.</span><span class="n">transformed_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformed_rating</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="EloCompetitor.beat"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.elo.EloCompetitor.beat">[docs]</a>    <span class="k">def</span> <span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">):</span>
+<div class="viewcode-block" id="EloCompetitor.beat"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.elo.EloCompetitor.beat">[docs]</a>    <span class="k">def</span> <span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        takes in a competitor object that lost, updates both&#39;s scores.</span>
+<span class="sd">        Takes in a competitor object that lost a match to this competitor, updates the ratings for both.</span>
+
+<span class="sd">        :param competitor: the competitor that lost their bout</span>
+<span class="sd">        :type competitor: EloCompetitor</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
@@ -224,11 +252,12 @@
         <span class="c1"># update the loser&#39;s rating</span>
         <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">*</span> <span class="p">(</span><span class="mi">0</span> <span class="o">-</span> <span class="n">lose_es</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="EloCompetitor.tied"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.elo.EloCompetitor.tied">[docs]</a>    <span class="k">def</span> <span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">):</span>
+<div class="viewcode-block" id="EloCompetitor.tied"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.elo.EloCompetitor.tied">[docs]</a>    <span class="k">def</span> <span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes in a competitor object that tied in a match to this competitor, updates the ratings for both.</span>
 
-<span class="sd">        :param competitor:</span>
-<span class="sd">        :return:</span>
+<span class="sd">        :param competitor: the competitor that tied with this one</span>
+<span class="sd">        :type competitor: EloCompetitor</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
