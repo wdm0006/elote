@@ -166,11 +166,11 @@
 <span class="sd">        :param competitors:</span>
 <span class="sd">        :param blend_mode:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_sub_competitors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sub_competitors</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">competitor</span> <span class="ow">in</span> <span class="n">competitors</span><span class="p">:</span>
             <span class="n">comp_type</span> <span class="o">=</span> <span class="n">competitor_types</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">competitor</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;EloCompetitor&#39;</span><span class="p">))</span>
             <span class="n">comp_kwargs</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;competitor_kwargs&#39;</span><span class="p">,</span> <span class="p">{})</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_sub_competitors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">comp_type</span><span class="p">(</span><span class="o">**</span><span class="n">comp_kwargs</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sub_competitors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">comp_type</span><span class="p">(</span><span class="o">**</span><span class="n">comp_kwargs</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">blend_mode</span> <span class="o">=</span> <span class="n">blend_mode</span>
 
@@ -179,6 +179,10 @@
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;&lt;BlendedCompetitor&gt;&#39;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">rating</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_competitors</span><span class="p">])</span>
 
 <div class="viewcode-block" id="BlendedCompetitor.export_state"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.ensemble.BlendedCompetitor.export_state">[docs]</a>    <span class="k">def</span> <span class="nf">export_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -193,7 +197,7 @@
                     <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
                     <span class="s2">&quot;competitor_kwargs&quot;</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">export_state</span><span class="p">()</span>
                 <span class="p">}</span>
-                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sub_competitors</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_competitors</span>
             <span class="p">]</span>
         <span class="p">}</span></div>
 
@@ -209,7 +213,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blend_mode</span> <span class="o">==</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">sum</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sub_competitors</span><span class="p">])</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sub_competitors</span><span class="p">)</span>
+            <span class="n">es</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">other_c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sub_competitors</span><span class="p">,</span> <span class="n">competitor</span><span class="o">.</span><span class="n">sub_competitors</span><span class="p">):</span>
+                <span class="n">es</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">other_c</span><span class="p">))</span>
+            <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">es</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">es</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Blend mode </span><span class="si">%s</span><span class="s1"> not supported&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blend_mode</span><span class="p">,</span> <span class="p">))</span></div>
 
@@ -223,8 +230,8 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sub_competitors</span><span class="p">:</span>
-            <span class="n">c</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span></div>
+        <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">other_c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sub_competitors</span><span class="p">,</span> <span class="n">competitor</span><span class="o">.</span><span class="n">sub_competitors</span><span class="p">):</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">other_c</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BlendedCompetitor.tied"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.ensemble.BlendedCompetitor.tied">[docs]</a>    <span class="k">def</span> <span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -236,8 +243,8 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sub_competitors</span><span class="p">:</span>
-            <span class="n">c</span><span class="o">.</span><span class="n">tied</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span></div></div>
+        <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">other_c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sub_competitors</span><span class="p">,</span> <span class="n">competitor</span><span class="o">.</span><span class="n">sub_competitors</span><span class="p">):</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">other_c</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

@@ -85,7 +85,11 @@
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="advance_example.html">Advanced Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="competitors.html">Competitors</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Arenas</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Arenas</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#lambda-arena">Lambda Arena</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#helpers">Helpers</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -152,6 +156,188 @@
             
   <div class="section" id="arenas">
 <h1>Arenas<a class="headerlink" href="#arenas" title="Permalink to this headline">¶</a></h1>
+<p>Arenas are objects that manage populations of competitors and their matchups. Currently there is only one
+type of arena implemented, LambdaArenas</p>
+<div class="section" id="lambda-arena">
+<h2>Lambda Arena<a class="headerlink" href="#lambda-arena" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="helpers">
+<h2>Helpers<a class="headerlink" href="#helpers" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="elote.arenas.base.History">
+<em class="property">class </em><code class="sig-prename descclassname">elote.arenas.base.</code><code class="sig-name descname">History</code><a class="reference internal" href="_modules/elote/arenas/base.html#History"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#elote.arenas.base.History" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="elote.arenas.base.History.add_bout">
+<code class="sig-name descname">add_bout</code><span class="sig-paren">(</span><em class="sig-param">bout</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/elote/arenas/base.html#History.add_bout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#elote.arenas.base.History.add_bout" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>bout</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="elote.arenas.base.History.confusion_matrix">
+<code class="sig-name descname">confusion_matrix</code><span class="sig-paren">(</span><em class="sig-param">lower_threshold=0.5</em>, <em class="sig-param">upper_threshold=0.5</em>, <em class="sig-param">attribute_filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/elote/arenas/base.html#History.confusion_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#elote.arenas.base.History.confusion_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lower_threshold</strong> – </p></li>
+<li><p><strong>upper_threshold</strong> – </p></li>
+<li><p><strong>attribute_filter</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="elote.arenas.base.History.random_search">
+<code class="sig-name descname">random_search</code><span class="sig-paren">(</span><em class="sig-param">trials=1000</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/elote/arenas/base.html#History.random_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#elote.arenas.base.History.random_search" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>trials</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="elote.arenas.base.History.report_results">
+<code class="sig-name descname">report_results</code><span class="sig-paren">(</span><em class="sig-param">lower_threshold=0.5</em>, <em class="sig-param">upper_threshold=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/elote/arenas/base.html#History.report_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#elote.arenas.base.History.report_results" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lower_threshold</strong> – </p></li>
+<li><p><strong>upper_threshold</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="elote.arenas.base.Bout">
+<em class="property">class </em><code class="sig-prename descclassname">elote.arenas.base.</code><code class="sig-name descname">Bout</code><span class="sig-paren">(</span><em class="sig-param">a</em>, <em class="sig-param">b</em>, <em class="sig-param">predicted_outcome</em>, <em class="sig-param">outcome</em>, <em class="sig-param">attributes=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/elote/arenas/base.html#Bout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#elote.arenas.base.Bout" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> – </p></li>
+<li><p><strong>b</strong> – </p></li>
+<li><p><strong>predicted_outcome</strong> – </p></li>
+<li><p><strong>outcome</strong> – </p></li>
+<li><p><strong>attributes</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="elote.arenas.base.Bout.actual_winner">
+<code class="sig-name descname">actual_winner</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/elote/arenas/base.html#Bout.actual_winner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#elote.arenas.base.Bout.actual_winner" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="elote.arenas.base.Bout.false_negative">
+<code class="sig-name descname">false_negative</code><span class="sig-paren">(</span><em class="sig-param">threshold=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/elote/arenas/base.html#Bout.false_negative"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#elote.arenas.base.Bout.false_negative" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>threshold</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="elote.arenas.base.Bout.false_positive">
+<code class="sig-name descname">false_positive</code><span class="sig-paren">(</span><em class="sig-param">threshold=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/elote/arenas/base.html#Bout.false_positive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#elote.arenas.base.Bout.false_positive" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>threshold</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="elote.arenas.base.Bout.predicted_loser">
+<code class="sig-name descname">predicted_loser</code><span class="sig-paren">(</span><em class="sig-param">lower_threshold=0.5</em>, <em class="sig-param">upper_threshold=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/elote/arenas/base.html#Bout.predicted_loser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#elote.arenas.base.Bout.predicted_loser" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lower_threshold</strong> – </p></li>
+<li><p><strong>upper_threshold</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="elote.arenas.base.Bout.predicted_winner">
+<code class="sig-name descname">predicted_winner</code><span class="sig-paren">(</span><em class="sig-param">lower_threshold=0.5</em>, <em class="sig-param">upper_threshold=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/elote/arenas/base.html#Bout.predicted_winner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#elote.arenas.base.Bout.predicted_winner" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lower_threshold</strong> – </p></li>
+<li><p><strong>upper_threshold</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="elote.arenas.base.Bout.true_negative">
+<code class="sig-name descname">true_negative</code><span class="sig-paren">(</span><em class="sig-param">threshold=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/elote/arenas/base.html#Bout.true_negative"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#elote.arenas.base.Bout.true_negative" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>threshold</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="elote.arenas.base.Bout.true_positive">
+<code class="sig-name descname">true_positive</code><span class="sig-paren">(</span><em class="sig-param">threshold=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/elote/arenas/base.html#Bout.true_positive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#elote.arenas.base.Bout.true_positive" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>threshold</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 
 
