@@ -1,3 +1,4 @@
+from tqdm import tqdm
 from elote import EloCompetitor
 from elote.arenas.base import BaseArena, Bout, History
 
@@ -44,7 +45,7 @@ class LambdaArena(BaseArena):
         :param matchups:
         :return:
         """
-        for data in matchups:
+        for data in tqdm(matchups):
             self.matchup(*data)
 
     def matchup(self, a, b, attributes=None):

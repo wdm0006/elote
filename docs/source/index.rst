@@ -27,6 +27,7 @@ Currently implemented rating systems are:
 
    getting_started
    examples
+   advanced_examples
    competitors
    arenas
 
