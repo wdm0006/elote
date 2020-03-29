@@ -40,65 +40,74 @@ def func(a, b, attributes=None):
     else:
         return False
 
-# we use the default EloCompetitor, but adjust the k_factor to 50 before running the tournament
-arena = LambdaArena(func)
-arena.set_competitor_class_var('_k_factor', 800)
-arena.tournament(train_matchups)
+win_pcts = []
+ks = [4, 32, 128, 512, 1024]
+for k in ks:
+    # we use the default EloCompetitor, but adjust the k_factor to 50 before running the tournament
+    arena = LambdaArena(func)
+    arena.set_competitor_class_var('_k_factor', 800)
+    arena.tournament(train_matchups)
 
-# do a threshold search and clear the history for validation
-_, thresholds = arena.history.random_search(trials=10000)
-tp, fp, tn, fn, do_nothing = arena.history.confusion_matrix(*thresholds)
-print('\t\tTrain Set: thresholds=%s' % (str(thresholds), ))
-print('wins: %s' % (tp + tn, ))
-print('losses: %s' % (fp + fn, ))
-print('do_nothing: %s' % (do_nothing, ))
-print('win pct: %s%%' % (100 * ((tp + tn)/(tp + tn + fp + fn + do_nothing))))
-arena.clear_history()
+    # do a threshold search and clear the history for validation
+    _, thresholds = arena.history.random_search(trials=10000)
+    tp, fp, tn, fn, do_nothing = arena.history.confusion_matrix(*thresholds)
+    print('\t\tTrain Set: thresholds=%s' % (str(thresholds), ))
+    print('wins: %s' % (tp + tn, ))
+    print('losses: %s' % (fp + fn, ))
+    print('do_nothing: %s' % (do_nothing, ))
+    print('win pct: %s%%' % (100 * ((tp + tn)/(tp + tn + fp + fn + do_nothing))))
+    arena.clear_history()
 
-# then we print out the top 25 as of the end of our training dataset
-print('\n\nTop 25 as of start of validation:')
-rankings = sorted(arena.leaderboard(), reverse=True, key=lambda x: x.get('rating'))[:25]
-for idx, item in enumerate(rankings):
-    print('\t%d) %s' % (idx + 1, item.get('competitor')))
+    # then we print out the top 25 as of the end of our training dataset
+    print('\n\nTop 25 as of start of validation:')
+    rankings = sorted(arena.leaderboard(), reverse=True, key=lambda x: x.get('rating'))[:25]
+    for idx, item in enumerate(rankings):
+        print('\t%d) %s' % (idx + 1, item.get('competitor')))
 
-# now validation
-print('\n\nStarting Validation Step...')
-arena.tournament(test_matchups)
-report = arena.history.report_results()
+    # now validation
+    print('\n\nStarting Validation Step...')
+    arena.tournament(test_matchups)
+    report = arena.history.report_results()
 
-tp, fp, tn, fn, do_nothing = arena.history.confusion_matrix(0.4, 0.6)
-print('\n\nTest Set: using 0.4/0.6 thresholds')
-print('wins: %s' % (tp + tn, ))
-print('losses: %s' % (fp + fn, ))
-print('do_nothing: %s' % (do_nothing, ))
-print('win pct: %s%%' % (100 * ((tp + tn)/(tp + tn + fp + fn + do_nothing))))
+    tp, fp, tn, fn, do_nothing = arena.history.confusion_matrix(0.4, 0.6)
+    print('\n\nTest Set: using 0.4/0.6 thresholds')
+    print('wins: %s' % (tp + tn, ))
+    print('losses: %s' % (fp + fn, ))
+    print('do_nothing: %s' % (do_nothing, ))
+    print('win pct: %s%%' % (100 * ((tp + tn)/(tp + tn + fp + fn + do_nothing))))
+    win_pcts.append(100 * ((tp + tn)/(tp + tn + fp + fn + do_nothing)))
 
-tp, fp, tn, fn, do_nothing = arena.history.confusion_matrix(*thresholds)
-print('\n\nTest Set: using learned thresholds: %s' % (str(thresholds), ))
-print('wins: %s' % (tp + tn, ))
-print('losses: %s' % (fp + fn, ))
-print('do_nothing: %s' % (do_nothing, ))
-print('win pct: %s%%' % (100 * ((tp + tn)/(tp + tn + fp + fn + do_nothing))))
+    tp, fp, tn, fn, do_nothing = arena.history.confusion_matrix(*thresholds)
+    print('\n\nTest Set: using learned thresholds: %s' % (str(thresholds), ))
+    print('wins: %s' % (tp + tn, ))
+    print('losses: %s' % (fp + fn, ))
+    print('do_nothing: %s' % (do_nothing, ))
+    print('win pct: %s%%' % (100 * ((tp + tn)/(tp + tn + fp + fn + do_nothing))))
 
-# baseline performance
-tp, fp, tn, fn, do_nothing = 0, 0, 0, 0, 0
-for idx, row in test_df.iterrows():
-    home_won = row.home_points > row.away_points
-    if float(row.home_post_win_prob) > 0.6:
-        if home_won:
-            tp += 1
+    # baseline performance
+    tp, fp, tn, fn, do_nothing = 0, 0, 0, 0, 0
+    for idx, row in test_df.iterrows():
+        home_won = row.home_points > row.away_points
+        if float(row.home_post_win_prob) > 0.6:
+            if home_won:
+                tp += 1
+            else:
+                fp += 1
+        elif float(row.home_post_win_prob) < 0.4:
+            if home_won:
+                fn += 1
+            else:
+                tn += 1
         else:
-            fp += 1
-    elif float(row.home_post_win_prob) < 0.4:
-        if home_won:
-            fn += 1
-        else:
-            tn += 1
-    else:
-        do_nothing += 1
+            do_nothing += 1
 
-print('\n\nTest Set: using probabilities from dataset as baseline')
-print('wins: %s' % (tp + tn, ))
-print('losses: %s' % (fp + fn, ))
-print('do_nothing: %s' % (do_nothing, ))
-print('win pct: %s%%' % (100 * ((tp + tn)/(tp + tn + fp + fn + do_nothing))))
+    print('\n\nTest Set: using probabilities from dataset as baseline')
+    print('wins: %s' % (tp + tn, ))
+    print('losses: %s' % (fp + fn, ))
+    print('do_nothing: %s' % (do_nothing, ))
+    print('win pct: %s%%' % (100 * ((tp + tn)/(tp + tn + fp + fn + do_nothing))))
+
+
+print('k vs win')
+print(ks)
+print(win_pcts)
