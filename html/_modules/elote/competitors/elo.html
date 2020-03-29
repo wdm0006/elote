@@ -1,0 +1,285 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>elote.competitors.elo &mdash; elote 0.0.5 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> elote
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advance_example.html">Advanced Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../competitors.html">Competitors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../arenas.html">Arenas</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">elote</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>elote.competitors.elo</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for elote.competitors.elo</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">elote.competitors.base</span> <span class="kn">import</span> <span class="n">BaseCompetitor</span>
+
+
+<div class="viewcode-block" id="EloCompetitor"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.elo.EloCompetitor">[docs]</a><span class="k">class</span> <span class="nc">EloCompetitor</span><span class="p">(</span><span class="n">BaseCompetitor</span><span class="p">):</span>
+    <span class="n">_base_rating</span> <span class="o">=</span> <span class="mi">400</span>
+    <span class="n">_k_factor</span> <span class="o">=</span> <span class="mi">32</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_rating</span><span class="o">=</span><span class="mi">400</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Elo rating is a rating system based on pairwise comparisons. Ratings are given to competitors based on their</span>
+<span class="sd">        comparisons (bouts) with peers, in which they can win, lose or tie. The change in a players rating is scaled by</span>
+<span class="sd">        the rating difference between them and their competitor.</span>
+
+<span class="sd">        class vars:</span>
+
+<span class="sd">         * _base_rating: defaults to 400.</span>
+<span class="sd">         * _k_factor: tunes the speed of response to new information, higher is faster response. Default=32</span>
+
+<span class="sd">        :param initial_rating: the initial rating to use for a new competitor who has no history.  Default 400</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;&lt;EloCompetitor: </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="fm">__hash__</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;&lt;EloCompetitor&gt;&#39;</span>
+
+<div class="viewcode-block" id="EloCompetitor.export_state"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.elo.EloCompetitor.export_state">[docs]</a>    <span class="k">def</span> <span class="nf">export_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Exports all information needed to re-create this competitor from scratch later on.</span>
+
+<span class="sd">        :return: dictionary of kwargs and class-args to re-instantiate this object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span>
+            <span class="s2">&quot;class_vars&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;_k_factor&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span><span class="p">,</span>
+                <span class="s2">&quot;_base_rating&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_rating</span>
+            <span class="p">}</span>
+        <span class="p">}</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">transformed_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_rating</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EloCompetitor.expected_score"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.elo.EloCompetitor.expected_score">[docs]</a>    <span class="k">def</span> <span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        In Elo rating, a player&#39;s expected score is their probability of winning plus half their probability of drawing.</span>
+<span class="sd">        This is because in Elo rating a draw is not explicitly accounted for, but rather counted as half of a win and</span>
+<span class="sd">        half of a loss. It can make the expected score a bit difficult to reason about, so be careful.</span>
+
+<span class="sd">        :param competitor: another EloCompetitor to compare this competitor to.</span>
+<span class="sd">        :return: likelihood to beat the passed competitor, as a float 0-1.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformed_rating</span> <span class="o">/</span> <span class="p">(</span><span class="n">competitor</span><span class="o">.</span><span class="n">transformed_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformed_rating</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EloCompetitor.beat"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.elo.EloCompetitor.beat">[docs]</a>    <span class="k">def</span> <span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        takes in a competitor object that lost, updates both&#39;s scores.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+
+        <span class="n">win_es</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">lose_es</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1"># update the winner&#39;s rating</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">win_es</span><span class="p">)</span>
+
+        <span class="c1"># update the loser&#39;s rating</span>
+        <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">*</span> <span class="p">(</span><span class="mi">0</span> <span class="o">-</span> <span class="n">lose_es</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EloCompetitor.tied"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.elo.EloCompetitor.tied">[docs]</a>    <span class="k">def</span> <span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param competitor:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+
+        <span class="n">win_es</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">lose_es</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1"># update the winner&#39;s rating</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">-</span> <span class="n">win_es</span><span class="p">)</span>
+
+        <span class="c1"># update the loser&#39;s rating</span>
+        <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">-</span> <span class="n">lose_es</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Will McGinnis
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
