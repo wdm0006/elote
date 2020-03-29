@@ -43,7 +43,7 @@ class EloCompetitor(BaseCompetitor):
         :param initial_rating: the initial rating to use for a new competitor who has no history.  Default 400
         :type initial_rating: int
         """
-        self.rating = initial_rating
+        self._rating = initial_rating
 
     def __repr__(self):
         return '<EloCompetitor: %s>' % (self.__hash__())
@@ -58,7 +58,7 @@ class EloCompetitor(BaseCompetitor):
         :return: dictionary of kwargs and class-args to re-instantiate this object
         """
         return {
-            "initial_rating": self.rating,
+            "initial_rating": self._rating,
             "class_vars": {
                 "_k_factor": self._k_factor,
                 "_base_rating": self._base_rating
@@ -67,7 +67,15 @@ class EloCompetitor(BaseCompetitor):
 
     @property
     def transformed_rating(self):
-        return 10 ** (self.rating / self._base_rating)
+        return 10 ** (self._rating / self._base_rating)
+
+    @property
+    def rating(self):
+        return self._rating
+
+    @rating.setter
+    def rating(self, value):
+        self._rating = value
 
     def expected_score(self, competitor: BaseCompetitor):
         """
@@ -97,7 +105,7 @@ class EloCompetitor(BaseCompetitor):
         lose_es = competitor.expected_score(self)
 
         # update the winner's rating
-        self.rating = self.rating + self._k_factor * (1 - win_es)
+        self._rating = self._rating + self._k_factor * (1 - win_es)
 
         # update the loser's rating
         competitor.rating = competitor.rating + self._k_factor * (0 - lose_es)
@@ -116,7 +124,7 @@ class EloCompetitor(BaseCompetitor):
         lose_es = competitor.expected_score(self)
 
         # update the winner's rating
-        self.rating = self.rating + self._k_factor * (0.5 - win_es)
+        self._rating = self._rating + self._k_factor * (0.5 - win_es)
 
         # update the loser's rating
         competitor.rating = competitor.rating + self._k_factor * (0.5 - lose_es)

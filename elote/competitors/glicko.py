@@ -17,7 +17,7 @@ class GlickoCompetitor(BaseCompetitor):
         :param initial_rating: the initial rating to use for a new competitor who has no history.  Default 1500
         :param initial_rd: initial value of rd to use for new competitors with no history. Default 350
         """
-        self.rating = initial_rating
+        self._rating = initial_rating
         self.rd = initial_rd
 
     def __repr__(self):
@@ -33,13 +33,21 @@ class GlickoCompetitor(BaseCompetitor):
         :return: dictionary of kwargs and class-args to re-instantiate this object
         """
         return {
-            "initial_rating": self.rating,
+            "initial_rating": self._rating,
             "initial_rd": self.rd,
             "class_vars": {
                 "_c": self._c,
                 "_q": self._q
             }
         }
+
+    @property
+    def rating(self):
+        return self._rating
+
+    @rating.setter
+    def rating(self, value):
+        self._rating = value
 
     @property
     def tranformed_rd(self):
@@ -61,7 +69,7 @@ class GlickoCompetitor(BaseCompetitor):
         self.verify_competitor_types(competitor)
 
         g_term = self._g(self.rd ** 2)
-        E = 1 / (1 + 10 ** ((-1 * g_term * (self.rating - competitor.rating))/400))
+        E = 1 / (1 + 10 ** ((-1 * g_term * (self._rating - competitor.rating)) / 400))
         return E
 
     def beat(self, competitor: BaseCompetitor):
@@ -78,7 +86,7 @@ class GlickoCompetitor(BaseCompetitor):
         s = 1
         E_term = self.expected_score(competitor)
         d_squared = (self._q ** 2 * (self._g(competitor.rd) ** 2 * E_term * (1 - E_term))) ** -1
-        s_new_r = self.rating + (self._q / (1 / self.rd ** 2 + 1 / d_squared)) * self._g(competitor.rd) * (s - E_term)
+        s_new_r = self._rating + (self._q / (1 / self.rd ** 2 + 1 / d_squared)) * self._g(competitor.rd) * (s - E_term)
         s_new_rd = math.sqrt((1 / self.rd ** 2 + 1 / d_squared) ** -1)
 
         # then the competitor
@@ -90,7 +98,7 @@ class GlickoCompetitor(BaseCompetitor):
         c_new_rd = math.sqrt((1 / competitor.rd ** 2 + 1 / d_squared) ** -1)
 
         # assign everything
-        self.rating = s_new_r
+        self._rating = s_new_r
         self.rd = s_new_rd
         competitor.rating = c_new_r
         competitor.rd = c_new_rd
@@ -109,7 +117,7 @@ class GlickoCompetitor(BaseCompetitor):
         s = 0.5
         E_term = self.expected_score(competitor)
         d_squared = (self._q ** 2 * (self._g(competitor.rd) ** 2 * E_term * (1 - E_term))) ** -1
-        s_new_r = self.rating + (self._q / (1 / self.rd ** 2 + 1 / d_squared)) * self._g(competitor.rd) * (s - E_term)
+        s_new_r = self._rating + (self._q / (1 / self.rd ** 2 + 1 / d_squared)) * self._g(competitor.rd) * (s - E_term)
         s_new_rd = math.sqrt((1 / self.rd ** 2 + 1 / d_squared) ** -1)
 
         # then the competitor
@@ -121,7 +129,7 @@ class GlickoCompetitor(BaseCompetitor):
         c_new_rd = math.sqrt((1 / competitor.rd ** 2 + 1 / d_squared) ** -1)
 
         # assign everything
-        self.rating = s_new_r
+        self._rating = s_new_r
         self.rd = s_new_rd
         competitor.rating = c_new_r
         competitor.rd = c_new_rd

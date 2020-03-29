@@ -16,11 +16,11 @@ class BlendedCompetitor(BaseCompetitor):
         :param competitors:
         :param blend_mode:
         """
-        self._sub_competitors = []
+        self.sub_competitors = []
         for competitor in competitors:
             comp_type = competitor_types.get(competitor.get('type', 'EloCompetitor'))
             comp_kwargs = competitor.get('competitor_kwargs', {})
-            self._sub_competitors.append(comp_type(**comp_kwargs))
+            self.sub_competitors.append(comp_type(**comp_kwargs))
 
         self.blend_mode = blend_mode
 
@@ -29,6 +29,10 @@ class BlendedCompetitor(BaseCompetitor):
 
     def __str__(self):
         return '<BlendedCompetitor>'
+
+    @property
+    def rating(self):
+        return sum([x.rating for x in self.sub_competitors])
 
     def export_state(self):
         """
@@ -43,7 +47,7 @@ class BlendedCompetitor(BaseCompetitor):
                     "type": x.__name__,
                     "competitor_kwargs": x.export_state()
                 }
-                for x in self._sub_competitors
+                for x in self.sub_competitors
             ]
         }
 
@@ -59,7 +63,10 @@ class BlendedCompetitor(BaseCompetitor):
         self.verify_competitor_types(competitor)
 
         if self.blend_mode == 'mean':
-            return sum([x.expected_score(competitor) for x in self._sub_competitors]) / len(self._sub_competitors)
+            es = list()
+            for c, other_c in zip(self.sub_competitors, competitor.sub_competitors):
+                es.append(c.expected_score(other_c))
+            return sum(es) / len(es)
         else:
             raise NotImplementedError('Blend mode %s not supported' % (self.blend_mode, ))
 
@@ -73,8 +80,8 @@ class BlendedCompetitor(BaseCompetitor):
 
         self.verify_competitor_types(competitor)
 
-        for c in self._sub_competitors:
-            c.beat(competitor)
+        for c, other_c in zip(self.sub_competitors, competitor.sub_competitors):
+            c.beat(other_c)
 
     def tied(self, competitor: BaseCompetitor):
         """
@@ -86,5 +93,5 @@ class BlendedCompetitor(BaseCompetitor):
 
         self.verify_competitor_types(competitor)
 
-        for c in self._sub_competitors:
-            c.tied(competitor)
+        for c, other_c in zip(self.sub_competitors, competitor.sub_competitors):
+            c.beat(other_c)

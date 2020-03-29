@@ -26,12 +26,26 @@ class BaseArena:
 
 class History:
     def __init__(self):
+        """
+
+        """
         self.bouts = []
 
     def add_bout(self, bout):
+        """
+
+        :param bout:
+        :return:
+        """
         self.bouts.append(bout)
 
     def report_results(self, lower_threshold=0.5, upper_threshold=0.5):
+        """
+
+        :param lower_threshold:
+        :param upper_threshold:
+        :return:
+        """
         report = list()
         for bout in self.bouts:
             report.append({
@@ -44,6 +58,13 @@ class History:
         return report
 
     def confusion_matrix(self, lower_threshold=0.5, upper_threshold=0.5, attribute_filter=None):
+        """
+
+        :param lower_threshold:
+        :param upper_threshold:
+        :param attribute_filter:
+        :return:
+        """
         tp, fp, tn, fn, do_nothing = 0, 0, 0, 0, 0
         for bout in self.bouts:
             match = True
@@ -67,6 +88,11 @@ class History:
         return tp, fp, tn, fn, do_nothing
 
     def random_search(self, trials=1000):
+        """
+
+        :param trials:
+        :return:
+        """
         best_net, best_thresholds = 0, list()
         for _ in range(trials):
             thresholds = sorted([random.random(), random.random()])
@@ -80,6 +106,14 @@ class History:
 
 class Bout:
     def __init__(self, a, b, predicted_outcome, outcome, attributes=None):
+        """
+
+        :param a:
+        :param b:
+        :param predicted_outcome:
+        :param outcome:
+        :param attributes:
+        """
         self.a = a
         self.b = b
         self.predicted_outcome = predicted_outcome
@@ -87,46 +121,82 @@ class Bout:
         self.attributes = attributes or dict()
 
     def true_positive(self, threshold=0.5):
+        """
+
+        :param threshold:
+        :return:
+        """
         if self.predicted_outcome > threshold and self.outcome == 'win':
             return True
         else:
             return False
 
     def false_positive(self, threshold=0.5):
+        """
+
+        :param threshold:
+        :return:
+        """
         if self.predicted_outcome > threshold and self.outcome != 'win':
             return True
         else:
             return False
 
     def true_negative(self, threshold=0.5):
+        """
+
+        :param threshold:
+        :return:
+        """
         if self.predicted_outcome <= threshold and self.outcome == 'loss':
             return True
         else:
             return False
 
     def false_negative(self, threshold=0.5):
+        """
+
+        :param threshold:
+        :return:
+        """
         if self.predicted_outcome <= threshold and self.outcome != 'loss':
             return True
         else:
             return False
 
-    def predicted_winner(self, lower_treshold=0.5, upper_threshold=0.5):
+    def predicted_winner(self, lower_threshold=0.5, upper_threshold=0.5):
+        """
+
+        :param lower_threshold:
+        :param upper_threshold:
+        :return:
+        """
         if self.predicted_outcome > upper_threshold:
             return self.a
-        elif self.predicted_outcome < lower_treshold:
+        elif self.predicted_outcome < lower_threshold:
             return self.b
         else:
             return None
 
-    def predicted_loser(self, lower_treshold=0.5, upper_threshold=0.5):
+    def predicted_loser(self, lower_threshold=0.5, upper_threshold=0.5):
+        """
+
+        :param lower_threshold:
+        :param upper_threshold:
+        :return:
+        """
         if self.predicted_outcome > upper_threshold:
             return self.b
-        elif self.predicted_outcome < lower_treshold:
+        elif self.predicted_outcome < lower_threshold:
             return self.a
         else:
             return None
 
     def actual_winner(self):
+        """
+
+        :return:
+        """
         if self.outcome == 'win':
             return self.a
         elif self.outcome == 'loss':
