@@ -7,8 +7,7 @@ class EloCompetitor(BaseCompetitor):
 
     def __init__(self, initial_rating: float = 400):
         """
-        Overview
-        ========
+        **Overview**
 
         Elo rating is a rating system based on pairwise comparisons. Ratings are given to competitors based on their
         comparisons (bouts) with peers, in which they can win, lose or tie. The change in a players rating is scaled by
@@ -16,8 +15,7 @@ class EloCompetitor(BaseCompetitor):
 
         [1] Elo, Arpad (1978). The Rating of Chessplayers, Past and Present. Arco. ISBN 0-668-04721-6.
 
-        Basic Usage
-        -----------
+        **Basic Usage**
 
         .. code-block:: python
 
@@ -28,8 +26,7 @@ class EloCompetitor(BaseCompetitor):
             print('probability of better beating good: %5.2f%%' % (better.expected_score(good) * 100, ))
 
 
-        Class Variables
-        ---------------
+        **Class Variables**
 
         Class variables are configured for all competitors in a population, not on a per-competitor basis. See the
         documentation on ``Arenas`` to see how to set these safely.
@@ -37,8 +34,7 @@ class EloCompetitor(BaseCompetitor):
          * _base_rating: defaults to 400.
          * _k_factor: tunes the speed of response to new information, higher is faster response. Default=32
 
-        Configuration Options
-        ---------------------
+        **Configuration Options**
 
         :param initial_rating: the initial rating to use for a new competitor who has no history.  Default 400
         :type initial_rating: int

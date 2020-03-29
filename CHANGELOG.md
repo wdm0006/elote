@@ -1,3 +1,10 @@
+v0.1.0
+======
+
+ * Many bugfixes
+ * Improved testing and documentation
+ * Added notion of history object and bout objects for arenas to track progress
+ 
 v0.0.3,4 and 5
 ==============
 
