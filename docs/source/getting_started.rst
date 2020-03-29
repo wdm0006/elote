@@ -14,8 +14,8 @@ To install bleeding edge, clone the repository and run:
     pip install -e .
 
 
-Examples
---------
+Basic Usage
+-----------
 
 The most basic object in ``elote`` is a competitor. To start with, let's take a look at ``EloCompetitor``. Let's make 3
 objects, one for each of 3 players in a game:

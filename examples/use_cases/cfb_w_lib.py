@@ -10,7 +10,8 @@ test_df = cfb.get_game_info(year=2018).append(cfb.get_game_info(year=2019))
 
 # sort the dates and drop unneeded cols
 train_df = train_df.reindex(columns=['start_date', 'home_team', 'away_team', 'home_points', 'away_points'])
-test_df = test_df.reindex(columns=['start_date', 'home_team', 'away_team', 'home_points', 'away_points'])
+test_df = test_df.reindex(columns=['start_date', 'home_team', 'away_team', 'home_points', 'away_points', 'home_post_win_prob'])
+test_df['home_post_win_prob'] = test_df['home_post_win_prob'].astype(float)
 train_df = train_df.sort_values(by='start_date')
 test_df = test_df.sort_values(by='start_date')
 
@@ -45,7 +46,7 @@ arena.set_competitor_class_var('_k_factor', 800)
 arena.tournament(train_matchups)
 
 # do a threshold search and clear the history for validation
-_, thresholds = arena.history.random_search(trials=10_000)
+_, thresholds = arena.history.random_search(trials=10000)
 tp, fp, tn, fn, do_nothing = arena.history.confusion_matrix(*thresholds)
 print('\t\tTrain Set: thresholds=%s' % (str(thresholds), ))
 print('wins: %s' % (tp + tn, ))
@@ -74,6 +75,29 @@ print('win pct: %s%%' % (100 * ((tp + tn)/(tp + tn + fp + fn + do_nothing))))
 
 tp, fp, tn, fn, do_nothing = arena.history.confusion_matrix(*thresholds)
 print('\n\nTest Set: using learned thresholds: %s' % (str(thresholds), ))
+print('wins: %s' % (tp + tn, ))
+print('losses: %s' % (fp + fn, ))
+print('do_nothing: %s' % (do_nothing, ))
+print('win pct: %s%%' % (100 * ((tp + tn)/(tp + tn + fp + fn + do_nothing))))
+
+# baseline performance
+tp, fp, tn, fn, do_nothing = 0, 0, 0, 0, 0
+for idx, row in test_df.iterrows():
+    home_won = row.home_points > row.away_points
+    if float(row.home_post_win_prob) > 0.6:
+        if home_won:
+            tp += 1
+        else:
+            fp += 1
+    elif float(row.home_post_win_prob) < 0.4:
+        if home_won:
+            fn += 1
+        else:
+            tn += 1
+    else:
+        do_nothing += 1
+
+print('\n\nTest Set: using probabilities from dataset as baseline')
 print('wins: %s' % (tp + tn, ))
 print('losses: %s' % (fp + fn, ))
 print('do_nothing: %s' % (do_nothing, ))

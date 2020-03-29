@@ -189,10 +189,23 @@ try doubling it to 800 and rerunning. Now you will see the final output:
     losses: 503
     do_nothing: 96
     win pct: 64.63990554899645%
-    
+
 
     Test Set: using learned thresholds: [0.5277889558418678, 0.6981558136040092]
     wins: 1093
     losses: 526
     do_nothing: 75
     win pct: 64.52184179456907%
+
+Before we get too excited about this, let's take a look at the post-game win probabilities provided by the same API we
+are getting data from:
+
+.. code-block::
+
+    Test Set: using probabilities from dataset as baseline
+    wins: 1481
+    losses: 117
+    do_nothing: 96
+    win pct: 87.42621015348288%
+
+So we're not exactly going to Vegas.
