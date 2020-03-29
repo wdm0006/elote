@@ -44,8 +44,8 @@ class LambdaArena(BaseArena):
         :param matchups:
         :return:
         """
-        for a, b, attributes in matchups:
-            self.matchup(a, b, attributes=attributes)
+        for data in matchups:
+            self.matchup(*data)
 
     def matchup(self, a, b, attributes=None):
         """
@@ -61,7 +61,11 @@ class LambdaArena(BaseArena):
 
         predicted_outcome = self.expected_score(a, b)
 
-        res = self.func(a, b, attributes=attributes)
+        if attributes:
+            res = self.func(a, b, attributes=attributes)
+        else:
+            res = self.func(a, b)
+
         if res is None:
             self.competitors[a].tied(self.competitors[b])
             self.history.add_bout(Bout(a, b, predicted_outcome, outcome='tie', attributes=attributes))

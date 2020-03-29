@@ -1,7 +1,17 @@
 Getting Started
 ===============
 
-Installation: TODO
+To install latest release:
+
+.. code-block::
+
+    pip install elote
+
+To install bleeding edge, clone the repository and run:
+
+.. code-block::
+
+    pip install -e .
 
 
 Examples

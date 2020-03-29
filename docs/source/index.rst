@@ -19,12 +19,14 @@ Currently implemented rating systems are:
  * Glicko-1 [1]
  * ECF [4]
  * DWZ [5]
+ * Ensemble
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    getting_started
+   examples
    competitors
    arenas
 
