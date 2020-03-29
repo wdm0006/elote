@@ -52,6 +52,9 @@ class BlendedCompetitor(BaseCompetitor):
         :param competitor:
         :return:
         """
+
+        self.verify_competitor_types(competitor)
+
         if self.blend_mode == 'mean':
             return sum([x.expected_score(competitor) for x in self._sub_competitors]) / len(self._sub_competitors)
         else:
@@ -61,6 +64,9 @@ class BlendedCompetitor(BaseCompetitor):
         """
         takes in a competitor object that lost, updates both's scores.
         """
+
+        self.verify_competitor_types(competitor)
+
         for c in self._sub_competitors:
             c.beat(competitor)
 
@@ -70,5 +76,8 @@ class BlendedCompetitor(BaseCompetitor):
         :param competitor:
         :return:
         """
+
+        self.verify_competitor_types(competitor)
+
         for c in self._sub_competitors:
             c.tied(competitor)

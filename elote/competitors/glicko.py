@@ -45,6 +45,9 @@ class GlickoCompetitor(BaseCompetitor):
         :param competitor:
         :return:
         """
+
+        self.verify_competitor_types(competitor)
+
         g_term = self._g(self.rd ** 2)
         E = 1 / (1 + 10 ** ((-1 * g_term * (self.rating - competitor.rating))/400))
         return E
@@ -53,6 +56,8 @@ class GlickoCompetitor(BaseCompetitor):
         """
         takes in a competitor object that lost, updates both's scores.
         """
+
+        self.verify_competitor_types(competitor)
 
         # first we update ourselves
         s = 1
@@ -81,6 +86,9 @@ class GlickoCompetitor(BaseCompetitor):
         :param competitor:
         :return:
         """
+
+        self.verify_competitor_types(competitor)
+
         # first we update ourselves
         s = 0.5
         E_term = self.expected_score(competitor)

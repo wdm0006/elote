@@ -43,12 +43,18 @@ class EloCompetitor(BaseCompetitor):
         :param competitor:
         :return:
         """
+
+        self.verify_competitor_types(competitor)
+
         return self.transformed_rating / (competitor.transformed_rating + self.transformed_rating)
 
     def beat(self, competitor):
         """
         takes in a competitor object that lost, updates both's scores.
         """
+
+        self.verify_competitor_types(competitor)
+
         win_es = self.expected_score(competitor)
         lose_es = competitor.expected_score(self)
 
@@ -64,6 +70,9 @@ class EloCompetitor(BaseCompetitor):
         :param competitor:
         :return:
         """
+
+        self.verify_competitor_types(competitor)
+
         win_es = self.expected_score(competitor)
         lose_es = competitor.expected_score(self)
 

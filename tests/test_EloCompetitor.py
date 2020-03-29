@@ -1,5 +1,6 @@
 import unittest
-from elote import EloCompetitor
+from elote import EloCompetitor, GlickoCompetitor
+from elote.competitors.base import MissMatchedCompetitorTypesException
 
 
 class TestElo(unittest.TestCase):
@@ -29,3 +30,10 @@ class TestElo(unittest.TestCase):
         player1 = EloCompetitor(initial_rating=1000)
         player2 = EloCompetitor(initial_rating=100)
         self.assertGreater(player1.expected_score(player2), player2.expected_score(player1))
+
+    def test_Exceptions(self):
+        player1 = EloCompetitor(initial_rating=1000)
+        player2 = GlickoCompetitor(initial_rating=100)
+
+        with self.assertRaises(MissMatchedCompetitorTypesException):
+            player1.verify_competitor_types(player2)

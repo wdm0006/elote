@@ -66,12 +66,17 @@ class ECFCompetitor(BaseCompetitor):
         :param competitor:
         :return:
         """
+        self.verify_competitor_types(competitor)
+
         return self.transformed_elo_rating / (competitor.transformed_elo_rating + self.transformed_elo_rating)
 
     def beat(self, competitor):
         """
         takes in a competitor object that lost, updates both's scores.
         """
+
+        self.verify_competitor_types(competitor)
+
         if self.scores is None:
             self.__initialize_ratings()
 
@@ -96,6 +101,9 @@ class ECFCompetitor(BaseCompetitor):
         :param competitor:
         :return:
         """
+
+        self.verify_competitor_types(competitor)
+
         if self.scores is None:
             self.__initialize_ratings()
 

@@ -34,6 +34,8 @@ class DWZCompetitor(BaseCompetitor):
         :param competitor:
         :return:
         """
+        self.verify_competitor_types(competitor)
+
         return 1 / (1 + 10 ** ((competitor.rating - self.rating) / 400 ))
 
     @property
@@ -60,6 +62,8 @@ class DWZCompetitor(BaseCompetitor):
         takes in a competitor object that lost, updates both's scores.
         """
 
+        self.verify_competitor_types(competitor)
+
         self_rating = self._new_rating(competitor, 1)
         competitor_rating = competitor._new_rating(self, 0)
 
@@ -75,6 +79,8 @@ class DWZCompetitor(BaseCompetitor):
         :param competitor:
         :return:
         """
+        self.verify_competitor_types(competitor)
+
         self_rating = self._new_rating(competitor, 0.5)
         competitor_rating = competitor._new_rating(self, 0.5)
 
