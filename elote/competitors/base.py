@@ -6,6 +6,11 @@ class MissMatchedCompetitorTypesException(Exception):
 
 
 class BaseCompetitor:
+    @property
+    @abc.abstractmethod
+    def rating(self):
+        pass
+
     @abc.abstractmethod
     def expected_score(self, competitor):
         pass
@@ -27,4 +32,5 @@ class BaseCompetitor:
 
     def verify_competitor_types(self, competitor):
         if type(competitor) != type(self):
-            raise MissMatchedCompetitorTypesException('Competitor types %s and %s cannot be co-mingled' % (type(competitor), type(self), ))
+            raise MissMatchedCompetitorTypesException(
+                'Competitor types %s and %s cannot be co-mingled' % (type(competitor), type(self),))
