@@ -136,7 +136,7 @@ as well as some use cases using real data, so far all from MasseyRatings.com, bu
 Installation
 ============
 
-Soon to be on PyPI, but for now you can fork the repo or install from git.
+    pip install elote
 
 Supporting only python 3.4+
 
