@@ -83,25 +83,7 @@ class GlickoCompetitor(BaseCompetitor):
         self.verify_competitor_types(competitor)
 
         # first we update ourselves
-        s = 1
-        E_term = self.expected_score(competitor)
-        d_squared = (self._q ** 2 * (self._g(competitor.rd) ** 2 * E_term * (1 - E_term))) ** -1
-        s_new_r = self._rating + (self._q / (1 / self.rd ** 2 + 1 / d_squared)) * self._g(competitor.rd) * (s - E_term)
-        s_new_rd = math.sqrt((1 / self.rd ** 2 + 1 / d_squared) ** -1)
-
-        # then the competitor
-        s = 0
-        E_term = competitor.expected_score(self)
-        d_squared = (self._q ** 2 * (self._g(self.rd) ** 2 * E_term * (1 - E_term))) ** -1
-        c_new_r = competitor.rating + (self._q / (1 / competitor.rd ** 2 + 1 / d_squared)) * self._g(self.rd) * (
-            s - E_term)
-        c_new_rd = math.sqrt((1 / competitor.rd ** 2 + 1 / d_squared) ** -1)
-
-        # assign everything
-        self._rating = s_new_r
-        self.rd = s_new_rd
-        competitor.rating = c_new_r
-        competitor.rd = c_new_rd
+        self._compute_match_result(competitor, s=1)
 
     def tied(self, competitor: BaseCompetitor):
         """
@@ -111,25 +93,26 @@ class GlickoCompetitor(BaseCompetitor):
         :type competitor: GlickoCompetitor
         """
 
-        self.verify_competitor_types(competitor)
+        self._compute_match_result(competitor, s=0.5)
 
+    def _compute_match_result(self, competitor, s):
+        self.verify_competitor_types(competitor)
         # first we update ourselves
-        s = 0.5
-        E_term = self.expected_score(competitor)
-        d_squared = (self._q ** 2 * (self._g(competitor.rd) ** 2 * E_term * (1 - E_term))) ** -1
-        s_new_r = self._rating + (self._q / (1 / self.rd ** 2 + 1 / d_squared)) * self._g(competitor.rd) * (s - E_term)
-        s_new_rd = math.sqrt((1 / self.rd ** 2 + 1 / d_squared) ** -1)
+        s_new_r, s_new_rd = self._update_competitor_rating(competitor, s)
 
         # then the competitor
-        s = 0.5
-        E_term = competitor.expected_score(self)
-        d_squared = (self._q ** 2 * (self._g(self.rd) ** 2 * E_term * (1 - E_term))) ** -1
-        c_new_r = competitor.rating + (self._q / (1 / competitor.rd ** 2 + 1 / d_squared)) * self._g(self.rd) * (
-            s - E_term)
-        c_new_rd = math.sqrt((1 / competitor.rd ** 2 + 1 / d_squared) ** -1)
+        s = abs(s - 1)
+        c_new_r, c_new_rd = competitor.update_competitor_rating(self, s)
 
         # assign everything
         self._rating = s_new_r
         self.rd = s_new_rd
         competitor.rating = c_new_r
         competitor.rd = c_new_rd
+
+    def _update_competitor_rating(self, competitor, s):
+        E_term = self.expected_score(competitor)
+        d_squared = (self._q ** 2 * (self._g(competitor.rd) ** 2 * E_term * (1 - E_term))) ** -1
+        s_new_r = self._rating + (self._q / (1 / self.rd ** 2 + 1 / d_squared)) * self._g(competitor.rd) * (s - E_term)
+        s_new_rd = math.sqrt((1 / self.rd ** 2 + 1 / d_squared) ** -1)
+        return s_new_r, s_new_rd
