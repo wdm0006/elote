@@ -72,7 +72,7 @@ class GlickoCompetitor(BaseCompetitor):
         E = 1 / (1 + 10 ** ((-1 * g_term * (self._rating - competitor.rating)) / 400))
         return E
 
-    def beat(self, competitor: BaseCompetitor):
+    def beat(self, competitor: 'GlickoCompetitor'):
         """
         Takes in a competitor object that lost a match to this competitor, updates the ratings for both.
 
@@ -85,7 +85,7 @@ class GlickoCompetitor(BaseCompetitor):
         # first we update ourselves
         self._compute_match_result(competitor, s=1)
 
-    def tied(self, competitor: BaseCompetitor):
+    def tied(self, competitor: 'GlickoCompetitor'):
         """
         Takes in a competitor object that tied in a match to this competitor, updates the ratings for both.
 
@@ -98,7 +98,7 @@ class GlickoCompetitor(BaseCompetitor):
     def _compute_match_result(self, competitor, s):
         self.verify_competitor_types(competitor)
         # first we update ourselves
-        s_new_r, s_new_rd = self._update_competitor_rating(competitor, s)
+        s_new_r, s_new_rd = self.update_competitor_rating(competitor, s)
 
         # then the competitor
         s = abs(s - 1)
@@ -110,7 +110,7 @@ class GlickoCompetitor(BaseCompetitor):
         competitor.rating = c_new_r
         competitor.rd = c_new_rd
 
-    def _update_competitor_rating(self, competitor, s):
+    def update_competitor_rating(self, competitor, s):
         E_term = self.expected_score(competitor)
         d_squared = (self._q ** 2 * (self._g(competitor.rd) ** 2 * E_term * (1 - E_term))) ** -1
         s_new_r = self._rating + (self._q / (1 / self.rd ** 2 + 1 / d_squared)) * self._g(competitor.rd) * (s - E_term)
