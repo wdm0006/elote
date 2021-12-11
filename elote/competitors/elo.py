@@ -5,7 +5,7 @@ class EloCompetitor(BaseCompetitor):
     _base_rating = 400
     _k_factor = 32
 
-    def __init__(self, initial_rating: float = 400):
+    def __init__(self, initial_rating: float = 400, k_factor: float = 32):
         """
         **Overview**
 
@@ -40,6 +40,7 @@ class EloCompetitor(BaseCompetitor):
         :type initial_rating: int
         """
         self._rating = initial_rating
+        self._k_factor = k_factor
 
     def __repr__(self):
         return '<EloCompetitor: %s>' % (self.__hash__())
