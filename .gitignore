@@ -4,3 +4,4 @@
 *.pyc
 *.sublime-project
 *.sublime-workspace
+docs/build/
