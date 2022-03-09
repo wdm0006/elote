@@ -8,7 +8,9 @@ here = path.abspath(path.dirname(__file__))
 # Get the long description from the README file
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
-
+# Get the requirements from the requirements.txt file
+with open(path.join(here, 'requirements.txt'), encoding='utf-8') as f:
+    requirements = f.read()
 setup(
     name='elote',
     version=__version__,
@@ -27,6 +29,6 @@ setup(
     include_package_data=True,
     long_description_content_type="text/markdown",
     author='Will McGinnis',
-    install_requires=[],
+    install_requires=[requirements],
     author_email='will@helton.io'
 )
