@@ -25,33 +25,43 @@ are the things you are rating, and an Arena is a mechanism to schedule Bouts bet
 Competitors
 -----------
 
-    from elote import EloCompetitor
-    
-    good = EloCompetitor(initial_rating=400)
-    better = EloCompetitor(initial_rating=500)
-    
-    print('probability of better beating good: %5.2f%%' % (better.expected_score(good) * 100, ))
-    print('probability of good beating better: %5.2f%%' % (good.expected_score(better) * 100, ))
+```python
+from elote import EloCompetitor
+
+good = EloCompetitor(initial_rating=400)
+better = EloCompetitor(initial_rating=500)
+
+print('probability of better beating good: %5.2f%%' % (better.expected_score(good) * 100, ))
+print('probability of good beating better: %5.2f%%' % (good.expected_score(better) * 100, ))
+```
 
 This creates two competitors, intilized with different starting ratings. Right away we can see how a match
 between them is likely to go:
 
-    probability of better beating good: 64.01%
-    probability of good beating better: 35.99%
+```bash
+probability of better beating good: 64.01%
+probability of good beating better: 35.99%
+```
 
 If we actually held the match, and there was an upset, updating their rankings is as easy as:
 
-    good.beat(better)
-    
+```python
+good.beat(better)
+```
+
 or
 
-    better.lost_to(good)
-    
+```python
+better.lost_to(good)
+```
+
 We can then rerun the predictions and see updated probabilities:
 
+```bash
     probability of better beating good: 61.25%
     probability of good beating better: 38.75%
-    
+```
+
 Not a huge change using default settings.
 
 Arenas
@@ -65,66 +75,70 @@ all of the competitors, run the matches and rank them all.
 Here's a toy example which uses a lambda function that just compares two integers. With this, we've implemented
 the worst performing, most over complicated sorting algorithm conceivable, but it works:
 
-    from elote import LambdaArena
-    import json
-    import random
-    
-    
-    # sample bout function which just compares the two inputs
-    def func(a, b):
-        return a > b
-    
-    matchups = [(random.randint(1, 10), random.randint(1, 10)) for _ in range(1000)]
-    
-    arena = LambdaArena(func)
-    arena.tournament(matchups)
-    
-    print(json.dumps(arena.leaderboard(), indent=4))
+```python
+from elote import LambdaArena
+import json
+import random
+
+
+# sample bout function which just compares the two inputs
+def func(a, b):
+    return a > b
+
+matchups = [(random.randint(1, 10), random.randint(1, 10)) for _ in range(1000)]
+
+arena = LambdaArena(func)
+arena.tournament(matchups)
+
+print(json.dumps(arena.leaderboard(), indent=4))
+```
 
 The final leaderboard looks like:
 
-    [
-        {
-            "rating": 560.0,
-            "competitor": 1
-        },
-        {
-            "rating": 803.3256886926524,
-            "competitor": 2
-        },
-        {
-            "rating": 994.1660057704563,
-            "competitor": 3
-        },
-        {
-            "rating": 1096.0912814220258,
-            "competitor": 4
-        },
-        {
-            "rating": 1221.000354671287,
-            "competitor": 5
-        },
-        {
-            "rating": 1351.4243548137367,
-            "competitor": 6
-        },
-        {
-            "rating": 1401.770230395329,
-            "competitor": 7
-        },
-        {
-            "rating": 1558.934907485894,
-            "competitor": 8
-        },
-        {
-            "rating": 1607.6971796462033,
-            "competitor": 9
-        },
-        {
-            "rating": 1708.3786662956998,
-            "competitor": 10
-        }
-    ]
+```bash
+[
+    {
+        "rating": 560.0,
+        "competitor": 1
+    },
+    {
+        "rating": 803.3256886926524,
+        "competitor": 2
+    },
+    {
+        "rating": 994.1660057704563,
+        "competitor": 3
+    },
+    {
+        "rating": 1096.0912814220258,
+        "competitor": 4
+    },
+    {
+        "rating": 1221.000354671287,
+        "competitor": 5
+    },
+    {
+        "rating": 1351.4243548137367,
+        "competitor": 6
+    },
+    {
+        "rating": 1401.770230395329,
+        "competitor": 7
+    },
+    {
+        "rating": 1558.934907485894,
+        "competitor": 8
+    },
+    {
+        "rating": 1607.6971796462033,
+        "competitor": 9
+    },
+    {
+        "rating": 1708.3786662956998,
+        "competitor": 10
+    }
+]
+```
 
 
 Examples
@@ -136,7 +150,9 @@ as well as some use cases using real data, so far all from MasseyRatings.com, bu
 Installation
 ============
 
+```bash
     pip install elote
+```
 
 Supporting only python 3.4+
 
