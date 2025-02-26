@@ -3,35 +3,70 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Elote
-=====
+Elote: Elegant Rating Systems in Python
+=======================================
 
-A python package for rating competitors based on bouts. The classical example of this would be rating chess players based
-on repeated head to head matches between different players. The first rating system implemented in elote, the Elo rating
-system, was made for just that [3]. Another well known use case would be for college football rankings.
+**Elote** is a powerful Python library for implementing and comparing rating systems. Whether you're ranking chess players, sports teams, or prioritizing features in your product backlog, Elote provides a simple, elegant API for all your competitive ranking needs.
 
-There are a whole bunch of other use-cases for this sort of system other than sports though, including collaborative
-ranking from a group (for voting, prioritizing, or other similar activities).
+Rating systems allow you to rank competitors based on their performance in head-to-head matchups. The most famous example is the Elo rating system used in chess, but these systems have applications far beyond sports:
 
-Currently implemented rating systems are:
+- Ranking products based on A/B comparisons
+- Prioritizing features through pairwise voting
+- Creating recommendation systems
+- Matchmaking in games and competitions
+- Collaborative filtering and ranking
 
- * Elo [3]
- * Glicko-1 [1]
- * ECF [4]
- * DWZ [5]
- * Ensemble
+Elote makes implementing these systems simple and intuitive, with a clean API that handles all the mathematical complexity for you.
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 1
+   :caption: Getting Started
 
    getting_started
-   examples
-   advance_example
+   installation
+   quickstart
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Core Concepts
+
    competitors
    arenas
+   
+.. toctree::
+   :maxdepth: 1
+   :caption: Rating Systems
 
+   rating_systems/elo
+   rating_systems/glicko
+   rating_systems/ecf
+   rating_systems/dwz
+   rating_systems/ensemble
+   rating_systems/comparison
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Examples
+
+   examples
+   advance_example
+   use_cases/product_ranking
+   use_cases/matchmaking
+   use_cases/feature_prioritization
+
+.. toctree::
+   :maxdepth: 1
+   :caption: API Reference
+
+   api/competitors
+   api/arenas
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Development
+
+   contributing
+   changelog
 
 Indices and tables
 ==================

@@ -69,6 +69,20 @@ build: clean
 # Build documentation
 docs:
 	cd docs && uv run $(MAKE) html SPHINXBUILD="python -m sphinx" 
+	@echo "Opening documentation in Google Chrome..."
+	@if [ "$(shell uname)" = "Darwin" ]; then \
+		open -a "Google Chrome" docs/build/html/index.html; \
+	else \
+		if command -v google-chrome > /dev/null; then \
+			google-chrome docs/build/html/index.html; \
+		elif command -v google-chrome-stable > /dev/null; then \
+			google-chrome-stable docs/build/html/index.html; \
+		elif command -v chromium > /dev/null; then \
+			chromium docs/build/html/index.html; \
+		else \
+			echo "Could not find Google Chrome. Please open docs/build/html/index.html manually."; \
+		fi; \
+	fi
 
 # Run tests on all supported Python versions
 test-all:
