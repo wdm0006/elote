@@ -1,0 +1,349 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quick Start Guide &mdash; elote 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=2389946f"></script>
+      <script src="_static/doctools.js?v=888ff710"></script>
+      <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Competitors" href="competitors.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            elote
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quick Start Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#recording-draws">Recording Draws</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-different-rating-systems">Using Different Rating Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-tournaments-with-arenas">Running Tournaments with Arenas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#custom-arenas">Custom Arenas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ensemble-rating-system">Ensemble Rating System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#next-steps">Next Steps</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="competitors.html">Competitors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arenas.html">Arenas</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/elo.html">Elo Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/ecf.html">ECF Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/dwz.html">DWZ Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/ensemble.html">Ensemble Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/comparison.html">Comparing Rating Systems</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advance_example.html">Advanced Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="use_cases/product_ranking.html">Product Ranking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="use_cases/matchmaking.html">Matchmaking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="use_cases/feature_prioritization.html">Feature Prioritization with Elote</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">elote</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Quick Start Guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/quickstart.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="quick-start-guide">
+<h1>Quick Start Guide<a class="headerlink" href="#quick-start-guide" title="Permalink to this heading"></a></h1>
+<p>This guide will help you get up and running with Elote quickly. We’ll cover the basics of creating competitors, recording match results, and using arenas for tournaments.</p>
+<section id="basic-usage">
+<h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this heading"></a></h2>
+<p>Let’s start with a simple example using the Elo rating system:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span>
+
+<span class="c1"># Create two competitors with different initial ratings</span>
+<span class="n">player1</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
+<span class="n">player2</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1600</span><span class="p">)</span>
+
+<span class="c1"># Check the probability of player2 beating player1</span>
+<span class="n">win_probability</span> <span class="o">=</span> <span class="n">player2</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 win probability: </span><span class="si">{</span><span class="n">win_probability</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># Output: Player 2 win probability: 64.01%</span>
+
+<span class="c1"># Record a match result where player1 beats player2 (an upset!)</span>
+<span class="n">player1</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">player2</span><span class="p">)</span>
+<span class="c1"># OR equivalently:</span>
+<span class="c1"># player2.lost_to(player1)</span>
+
+<span class="c1"># Check the updated ratings</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 1 new rating: </span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 new rating: </span><span class="si">{</span><span class="n">player2</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Check the new win probability</span>
+<span class="n">new_probability</span> <span class="o">=</span> <span class="n">player2</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 new win probability: </span><span class="si">{</span><span class="n">new_probability</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># The probability will have decreased</span>
+</pre></div>
+</div>
+</section>
+<section id="recording-draws">
+<h2>Recording Draws<a class="headerlink" href="#recording-draws" title="Permalink to this heading"></a></h2>
+<p>Elote also supports recording draws between competitors:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span>
+
+<span class="n">player1</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
+<span class="n">player2</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1600</span><span class="p">)</span>
+
+<span class="c1"># Record a draw</span>
+<span class="n">player1</span><span class="o">.</span><span class="n">tied</span><span class="p">(</span><span class="n">player2</span><span class="p">)</span>
+<span class="c1"># OR equivalently:</span>
+<span class="c1"># player2.tied(player1)</span>
+
+<span class="c1"># Check the updated ratings</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 1 new rating: </span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 new rating: </span><span class="si">{</span><span class="n">player2</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="using-different-rating-systems">
+<h2>Using Different Rating Systems<a class="headerlink" href="#using-different-rating-systems" title="Permalink to this heading"></a></h2>
+<p>Elote supports multiple rating systems. Here’s how to use Glicko instead of Elo:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">GlickoCompetitor</span>
+
+<span class="c1"># Create two competitors with Glicko ratings</span>
+<span class="n">player1</span> <span class="o">=</span> <span class="n">GlickoCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">initial_rd</span><span class="o">=</span><span class="mi">350</span><span class="p">)</span>
+<span class="n">player2</span> <span class="o">=</span> <span class="n">GlickoCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1600</span><span class="p">,</span> <span class="n">initial_rd</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+
+<span class="c1"># Check win probability</span>
+<span class="n">win_probability</span> <span class="o">=</span> <span class="n">player2</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 win probability: </span><span class="si">{</span><span class="n">win_probability</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Record a match result</span>
+<span class="n">player1</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">player2</span><span class="p">)</span>
+
+<span class="c1"># Check the updated ratings and rating deviations</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 1: rating=</span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">, rd=</span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">rd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2: rating=</span><span class="si">{</span><span class="n">player2</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">, rd=</span><span class="si">{</span><span class="n">player2</span><span class="o">.</span><span class="n">rd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="running-tournaments-with-arenas">
+<h2>Running Tournaments with Arenas<a class="headerlink" href="#running-tournaments-with-arenas" title="Permalink to this heading"></a></h2>
+<p>For managing multiple competitors and matches, use an Arena:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">LambdaArena</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+<span class="c1"># Define a comparison function (returns True if a beats b)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compare_numbers</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="n">b</span>
+
+<span class="c1"># Generate 1000 random matchups between numbers 1-10</span>
+<span class="n">matchups</span> <span class="o">=</span> <span class="p">[(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)]</span>
+
+<span class="c1"># Create arena and run tournament</span>
+<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">compare_numbers</span><span class="p">)</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
+
+<span class="c1"># Display final rankings</span>
+<span class="n">rankings</span> <span class="o">=</span> <span class="n">arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">rankings</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>The output will show the numbers ranked by their ratings, with higher numbers having higher ratings.</p>
+</section>
+<section id="custom-arenas">
+<h2>Custom Arenas<a class="headerlink" href="#custom-arenas" title="Permalink to this heading"></a></h2>
+<p>You can create custom arenas for specific use cases:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">Arena</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ChessArena</span><span class="p">(</span><span class="n">Arena</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">register_competitor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">rating</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">record_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name1</span><span class="p">,</span> <span class="n">name2</span><span class="p">,</span> <span class="n">winner</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">register_competitor</span><span class="p">(</span><span class="n">name1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">register_competitor</span><span class="p">(</span><span class="n">name2</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">winner</span> <span class="o">==</span> <span class="n">name1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">name1</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">name2</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">winner</span> <span class="o">==</span> <span class="n">name2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">name2</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">name1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">name1</span><span class="p">]</span><span class="o">.</span><span class="n">tied</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">name2</span><span class="p">])</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">leaderboard</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span><span class="p">}</span>
+             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">competitor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="o">.</span><span class="n">items</span><span class="p">()],</span>
+            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;rating&quot;</span><span class="p">],</span>
+            <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+<span class="c1"># Usage</span>
+<span class="n">chess_arena</span> <span class="o">=</span> <span class="n">ChessArena</span><span class="p">()</span>
+
+<span class="c1"># Register some players with initial ratings</span>
+<span class="n">chess_arena</span><span class="o">.</span><span class="n">register_competitor</span><span class="p">(</span><span class="s2">&quot;Magnus&quot;</span><span class="p">,</span> <span class="mi">2800</span><span class="p">)</span>
+<span class="n">chess_arena</span><span class="o">.</span><span class="n">register_competitor</span><span class="p">(</span><span class="s2">&quot;Hikaru&quot;</span><span class="p">,</span> <span class="mi">2750</span><span class="p">)</span>
+
+<span class="c1"># Record match results</span>
+<span class="n">chess_arena</span><span class="o">.</span><span class="n">record_result</span><span class="p">(</span><span class="s2">&quot;Magnus&quot;</span><span class="p">,</span> <span class="s2">&quot;Hikaru&quot;</span><span class="p">,</span> <span class="n">winner</span><span class="o">=</span><span class="s2">&quot;Magnus&quot;</span><span class="p">)</span>
+<span class="n">chess_arena</span><span class="o">.</span><span class="n">record_result</span><span class="p">(</span><span class="s2">&quot;Fabiano&quot;</span><span class="p">,</span> <span class="s2">&quot;Magnus&quot;</span><span class="p">,</span> <span class="n">winner</span><span class="o">=</span><span class="s2">&quot;Magnus&quot;</span><span class="p">)</span>  <span class="c1"># Auto-registers Fabiano</span>
+
+<span class="c1"># Get rankings</span>
+<span class="n">rankings</span> <span class="o">=</span> <span class="n">chess_arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">rank</span><span class="p">,</span> <span class="n">player</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rankings</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rank</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">player</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">player</span><span class="p">[</span><span class="s1">&#39;rating&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="ensemble-rating-system">
+<h2>Ensemble Rating System<a class="headerlink" href="#ensemble-rating-system" title="Permalink to this heading"></a></h2>
+<p>For more robust ratings, you can use the Ensemble rating system that combines multiple rating methods:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnsembleCompetitor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span><span class="p">,</span> <span class="n">GlickoCompetitor</span>
+
+<span class="c1"># Create an ensemble with Elo and Glicko components</span>
+<span class="n">player1</span> <span class="o">=</span> <span class="n">EnsembleCompetitor</span><span class="p">(</span>
+    <span class="n">rating_systems</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span><span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">),</span> <span class="mf">0.7</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">GlickoCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">initial_rd</span><span class="o">=</span><span class="mi">350</span><span class="p">),</span> <span class="mf">0.3</span><span class="p">)</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">player2</span> <span class="o">=</span> <span class="n">EnsembleCompetitor</span><span class="p">(</span>
+    <span class="n">rating_systems</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span><span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1600</span><span class="p">),</span> <span class="mf">0.7</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">GlickoCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1600</span><span class="p">,</span> <span class="n">initial_rd</span><span class="o">=</span><span class="mi">350</span><span class="p">),</span> <span class="mf">0.3</span><span class="p">)</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="c1"># Use just like any other competitor</span>
+<span class="n">win_probability</span> <span class="o">=</span> <span class="n">player2</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 win probability: </span><span class="si">{</span><span class="n">win_probability</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">player1</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">player2</span><span class="p">)</span>
+
+<span class="c1"># All underlying ratings are automatically updated</span>
+<span class="n">new_probability</span> <span class="o">=</span> <span class="n">player2</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 new win probability: </span><span class="si">{</span><span class="n">new_probability</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="next-steps">
+<h2>Next Steps<a class="headerlink" href="#next-steps" title="Permalink to this heading"></a></h2>
+<p>Now that you understand the basics of Elote, you can:</p>
+<ul class="simple">
+<li><p>Explore the different rating systems in more detail</p></li>
+<li><p>Learn about advanced arena configurations</p></li>
+<li><p>Check out the examples directory for real-world use cases</p></li>
+<li><p>Integrate Elote into your own projects</p></li>
+</ul>
+<p>For more detailed information, see the following sections:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="rating_systems/elo.html"><span class="doc">Elo Rating System</span></a></p></li>
+<li><p><a class="reference internal" href="rating_systems/glicko.html"><span class="doc">Glicko Rating System</span></a></p></li>
+<li><p><a class="reference internal" href="rating_systems/ecf.html"><span class="doc">ECF Rating System</span></a></p></li>
+<li><p><a class="reference internal" href="rating_systems/dwz.html"><span class="doc">DWZ Rating System</span></a></p></li>
+<li><p><a class="reference internal" href="rating_systems/ensemble.html"><span class="doc">Ensemble Rating System</span></a></p></li>
+<li><p><a class="reference internal" href="arenas.html"><span class="doc">Arenas</span></a></p></li>
+<li><p><a class="reference internal" href="examples.html"><span class="doc">Examples</span></a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="competitors.html" class="btn btn-neutral float-right" title="Competitors" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, Will McGinnis.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

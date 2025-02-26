@@ -1,0 +1,270 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DWZ Rating System &mdash; elote 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Ensemble Rating System" href="ensemble.html" />
+    <link rel="prev" title="ECF Rating System" href="ecf.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            elote
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick Start Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../competitors.html">Competitors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../arenas.html">Arenas</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="elo.html">Elo Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ecf.html">ECF Rating System</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">DWZ Rating System</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-it-works">How It Works</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#advantages">Advantages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#limitations">Limitations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#implementation-in-elote">Implementation in Elote</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#customization">Customization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dwz-to-elo-conversion">DWZ to Elo Conversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#real-world-applications">Real-World Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ensemble.html">Ensemble Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comparison.html">Comparing Rating Systems</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advance_example.html">Advanced Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use_cases/product_ranking.html">Product Ranking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use_cases/matchmaking.html">Matchmaking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use_cases/feature_prioritization.html">Feature Prioritization with Elote</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">elote</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">DWZ Rating System</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/rating_systems/dwz.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dwz-rating-system">
+<h1>DWZ Rating System<a class="headerlink" href="#dwz-rating-system" title="Permalink to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading"></a></h2>
+<p>The Deutsche Wertungszahl (DWZ), or German Evaluation Number, is the official chess rating system of the German Chess Federation (Deutscher Schachbund). Developed in the 1990s as a replacement for the previously used Ingo system, DWZ is similar to the Elo rating system but with some important modifications to better handle tournament play and player development.</p>
+<p>The DWZ system is particularly notable for its sophisticated handling of youth players, whose ratings tend to change more rapidly as they improve, and for its detailed approach to calculating expected outcomes based on rating differences.</p>
+</section>
+<section id="how-it-works">
+<h2>How It Works<a class="headerlink" href="#how-it-works" title="Permalink to this heading"></a></h2>
+<p>The DWZ system uses the following key components:</p>
+<ol class="arabic simple">
+<li><p><strong>Rating (R)</strong>: Represents the player’s skill level</p></li>
+<li><p><strong>Development Coefficient (E)</strong>: Determines how quickly ratings change, with higher values for younger and less experienced players</p></li>
+<li><p><strong>Performance Rating (P)</strong>: The rating that would exactly match a player’s tournament results</p></li>
+</ol>
+<p>The expected outcome calculation is similar to Elo:</p>
+<div class="math notranslate nohighlight">
+\[W_e = \frac{1}{1 + 10^{-(R_A - R_B) / 400}}\]</div>
+<p>Where:
+- <span class="math notranslate nohighlight">\(W_e\)</span> is the expected score for player A
+- <span class="math notranslate nohighlight">\(R_A\)</span> is the rating of player A
+- <span class="math notranslate nohighlight">\(R_B\)</span> is the rating of player B</p>
+<p>After a tournament, the rating is updated using:</p>
+<div class="math notranslate nohighlight">
+\[R' = R + E \times (W - W_e)\]</div>
+<p>Where:
+- <span class="math notranslate nohighlight">\(R'\)</span> is the new rating
+- <span class="math notranslate nohighlight">\(E\)</span> is the development coefficient
+- <span class="math notranslate nohighlight">\(W\)</span> is the actual score
+- <span class="math notranslate nohighlight">\(W_e\)</span> is the expected score</p>
+<p>The development coefficient is calculated based on:</p>
+<div class="math notranslate nohighlight">
+\[E = E_0 \times f(A) \times f(n)\]</div>
+<p>Where:
+- <span class="math notranslate nohighlight">\(E_0\)</span> is the base coefficient (typically 30)
+- <span class="math notranslate nohighlight">\(f(A)\)</span> is an age factor (higher for younger players)
+- <span class="math notranslate nohighlight">\(f(n)\)</span> is an experience factor based on number of rated games played</p>
+</section>
+<section id="advantages">
+<h2>Advantages<a class="headerlink" href="#advantages" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Age Sensitivity</strong>: Better handles rating changes for youth players</p></li>
+<li><p><strong>Experience Factor</strong>: Accounts for player experience level</p></li>
+<li><p><strong>Tournament Focus</strong>: Designed for batch updates after tournaments</p></li>
+<li><p><strong>National Standardization</strong>: Consistent application across German chess events</p></li>
+<li><p><strong>Detailed Documentation</strong>: Well-documented methodology with regular updates</p></li>
+</ul>
+</section>
+<section id="limitations">
+<h2>Limitations<a class="headerlink" href="#limitations" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Complexity</strong>: More complex to calculate than basic Elo</p></li>
+<li><p><strong>Regional Focus</strong>: Primarily used in Germany and some neighboring countries</p></li>
+<li><p><strong>No Uncertainty Measure</strong>: Unlike Glicko, doesn’t explicitly track rating reliability</p></li>
+<li><p><strong>Parameter Sensitivity</strong>: Results depend on proper calibration of multiple factors</p></li>
+<li><p><strong>Less International Recognition</strong>: Not as widely recognized as FIDE Elo ratings</p></li>
+</ul>
+</section>
+<section id="implementation-in-elote">
+<h2>Implementation in Elote<a class="headerlink" href="#implementation-in-elote" title="Permalink to this heading"></a></h2>
+<p>Elote provides an implementation of the DWZ rating system through the <code class="docutils literal notranslate"><span class="pre">DWZCompetitor</span></code> class:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">DWZCompetitor</span>
+
+<span class="c1"># Create two competitors with different initial ratings</span>
+<span class="n">player1</span> <span class="o">=</span> <span class="n">DWZCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1600</span><span class="p">)</span>
+<span class="n">player2</span> <span class="o">=</span> <span class="n">DWZCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1800</span><span class="p">)</span>
+
+<span class="c1"># Get win probability</span>
+<span class="n">win_probability</span> <span class="o">=</span> <span class="n">player2</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 win probability: </span><span class="si">{</span><span class="n">win_probability</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Record a match result</span>
+<span class="n">player1</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">player2</span><span class="p">)</span>  <span class="c1"># Player 1 won!</span>
+
+<span class="c1"># Ratings are automatically updated</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 1 new rating: </span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 new rating: </span><span class="si">{</span><span class="n">player2</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="customization">
+<h2>Customization<a class="headerlink" href="#customization" title="Permalink to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">DWZCompetitor</span></code> class allows for customization of several parameters:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a competitor with custom parameters</span>
+<span class="n">player</span> <span class="o">=</span> <span class="n">DWZCompetitor</span><span class="p">(</span>
+    <span class="n">initial_rating</span><span class="o">=</span><span class="mi">1600</span><span class="p">,</span>
+    <span class="n">initial_development_coeff</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+    <span class="n">base_development_coeff</span><span class="o">=</span><span class="mi">30</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Key parameters:
+- <strong>initial_rating</strong>: Starting rating value
+- <strong>initial_development_coeff</strong>: Starting development coefficient
+- <strong>base_development_coeff</strong>: Base value for development coefficient calculation</p>
+</section>
+<section id="dwz-to-elo-conversion">
+<h2>DWZ to Elo Conversion<a class="headerlink" href="#dwz-to-elo-conversion" title="Permalink to this heading"></a></h2>
+<p>While DWZ and Elo use different calculation methods, the numerical values are designed to be roughly comparable. For practical purposes:</p>
+<div class="math notranslate nohighlight">
+\[\text{DWZ} \approx \text{Elo}\]</div>
+<p>However, due to different update mechanisms, the ratings may diverge over time for the same player.</p>
+</section>
+<section id="real-world-applications">
+<h2>Real-World Applications<a class="headerlink" href="#real-world-applications" title="Permalink to this heading"></a></h2>
+<p>The DWZ rating system is used primarily in:</p>
+<ul class="simple">
+<li><p><strong>German Chess Federation</strong>: Official rating system for all German chess events</p></li>
+<li><p><strong>Youth Development</strong>: Specially calibrated for tracking youth player development</p></li>
+<li><p><strong>Club Championships</strong>: Used for local and regional tournaments in Germany</p></li>
+<li><p><strong>National Rankings</strong>: Determining Germany’s top players</p></li>
+</ul>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>[Deutsche Wertungszahl](<a class="reference external" href="https://en.wikipedia.org/wiki/Deutsche_Wertungszahl">https://en.wikipedia.org/wiki/Deutsche_Wertungszahl</a>) - Wikipedia article</p></li>
+<li><p>[Deutscher Schachbund](<a class="reference external" href="https://www.schachbund.de/dwz.html">https://www.schachbund.de/dwz.html</a>) - Official German Chess Federation site</p></li>
+<li><p>Hechenberger, A. (2001). “Die Deutsche Wertungszahl”. Schach-Journal.</p></li>
+<li><p>Glickman, Mark E. (1995). “A Comprehensive Guide to Chess Ratings”. American Chess Journal, 3, 59-102.</p></li>
+</ol>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ecf.html" class="btn btn-neutral float-left" title="ECF Rating System" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ensemble.html" class="btn btn-neutral float-right" title="Ensemble Rating System" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, Will McGinnis.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

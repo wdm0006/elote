@@ -1,22 +1,20 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>elote.competitors.ecf &mdash; elote 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=2389946f"></script>
-        <script src="../../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -41,13 +39,38 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../advance_example.html">Advanced Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Concepts</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../competitors.html">Competitors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../arenas.html">Arenas</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/elo.html">Elo Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/ecf.html">ECF Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/dwz.html">DWZ Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/ensemble.html">Ensemble Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/comparison.html">Comparing Rating Systems</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advance_example.html">Advanced Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../use_cases/product_ranking.html">Product Ranking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../use_cases/matchmaking.html">Matchmaking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../use_cases/feature_prioritization.html">Feature Prioritization with Elote</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
 </ul>
 
         </div>
@@ -75,16 +98,16 @@
            <div itemprop="articleBody">
              
   <h1>Source code for elote.competitors.ecf</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">elote.competitors.base</span> <span class="kn">import</span> <span class="n">BaseCompetitor</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
-<span class="kn">import</span> <span class="nn">statistics</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote.competitors.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCompetitor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">deque</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">statistics</span>
 
 
-<div class="viewcode-block" id="ECFCompetitor"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.ecf.ECFCompetitor">[docs]</a><span class="k">class</span> <span class="nc">ECFCompetitor</span><span class="p">(</span><span class="n">BaseCompetitor</span><span class="p">):</span>
+<div class="viewcode-block" id="ECFCompetitor"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.ecf.ECFCompetitor">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ECFCompetitor</span><span class="p">(</span><span class="n">BaseCompetitor</span><span class="p">):</span>
     <span class="n">_delta</span> <span class="o">=</span> <span class="mi">50</span>
     <span class="n">_n_periods</span> <span class="o">=</span> <span class="mi">30</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_rating</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">40</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_rating</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">40</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        class vars:</span>
@@ -96,40 +119,60 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__initial_rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_rating</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Cache for the rating calculation</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;&lt;ECFCompetitor: </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="fm">__hash__</span><span class="p">())</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;&lt;ECFCompetitor: </span><span class="si">%s</span><span class="s2">&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="fm">__hash__</span><span class="p">())</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;&lt;ECFCompetitor&gt;&#39;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;&lt;ECFCompetitor&gt;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__initialize_ratings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="n">deque</span><span class="p">([</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_periods</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)])</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__initialize_ratings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Initialize with a single value instead of a full deque of None values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_periods</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__initial_rating</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__initial_rating</span>  <span class="c1"># Initialize the cache</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">elo_conversion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">elo_conversion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">*</span> <span class="mf">7.5</span> <span class="o">+</span> <span class="mi">700</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__initialize_ratings</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_rating</span>
 
-        <span class="k">return</span> <span class="n">statistics</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">_</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="k">if</span> <span class="n">_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">])</span>
+        <span class="c1"># Return cached value if available</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_rating</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_rating</span>
 
-    <span class="k">def</span> <span class="nf">_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rating</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="c1"># Calculate and cache the mean</span>
+        <span class="n">valid_scores</span> <span class="o">=</span> <span class="p">[</span><span class="n">_</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="k">if</span> <span class="n">_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">valid_scores</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cached_rating</span> <span class="o">=</span> <span class="n">statistics</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">valid_scores</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cached_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__initial_rating</span>
+            
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_rating</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rating</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__initialize_ratings</span><span class="p">()</span>
-
+        
+        <span class="c1"># Invalidate the cache when updating scores</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cached_rating</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="c1"># Add the new rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rating</span><span class="p">)</span>
-        <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+        
+        <span class="c1"># No need to manually popleft since we&#39;re using maxlen</span>
 
-<div class="viewcode-block" id="ECFCompetitor.export_state"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.ecf.ECFCompetitor.export_state">[docs]</a>    <span class="k">def</span> <span class="nf">export_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ECFCompetitor.export_state"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.ecf.ECFCompetitor.export_state">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">export_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Exports all information needed to re-create this competitor from scratch later on.</span>
 
@@ -137,17 +180,26 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span>
-            <span class="s2">&quot;class_vars&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;_delta&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span><span class="p">,</span>
-                <span class="s2">&quot;_n_periods&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_periods</span>
-            <span class="p">}</span>
+            <span class="s2">&quot;class_vars&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;_delta&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span><span class="p">,</span> <span class="s2">&quot;_n_periods&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_periods</span><span class="p">},</span>
         <span class="p">}</span></div>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">transformed_elo_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elo_conversion</span> <span class="o">/</span> <span class="mi">400</span><span class="p">)</span>
+    <span class="c1"># Cache the transformed rating calculation</span>
+    <span class="n">_cached_transformed_elo_rating</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_cached_elo_conversion_for_transform</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="ECFCompetitor.expected_score"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.ecf.ECFCompetitor.expected_score">[docs]</a>    <span class="k">def</span> <span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transformed_elo_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Check if we can use the cached value</span>
+        <span class="n">current_elo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">elo_conversion</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_transformed_elo_rating</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_elo_conversion_for_transform</span> <span class="o">==</span> <span class="n">current_elo</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_transformed_elo_rating</span>
+            
+        <span class="c1"># Calculate and cache the result</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_elo_conversion_for_transform</span> <span class="o">=</span> <span class="n">current_elo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_transformed_elo_rating</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="n">current_elo</span> <span class="o">/</span> <span class="mi">400</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_transformed_elo_rating</span>
+
+<div class="viewcode-block" id="ECFCompetitor.expected_score"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.ecf.ECFCompetitor.expected_score">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The expected outcome of a match between this competitor and one passed in. Scaled between 0-1, where 1 is a strong</span>
 <span class="sd">        likelihood of this competitor winning and 0 is a strong likelihood of this competitor losing.</span>
@@ -157,16 +209,18 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformed_elo_rating</span> <span class="o">/</span> <span class="p">(</span><span class="n">competitor</span><span class="o">.</span><span class="n">transformed_elo_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformed_elo_rating</span><span class="p">)</span></div>
+        <span class="c1"># Calculate directly to avoid multiple property accesses</span>
+        <span class="n">my_transformed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformed_elo_rating</span>
+        <span class="n">their_transformed</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">transformed_elo_rating</span>
+        <span class="k">return</span> <span class="n">my_transformed</span> <span class="o">/</span> <span class="p">(</span><span class="n">their_transformed</span> <span class="o">+</span> <span class="n">my_transformed</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ECFCompetitor.beat"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.ecf.ECFCompetitor.beat">[docs]</a>    <span class="k">def</span> <span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">):</span>
+<div class="viewcode-block" id="ECFCompetitor.beat"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.ecf.ECFCompetitor.beat">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Takes in a competitor object that lost a match to this competitor, updates the ratings for both.</span>
 
 <span class="sd">        :param competitor: the competitor that lost their bout</span>
 <span class="sd">        :type competitor: ECFCompetitor</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -179,22 +233,21 @@
         <span class="c1"># limit the competitors based on the class delta value</span>
         <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">self_rating</span> <span class="o">-</span> <span class="n">competitors_rating</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">self_rating</span> <span class="o">&gt;</span> <span class="n">competitors_rating</span><span class="p">:</span>
-                <span class="n">sign</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+                <span class="n">competitors_rating</span> <span class="o">=</span> <span class="n">self_rating</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">sign</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="n">competitors_rating</span> <span class="o">=</span> <span class="n">self_rating</span> <span class="o">+</span> <span class="p">(</span><span class="n">sign</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span><span class="p">)</span>
+                <span class="n">competitors_rating</span> <span class="o">=</span> <span class="n">self_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span>
 
+        <span class="c1"># Update both competitors in one go</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">competitors_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span><span class="p">)</span>
         <span class="n">competitor</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">self_rating</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ECFCompetitor.tied"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.ecf.ECFCompetitor.tied">[docs]</a>    <span class="k">def</span> <span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">):</span>
+<div class="viewcode-block" id="ECFCompetitor.tied"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.ecf.ECFCompetitor.tied">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Takes in a competitor object that tied in a match to this competitor, updates the ratings for both.</span>
 
 <span class="sd">        :param competitor: the competitor that tied with this one</span>
 <span class="sd">        :type competitor: ECFCompetitor</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -207,11 +260,11 @@
         <span class="c1"># limit the competitors based on the class delta value</span>
         <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">self_rating</span> <span class="o">-</span> <span class="n">competitors_rating</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">self_rating</span> <span class="o">&gt;</span> <span class="n">competitors_rating</span><span class="p">:</span>
-                <span class="n">sign</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+                <span class="n">competitors_rating</span> <span class="o">=</span> <span class="n">self_rating</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">sign</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="n">competitors_rating</span> <span class="o">=</span> <span class="n">self_rating</span> <span class="o">+</span> <span class="p">(</span><span class="n">sign</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span><span class="p">)</span>
+                <span class="n">competitors_rating</span> <span class="o">=</span> <span class="n">self_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span>
 
+        <span class="c1"># Update both competitors in one go</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">competitors_rating</span><span class="p">)</span>
         <span class="n">competitor</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">self_rating</span><span class="p">)</span></div></div>
 </pre></div>

@@ -1,0 +1,448 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comparing Rating Systems &mdash; elote 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Examples" href="../examples.html" />
+    <link rel="prev" title="Ensemble Rating System" href="ensemble.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            elote
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick Start Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../competitors.html">Competitors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../arenas.html">Arenas</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="elo.html">Elo Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ecf.html">ECF Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dwz.html">DWZ Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ensemble.html">Ensemble Rating System</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Comparing Rating Systems</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview-comparison">Overview Comparison</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mathematical-formulation">Mathematical Formulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#key-parameters">Key Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#strengths-and-weaknesses">Strengths and Weaknesses</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#elo">Elo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#glicko">Glicko</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ecf">ECF</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dwz">DWZ</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ensemble">Ensemble</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#choosing-the-right-system">Choosing the Right System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#code-comparison">Code Comparison</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#empirical-comparison">Empirical Comparison</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advance_example.html">Advanced Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use_cases/product_ranking.html">Product Ranking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use_cases/matchmaking.html">Matchmaking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use_cases/feature_prioritization.html">Feature Prioritization with Elote</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">elote</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Comparing Rating Systems</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/rating_systems/comparison.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="comparing-rating-systems">
+<h1>Comparing Rating Systems<a class="headerlink" href="#comparing-rating-systems" title="Permalink to this heading"></a></h1>
+<p>This page provides a side-by-side comparison of the rating systems implemented in Elote, helping you choose the right system for your specific use case.</p>
+<section id="overview-comparison">
+<h2>Overview Comparison<a class="headerlink" href="#overview-comparison" title="Permalink to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 16.0%" />
+<col style="width: 16.0%" />
+<col style="width: 16.0%" />
+<col style="width: 16.0%" />
+<col style="width: 16.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Feature</p></th>
+<th class="head"><p>Elo</p></th>
+<th class="head"><p>Glicko</p></th>
+<th class="head"><p>ECF</p></th>
+<th class="head"><p>DWZ</p></th>
+<th class="head"><p>Ensemble</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Origin</strong></p></td>
+<td><p>Chess (1960s)</p></td>
+<td><p>Chess (1995)</p></td>
+<td><p>England (1950s)</p></td>
+<td><p>Germany (1990s)</p></td>
+<td><p>Meta-system</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Complexity</strong></p></td>
+<td><p>Low</p></td>
+<td><p>Medium</p></td>
+<td><p>Low</p></td>
+<td><p>Medium</p></td>
+<td><p>High</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Uncertainty Tracking</strong></p></td>
+<td><p>No</p></td>
+<td><p>Yes (RD)</p></td>
+<td><p>No</p></td>
+<td><p>Partial</p></td>
+<td><p>Depends on components</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Expected Score Formula</strong></p></td>
+<td><p>Logistic</p></td>
+<td><p>Modified Logistic</p></td>
+<td><p>Linear</p></td>
+<td><p>Logistic</p></td>
+<td><p>Weighted Average</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Inactivity Handling</strong></p></td>
+<td><p>No</p></td>
+<td><p>Yes</p></td>
+<td><p>No</p></td>
+<td><p>Partial</p></td>
+<td><p>Depends on components</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Implementation Difficulty</strong></p></td>
+<td><p>Easy</p></td>
+<td><p>Moderate</p></td>
+<td><p>Easy</p></td>
+<td><p>Moderate</p></td>
+<td><p>Complex</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Computational Cost</strong></p></td>
+<td><p>Low</p></td>
+<td><p>Medium</p></td>
+<td><p>Low</p></td>
+<td><p>Medium</p></td>
+<td><p>High</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Typical Use Cases</strong></p></td>
+<td><p>General purpose</p></td>
+<td><p>Sparse competitions</p></td>
+<td><p>English chess</p></td>
+<td><p>Youth development</p></td>
+<td><p>Complex domains</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="mathematical-formulation">
+<h2>Mathematical Formulation<a class="headerlink" href="#mathematical-formulation" title="Permalink to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>System</p></th>
+<th class="head"><p>Expected Outcome Formula</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Elo</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(E_A = \frac{1}{1 + 10^{(R_B - R_A) / 400}}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Glicko</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(E(A, B) = \frac{1}{1 + 10^{-g(RD_B) \times (r_A - r_B) / 400}}\)</span> where <span class="math notranslate nohighlight">\(g(RD) = \frac{1}{\sqrt{1 + 3 \times RD^2 / \pi^2}}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>ECF</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(E_A = 0.5 + \frac{R_A - R_B}{F}\)</span> where F is typically 120</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>DWZ</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(W_e = \frac{1}{1 + 10^{-(R_A - R_B) / 400}}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Ensemble</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(E_{ensemble} = \sum_{i=1}^{n} w_i \times E_i\)</span> where <span class="math notranslate nohighlight">\(w_i\)</span> are weights</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="key-parameters">
+<h2>Key Parameters<a class="headerlink" href="#key-parameters" title="Permalink to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>System</p></th>
+<th class="head"><p>Key Parameters</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Elo</strong></p></td>
+<td><p>K-factor (determines rating change magnitude)</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Glicko</strong></p></td>
+<td><p>Initial rating, Initial RD, Volatility, Tau</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>ECF</strong></p></td>
+<td><p>K-factor, F-factor (conversion factor)</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>DWZ</strong></p></td>
+<td><p>Initial rating, Development coefficient</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Ensemble</strong></p></td>
+<td><p>Component systems, Weights</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="strengths-and-weaknesses">
+<h2>Strengths and Weaknesses<a class="headerlink" href="#strengths-and-weaknesses" title="Permalink to this heading"></a></h2>
+<section id="elo">
+<h3>Elo<a class="headerlink" href="#elo" title="Permalink to this heading"></a></h3>
+<p><strong>Strengths:</strong>
+- Simple to understand and implement
+- Widely recognized and used
+- Works well with sufficient data
+- Zero-sum in two-player games</p>
+<p><strong>Weaknesses:</strong>
+- No uncertainty measurement
+- Requires many matches for accuracy
+- Fixed K-factor can be problematic
+- Doesn’t handle inactivity well</p>
+</section>
+<section id="glicko">
+<h3>Glicko<a class="headerlink" href="#glicko" title="Permalink to this heading"></a></h3>
+<p><strong>Strengths:</strong>
+- Tracks rating reliability
+- Handles inactivity appropriately
+- More accurate for sparse competitions
+- Better for matchmaking</p>
+<p><strong>Weaknesses:</strong>
+- More complex to implement
+- Higher computational requirements
+- More parameters to tune
+- Less intuitive interpretation</p>
+</section>
+<section id="ecf">
+<h3>ECF<a class="headerlink" href="#ecf" title="Permalink to this heading"></a></h3>
+<p><strong>Strengths:</strong>
+- Linear relationship is easy to calculate
+- Designed for English chess ecosystem
+- Simple to understand
+- Long history of use</p>
+<p><strong>Weaknesses:</strong>
+- Limited range of effectiveness
+- Regional focus
+- Less theoretical justification
+- No uncertainty tracking</p>
+</section>
+<section id="dwz">
+<h3>DWZ<a class="headerlink" href="#dwz" title="Permalink to this heading"></a></h3>
+<p><strong>Strengths:</strong>
+- Handles youth development well
+- Age and experience factors
+- Good for tournament play
+- National standardization</p>
+<p><strong>Weaknesses:</strong>
+- Complex calculation
+- Regional focus
+- Parameter sensitivity
+- Less international recognition</p>
+</section>
+<section id="ensemble">
+<h3>Ensemble<a class="headerlink" href="#ensemble" title="Permalink to this heading"></a></h3>
+<p><strong>Strengths:</strong>
+- Combines strengths of multiple systems
+- More robust predictions
+- Adaptable to different domains
+- Graceful degradation</p>
+<p><strong>Weaknesses:</strong>
+- Most complex to implement
+- Highest computational cost
+- Requires weight tuning
+- Less interpretable</p>
+</section>
+</section>
+<section id="choosing-the-right-system">
+<h2>Choosing the Right System<a class="headerlink" href="#choosing-the-right-system" title="Permalink to this heading"></a></h2>
+<p>Consider the following factors when choosing a rating system:</p>
+<ol class="arabic simple">
+<li><p><strong>Data Density</strong>: How frequently do competitors face each other?
+- Sparse data: Consider Glicko
+- Dense data: Elo may be sufficient</p></li>
+<li><p><strong>Domain Specifics</strong>:
+- Chess in England: ECF
+- Chess in Germany: DWZ
+- Youth development: DWZ
+- General purpose: Elo or Glicko</p></li>
+<li><p><strong>Computational Resources</strong>:
+- Limited resources: Elo or ECF
+- Sufficient resources: Glicko, DWZ, or Ensemble</p></li>
+<li><p><strong>Uncertainty Importance</strong>:
+- Critical to track uncertainty: Glicko
+- Uncertainty less important: Elo or ECF</p></li>
+<li><p><strong>Complexity Tolerance</strong>:
+- Need simple explanation: Elo or ECF
+- Can handle complexity: Glicko, DWZ, or Ensemble</p></li>
+<li><p><strong>Prediction Accuracy</strong>:
+- Highest accuracy needed: Consider Ensemble
+- Reasonable accuracy sufficient: Any individual system</p></li>
+</ol>
+</section>
+<section id="code-comparison">
+<h2>Code Comparison<a class="headerlink" href="#code-comparison" title="Permalink to this heading"></a></h2>
+<p>Here’s a quick comparison of how to use each system in Elote:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span><span class="p">,</span> <span class="n">GlickoCompetitor</span><span class="p">,</span> <span class="n">ECFCompetitor</span><span class="p">,</span> <span class="n">DWZCompetitor</span><span class="p">,</span> <span class="n">EnsembleCompetitor</span>
+
+<span class="c1"># Elo</span>
+<span class="n">elo_player</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">k_factor</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+
+<span class="c1"># Glicko</span>
+<span class="n">glicko_player</span> <span class="o">=</span> <span class="n">GlickoCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">initial_rd</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">volatility</span><span class="o">=</span><span class="mf">0.06</span><span class="p">)</span>
+
+<span class="c1"># ECF</span>
+<span class="n">ecf_player</span> <span class="o">=</span> <span class="n">ECFCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span> <span class="n">k_factor</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">f_factor</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+
+<span class="c1"># DWZ</span>
+<span class="n">dwz_player</span> <span class="o">=</span> <span class="n">DWZCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1600</span><span class="p">,</span> <span class="n">initial_development_coeff</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+
+<span class="c1"># Ensemble</span>
+<span class="n">ensemble_player</span> <span class="o">=</span> <span class="n">EnsembleCompetitor</span><span class="p">(</span>
+    <span class="n">rating_systems</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span><span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">),</span> <span class="mf">0.5</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">GlickoCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">),</span> <span class="mf">0.5</span><span class="p">)</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="c1"># Usage is the same for all systems</span>
+<span class="n">opponent</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1400</span><span class="p">)</span>
+
+<span class="c1"># Get expected scores</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Elo expected: </span><span class="si">{</span><span class="n">elo_player</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Glicko expected: </span><span class="si">{</span><span class="n">glicko_player</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ECF expected: </span><span class="si">{</span><span class="n">ecf_player</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DWZ expected: </span><span class="si">{</span><span class="n">dwz_player</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ensemble expected: </span><span class="si">{</span><span class="n">ensemble_player</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Record a win</span>
+<span class="n">elo_player</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span>
+<span class="n">glicko_player</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span>
+<span class="n">ecf_player</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span>
+<span class="n">dwz_player</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span>
+<span class="n">ensemble_player</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="empirical-comparison">
+<h2>Empirical Comparison<a class="headerlink" href="#empirical-comparison" title="Permalink to this heading"></a></h2>
+<p>While theoretical comparisons are useful, the best way to choose a rating system is through empirical testing on your specific domain. Elote makes it easy to experiment with different systems and compare their predictive accuracy.</p>
+<p>Here’s a simple approach to compare systems:</p>
+<ol class="arabic simple">
+<li><p>Split your historical match data into training and testing sets</p></li>
+<li><p>Train each rating system on the training data</p></li>
+<li><p>Evaluate prediction accuracy on the test data</p></li>
+<li><p>Choose the system with the best performance for your specific use case</p></li>
+</ol>
+<p>Remember that no rating system is universally best - the right choice depends on your specific requirements, data characteristics, and domain constraints.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ensemble.html" class="btn btn-neutral float-left" title="Ensemble Rating System" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../examples.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, Will McGinnis.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

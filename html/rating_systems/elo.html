@@ -1,0 +1,252 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elo Rating System &mdash; elote 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Glicko Rating System" href="glicko.html" />
+    <link rel="prev" title="Arenas" href="../arenas.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            elote
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick Start Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../competitors.html">Competitors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../arenas.html">Arenas</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Elo Rating System</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-it-works">How It Works</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#advantages">Advantages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#limitations">Limitations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#implementation-in-elote">Implementation in Elote</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#customization">Customization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#real-world-applications">Real-World Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ecf.html">ECF Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dwz.html">DWZ Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ensemble.html">Ensemble Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comparison.html">Comparing Rating Systems</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advance_example.html">Advanced Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use_cases/product_ranking.html">Product Ranking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use_cases/matchmaking.html">Matchmaking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use_cases/feature_prioritization.html">Feature Prioritization with Elote</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">elote</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Elo Rating System</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/rating_systems/elo.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="elo-rating-system">
+<h1>Elo Rating System<a class="headerlink" href="#elo-rating-system" title="Permalink to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading"></a></h2>
+<p>The Elo rating system is one of the most widely used rating systems in the world. Developed by Hungarian-American physics professor Arpad Elo, it was originally designed for chess but has since been adapted for many other competitive domains including video games, basketball, football, and baseball.</p>
+<p>The Elo system is named after its creator and was first introduced as the official rating system for the United States Chess Federation in 1960, and later adopted by the World Chess Federation (FIDE) in 1970.</p>
+</section>
+<section id="how-it-works">
+<h2>How It Works<a class="headerlink" href="#how-it-works" title="Permalink to this heading"></a></h2>
+<p>The Elo rating system is based on the following principles:</p>
+<ol class="arabic simple">
+<li><p>Each player has a rating that represents their skill level</p></li>
+<li><p>The difference between ratings determines the expected outcome of a match</p></li>
+<li><p>After each match, ratings are adjusted based on the actual outcome compared to the expected outcome</p></li>
+</ol>
+<p>The core formula for calculating the expected score (probability of winning) is:</p>
+<div class="math notranslate nohighlight">
+\[E_A = \frac{1}{1 + 10^{(R_B - R_A) / 400}}\]</div>
+<p>Where:
+- <span class="math notranslate nohighlight">\(E_A\)</span> is the expected score for player A
+- <span class="math notranslate nohighlight">\(R_A\)</span> is the rating of player A
+- <span class="math notranslate nohighlight">\(R_B\)</span> is the rating of player B</p>
+<p>After a match, the ratings are updated using:</p>
+<div class="math notranslate nohighlight">
+\[R'_A = R_A + K \times (S_A - E_A)\]</div>
+<p>Where:
+- <span class="math notranslate nohighlight">\(R'_A\)</span> is the new rating for player A
+- <span class="math notranslate nohighlight">\(K\)</span> is the K-factor (determines how quickly ratings change)
+- <span class="math notranslate nohighlight">\(S_A\)</span> is the actual score (1 for win, 0.5 for draw, 0 for loss)
+- <span class="math notranslate nohighlight">\(E_A\)</span> is the expected score</p>
+</section>
+<section id="advantages">
+<h2>Advantages<a class="headerlink" href="#advantages" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Simplicity</strong>: The Elo system is easy to understand and implement</p></li>
+<li><p><strong>Transparency</strong>: Players can easily see how their rating changes after each match</p></li>
+<li><p><strong>Proven Track Record</strong>: Used successfully for decades in various competitive domains</p></li>
+<li><p><strong>Zero-Sum</strong>: In a two-player game, the rating points one player gains are exactly what the other player loses</p></li>
+<li><p><strong>Self-Correcting</strong>: Ratings naturally adjust over time as more matches are played</p></li>
+</ul>
+</section>
+<section id="limitations">
+<h2>Limitations<a class="headerlink" href="#limitations" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Requires Many Matches</strong>: Needs a significant number of matches to reach an accurate rating</p></li>
+<li><p><strong>No Confidence Intervals</strong>: Unlike Glicko, Elo doesn’t account for rating reliability</p></li>
+<li><p><strong>Assumes Stable Performance</strong>: Doesn’t account for player improvement or decline over time</p></li>
+<li><p><strong>K-Factor Sensitivity</strong>: Results are highly dependent on the chosen K-factor</p></li>
+<li><p><strong>No Team Dynamics</strong>: In team sports, doesn’t account for individual contributions</p></li>
+</ul>
+</section>
+<section id="implementation-in-elote">
+<h2>Implementation in Elote<a class="headerlink" href="#implementation-in-elote" title="Permalink to this heading"></a></h2>
+<p>Elote provides a straightforward implementation of the Elo rating system through the <code class="docutils literal notranslate"><span class="pre">EloCompetitor</span></code> class:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span>
+
+<span class="c1"># Create two competitors with different initial ratings</span>
+<span class="n">player1</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
+<span class="n">player2</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1600</span><span class="p">)</span>
+
+<span class="c1"># Get win probability</span>
+<span class="n">win_probability</span> <span class="o">=</span> <span class="n">player2</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 win probability: </span><span class="si">{</span><span class="n">win_probability</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Record a match result</span>
+<span class="n">player1</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">player2</span><span class="p">)</span>  <span class="c1"># Player 1 won!</span>
+
+<span class="c1"># Ratings are automatically updated</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 1 new rating: </span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 new rating: </span><span class="si">{</span><span class="n">player2</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="customization">
+<h2>Customization<a class="headerlink" href="#customization" title="Permalink to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">EloCompetitor</span></code> class allows for customization of the K-factor:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a competitor with a custom K-factor</span>
+<span class="n">player</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">k_factor</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A higher K-factor makes ratings change more quickly, while a lower K-factor makes them more stable. Common K-factor values:</p>
+<ul class="simple">
+<li><p>40: For new players with fewer than 30 games (FIDE standard)</p></li>
+<li><p>20: For players with ratings under 2400 (FIDE standard)</p></li>
+<li><p>10: For elite players with ratings over 2400 (FIDE standard)</p></li>
+</ul>
+</section>
+<section id="real-world-applications">
+<h2>Real-World Applications<a class="headerlink" href="#real-world-applications" title="Permalink to this heading"></a></h2>
+<p>The Elo rating system is used in many domains:</p>
+<ul class="simple">
+<li><p><strong>Chess</strong>: FIDE and national chess federations</p></li>
+<li><p><strong>Video Games</strong>: League of Legends, DOTA 2, and many other competitive games</p></li>
+<li><p><strong>Sports</strong>: Used for international football rankings</p></li>
+<li><p><strong>Online Matchmaking</strong>: Many platforms use Elo or Elo-derived systems to match players of similar skill</p></li>
+</ul>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Elo, Arpad (1978). <em>The Rating of Chessplayers, Past and Present</em>. Arco. ISBN 0-668-04721-6.</p></li>
+<li><p>Glickman, Mark E. (1995). “A Comprehensive Guide to Chess Ratings”. American Chess Journal, 3, 59-102.</p></li>
+<li><p>Silver, Nate (2015). “How We Calculate NBA Elo Ratings”. FiveThirtyEight.</p></li>
+</ol>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../arenas.html" class="btn btn-neutral float-left" title="Arenas" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="glicko.html" class="btn btn-neutral float-right" title="Glicko Rating System" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, Will McGinnis.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

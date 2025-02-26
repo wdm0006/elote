@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en">
 <head>
@@ -5,24 +7,20 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Examples &mdash; elote 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=2389946f"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=2389946f"></script>
+      <script src="_static/doctools.js?v=888ff710"></script>
+      <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Advanced Examples" href="advance_example.html" />
-    <link rel="prev" title="Getting Started" href="getting_started.html" /> 
+    <link rel="prev" title="Comparing Rating Systems" href="rating_systems/comparison.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -44,9 +42,28 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="competitors.html">Competitors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arenas.html">Arenas</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/elo.html">Elo Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/ecf.html">ECF Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/dwz.html">DWZ Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/ensemble.html">Ensemble Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/comparison.html">Comparing Rating Systems</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#sample-bout">Sample Bout</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#bout-with-initialization">Bout with Initialization</a></li>
@@ -60,8 +77,14 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="advance_example.html">Advanced Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="competitors.html">Competitors</a></li>
-<li class="toctree-l1"><a class="reference internal" href="arenas.html">Arenas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="use_cases/product_ranking.html">Product Ranking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="use_cases/matchmaking.html">Matchmaking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="use_cases/feature_prioritization.html">Feature Prioritization with Elote</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 
         </div>
@@ -92,7 +115,7 @@
 <h1>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h1>
 <section id="sample-bout">
 <h2>Sample Bout<a class="headerlink" href="#sample-bout" title="Permalink to this heading"></a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">elote</span> <span class="kn">import</span> <span class="n">EloCompetitor</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span>
 
 <span class="n">good</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">()</span>
 <span class="n">better</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">()</span>
@@ -128,7 +151,7 @@
 </section>
 <section id="bout-with-initialization">
 <h2>Bout with Initialization<a class="headerlink" href="#bout-with-initialization" title="Permalink to this heading"></a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">elote</span> <span class="kn">import</span> <span class="n">EloCompetitor</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span>
 
 <span class="n">good</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
 <span class="n">better</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">450</span><span class="p">)</span>
@@ -174,7 +197,7 @@
 </section>
 <section id="bout-with-ties">
 <h2>Bout with Ties<a class="headerlink" href="#bout-with-ties" title="Permalink to this heading"></a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">elote</span> <span class="kn">import</span> <span class="n">EloCompetitor</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span>
 
 <span class="n">good</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
 <span class="n">better</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">450</span><span class="p">)</span>
@@ -222,7 +245,7 @@
 </section>
 <section id="prediction">
 <h2>Prediction<a class="headerlink" href="#prediction" title="Permalink to this heading"></a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">elote</span> <span class="kn">import</span> <span class="n">EloCompetitor</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span>
 
 <span class="n">good</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
 <span class="n">better</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
@@ -245,13 +268,13 @@
 </section>
 <section id="sample-arena">
 <h2>Sample Arena<a class="headerlink" href="#sample-arena" title="Permalink to this heading"></a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">elote</span> <span class="kn">import</span> <span class="n">LambdaArena</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">random</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">LambdaArena</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 
 
 <span class="c1"># sample bout function which just compares the two inputs</span>
-<span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">func</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="n">b</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="k">else</span><span class="p">:</span>
@@ -263,10 +286,12 @@
 <span class="n">arena</span><span class="o">.</span><span class="n">set_competitor_class_var</span><span class="p">(</span><span class="s1">&#39;_k_factor&#39;</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
 <span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
 
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arena results:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Arena</span> <span class="n">results</span><span class="p">:</span>
+<span class="p">[</span>
     <span class="p">{</span>
         <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
         <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">486.7172340293576</span>
@@ -290,13 +315,13 @@
 </section>
 <section id="dwz-arena">
 <h2>DWZ Arena<a class="headerlink" href="#dwz-arena" title="Permalink to this heading"></a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">elote</span> <span class="kn">import</span> <span class="n">LambdaArena</span><span class="p">,</span> <span class="n">DWZCompetitor</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">random</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">LambdaArena</span><span class="p">,</span> <span class="n">DWZCompetitor</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 
 
 <span class="c1"># sample bout function which just compares the two inputs</span>
-<span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">func</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="n">b</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="k">else</span><span class="p">:</span>
@@ -308,10 +333,12 @@
 <span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">DWZCompetitor</span><span class="p">)</span>
 <span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
 
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arena results:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Arena</span> <span class="n">results</span><span class="p">:</span>
+<span class="p">[</span>
     <span class="p">{</span>
         <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
         <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">212.72183429478434</span>
@@ -335,13 +362,13 @@
 </section>
 <section id="ecf-arena">
 <h2>ECF Arena<a class="headerlink" href="#ecf-arena" title="Permalink to this heading"></a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">elote</span> <span class="kn">import</span> <span class="n">LambdaArena</span><span class="p">,</span> <span class="n">ECFCompetitor</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">random</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">LambdaArena</span><span class="p">,</span> <span class="n">ECFCompetitor</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 
 
 <span class="c1"># sample bout function which just compares the two inputs</span>
-<span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">func</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="n">b</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="k">else</span><span class="p">:</span>
@@ -353,10 +380,12 @@
 <span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">ECFCompetitor</span><span class="p">)</span>
 <span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
 
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arena results:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Arena</span> <span class="n">results</span><span class="p">:</span>
+<span class="p">[</span>
     <span class="p">{</span>
         <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
         <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">39.64319765445675</span>
@@ -380,13 +409,13 @@
 </section>
 <section id="glicko-arena">
 <h2>Glicko Arena<a class="headerlink" href="#glicko-arena" title="Permalink to this heading"></a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">elote</span> <span class="kn">import</span> <span class="n">LambdaArena</span><span class="p">,</span> <span class="n">GlickoCompetitor</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">random</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">LambdaArena</span><span class="p">,</span> <span class="n">GlickoCompetitor</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 
 
 <span class="c1"># sample bout function which just compares the two inputs</span>
-<span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">func</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="n">b</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="k">else</span><span class="p">:</span>
@@ -397,10 +426,12 @@
 <span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">GlickoCompetitor</span><span class="p">)</span>
 <span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
 
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arena results:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Arena</span> <span class="n">results</span><span class="p">:</span>
+<span class="p">[</span>
     <span class="p">{</span>
         <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
         <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">126.83348029853865</span>
@@ -424,13 +455,14 @@
 </section>
 <section id="persisting-state-from-an-arena">
 <h2>Persisting State from an Arena<a class="headerlink" href="#persisting-state-from-an-arena" title="Permalink to this heading"></a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">elote</span> <span class="kn">import</span> <span class="n">LambdaArena</span><span class="p">,</span> <span class="n">GlickoCompetitor</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">random</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">LambdaArena</span><span class="p">,</span> <span class="n">GlickoCompetitor</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
 
 
 <span class="c1"># sample bout function which just compares the two inputs</span>
-<span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">func</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="n">b</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="k">else</span><span class="p">:</span>
@@ -441,19 +473,33 @@
 <span class="n">matchups</span> <span class="o">=</span> <span class="p">[(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
 <span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">GlickoCompetitor</span><span class="p">)</span>
 <span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arena results:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 
-<span class="n">saved_state</span> <span class="o">=</span> <span class="n">arena</span><span class="o">.</span><span class="n">export_state</span><span class="p">()</span>
+<span class="c1"># Export state and create a deep copy to avoid modifying the original</span>
+<span class="n">saved_state</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">export_state</span><span class="p">())</span>
 
-<span class="c1"># restart with some new class level args</span>
+<span class="c1"># Create a new arena with the saved state</span>
+<span class="c1"># We&#39;ll manually recreate the competitors to avoid the class_vars issue</span>
 <span class="n">matchups</span> <span class="o">=</span> <span class="p">[(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">)]</span>
-<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">GlickoCompetitor</span><span class="p">,</span> <span class="n">initial_state</span><span class="o">=</span><span class="n">saved_state</span><span class="p">)</span>
-<span class="n">arena</span><span class="o">.</span><span class="n">set_competitor_class_var</span><span class="p">(</span><span class="s1">&#39;_c&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-<span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">new_arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">GlickoCompetitor</span><span class="p">)</span>
+
+<span class="c1"># Manually add competitors from saved state</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">saved_state</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="c1"># Filter out any class_vars if present</span>
+    <span class="n">competitor_args</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                      <span class="k">if</span> <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;class_vars&#39;</span><span class="p">}</span>
+    <span class="n">new_arena</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">GlickoCompetitor</span><span class="p">(</span><span class="o">**</span><span class="n">competitor_args</span><span class="p">)</span>
+
+<span class="c1"># Set class variable after initialization</span>
+<span class="n">new_arena</span><span class="o">.</span><span class="n">set_competitor_class_var</span><span class="p">(</span><span class="s2">&quot;_c&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">new_arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arena results:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">new_arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Arena</span> <span class="n">results</span><span class="p">:</span>
+<span class="p">[</span>
     <span class="p">{</span>
         <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
         <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">955.4305146831251</span>
@@ -472,6 +518,7 @@
         <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1967.7914038679244</span>
     <span class="p">}</span>
 <span class="p">]</span>
+<span class="n">Arena</span> <span class="n">results</span><span class="p">:</span>
 <span class="p">[</span>
     <span class="p">{</span>
         <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
@@ -500,7 +547,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rating_systems/comparison.html" class="btn btn-neutral float-left" title="Comparing Rating Systems" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="advance_example.html" class="btn btn-neutral float-right" title="Advanced Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

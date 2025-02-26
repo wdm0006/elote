@@ -1,22 +1,20 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>elote.arenas.base &mdash; elote 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=2389946f"></script>
-        <script src="../../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -41,13 +39,38 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../advance_example.html">Advanced Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Concepts</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../competitors.html">Competitors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../arenas.html">Arenas</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/elo.html">Elo Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/ecf.html">ECF Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/dwz.html">DWZ Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/ensemble.html">Ensemble Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/comparison.html">Comparing Rating Systems</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advance_example.html">Advanced Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../use_cases/product_ranking.html">Product Ranking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../use_cases/matchmaking.html">Matchmaking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../use_cases/feature_prioritization.html">Feature Prioritization with Elote</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
 </ul>
 
         </div>
@@ -75,72 +98,131 @@
            <div itemprop="articleBody">
              
   <h1>Source code for elote.arenas.base</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">abc</span>
-<span class="kn">import</span> <span class="nn">random</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">abc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 
 
-<span class="k">class</span> <span class="nc">BaseArena</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseArena</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base abstract class for all arena implementations.</span>
+<span class="sd">    </span>
+<span class="sd">    Arenas manage competitions between multiple competitors, handling matchups,</span>
+<span class="sd">    tournaments, and leaderboard generation. This class defines the interface</span>
+<span class="sd">    that all arena implementations must follow.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">set_competitor_class_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">pass</span>
-
-    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">tournament</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matchups</span><span class="p">):</span>
-        <span class="k">pass</span>
-
-    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">matchup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
-        <span class="k">pass</span>
-
-    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">leaderboard</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">pass</span>
-
-    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">export_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">pass</span>
-
-
-<div class="viewcode-block" id="History"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.History">[docs]</a><span class="k">class</span> <span class="nc">History</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_competitor_class_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set a class variable on all competitors in this arena.</span>
+<span class="sd">        </span>
+<span class="sd">        This method allows for global configuration of all competitors</span>
+<span class="sd">        managed by this arena.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): The name of the class variable to set.</span>
+<span class="sd">            value: The value to set for the class variable.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tournament</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matchups</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a tournament with the given matchups.</span>
+<span class="sd">        </span>
+<span class="sd">        A tournament consists of multiple matchups between competitors.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            matchups (list): A list of matchup pairs to process.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matchup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process a single matchup between two competitors.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            a: The first competitor or competitor identifier.</span>
+<span class="sd">            b: The second competitor or competitor identifier.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            The result of the matchup.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">leaderboard</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a leaderboard of all competitors.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list: A sorted list of competitors and their ratings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">export_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the current state of this arena for serialization.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: A dictionary containing all necessary information to recreate</span>
+<span class="sd">                 this arena&#39;s current state.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+
+<div class="viewcode-block" id="History"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.History">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">History</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tracks the history of bouts (matchups) and provides analysis methods.</span>
+<span class="sd">    </span>
+<span class="sd">    This class stores the results of matchups and provides methods to analyze</span>
+<span class="sd">    the performance of the rating system.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize an empty history of bouts.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span> <span class="o">=</span> <span class="p">[]</span>
 
-<div class="viewcode-block" id="History.add_bout"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.History.add_bout">[docs]</a>    <span class="k">def</span> <span class="nf">add_bout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bout</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param bout:</span>
-<span class="sd">        :return:</span>
+<div class="viewcode-block" id="History.add_bout"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.History.add_bout">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">add_bout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bout</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a bout to the history.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            bout (Bout): The bout object to add to the history.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bout</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="History.report_results"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.History.report_results">[docs]</a>    <span class="k">def</span> <span class="nf">report_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param lower_threshold:</span>
-<span class="sd">        :param upper_threshold:</span>
-<span class="sd">        :return:</span>
+<div class="viewcode-block" id="History.report_results"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.History.report_results">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">report_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a report of the results in this history.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            lower_threshold (float): The lower probability threshold for predictions.</span>
+<span class="sd">            upper_threshold (float): The upper probability threshold for predictions.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list: A list of dictionaries containing the results of each bout.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">report</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">:</span>
-            <span class="n">report</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
-                <span class="s1">&#39;predicted_winnder&#39;</span><span class="p">:</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_winner</span><span class="p">(</span><span class="n">lower_threshold</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="p">),</span>
-                <span class="s1">&#39;predicted_loser&#39;</span><span class="p">:</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_loser</span><span class="p">(</span><span class="n">lower_threshold</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="p">),</span>
-                <span class="s1">&#39;probability&#39;</span><span class="p">:</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
-                <span class="s1">&#39;actual_winner&#39;</span><span class="p">:</span> <span class="n">bout</span><span class="o">.</span><span class="n">actual_winner</span><span class="p">(),</span>
-                <span class="s1">&#39;correct&#39;</span><span class="p">:</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_winner</span><span class="p">(</span><span class="n">lower_threshold</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="p">)</span> <span class="o">==</span> <span class="n">bout</span><span class="o">.</span><span class="n">actual_winner</span><span class="p">()</span>
-            <span class="p">})</span>
+            <span class="n">report</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;predicted_winnder&quot;</span><span class="p">:</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_winner</span><span class="p">(</span><span class="n">lower_threshold</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="p">),</span>
+                    <span class="s2">&quot;predicted_loser&quot;</span><span class="p">:</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_loser</span><span class="p">(</span><span class="n">lower_threshold</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="p">),</span>
+                    <span class="s2">&quot;probability&quot;</span><span class="p">:</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+                    <span class="s2">&quot;actual_winner&quot;</span><span class="p">:</span> <span class="n">bout</span><span class="o">.</span><span class="n">actual_winner</span><span class="p">(),</span>
+                    <span class="s2">&quot;correct&quot;</span><span class="p">:</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_winner</span><span class="p">(</span><span class="n">lower_threshold</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="p">)</span> <span class="o">==</span> <span class="n">bout</span><span class="o">.</span><span class="n">actual_winner</span><span class="p">(),</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="n">report</span></div>
 
-<div class="viewcode-block" id="History.confusion_matrix"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.History.confusion_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">confusion_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">attribute_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param lower_threshold:</span>
-<span class="sd">        :param upper_threshold:</span>
-<span class="sd">        :param attribute_filter:</span>
-<span class="sd">        :return:</span>
+<div class="viewcode-block" id="History.confusion_matrix"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.History.confusion_matrix">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">confusion_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">attribute_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate confusion matrix metrics for the bout history.</span>
+<span class="sd">        </span>
+<span class="sd">        This method calculates true positives, false positives, true negatives,</span>
+<span class="sd">        and false negatives based on the prediction thresholds.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            lower_threshold (float): The lower probability threshold for predictions.</span>
+<span class="sd">            upper_threshold (float): The upper probability threshold for predictions.</span>
+<span class="sd">            attribute_filter (dict, optional): Filter bouts by attributes.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: A tuple containing (true_positives, false_positives, true_negatives, </span>
+<span class="sd">                  false_negatives, do_nothing_count).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">tp</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">tn</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">do_nothing</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">:</span>
@@ -164,11 +246,17 @@
 
         <span class="k">return</span> <span class="n">tp</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">tn</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">do_nothing</span></div>
 
-<div class="viewcode-block" id="History.random_search"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.History.random_search">[docs]</a>    <span class="k">def</span> <span class="nf">random_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param trials:</span>
-<span class="sd">        :return:</span>
+<div class="viewcode-block" id="History.random_search"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.History.random_search">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">random_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Search for optimal prediction thresholds using random sampling.</span>
+<span class="sd">        </span>
+<span class="sd">        This method performs a random search to find the best lower and upper</span>
+<span class="sd">        thresholds that maximize the net performance (TP + TN - FP - FN).</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            trials (int): The number of random threshold pairs to try.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: A tuple containing (best_net_performance, best_thresholds).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">best_net</span><span class="p">,</span> <span class="n">best_thresholds</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">list</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">trials</span><span class="p">):</span>
@@ -181,15 +269,22 @@
         <span class="k">return</span> <span class="n">best_net</span><span class="p">,</span> <span class="n">best_thresholds</span></div></div>
 
 
-<div class="viewcode-block" id="Bout"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout">[docs]</a><span class="k">class</span> <span class="nc">Bout</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">predicted_outcome</span><span class="p">,</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param a:</span>
-<span class="sd">        :param b:</span>
-<span class="sd">        :param predicted_outcome:</span>
-<span class="sd">        :param outcome:</span>
-<span class="sd">        :param attributes:</span>
+<div class="viewcode-block" id="Bout"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Bout</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a single matchup (bout) between two competitors.</span>
+<span class="sd">    </span>
+<span class="sd">    This class stores the competitors, the predicted outcome, the actual outcome,</span>
+<span class="sd">    and any additional attributes of the bout.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">predicted_outcome</span><span class="p">,</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a bout between two competitors.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            a: The first competitor.</span>
+<span class="sd">            b: The second competitor.</span>
+<span class="sd">            predicted_outcome (float): The predicted probability of a winning.</span>
+<span class="sd">            outcome (str): The actual outcome (&quot;win&quot;, &quot;loss&quot;, or &quot;draw&quot;).</span>
+<span class="sd">            attributes (dict, optional): Additional attributes of this bout.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span>
@@ -197,56 +292,79 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">=</span> <span class="n">outcome</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span> <span class="o">=</span> <span class="n">attributes</span> <span class="ow">or</span> <span class="nb">dict</span><span class="p">()</span>
 
-<div class="viewcode-block" id="Bout.true_positive"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout.true_positive">[docs]</a>    <span class="k">def</span> <span class="nf">true_positive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param threshold:</span>
-<span class="sd">        :return:</span>
+<div class="viewcode-block" id="Bout.true_positive"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout.true_positive">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">true_positive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if this bout is a true positive prediction.</span>
+<span class="sd">        </span>
+<span class="sd">        A true positive occurs when the model correctly predicts a win.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            threshold (float): The probability threshold for a positive prediction.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if this bout is a true positive, False otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&gt;</span> <span class="n">threshold</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="s1">&#39;win&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&gt;</span> <span class="n">threshold</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="s2">&quot;win&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="Bout.false_positive"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout.false_positive">[docs]</a>    <span class="k">def</span> <span class="nf">false_positive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param threshold:</span>
-<span class="sd">        :return:</span>
+<div class="viewcode-block" id="Bout.false_positive"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout.false_positive">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">false_positive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if this bout is a false positive prediction.</span>
+<span class="sd">        </span>
+<span class="sd">        A false positive occurs when the model incorrectly predicts a win.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            threshold (float): The probability threshold for a positive prediction.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if this bout is a false positive, False otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&gt;</span> <span class="n">threshold</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">!=</span> <span class="s1">&#39;win&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&gt;</span> <span class="n">threshold</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">!=</span> <span class="s2">&quot;win&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="Bout.true_negative"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout.true_negative">[docs]</a>    <span class="k">def</span> <span class="nf">true_negative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param threshold:</span>
-<span class="sd">        :return:</span>
+<div class="viewcode-block" id="Bout.true_negative"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout.true_negative">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">true_negative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if this bout is a true negative prediction.</span>
+<span class="sd">        </span>
+<span class="sd">        A true negative occurs when the model correctly predicts a non-win.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            threshold (float): The probability threshold for a negative prediction.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if this bout is a true negative, False otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&lt;=</span> <span class="n">threshold</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="s1">&#39;loss&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&lt;=</span> <span class="n">threshold</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="s2">&quot;loss&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="Bout.false_negative"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout.false_negative">[docs]</a>    <span class="k">def</span> <span class="nf">false_negative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param threshold:</span>
-<span class="sd">        :return:</span>
+<div class="viewcode-block" id="Bout.false_negative"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout.false_negative">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">false_negative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if this bout is a false negative prediction.</span>
+<span class="sd">        </span>
+<span class="sd">        A false negative occurs when the model incorrectly predicts a non-win.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            threshold (float): The probability threshold for a negative prediction.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if this bout is a false negative, False otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&lt;=</span> <span class="n">threshold</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">!=</span> <span class="s1">&#39;loss&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&lt;=</span> <span class="n">threshold</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">!=</span> <span class="s2">&quot;loss&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="Bout.predicted_winner"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout.predicted_winner">[docs]</a>    <span class="k">def</span> <span class="nf">predicted_winner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param lower_threshold:</span>
-<span class="sd">        :param upper_threshold:</span>
-<span class="sd">        :return:</span>
+<div class="viewcode-block" id="Bout.predicted_winner"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout.predicted_winner">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">predicted_winner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine the predicted winner of this bout.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            lower_threshold (float): The lower probability threshold for predictions.</span>
+<span class="sd">            upper_threshold (float): The upper probability threshold for predictions.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The identifier of the predicted winner, or None if no winner is predicted.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&gt;</span> <span class="n">upper_threshold</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span>
@@ -255,12 +373,15 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="Bout.predicted_loser"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout.predicted_loser">[docs]</a>    <span class="k">def</span> <span class="nf">predicted_loser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param lower_threshold:</span>
-<span class="sd">        :param upper_threshold:</span>
-<span class="sd">        :return:</span>
+<div class="viewcode-block" id="Bout.predicted_loser"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout.predicted_loser">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">predicted_loser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine the predicted loser of this bout.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            lower_threshold (float): The lower probability threshold for predictions.</span>
+<span class="sd">            upper_threshold (float): The upper probability threshold for predictions.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The identifier of the predicted loser, or None if no loser is predicted.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&gt;</span> <span class="n">upper_threshold</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
@@ -269,14 +390,15 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="Bout.actual_winner"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout.actual_winner">[docs]</a>    <span class="k">def</span> <span class="nf">actual_winner</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :return:</span>
+<div class="viewcode-block" id="Bout.actual_winner"><a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout.actual_winner">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">actual_winner</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine the actual winner of this bout.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The identifier of the actual winner, or None if no winner is determined.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="s1">&#39;win&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="s2">&quot;win&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="s1">&#39;loss&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="s2">&quot;loss&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span></div></div>
