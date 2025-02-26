@@ -13,3 +13,5 @@ htmlcov/
 .pytest_cache/
 .ruff_cache/
 *.egg-info/
+.venv/
+.benchmarks/
