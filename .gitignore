@@ -6,3 +6,10 @@ docs/build/*
 *.sublime-project
 *.sublime-workspace
 docs/build/
+benchmark_results/
+.tox/
+.coverage
+htmlcov/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/

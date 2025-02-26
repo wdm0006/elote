@@ -5,7 +5,7 @@ competitor_types = {
     "EloCompetitor": EloCompetitor,
     "ECFCompetitor": ECFCompetitor,
     "DWZCompetitor": DWZCompetitor,
-    "GlickoCompetitor": GlickoCompetitor
+    "GlickoCompetitor": GlickoCompetitor,
 }
 
 
@@ -18,17 +18,17 @@ class BlendedCompetitor(BaseCompetitor):
         """
         self.sub_competitors = []
         for competitor in competitors:
-            comp_type = competitor_types.get(competitor.get('type', 'EloCompetitor'))
-            comp_kwargs = competitor.get('competitor_kwargs', {})
+            comp_type = competitor_types.get(competitor.get("type", "EloCompetitor"))
+            comp_kwargs = competitor.get("competitor_kwargs", {})
             self.sub_competitors.append(comp_type(**comp_kwargs))
 
         self.blend_mode = blend_mode
 
     def __repr__(self):
-        return '<BlendedCompetitor: %s>' % (self.__hash__())
+        return "<BlendedCompetitor: %s>" % (self.__hash__())
 
     def __str__(self):
-        return '<BlendedCompetitor>'
+        return "<BlendedCompetitor>"
 
     @property
     def rating(self):
@@ -42,13 +42,7 @@ class BlendedCompetitor(BaseCompetitor):
         """
         return {
             "blend_mode": self.blend_mode,
-            "competitors": [
-                {
-                    "type": x.__name__,
-                    "competitor_kwargs": x.export_state()
-                }
-                for x in self.sub_competitors
-            ]
+            "competitors": [{"type": x.__name__, "competitor_kwargs": x.export_state()} for x in self.sub_competitors],
         }
 
     def expected_score(self, competitor: BaseCompetitor):
@@ -62,13 +56,13 @@ class BlendedCompetitor(BaseCompetitor):
 
         self.verify_competitor_types(competitor)
 
-        if self.blend_mode == 'mean':
+        if self.blend_mode == "mean":
             es = list()
             for c, other_c in zip(self.sub_competitors, competitor.sub_competitors):
                 es.append(c.expected_score(other_c))
             return sum(es) / len(es)
         else:
-            raise NotImplementedError('Blend mode %s not supported' % (self.blend_mode, ))
+            raise NotImplementedError("Blend mode %s not supported" % (self.blend_mode,))
 
     def beat(self, competitor: BaseCompetitor):
         """

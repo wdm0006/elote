@@ -1,6 +1,0 @@
-pytest
-sphinx>=6.1.3
-docutils>=0.19
-sphinx_rtd_theme
-flake8
-wheel

@@ -17,5 +17,3 @@ arena = LambdaArena(func, base_competitor=ECFCompetitor)
 arena.tournament(matchups)
 
 print(json.dumps(arena.leaderboard(), indent=4))
-
-

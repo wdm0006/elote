@@ -21,10 +21,10 @@ class ECFCompetitor(BaseCompetitor):
         self.scores = None
 
     def __repr__(self):
-        return '<ECFCompetitor: %s>' % (self.__hash__())
+        return "<ECFCompetitor: %s>" % (self.__hash__())
 
     def __str__(self):
-        return '<ECFCompetitor>'
+        return "<ECFCompetitor>"
 
     def __initialize_ratings(self):
         self.scores = deque([None for _ in range(self._n_periods - 1)])
@@ -60,10 +60,7 @@ class ECFCompetitor(BaseCompetitor):
         """
         return {
             "initial_rating": self.rating,
-            "class_vars": {
-                "_delta": self._delta,
-                "_n_periods": self._n_periods
-            }
+            "class_vars": {"_delta": self._delta, "_n_periods": self._n_periods},
         }
 
     @property

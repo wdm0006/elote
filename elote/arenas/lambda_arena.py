@@ -4,7 +4,13 @@ from elote.arenas.base import BaseArena, Bout, History
 
 
 class LambdaArena(BaseArena):
-    def __init__(self, func, base_competitor=EloCompetitor, base_competitor_kwargs=None, initial_state=None):
+    def __init__(
+        self,
+        func,
+        base_competitor=EloCompetitor,
+        base_competitor_kwargs=None,
+        initial_state=None,
+    ):
         """
 
         :param func:
@@ -69,13 +75,13 @@ class LambdaArena(BaseArena):
 
         if res is None:
             self.competitors[a].tied(self.competitors[b])
-            self.history.add_bout(Bout(a, b, predicted_outcome, outcome='tie', attributes=attributes))
+            self.history.add_bout(Bout(a, b, predicted_outcome, outcome="tie", attributes=attributes))
         elif res is True:
             self.competitors[a].beat(self.competitors[b])
-            self.history.add_bout(Bout(a, b, predicted_outcome, outcome='win', attributes=attributes))
+            self.history.add_bout(Bout(a, b, predicted_outcome, outcome="win", attributes=attributes))
         else:
             self.competitors[b].beat(self.competitors[a])
-            self.history.add_bout(Bout(a, b, predicted_outcome, outcome='loss', attributes=attributes))
+            self.history.add_bout(Bout(a, b, predicted_outcome, outcome="loss", attributes=attributes))
 
     def expected_score(self, a, b):
         """
@@ -106,12 +112,6 @@ class LambdaArena(BaseArena):
 
         :return:
         """
-        lb = [
-            {
-                "competitor": k,
-                "rating": v.rating
-            }
-            for k, v in self.competitors.items()
-        ]
+        lb = [{"competitor": k, "rating": v.rating} for k, v in self.competitors.items()]
 
-        return sorted(lb, key=lambda x: x.get('rating'))
+        return sorted(lb, key=lambda x: x.get("rating"))

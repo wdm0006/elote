@@ -43,10 +43,10 @@ class EloCompetitor(BaseCompetitor):
         self._k_factor = k_factor
 
     def __repr__(self):
-        return '<EloCompetitor: %s>' % (self.__hash__())
+        return "<EloCompetitor: %s>" % (self.__hash__())
 
     def __str__(self):
-        return '<EloCompetitor>'
+        return "<EloCompetitor>"
 
     def export_state(self):
         """
@@ -58,8 +58,8 @@ class EloCompetitor(BaseCompetitor):
             "initial_rating": self._rating,
             "class_vars": {
                 "_k_factor": self._k_factor,
-                "_base_rating": self._base_rating
-            }
+                "_base_rating": self._base_rating,
+            },
         }
 
     @property

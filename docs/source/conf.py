@@ -12,18 +12,31 @@
 
 import os
 import sys
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath('.'))))
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath("."))))
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'elote'
-copyright = '2020, Will McGinnis'
-author = 'Will McGinnis'
+project = "elote"
+copyright = "2020, Will McGinnis"
+author = "Will McGinnis"
 
 # The full version, including alpha/beta/rc tags
-from version import __version__
-release = __version__
+try:
+    # Try to get version from importlib.metadata (Python 3.8+)
+    from importlib.metadata import version as get_version
+
+    release = get_version("elote")
+except ImportError:
+    # Fallback for older Python versions
+    try:
+        import pkg_resources
+
+        release = pkg_resources.get_distribution("elote").version
+    except Exception:  # Replace bare except with specific exception type
+        # Hardcoded fallback
+        release = "0.1.0"
 
 
 # -- General configuration ---------------------------------------------------
@@ -31,13 +44,10 @@ release = __version__
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.viewcode'
-]
+extensions = ["sphinx.ext.autodoc", "sphinx.ext.viewcode"]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -50,11 +60,11 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = "sphinx_rtd_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
-autoclass_content = 'both'
+autoclass_content = "both"

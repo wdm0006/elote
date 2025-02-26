@@ -31,6 +31,11 @@ class BaseCompetitor:
         pass
 
     def verify_competitor_types(self, competitor):
-        if type(competitor) != type(self):
+        if not isinstance(competitor, self.__class__):
             raise MissMatchedCompetitorTypesException(
-                'Competitor types %s and %s cannot be co-mingled' % (type(competitor), type(self),))
+                "Competitor types %s and %s cannot be co-mingled"
+                % (
+                    type(competitor),
+                    type(self),
+                )
+            )

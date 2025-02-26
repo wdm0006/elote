@@ -18,10 +18,10 @@ class DWZCompetitor(BaseCompetitor):
         self._rating = initial_rating
 
     def __repr__(self):
-        return '<DWZCompetitor: %s>' % (self.__hash__())
+        return "<DWZCompetitor: %s>" % (self.__hash__())
 
     def __str__(self):
-        return '<DWZCompetitor>'
+        return "<DWZCompetitor>"
 
     @property
     def rating(self):
@@ -37,13 +37,7 @@ class DWZCompetitor(BaseCompetitor):
 
         :return: dictionary of kwargs and class-args to re-instantiate this object
         """
-        return {
-            "initial_rating": self._rating,
-            "class_vars": {
-                "_J": self._J
-            }
-        }
-
+        return {"initial_rating": self._rating, "class_vars": {"_J": self._J}}
 
     def expected_score(self, competitor: BaseCompetitor):
         """

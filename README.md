@@ -15,6 +15,63 @@ Currently implemented rating systems are:
  * ECF [4]
  * DWZ [5]
 
+Installation
+===========
+
+You can install Elote using pip:
+
+```bash
+pip install elote
+```
+
+For development, we now use a modern Python packaging approach with `pyproject.toml`:
+
+```bash
+# Using Make (recommended)
+make install-dev
+
+# Or using pip
+pip install -e ".[dev]"
+
+# Or using uv
+uv pip install -e ".[dev]"
+```
+
+See [PYPROJECT_README.md](PYPROJECT_README.md) for more details on the new project structure.
+
+Requirements
+===========
+
+- Python 3.8 or higher
+
+Development
+===========
+
+The project includes a Makefile that simplifies common development tasks:
+
+```bash
+# Run tests
+make test
+
+# Run tests with coverage
+make test-cov
+
+# Lint code
+make lint
+
+# Auto-fix linting issues
+make lint-fix
+
+# Format code
+make format
+
+# Build package
+make build
+
+# Build documentation
+make docs
+```
+
 Usage
 =====
 
@@ -146,13 +203,6 @@ Examples
 
 In the examples directory there are a bunch of basic examples using generated data to show different features of elote,
 as well as some use cases using real data, so far all from MasseyRatings.com, but transformed into JSON [2].
-
-Installation
-============
-
-```bash
-    pip install elote
-```
 
 Supporting only python 3.4+
 

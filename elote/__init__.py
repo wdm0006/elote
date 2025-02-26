@@ -13,5 +13,5 @@ __all__ = [
     "DWZCompetitor",
     "GlickoCompetitor",
     "LambdaArena",
-    "BlendedCompetitor"
+    "BlendedCompetitor",
 ]

@@ -1,0 +1,90 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "elote"
+version = "0.1.0"
+description = "Python module for rating bouts (like with Elo Rating)"
+readme = "README.md"
+authors = [
+    {name = "Will McGinnis", email = "will@helton.io"},
+]
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+keywords = ["elo", "scoring", "rating"]
+dependencies = [
+    "tqdm==4.66.3",
+]
+requires-python = ">=3.8"
+
+[project.urls]
+Homepage = "https://github.com/helton-tech/elote"
+"Bug Tracker" = "https://github.com/helton-tech/elote/issues"
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "sphinx>=6.1.3",
+    "docutils>=0.19",
+    "sphinx_rtd_theme",
+    "ruff",
+    "wheel",
+    "build",
+    "tox",
+    "tox-uv",
+    "pytest-benchmark",
+]
+
+[tool.setuptools]
+packages = ["elote"]
+package-data = {"elote" = ["py.typed"]}
+
+[tool.setuptools.exclude-package-data]
+"*" = ["*.pyc", "*.pyo", "*.pyd", "*.so", "*.dylib", "*~"]
+
+[tool.pytest]
+testpaths = ["tests"]
+python_files = "test_*.py"
+
+[tool.ruff]
+# Same as Black.
+line-length = 120
+indent-width = 4
+
+# Assume Python 3.8
+target-version = "py38"
+
+[tool.ruff.lint]
+# Enable Pyflakes (`F`), pycodestyle (`E`), and flake8-bugbear (`B`) rules
+select = ["E", "F", "B"]
+ignore = ["E501"]  # Ignore line length errors since we'll fix them gradually
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+# Use double quotes for strings.
+quote-style = "double"
+
+# Indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Automatically detect the appropriate line ending.
+line-ending = "auto" 

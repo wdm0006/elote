@@ -26,9 +26,7 @@ class BaseArena:
 
 class History:
     def __init__(self):
-        """
-
-        """
+        """ """
         self.bouts = []
 
     def add_bout(self, bout):
@@ -48,13 +46,15 @@ class History:
         """
         report = list()
         for bout in self.bouts:
-            report.append({
-                'predicted_winnder': bout.predicted_winner(lower_threshold, upper_threshold),
-                'predicted_loser': bout.predicted_loser(lower_threshold, upper_threshold),
-                'probability': bout.predicted_outcome * 100,
-                'actual_winner': bout.actual_winner(),
-                'correct': bout.predicted_winner(lower_threshold, upper_threshold) == bout.actual_winner()
-            })
+            report.append(
+                {
+                    "predicted_winnder": bout.predicted_winner(lower_threshold, upper_threshold),
+                    "predicted_loser": bout.predicted_loser(lower_threshold, upper_threshold),
+                    "probability": bout.predicted_outcome * 100,
+                    "actual_winner": bout.actual_winner(),
+                    "correct": bout.predicted_winner(lower_threshold, upper_threshold) == bout.actual_winner(),
+                }
+            )
         return report
 
     def confusion_matrix(self, lower_threshold=0.5, upper_threshold=0.5, attribute_filter=None):
@@ -126,7 +126,7 @@ class Bout:
         :param threshold:
         :return:
         """
-        if self.predicted_outcome > threshold and self.outcome == 'win':
+        if self.predicted_outcome > threshold and self.outcome == "win":
             return True
         else:
             return False
@@ -137,7 +137,7 @@ class Bout:
         :param threshold:
         :return:
         """
-        if self.predicted_outcome > threshold and self.outcome != 'win':
+        if self.predicted_outcome > threshold and self.outcome != "win":
             return True
         else:
             return False
@@ -148,7 +148,7 @@ class Bout:
         :param threshold:
         :return:
         """
-        if self.predicted_outcome <= threshold and self.outcome == 'loss':
+        if self.predicted_outcome <= threshold and self.outcome == "loss":
             return True
         else:
             return False
@@ -159,7 +159,7 @@ class Bout:
         :param threshold:
         :return:
         """
-        if self.predicted_outcome <= threshold and self.outcome != 'loss':
+        if self.predicted_outcome <= threshold and self.outcome != "loss":
             return True
         else:
             return False
@@ -197,9 +197,9 @@ class Bout:
 
         :return:
         """
-        if self.outcome == 'win':
+        if self.outcome == "win":
             return self.a
-        elif self.outcome == 'loss':
+        elif self.outcome == "loss":
             return self.b
         else:
             return None
