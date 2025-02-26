@@ -1,30 +1,55 @@
-Elote
-=====
+# Elote 🏆
 
-A python package for rating competitors based on bouts. The classical example of this would be rating chess players based
-on repeated head to head matches between different players. The first rating system implemented in elote, the Elo rating
-system, was made for just that [3]. Another well known use case would be for college football rankings.
+[![PyPI version](https://badge.fury.io/py/elote.svg)](https://badge.fury.io/py/elote)
+[![Python Versions](https://img.shields.io/pypi/pyversions/elote.svg)](https://pypi.org/project/elote/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-There are a whole bunch of other use-cases for this sort of system other than sports though, including collaborative
-ranking from a group (for voting, prioritizing, or other similar activities).
+**Elote** (Spanish for "corn") is a powerful Python library for implementing and comparing rating systems. Whether you're ranking chess players, sports teams, or prioritizing features in your product backlog, Elote provides a simple, elegant API for all your competitive ranking needs.
 
-Currently implemented rating systems are:
+## Table of Contents
+- [Overview](#overview)
+- [Features](#features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Usage Examples](#usage-examples)
+  - [Competitors](#competitors)
+  - [Arenas](#arenas)
+- [Development](#development)
+- [Contributing](#contributing)
+- [References](#references)
 
- * Elo [3]
- * Glicko-1 [1]
- * ECF [4]
- * DWZ [5]
+## Overview
 
-Installation
-===========
+Rating systems allow you to rank competitors based on their performance in head-to-head matchups. The most famous example is the Elo rating system used in chess, but these systems have applications far beyond sports:
 
-You can install Elote using pip:
+- Ranking products based on A/B comparisons
+- Prioritizing features through pairwise voting
+- Creating recommendation systems
+- Matchmaking in games and competitions
+- Collaborative filtering and ranking
+
+Elote makes implementing these systems simple and intuitive, with a clean API that handles all the mathematical complexity for you.
+
+## Features
+
+Currently implemented rating systems:
+
+- **Elo** - The classic chess rating system
+- **Glicko-1** - An improvement on Elo that accounts for rating reliability
+- **ECF** - The English Chess Federation rating system
+- **DWZ** - The Deutsche Wertungszahl (German evaluation number) system
+
+## Installation
+
+### For Users
 
 ```bash
 pip install elote
 ```
 
-For development, we now use a modern Python packaging approach with `pyproject.toml`:
+### For Developers
+
+We use a modern Python packaging approach with `pyproject.toml`:
 
 ```bash
 # Using Make (recommended)
@@ -37,15 +62,103 @@ pip install -e ".[dev]"
 uv pip install -e ".[dev]"
 ```
 
-See [PYPROJECT_README.md](PYPROJECT_README.md) for more details on the new project structure.
+See [PYPROJECT_README.md](PYPROJECT_README.md) for more details on the project structure.
 
-Requirements
-===========
+### Requirements
 
 - Python 3.8 or higher
 
-Development
-===========
+## Quick Start
+
+```python
+from elote import EloCompetitor
+
+# Create two competitors with different initial ratings
+player1 = EloCompetitor(initial_rating=1500)
+player2 = EloCompetitor(initial_rating=1600)
+
+# Get win probability
+print(f"Player 2 win probability: {player2.expected_score(player1):.2%}")
+
+# Record a match result
+player1.beat(player2)  # Player 1 won!
+
+# Ratings are automatically updated
+print(f"Player 1 new rating: {player1.rating}")
+print(f"Player 2 new rating: {player2.rating}")
+```
+
+## Usage Examples
+
+Elote is built around two main concepts: **Competitors** and **Arenas**.
+
+### Competitors
+
+Competitors represent the entities you're rating. Here's how to use them:
+
+```python
+from elote import EloCompetitor
+
+good = EloCompetitor(initial_rating=400)
+better = EloCompetitor(initial_rating=500)
+
+# Check win probabilities
+print(f"Probability of better beating good: {better.expected_score(good):.2%}")
+print(f"Probability of good beating better: {good.expected_score(better):.2%}")
+```
+
+Output:
+```
+Probability of better beating good: 64.01%
+Probability of good beating better: 35.99%
+```
+
+If a match occurs, updating ratings is simple:
+
+```python
+# If good wins (an upset!)
+good.beat(better)
+# OR
+better.lost_to(good)
+
+# Check updated probabilities
+print(f"Probability of better beating good: {better.expected_score(good):.2%}")
+print(f"Probability of good beating better: {good.expected_score(better):.2%}")
+```
+
+Output:
+```
+Probability of better beating good: 61.25%
+Probability of good beating better: 38.75%
+```
+
+### Arenas
+
+Arenas handle large numbers of matchups automatically. The `LambdaArena` takes a comparison function and manages all competitors for you:
+
+```python
+from elote import LambdaArena
+import json
+import random
+
+# Define a comparison function (returns True if a beats b)
+def comparison(a, b):
+    return a > b
+
+# Generate 1000 random matchups between numbers 1-10
+matchups = [(random.randint(1, 10), random.randint(1, 10)) for _ in range(1000)]
+
+# Create arena and run tournament
+arena = LambdaArena(comparison)
+arena.tournament(matchups)
+
+# Display final rankings
+print(json.dumps(arena.leaderboard(), indent=4))
+```
+
+This example effectively implements a sorting algorithm using a rating system - not efficient, but demonstrates how Elote works with any comparable objects!
+
+## Development
 
 The project includes a Makefile that simplifies common development tasks:
 
@@ -72,151 +185,22 @@ make build
 make docs
 ```
 
-Usage
-=====
+## Contributing
 
-There are a bunch of examples in the examples directory if you want to dive a little deeper, but 
-Elote is pretty simple to use. The two objects we care about are Competitors and Arenas. Competitors 
-are the things you are rating, and an Arena is a mechanism to schedule Bouts between them. First, Competitors:
+Contributions are welcome! If you'd like to help improve Elote:
 
-Competitors
------------
+1. Check the [issues](https://github.com/yourusername/elote/issues) for open tasks
+2. Fork the repository
+3. Create a feature branch
+4. Add your changes
+5. Submit a pull request
 
-```python
-from elote import EloCompetitor
+For major changes, please open an issue first to discuss what you'd like to change.
 
-good = EloCompetitor(initial_rating=400)
-better = EloCompetitor(initial_rating=500)
+## References
 
-print('probability of better beating good: %5.2f%%' % (better.expected_score(good) * 100, ))
-print('probability of good beating better: %5.2f%%' % (good.expected_score(better) * 100, ))
-```
-
-This creates two competitors, intilized with different starting ratings. Right away we can see how a match
-between them is likely to go:
-
-```bash
-probability of better beating good: 64.01%
-probability of good beating better: 35.99%
-```
-
-If we actually held the match, and there was an upset, updating their rankings is as easy as:
-
-```python
-good.beat(better)
-```
-
-or
-
-```python
-better.lost_to(good)
-```
-
-We can then rerun the predictions and see updated probabilities:
-
-```bash
-    probability of better beating good: 61.25%
-    probability of good beating better: 38.75%
-```
-
-Not a huge change using default settings.
-
-Arenas
-------
-
-Arenas are a useful abstraction for scheduling large numbers of bouts or matches. The LambdaArena object 
-takes in a lambda function with two arguments which returns a boolean for if the first argument won (None for ties). Without 
-ever manually setting up any competitors, as long as the arguments are hash-able, the Arena object will create
-all of the competitors, run the matches and rank them all. 
-
-Here's a toy example which uses a lambda function that just compares two integers. With this, we've implemented
-the worst performing, most over complicated sorting algorithm conceivable, but it works:
-
-```python
-from elote import LambdaArena
-import json
-import random
-
-
-# sample bout function which just compares the two inputs
-def func(a, b):
-    return a > b
-
-matchups = [(random.randint(1, 10), random.randint(1, 10)) for _ in range(1000)]
-
-arena = LambdaArena(func)
-arena.tournament(matchups)
-
-print(json.dumps(arena.leaderboard(), indent=4))
-```
-
-The final leaderboard looks like:
-
-```bash
-[
-    {
-        "rating": 560.0,
-        "competitor": 1
-    },
-    {
-        "rating": 803.3256886926524,
-        "competitor": 2
-    },
-    {
-        "rating": 994.1660057704563,
-        "competitor": 3
-    },
-    {
-        "rating": 1096.0912814220258,
-        "competitor": 4
-    },
-    {
-        "rating": 1221.000354671287,
-        "competitor": 5
-    },
-    {
-        "rating": 1351.4243548137367,
-        "competitor": 6
-    },
-    {
-        "rating": 1401.770230395329,
-        "competitor": 7
-    },
-    {
-        "rating": 1558.934907485894,
-        "competitor": 8
-    },
-    {
-        "rating": 1607.6971796462033,
-        "competitor": 9
-    },
-    {
-        "rating": 1708.3786662956998,
-        "competitor": 10
-    }
-]
-```
-
-
-Examples
-========
-
-In the examples directory there are a bunch of basic examples using generated data to show different features of elote,
-as well as some use cases using real data, so far all from MasseyRatings.com, but transformed into JSON [2].
-
-Supporting only python 3.4+
-
-Contributing
-============
-
-This is very much still a work in progress, so if you're interested in contributing, there is lots to do. Open up an
-issue or a PR and we can coordinate efforts.
-
-References
-==========
-
- - [1] http://www.glicko.net/glicko/glicko.pdf
- - [2] MasseyRatings.com
- - [3] Elo, Arpad (1978). The Rating of Chessplayers, Past and Present. Arco. ISBN 0-668-04721-6.
- - [4] http://www.ecfgrading.org.uk/new/help.php#elo
- - [5] https://en.wikipedia.org/wiki/Deutsche_Wertungszahl
+1. [Glicko Rating System](http://www.glicko.net/glicko/glicko.pdf)
+2. [Massey Ratings](https://masseyratings.com)
+3. Elo, Arpad (1978). The Rating of Chessplayers, Past and Present. Arco. ISBN 0-668-04721-6.
+4. [ECF Grading System](http://www.ecfgrading.org.uk/new/help.php#elo)
+5. [Deutsche Wertungszahl](https://en.wikipedia.org/wiki/Deutsche_Wertungszahl)
