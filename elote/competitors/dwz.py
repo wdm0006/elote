@@ -61,11 +61,13 @@ class DWZCompetitor(BaseCompetitor):
     @property
     def _E(self):
         # Check if we can use cached value
-        if (self._cached_E is not None and 
-            self._cached_rating_for_E == self._rating and 
-            self._cached_count_for_E == self._count):
+        if (
+            self._cached_E is not None
+            and self._cached_rating_for_E == self._rating
+            and self._cached_count_for_E == self._count
+        ):
             return self._cached_E
-            
+
         # Calculate E
         E0 = (self._rating / 1000) ** 4 + self._J
         a = max([0.5, min([self._rating / 2000, 1])])
@@ -80,12 +82,12 @@ class DWZCompetitor(BaseCompetitor):
             result = max([5, min([E, min([30, 5 * self._count])])])
         else:
             result = max([5, min([E, 150])])
-            
+
         # Cache the result
         self._cached_E = result
         self._cached_rating_for_E = self._rating
         self._cached_count_for_E = self._count
-        
+
         return result
 
     def _new_rating(self, competitor, W_a):
@@ -111,7 +113,7 @@ class DWZCompetitor(BaseCompetitor):
         self._rating = self_rating
         self._count += 1
         self._cached_E = None  # Invalidate cache
-        
+
         competitor.rating = competitor_rating
         competitor._count += 1
 
@@ -132,6 +134,6 @@ class DWZCompetitor(BaseCompetitor):
         self._rating = self_rating
         self._count += 1
         self._cached_E = None  # Invalidate cache
-        
+
         competitor.rating = competitor_rating
         competitor._count += 1

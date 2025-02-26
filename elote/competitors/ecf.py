@@ -57,19 +57,19 @@ class ECFCompetitor(BaseCompetitor):
             self.__cached_rating = statistics.mean(valid_scores)
         else:
             self.__cached_rating = self.__initial_rating
-            
+
         return self.__cached_rating
 
     def _update(self, rating: float):
         if self.scores is None:
             self.__initialize_ratings()
-        
+
         # Invalidate the cache when updating scores
         self.__cached_rating = None
-        
+
         # Add the new rating
         self.scores.append(rating)
-        
+
         # No need to manually popleft since we're using maxlen
 
     def export_state(self):
@@ -93,7 +93,7 @@ class ECFCompetitor(BaseCompetitor):
         current_elo = self.elo_conversion
         if self._cached_transformed_elo_rating is not None and self._cached_elo_conversion_for_transform == current_elo:
             return self._cached_transformed_elo_rating
-            
+
         # Calculate and cache the result
         self._cached_elo_conversion_for_transform = current_elo
         self._cached_transformed_elo_rating = 10 ** (current_elo / 400)

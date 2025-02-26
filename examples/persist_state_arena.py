@@ -30,8 +30,7 @@ new_arena = LambdaArena(func, base_competitor=GlickoCompetitor)
 # Manually add competitors from saved state
 for k, v in saved_state.items():
     # Filter out any class_vars if present
-    competitor_args = {key: value for key, value in v.items() 
-                      if key != 'class_vars'}
+    competitor_args = {key: value for key, value in v.items() if key != "class_vars"}
     new_arena.competitors[k] = GlickoCompetitor(**competitor_args)
 
 # Set class variable after initialization

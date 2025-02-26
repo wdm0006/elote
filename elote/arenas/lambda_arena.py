@@ -12,11 +12,11 @@ class LambdaArena(BaseArena):
         initial_state=None,
     ):
         """Initialize a LambdaArena with a comparison function.
-        
+
         The LambdaArena uses a provided function to determine the outcome of matchups
         between competitors. This is particularly useful for comparing objects that
         aren't competitors themselves.
-        
+
         Args:
             func (callable): A function that takes two arguments (a, b) and returns
                 True if a beats b, False if b beats a, and None for a draw.
@@ -48,10 +48,10 @@ class LambdaArena(BaseArena):
 
     def set_competitor_class_var(self, name, value):
         """Set a class variable on the base competitor class.
-        
+
         This method allows for global configuration of all competitors
         managed by this arena.
-        
+
         Args:
             name (str): The name of the class variable to set.
             value: The value to set for the class variable.
@@ -60,13 +60,13 @@ class LambdaArena(BaseArena):
 
     def tournament(self, matchups):
         """Run a tournament with the given matchups.
-        
+
         Process multiple matchups between competitors, updating ratings
         after each matchup.
-        
+
         Args:
             matchups (list): A list of (competitor_a, competitor_b) tuples.
-            
+
         Returns:
             list: A list of bout results.
         """
@@ -75,16 +75,16 @@ class LambdaArena(BaseArena):
 
     def matchup(self, a, b, attributes=None):
         """Process a single matchup between two competitors.
-        
+
         This method handles a matchup between two competitors, creating them
         if they don't already exist in the arena. It uses the comparison function
         to determine the outcome and updates the ratings accordingly.
-        
+
         Args:
             a: The first competitor or competitor identifier.
             b: The second competitor or competitor identifier.
             attributes (dict, optional): Additional attributes to record with this bout.
-            
+
         Returns:
             The result of the matchup.
         """
@@ -112,13 +112,13 @@ class LambdaArena(BaseArena):
 
     def expected_score(self, a, b):
         """Calculate the expected score for a matchup between two competitors.
-        
+
         This method returns the probability that competitor a will beat competitor b.
-        
+
         Args:
             a: The first competitor or competitor identifier.
             b: The second competitor or competitor identifier.
-            
+
         Returns:
             float: The probability that a will beat b (between 0 and 1).
         """
@@ -131,7 +131,7 @@ class LambdaArena(BaseArena):
 
     def export_state(self):
         """Export the current state of this arena for serialization.
-        
+
         Returns:
             dict: A dictionary containing the state of all competitors in this arena.
         """
@@ -142,7 +142,7 @@ class LambdaArena(BaseArena):
 
     def leaderboard(self):
         """Generate a leaderboard of all competitors.
-        
+
         Returns:
             list: A list of dictionaries containing competitor IDs and their ratings,
                  sorted by rating in descending order.

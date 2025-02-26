@@ -4,19 +4,19 @@ import random
 
 class BaseArena:
     """Base abstract class for all arena implementations.
-    
+
     Arenas manage competitions between multiple competitors, handling matchups,
     tournaments, and leaderboard generation. This class defines the interface
     that all arena implementations must follow.
     """
-    
+
     @abc.abstractmethod
     def set_competitor_class_var(self, name, value):
         """Set a class variable on all competitors in this arena.
-        
+
         This method allows for global configuration of all competitors
         managed by this arena.
-        
+
         Args:
             name (str): The name of the class variable to set.
             value: The value to set for the class variable.
@@ -26,9 +26,9 @@ class BaseArena:
     @abc.abstractmethod
     def tournament(self, matchups):
         """Run a tournament with the given matchups.
-        
+
         A tournament consists of multiple matchups between competitors.
-        
+
         Args:
             matchups (list): A list of matchup pairs to process.
         """
@@ -37,11 +37,11 @@ class BaseArena:
     @abc.abstractmethod
     def matchup(self, a, b):
         """Process a single matchup between two competitors.
-        
+
         Args:
             a: The first competitor or competitor identifier.
             b: The second competitor or competitor identifier.
-            
+
         Returns:
             The result of the matchup.
         """
@@ -50,7 +50,7 @@ class BaseArena:
     @abc.abstractmethod
     def leaderboard(self):
         """Generate a leaderboard of all competitors.
-        
+
         Returns:
             list: A sorted list of competitors and their ratings.
         """
@@ -59,7 +59,7 @@ class BaseArena:
     @abc.abstractmethod
     def export_state(self):
         """Export the current state of this arena for serialization.
-        
+
         Returns:
             dict: A dictionary containing all necessary information to recreate
                  this arena's current state.
@@ -69,18 +69,18 @@ class BaseArena:
 
 class History:
     """Tracks the history of bouts (matchups) and provides analysis methods.
-    
+
     This class stores the results of matchups and provides methods to analyze
     the performance of the rating system.
     """
-    
+
     def __init__(self):
         """Initialize an empty history of bouts."""
         self.bouts = []
 
     def add_bout(self, bout):
         """Add a bout to the history.
-        
+
         Args:
             bout (Bout): The bout object to add to the history.
         """
@@ -88,11 +88,11 @@ class History:
 
     def report_results(self, lower_threshold=0.5, upper_threshold=0.5):
         """Generate a report of the results in this history.
-        
+
         Args:
             lower_threshold (float): The lower probability threshold for predictions.
             upper_threshold (float): The upper probability threshold for predictions.
-            
+
         Returns:
             list: A list of dictionaries containing the results of each bout.
         """
@@ -111,17 +111,17 @@ class History:
 
     def confusion_matrix(self, lower_threshold=0.5, upper_threshold=0.5, attribute_filter=None):
         """Calculate confusion matrix metrics for the bout history.
-        
+
         This method calculates true positives, false positives, true negatives,
         and false negatives based on the prediction thresholds.
-        
+
         Args:
             lower_threshold (float): The lower probability threshold for predictions.
             upper_threshold (float): The upper probability threshold for predictions.
             attribute_filter (dict, optional): Filter bouts by attributes.
-            
+
         Returns:
-            tuple: A tuple containing (true_positives, false_positives, true_negatives, 
+            tuple: A tuple containing (true_positives, false_positives, true_negatives,
                   false_negatives, do_nothing_count).
         """
         tp, fp, tn, fn, do_nothing = 0, 0, 0, 0, 0
@@ -148,13 +148,13 @@ class History:
 
     def random_search(self, trials=1000):
         """Search for optimal prediction thresholds using random sampling.
-        
+
         This method performs a random search to find the best lower and upper
         thresholds that maximize the net performance (TP + TN - FP - FN).
-        
+
         Args:
             trials (int): The number of random threshold pairs to try.
-            
+
         Returns:
             tuple: A tuple containing (best_net_performance, best_thresholds).
         """
@@ -171,14 +171,14 @@ class History:
 
 class Bout:
     """Represents a single matchup (bout) between two competitors.
-    
+
     This class stores the competitors, the predicted outcome, the actual outcome,
     and any additional attributes of the bout.
     """
-    
+
     def __init__(self, a, b, predicted_outcome, outcome, attributes=None):
         """Initialize a bout between two competitors.
-        
+
         Args:
             a: The first competitor.
             b: The second competitor.
@@ -194,12 +194,12 @@ class Bout:
 
     def true_positive(self, threshold=0.5):
         """Check if this bout is a true positive prediction.
-        
+
         A true positive occurs when the model correctly predicts a win.
-        
+
         Args:
             threshold (float): The probability threshold for a positive prediction.
-            
+
         Returns:
             bool: True if this bout is a true positive, False otherwise.
         """
@@ -210,12 +210,12 @@ class Bout:
 
     def false_positive(self, threshold=0.5):
         """Check if this bout is a false positive prediction.
-        
+
         A false positive occurs when the model incorrectly predicts a win.
-        
+
         Args:
             threshold (float): The probability threshold for a positive prediction.
-            
+
         Returns:
             bool: True if this bout is a false positive, False otherwise.
         """
@@ -226,12 +226,12 @@ class Bout:
 
     def true_negative(self, threshold=0.5):
         """Check if this bout is a true negative prediction.
-        
+
         A true negative occurs when the model correctly predicts a non-win.
-        
+
         Args:
             threshold (float): The probability threshold for a negative prediction.
-            
+
         Returns:
             bool: True if this bout is a true negative, False otherwise.
         """
@@ -242,12 +242,12 @@ class Bout:
 
     def false_negative(self, threshold=0.5):
         """Check if this bout is a false negative prediction.
-        
+
         A false negative occurs when the model incorrectly predicts a non-win.
-        
+
         Args:
             threshold (float): The probability threshold for a negative prediction.
-            
+
         Returns:
             bool: True if this bout is a false negative, False otherwise.
         """
@@ -258,11 +258,11 @@ class Bout:
 
     def predicted_winner(self, lower_threshold=0.5, upper_threshold=0.5):
         """Determine the predicted winner of this bout.
-        
+
         Args:
             lower_threshold (float): The lower probability threshold for predictions.
             upper_threshold (float): The upper probability threshold for predictions.
-            
+
         Returns:
             str: The identifier of the predicted winner, or None if no winner is predicted.
         """
@@ -275,11 +275,11 @@ class Bout:
 
     def predicted_loser(self, lower_threshold=0.5, upper_threshold=0.5):
         """Determine the predicted loser of this bout.
-        
+
         Args:
             lower_threshold (float): The lower probability threshold for predictions.
             upper_threshold (float): The upper probability threshold for predictions.
-            
+
         Returns:
             str: The identifier of the predicted loser, or None if no loser is predicted.
         """
@@ -292,7 +292,7 @@ class Bout:
 
     def actual_winner(self):
         """Determine the actual winner of this bout.
-        
+
         Returns:
             str: The identifier of the actual winner, or None if no winner is determined.
         """
