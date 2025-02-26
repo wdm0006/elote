@@ -1,13 +1,6 @@
 import random
 import pytest
-from elote import (
-    EloCompetitor,
-    GlickoCompetitor,
-    ECFCompetitor,
-    DWZCompetitor,
-    BlendedCompetitor,
-    LambdaArena
-)
+from elote import EloCompetitor, GlickoCompetitor, ECFCompetitor, DWZCompetitor, BlendedCompetitor, LambdaArena
 
 
 # Utility functions for benchmarks
@@ -22,14 +15,18 @@ def generate_random_competitors(competitor_class, n=100):
 
 
 # Benchmark individual competitor operations
-@pytest.mark.parametrize("competitor_class", [
-    EloCompetitor,
-    GlickoCompetitor,
-    ECFCompetitor,
-    DWZCompetitor,
-])
+@pytest.mark.parametrize(
+    "competitor_class",
+    [
+        EloCompetitor,
+        GlickoCompetitor,
+        ECFCompetitor,
+        DWZCompetitor,
+    ],
+)
 def test_competitor_expected_score(benchmark, competitor_class):
     """Benchmark the expected_score method for different competitor types."""
+
     def setup():
         comp1 = competitor_class(initial_rating=1500)
         comp2 = competitor_class(initial_rating=1200)
@@ -42,14 +39,18 @@ def test_competitor_expected_score(benchmark, competitor_class):
     assert result > 0
 
 
-@pytest.mark.parametrize("competitor_class", [
-    EloCompetitor,
-    GlickoCompetitor,
-    ECFCompetitor,
-    DWZCompetitor,
-])
+@pytest.mark.parametrize(
+    "competitor_class",
+    [
+        EloCompetitor,
+        GlickoCompetitor,
+        ECFCompetitor,
+        DWZCompetitor,
+    ],
+)
 def test_competitor_beat(benchmark, competitor_class):
     """Benchmark the beat method for different competitor types."""
+
     def setup():
         comp1 = competitor_class(initial_rating=1500)
         comp2 = competitor_class(initial_rating=1200)
@@ -63,14 +64,18 @@ def test_competitor_beat(benchmark, competitor_class):
     assert result > 0
 
 
-@pytest.mark.parametrize("competitor_class", [
-    EloCompetitor,
-    GlickoCompetitor,
-    ECFCompetitor,
-    DWZCompetitor,
-])
+@pytest.mark.parametrize(
+    "competitor_class",
+    [
+        EloCompetitor,
+        GlickoCompetitor,
+        ECFCompetitor,
+        DWZCompetitor,
+    ],
+)
 def test_competitor_tied(benchmark, competitor_class):
     """Benchmark the tied method for different competitor types."""
+
     def setup():
         comp1 = competitor_class(initial_rating=1500)
         comp2 = competitor_class(initial_rating=1200)
@@ -87,17 +92,18 @@ def test_competitor_tied(benchmark, competitor_class):
 # Benchmark blended competitor operations
 def test_blended_competitor_expected_score(benchmark):
     """Benchmark the expected_score method for BlendedCompetitor."""
+
     def setup():
         comp1 = BlendedCompetitor(
             competitors=[
                 {"type": "EloCompetitor", "competitor_kwargs": {"initial_rating": 1500}},
-                {"type": "GlickoCompetitor", "competitor_kwargs": {"initial_rating": 1500}}
+                {"type": "GlickoCompetitor", "competitor_kwargs": {"initial_rating": 1500}},
             ]
         )
         comp2 = BlendedCompetitor(
             competitors=[
                 {"type": "EloCompetitor", "competitor_kwargs": {"initial_rating": 1200}},
-                {"type": "GlickoCompetitor", "competitor_kwargs": {"initial_rating": 1200}}
+                {"type": "GlickoCompetitor", "competitor_kwargs": {"initial_rating": 1200}},
             ]
         )
         return comp1, comp2
@@ -111,17 +117,18 @@ def test_blended_competitor_expected_score(benchmark):
 
 def test_blended_competitor_beat(benchmark):
     """Benchmark the beat method for BlendedCompetitor."""
+
     def setup():
         comp1 = BlendedCompetitor(
             competitors=[
                 {"type": "EloCompetitor", "competitor_kwargs": {"initial_rating": 1500}},
-                {"type": "GlickoCompetitor", "competitor_kwargs": {"initial_rating": 1500}}
+                {"type": "GlickoCompetitor", "competitor_kwargs": {"initial_rating": 1500}},
             ]
         )
         comp2 = BlendedCompetitor(
             competitors=[
                 {"type": "EloCompetitor", "competitor_kwargs": {"initial_rating": 1200}},
-                {"type": "GlickoCompetitor", "competitor_kwargs": {"initial_rating": 1200}}
+                {"type": "GlickoCompetitor", "competitor_kwargs": {"initial_rating": 1200}},
             ]
         )
         return comp1, comp2
@@ -135,19 +142,20 @@ def test_blended_competitor_beat(benchmark):
 
 
 # Benchmark arena operations
-@pytest.mark.parametrize("competitor_class", [
-    EloCompetitor,
-    GlickoCompetitor,
-    ECFCompetitor,
-    DWZCompetitor,
-])
+@pytest.mark.parametrize(
+    "competitor_class",
+    [
+        EloCompetitor,
+        GlickoCompetitor,
+        ECFCompetitor,
+        DWZCompetitor,
+    ],
+)
 def test_arena_matchup(benchmark, competitor_class):
     """Benchmark the matchup method for different competitor types in an arena."""
+
     def setup():
-        arena = LambdaArena(
-            lambda a, b: a > b,
-            base_competitor=competitor_class
-        )
+        arena = LambdaArena(lambda a, b: a > b, base_competitor=competitor_class)
         return arena
 
     def matchup(arena):
@@ -161,19 +169,20 @@ def test_arena_matchup(benchmark, competitor_class):
     assert result > 0
 
 
-@pytest.mark.parametrize("competitor_class", [
-    EloCompetitor,
-    GlickoCompetitor,
-    ECFCompetitor,
-    DWZCompetitor,
-])
+@pytest.mark.parametrize(
+    "competitor_class",
+    [
+        EloCompetitor,
+        GlickoCompetitor,
+        ECFCompetitor,
+        DWZCompetitor,
+    ],
+)
 def test_arena_tournament(benchmark, competitor_class):
     """Benchmark the tournament method for different competitor types in an arena."""
+
     def setup():
-        arena = LambdaArena(
-            lambda a, b: a > b,
-            base_competitor=competitor_class
-        )
+        arena = LambdaArena(lambda a, b: a > b, base_competitor=competitor_class)
         competitors = list(range(1, 21))  # 20 competitors
         return arena, competitors
 
@@ -188,6 +197,7 @@ def test_arena_tournament(benchmark, competitor_class):
 # Benchmark large-scale operations
 def test_large_tournament(benchmark):
     """Benchmark a large tournament with many competitors."""
+
     def setup():
         arena = LambdaArena(lambda a, b: a > b)
         competitors = list(range(1, 101))  # 100 competitors
@@ -205,6 +215,7 @@ def test_large_tournament(benchmark):
 
 def test_many_sequential_matchups(benchmark):
     """Benchmark many sequential matchups."""
+
     def setup():
         arena = LambdaArena(lambda a, b: a > b)
         matchups = [(random.randint(1, 1000), random.randint(1, 1000)) for _ in range(500)]
@@ -216,4 +227,4 @@ def test_many_sequential_matchups(benchmark):
         return len(arena.history.bouts)
 
     result = benchmark.pedantic(many_matchups, args=setup(), rounds=3)
-    assert result > 0 
+    assert result > 0
