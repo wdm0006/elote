@@ -161,11 +161,13 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_E</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Check if we can use cached value</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cached_E</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> 
-            <span class="bp">self</span><span class="o">.</span><span class="n">_cached_rating_for_E</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="ow">and</span> 
-            <span class="bp">self</span><span class="o">.</span><span class="n">_cached_count_for_E</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cached_E</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_rating_for_E</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_count_for_E</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count</span>
+        <span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_E</span>
-            
+
         <span class="c1"># Calculate E</span>
         <span class="n">E0</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">**</span> <span class="mi">4</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_J</span>
         <span class="n">a</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="nb">min</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">/</span> <span class="mi">2000</span><span class="p">,</span> <span class="mi">1</span><span class="p">])])</span>
@@ -180,12 +182,12 @@
             <span class="n">result</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="nb">min</span><span class="p">([</span><span class="n">E</span><span class="p">,</span> <span class="nb">min</span><span class="p">([</span><span class="mi">30</span><span class="p">,</span> <span class="mi">5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count</span><span class="p">])])])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">result</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="nb">min</span><span class="p">([</span><span class="n">E</span><span class="p">,</span> <span class="mi">150</span><span class="p">])])</span>
-            
+
         <span class="c1"># Cache the result</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cached_E</span> <span class="o">=</span> <span class="n">result</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cached_rating_for_E</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cached_count_for_E</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count</span>
-        
+
         <span class="k">return</span> <span class="n">result</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_new_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">,</span> <span class="n">W_a</span><span class="p">):</span>
@@ -211,7 +213,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">self_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cached_E</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Invalidate cache</span>
-        
+
         <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">competitor_rating</span>
         <span class="n">competitor</span><span class="o">.</span><span class="n">_count</span> <span class="o">+=</span> <span class="mi">1</span></div>
 
@@ -232,7 +234,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">self_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cached_E</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Invalidate cache</span>
-        
+
         <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">competitor_rating</span>
         <span class="n">competitor</span><span class="o">.</span><span class="n">_count</span> <span class="o">+=</span> <span class="mi">1</span></div></div>
 </pre></div>
