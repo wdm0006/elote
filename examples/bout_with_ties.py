@@ -16,7 +16,7 @@ print(
     )
 )
 
-print("\nAfter matches")
+print("\nAfter matches with ties")
 
 for _ in range(20):
     better.beat(good)

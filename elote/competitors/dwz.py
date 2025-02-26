@@ -16,6 +16,9 @@ class DWZCompetitor(BaseCompetitor):
         """
         self._count = 0
         self._rating = initial_rating
+        self._cached_E = None
+        self._cached_rating_for_E = None
+        self._cached_count_for_E = None
 
     def __repr__(self):
         return "<DWZCompetitor: %s>" % (self.__hash__())
@@ -30,6 +33,8 @@ class DWZCompetitor(BaseCompetitor):
     @rating.setter
     def rating(self, value):
         self._rating = value
+        # Invalidate cache when rating changes
+        self._cached_E = None
 
     def export_state(self):
         """
@@ -49,10 +54,19 @@ class DWZCompetitor(BaseCompetitor):
         """
         self.verify_competitor_types(competitor)
 
-        return 1 / (1 + 10 ** ((competitor.rating - self._rating) / 400))
+        # Direct calculation to avoid property access overhead
+        competitor_rating = competitor._rating
+        return 1 / (1 + 10 ** ((competitor_rating - self._rating) / 400))
 
     @property
     def _E(self):
+        # Check if we can use cached value
+        if (self._cached_E is not None and 
+            self._cached_rating_for_E == self._rating and 
+            self._cached_count_for_E == self._count):
+            return self._cached_E
+            
+        # Calculate E
         E0 = (self._rating / 1000) ** 4 + self._J
         a = max([0.5, min([self._rating / 2000, 1])])
 
@@ -63,12 +77,22 @@ class DWZCompetitor(BaseCompetitor):
 
         E = int(a * E0 + B)
         if B == 0:
-            return max([5, min([E, min([30, 5 * self._count])])])
+            result = max([5, min([E, min([30, 5 * self._count])])])
         else:
-            return max([5, min([E, 150])])
+            result = max([5, min([E, 150])])
+            
+        # Cache the result
+        self._cached_E = result
+        self._cached_rating_for_E = self._rating
+        self._cached_count_for_E = self._count
+        
+        return result
 
     def _new_rating(self, competitor, W_a):
-        return self._rating + (800 / (self._E + self._count)) * (W_a - self.expected_score(competitor))
+        # Calculate expected score directly to avoid multiple property accesses
+        expected = self.expected_score(competitor)
+        E_value = self._E  # Get E value once
+        return self._rating + (800 / (E_value + self._count)) * (W_a - expected)
 
     def beat(self, competitor: BaseCompetitor):
         """
@@ -77,15 +101,17 @@ class DWZCompetitor(BaseCompetitor):
         :param competitor: the competitor that lost thr bout
         :type competitor: DWZCompetitor
         """
-
         self.verify_competitor_types(competitor)
 
+        # Calculate new ratings
         self_rating = self._new_rating(competitor, 1)
         competitor_rating = competitor._new_rating(self, 0)
 
+        # Update ratings and counts in one go
         self._rating = self_rating
         self._count += 1
-
+        self._cached_E = None  # Invalidate cache
+        
         competitor.rating = competitor_rating
         competitor._count += 1
 
@@ -98,11 +124,14 @@ class DWZCompetitor(BaseCompetitor):
         """
         self.verify_competitor_types(competitor)
 
+        # Calculate new ratings
         self_rating = self._new_rating(competitor, 0.5)
         competitor_rating = competitor._new_rating(self, 0.5)
 
+        # Update ratings and counts in one go
         self._rating = self_rating
         self._count += 1
-
+        self._cached_E = None  # Invalidate cache
+        
         competitor.rating = competitor_rating
         competitor._count += 1

@@ -16,4 +16,5 @@ matchups = [(random.randint(1, 10), random.randint(1, 10)) for _ in range(1000)]
 arena = LambdaArena(func, base_competitor=DWZCompetitor)
 arena.tournament(matchups)
 
+print("Arena results:")
 print(json.dumps(arena.leaderboard(), indent=4))

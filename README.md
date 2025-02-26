@@ -4,7 +4,7 @@
 [![Python Versions](https://img.shields.io/pypi/pyversions/elote.svg)](https://pypi.org/project/elote/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Elote** (Spanish for "corn") is a powerful Python library for implementing and comparing rating systems. Whether you're ranking chess players, sports teams, or prioritizing features in your product backlog, Elote provides a simple, elegant API for all your competitive ranking needs.
+**Elote** is a powerful Python library for implementing and comparing rating systems. Whether you're ranking chess players, sports teams, or prioritizing features in your product backlog, Elote provides a simple, elegant API for all your competitive ranking needs.
 
 ## Table of Contents
 - [Overview](#overview)
@@ -49,7 +49,7 @@ pip install elote
 
 ### For Developers
 
-We use a modern Python packaging approach with `pyproject.toml`:
+We use a modern Python packaging approach with `pyproject.toml`. Most things you need are in the `Makefile`:
 
 ```bash
 # Using Make (recommended)
@@ -61,8 +61,6 @@ pip install -e ".[dev]"
 # Or using uv
 uv pip install -e ".[dev]"
 ```
-
-See [PYPROJECT_README.md](PYPROJECT_README.md) for more details on the project structure.
 
 ### Requirements
 
@@ -153,6 +151,7 @@ arena = LambdaArena(comparison)
 arena.tournament(matchups)
 
 # Display final rankings
+print("Arena results:")
 print(json.dumps(arena.leaderboard(), indent=4))
 ```
 

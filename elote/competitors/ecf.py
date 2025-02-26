@@ -19,6 +19,7 @@ class ECFCompetitor(BaseCompetitor):
         """
         self.__initial_rating = initial_rating
         self.scores = None
+        self.__cached_rating = None  # Cache for the rating calculation
 
     def __repr__(self):
         return "<ECFCompetitor: %s>" % (self.__hash__())
@@ -27,8 +28,10 @@ class ECFCompetitor(BaseCompetitor):
         return "<ECFCompetitor>"
 
     def __initialize_ratings(self):
-        self.scores = deque([None for _ in range(self._n_periods - 1)])
+        # Initialize with a single value instead of a full deque of None values
+        self.scores = deque(maxlen=self._n_periods)
         self.scores.append(self.__initial_rating)
+        self.__cached_rating = self.__initial_rating  # Initialize the cache
 
     @property
     def elo_conversion(self):
@@ -42,15 +45,32 @@ class ECFCompetitor(BaseCompetitor):
         """
         if self.scores is None:
             self.__initialize_ratings()
+            return self.__cached_rating
 
-        return statistics.mean([_ for _ in self.scores if _ is not None])
+        # Return cached value if available
+        if self.__cached_rating is not None:
+            return self.__cached_rating
+
+        # Calculate and cache the mean
+        valid_scores = [_ for _ in self.scores if _ is not None]
+        if valid_scores:
+            self.__cached_rating = statistics.mean(valid_scores)
+        else:
+            self.__cached_rating = self.__initial_rating
+            
+        return self.__cached_rating
 
     def _update(self, rating: float):
         if self.scores is None:
             self.__initialize_ratings()
-
+        
+        # Invalidate the cache when updating scores
+        self.__cached_rating = None
+        
+        # Add the new rating
         self.scores.append(rating)
-        _ = self.scores.popleft()
+        
+        # No need to manually popleft since we're using maxlen
 
     def export_state(self):
         """
@@ -63,9 +83,21 @@ class ECFCompetitor(BaseCompetitor):
             "class_vars": {"_delta": self._delta, "_n_periods": self._n_periods},
         }
 
+    # Cache the transformed rating calculation
+    _cached_transformed_elo_rating = None
+    _cached_elo_conversion_for_transform = None
+
     @property
     def transformed_elo_rating(self):
-        return 10 ** (self.elo_conversion / 400)
+        # Check if we can use the cached value
+        current_elo = self.elo_conversion
+        if self._cached_transformed_elo_rating is not None and self._cached_elo_conversion_for_transform == current_elo:
+            return self._cached_transformed_elo_rating
+            
+        # Calculate and cache the result
+        self._cached_elo_conversion_for_transform = current_elo
+        self._cached_transformed_elo_rating = 10 ** (current_elo / 400)
+        return self._cached_transformed_elo_rating
 
     def expected_score(self, competitor: BaseCompetitor):
         """
@@ -77,7 +109,10 @@ class ECFCompetitor(BaseCompetitor):
         """
         self.verify_competitor_types(competitor)
 
-        return self.transformed_elo_rating / (competitor.transformed_elo_rating + self.transformed_elo_rating)
+        # Calculate directly to avoid multiple property accesses
+        my_transformed = self.transformed_elo_rating
+        their_transformed = competitor.transformed_elo_rating
+        return my_transformed / (their_transformed + my_transformed)
 
     def beat(self, competitor: BaseCompetitor):
         """
@@ -86,7 +121,6 @@ class ECFCompetitor(BaseCompetitor):
         :param competitor: the competitor that lost their bout
         :type competitor: ECFCompetitor
         """
-
         self.verify_competitor_types(competitor)
 
         if self.scores is None:
@@ -99,11 +133,11 @@ class ECFCompetitor(BaseCompetitor):
         # limit the competitors based on the class delta value
         if abs(self_rating - competitors_rating) > self._delta:
             if self_rating > competitors_rating:
-                sign = -1
+                competitors_rating = self_rating - self._delta
             else:
-                sign = 1
-            competitors_rating = self_rating + (sign * self._delta)
+                competitors_rating = self_rating + self._delta
 
+        # Update both competitors in one go
         self._update(competitors_rating + self._delta)
         competitor._update(self_rating - self._delta)
 
@@ -114,7 +148,6 @@ class ECFCompetitor(BaseCompetitor):
         :param competitor: the competitor that tied with this one
         :type competitor: ECFCompetitor
         """
-
         self.verify_competitor_types(competitor)
 
         if self.scores is None:
@@ -127,10 +160,10 @@ class ECFCompetitor(BaseCompetitor):
         # limit the competitors based on the class delta value
         if abs(self_rating - competitors_rating) > self._delta:
             if self_rating > competitors_rating:
-                sign = -1
+                competitors_rating = self_rating - self._delta
             else:
-                sign = 1
-            competitors_rating = self_rating + (sign * self._delta)
+                competitors_rating = self_rating + self._delta
 
+        # Update both competitors in one go
         self._update(competitors_rating)
         competitor._update(self_rating)

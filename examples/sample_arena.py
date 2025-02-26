@@ -17,4 +17,5 @@ arena = LambdaArena(func)
 arena.set_competitor_class_var("_k_factor", 50)
 arena.tournament(matchups)
 
+print("Arena results:")
 print(json.dumps(arena.leaderboard(), indent=4))
