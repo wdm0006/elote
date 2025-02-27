@@ -1,0 +1,358 @@
+---
+description: how to implement new competitors in elote
+globs: elote/competitors/*.py
+---
+ # Implementing New Competitors in Elote
+
+This guide explains how to implement new rating system competitors in the Elote framework using the unified interface provided by the `BaseCompetitor` abstract base class.
+
+## Overview
+
+Elote provides a unified interface for implementing rating systems through the `BaseCompetitor` abstract base class. This ensures that all rating systems follow the same API, making them interchangeable and compatible with arenas and other components of the framework.
+
+## Step 1: Inherit from BaseCompetitor
+
+All new competitor classes must inherit from `BaseCompetitor`:
+
+```python
+from elote.competitors.base import BaseCompetitor, InvalidRatingValueException, InvalidParameterException
+from typing import Dict, Any, ClassVar, Type, TypeVar
+
+T = TypeVar('T', bound='MyNewCompetitor')
+
+class MyNewCompetitor(BaseCompetitor):
+    """My new rating system competitor.
+    
+    Provide a detailed description of the rating system here, including
+    its origins, key characteristics, and any relevant references.
+    
+    Class Attributes:
+        _some_parameter (float): Description of the parameter. Default: value.
+    """
+    
+    _some_parameter: ClassVar[float] = 1.0
+```
+
+## Step 2: Implement Required Methods
+
+The `BaseCompetitor` class defines several abstract methods that must be implemented:
+
+### 2.1. Constructor
+
+```python
+def __init__(self, initial_rating: float = 1500):
+    """Initialize a new competitor.
+    
+    Args:
+        initial_rating (float, optional): The initial rating of this competitor. Default: 1500.
+        
+    Raises:
+        InvalidRatingValueException: If the initial rating is below the minimum rating.
+    """
+    if initial_rating < self._minimum_rating:
+        raise InvalidRatingValueException(f"Initial rating cannot be below the minimum rating of {self._minimum_rating}")
+        
+    self._initial_rating = initial_rating
+    self._rating = initial_rating
+    # Initialize any other instance variables needed for your rating system
+```
+
+### 2.2. Rating Property
+
+```python
+@property
+def rating(self) -> float:
+    """Get the current rating of this competitor.
+    
+    Returns:
+        float: The current rating.
+    """
+    return self._rating
+
+@rating.setter
+def rating(self, value: float) -> None:
+    """Set the current rating of this competitor.
+    
+    Args:
+        value (float): The new rating value.
+        
+    Raises:
+        InvalidRatingValueException: If the rating value is below the minimum rating.
+    """
+    if value < self._minimum_rating:
+        raise InvalidRatingValueException(f"Rating cannot be below the minimum rating of {self._minimum_rating}")
+    self._rating = value
+```
+
+### 2.3. Expected Score
+
+```python
+def expected_score(self, competitor: BaseCompetitor) -> float:
+    """Calculate the expected score (probability of winning) against another competitor.
+    
+    Args:
+        competitor (BaseCompetitor): The opponent competitor to compare against.
+        
+    Returns:
+        float: The probability of winning (between 0 and 1).
+        
+    Raises:
+        MissMatchedCompetitorTypesException: If the competitor types don't match.
+    """
+    self.verify_competitor_types(competitor)
+    # Implement your rating system's expected score calculation
+    # Return a value between 0 and 1
+```
+
+### 2.4. Beat Method
+
+```python
+def beat(self, competitor: BaseCompetitor) -> None:
+    """Update ratings after this competitor has won against the given competitor.
+    
+    This method updates the ratings of both this competitor and the opponent
+    based on the match outcome where this competitor won.
+    
+    Args:
+        competitor (BaseCompetitor): The opponent competitor that lost.
+        
+    Raises:
+        MissMatchedCompetitorTypesException: If the competitor types don't match.
+    """
+    self.verify_competitor_types(competitor)
+    # Implement your rating system's update logic for a win
+    # Make sure to update both this competitor and the opponent
+```
+
+### 2.5. Tied Method
+
+```python
+def tied(self, competitor: BaseCompetitor) -> None:
+    """Update ratings after this competitor has tied with the given competitor.
+    
+    This method updates the ratings of both this competitor and the opponent
+    based on a drawn match outcome.
+    
+    Args:
+        competitor (BaseCompetitor): The opponent competitor that tied.
+        
+    Raises:
+        MissMatchedCompetitorTypesException: If the competitor types don't match.
+    """
+    self.verify_competitor_types(competitor)
+    # Implement your rating system's update logic for a tie
+    # Make sure to update both this competitor and the opponent
+```
+
+### 2.6. Export State
+
+```python
+def export_state(self) -> Dict[str, Any]:
+    """Export the current state of this competitor for serialization.
+    
+    Returns:
+        dict: A dictionary containing all necessary information to recreate
+             this competitor's current state.
+    """
+    return {
+        "initial_rating": self._initial_rating,
+        "current_rating": self._rating,
+        # Include any other instance variables needed to recreate the state
+        "class_vars": {
+            "some_parameter": self._some_parameter,
+            # Include any class variables that might be configured
+        },
+    }
+```
+
+### 2.7. From State (Class Method)
+
+```python
+@classmethod
+def from_state(cls: Type[T], state: Dict[str, Any]) -> T:
+    """Create a new competitor from a previously exported state.
+    
+    Args:
+        state (dict): A dictionary containing the state of a competitor,
+                     as returned by export_state().
+                     
+    Returns:
+        MyNewCompetitor: A new competitor with the same state as the exported one.
+        
+    Raises:
+        KeyError: If the state dictionary is missing required keys.
+    """
+    # Configure class variables if provided
+    if "class_vars" in state:
+        class_vars = state["class_vars"]
+        if "some_parameter" in class_vars:
+            cls._some_parameter = class_vars["some_parameter"]
+    
+    # Create a new competitor with the initial rating
+    competitor = cls(
+        initial_rating=state.get("initial_rating", 1500)
+    )
+    
+    # Set the current rating if provided
+    if "current_rating" in state:
+        competitor._rating = state["current_rating"]
+        
+    # Set any other instance variables from the state
+    
+    return competitor
+```
+
+### 2.8. Reset Method
+
+```python
+def reset(self) -> None:
+    """Reset this competitor to its initial state.
+    
+    This method resets the competitor's rating to the initial value.
+    """
+    self._rating = self._initial_rating
+    # Reset any other instance variables to their initial values
+```
+
+## Step 3: Implement String Representation Methods
+
+While not abstract, it's good practice to implement these methods:
+
+```python
+def __repr__(self) -> str:
+    """Return a string representation of this competitor.
+    
+    Returns:
+        str: A string representation of this competitor.
+    """
+    return f"<MyNewCompetitor: rating={self._rating}, parameter={self._some_parameter}>"
+
+def __str__(self) -> str:
+    """Return a string representation of this competitor.
+    
+    Returns:
+        str: A string representation of this competitor.
+    """
+    return f"<MyNewCompetitor: rating={self._rating}>"
+```
+
+## Step 4: Add Helper Methods (Optional)
+
+You can add any helper methods needed for your rating system:
+
+```python
+def _helper_method(self, value: float) -> float:
+    """Helper method for internal calculations.
+    
+    Args:
+        value (float): Input value.
+        
+    Returns:
+        float: Calculated result.
+    """
+    # Implementation
+    return result
+```
+
+## Step 5: Register Your Competitor (Optional)
+
+If you want your competitor to be usable with `BlendedCompetitor`, add it to the `competitor_types` dictionary in `elote/competitors/ensemble.py`:
+
+```python
+from elote.competitors.my_new_competitor import MyNewCompetitor
+
+competitor_types = {
+    # Existing competitors...
+    "MyNewCompetitor": MyNewCompetitor,
+}
+```
+
+## Best Practices
+
+1. **Minimum Rating**: Always respect the `_minimum_rating` class variable (default: 100) to prevent negative or unreasonably low ratings.
+
+2. **Documentation**: Provide comprehensive docstrings for your class and methods.
+
+3. **Type Hints**: Use proper type hints for all methods and parameters.
+
+4. **Error Handling**: Raise appropriate exceptions for invalid inputs.
+
+5. **Testing**: Create unit tests for your competitor in the `tests` directory.
+
+## Example: Simplified Elo Implementation
+
+Here's a simplified example of how the Elo rating system is implemented:
+
+```python
+class SimpleEloCompetitor(BaseCompetitor):
+    """Simplified Elo rating system competitor."""
+    
+    _k_factor: ClassVar[float] = 32
+    
+    def __init__(self, initial_rating: float = 1200):
+        if initial_rating < self._minimum_rating:
+            raise InvalidRatingValueException(f"Initial rating cannot be below the minimum rating of {self._minimum_rating}")
+            
+        self._initial_rating = initial_rating
+        self._rating = initial_rating
+    
+    @property
+    def rating(self) -> float:
+        return self._rating
+    
+    @rating.setter
+    def rating(self, value: float) -> None:
+        if value < self._minimum_rating:
+            raise InvalidRatingValueException(f"Rating cannot be below the minimum rating of {self._minimum_rating}")
+        self._rating = value
+    
+    def expected_score(self, competitor: BaseCompetitor) -> float:
+        self.verify_competitor_types(competitor)
+        return 1 / (1 + 10 ** ((competitor.rating - self._rating) / 400))
+    
+    def beat(self, competitor: BaseCompetitor) -> None:
+        self.verify_competitor_types(competitor)
+        
+        expected = self.expected_score(competitor)
+        self._rating = self._rating + self._k_factor * (1 - expected)
+        
+        competitor_expected = competitor.expected_score(self)
+        competitor.rating = competitor.rating + self._k_factor * (0 - competitor_expected)
+    
+    def tied(self, competitor: BaseCompetitor) -> None:
+        self.verify_competitor_types(competitor)
+        
+        expected = self.expected_score(competitor)
+        self._rating = self._rating + self._k_factor * (0.5 - expected)
+        
+        competitor_expected = competitor.expected_score(self)
+        competitor.rating = competitor.rating + self._k_factor * (0.5 - competitor_expected)
+    
+    def export_state(self) -> Dict[str, Any]:
+        return {
+            "initial_rating": self._initial_rating,
+            "current_rating": self._rating,
+            "class_vars": {
+                "k_factor": self._k_factor,
+            },
+        }
+    
+    @classmethod
+    def from_state(cls: Type[T], state: Dict[str, Any]) -> T:
+        if "class_vars" in state and "k_factor" in state["class_vars"]:
+            cls._k_factor = state["class_vars"]["k_factor"]
+        
+        competitor = cls(initial_rating=state.get("initial_rating", 1200))
+        
+        if "current_rating" in state:
+            competitor._rating = state["current_rating"]
+            
+        return competitor
+    
+    def reset(self) -> None:
+        self._rating = self._initial_rating
+```
+
+## Conclusion
+
+By following these guidelines, you can implement new rating systems that seamlessly integrate with the Elote framework. The unified interface ensures that your rating system will work with all existing components, including arenas and ensemble methods.

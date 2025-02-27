@@ -13,8 +13,8 @@ Let's start with a simple example using the Elo rating system:
     from elote import EloCompetitor
 
     # Create two competitors with different initial ratings
-    player1 = EloCompetitor(initial_rating=1500)
-    player2 = EloCompetitor(initial_rating=1600)
+    player1 = EloCompetitor(initial_rating=1200)
+    player2 = EloCompetitor(initial_rating=1300)
 
     # Check the probability of player2 beating player1
     win_probability = player2.expected_score(player1)
@@ -44,8 +44,8 @@ Elote also supports recording draws between competitors:
 
     from elote import EloCompetitor
 
-    player1 = EloCompetitor(initial_rating=1500)
-    player2 = EloCompetitor(initial_rating=1600)
+    player1 = EloCompetitor(initial_rating=1200)
+    player2 = EloCompetitor(initial_rating=1300)
 
     # Record a draw
     player1.tied(player2)
@@ -98,8 +98,11 @@ For managing multiple competitors and matches, use an Arena:
     # Generate 1000 random matchups between numbers 1-10
     matchups = [(random.randint(1, 10), random.randint(1, 10)) for _ in range(1000)]
 
-    # Create arena and run tournament
-    arena = LambdaArena(compare_numbers)
+    # Create arena and run tournament with appropriate initial ratings
+    arena = LambdaArena(
+        compare_numbers, 
+        base_competitor_kwargs={"initial_rating": 1200}
+    )
     arena.tournament(matchups)
 
     # Display final rankings
@@ -122,7 +125,7 @@ You can create custom arenas for specific use cases:
         def __init__(self):
             self.competitors = {}
             
-        def register_competitor(self, name, rating=1500):
+        def register_competitor(self, name, rating=1200):
             self.competitors[name] = EloCompetitor(initial_rating=rating)
             
         def record_result(self, name1, name2, winner=None):
@@ -175,14 +178,14 @@ For more robust ratings, you can use the Ensemble rating system that combines mu
     # Create an ensemble with Elo and Glicko components
     player1 = EnsembleCompetitor(
         rating_systems=[
-            (EloCompetitor(initial_rating=1500), 0.7),
+            (EloCompetitor(initial_rating=1200), 0.7),
             (GlickoCompetitor(initial_rating=1500, initial_rd=350), 0.3)
         ]
     )
     
     player2 = EnsembleCompetitor(
         rating_systems=[
-            (EloCompetitor(initial_rating=1600), 0.7),
+            (EloCompetitor(initial_rating=1300), 0.7),
             (GlickoCompetitor(initial_rating=1600, initial_rd=350), 0.3)
         ]
     )

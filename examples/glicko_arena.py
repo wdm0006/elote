@@ -13,7 +13,8 @@ def func(a, b):
 
 matchups = [(random.randint(1, 10), random.randint(1, 10)) for _ in range(1000)]
 
-arena = LambdaArena(func, base_competitor=GlickoCompetitor)
+# Create arena with GlickoCompetitor and set higher initial rating in constructor
+arena = LambdaArena(func, base_competitor=GlickoCompetitor, base_competitor_kwargs={"initial_rating": 1500})
 arena.tournament(matchups)
 
 print("Arena results:")

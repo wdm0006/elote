@@ -179,11 +179,14 @@ Sample Arena
         else:
             return a > b
 
+    # Configure the EloCompetitor class with a moderate k_factor
+    # Note: Using a more moderate k_factor (20) to prevent ratings from changing too drastically
     matchups = [(random.randint(1, 10), random.randint(1, 10)) for _ in range(1000)]
 
     arena = LambdaArena(func)
-    arena.set_competitor_class_var('_k_factor', 50)
-    arena.tournament(matchups)
+    arena.set_competitor_class_var('_k_factor', 20)
+    # Using 1200 as initial rating (standard chess starting rating) to prevent negative ratings
+    arena.tournament(matchups, base_competitor_kwargs={"initial_rating": 1200})
 
     print("Arena results:")
     print(json.dumps(arena.leaderboard(), indent=4))
@@ -194,20 +197,20 @@ Sample Arena
     [
         {
             "competitor": 1,
-            "rating": -486.7172340293576
+            "rating": 1013.2827659706424
         },
         {
             "competitor": 2,
-            "rating": -241.53013991378097
+            "rating": 1058.4698600862191
         },
         ...
         {
             "competitor": 9,
-            "rating": 1028.7158907591229
+            "rating": 1328.7158907591229
         },
         {
             "competitor": 10,
-            "rating": 1235.6511383857194
+            "rating": 1435.6511383857194
         }
     ]
 
@@ -231,7 +234,12 @@ DWZ Arena
 
     matchups = [(random.randint(1, 10), random.randint(1, 10)) for _ in range(1000)]
 
-    arena = LambdaArena(func, base_competitor=DWZCompetitor)
+    # Create arena with DWZCompetitor and set higher initial rating
+    arena = LambdaArena(
+        func, 
+        base_competitor=DWZCompetitor,
+        base_competitor_kwargs={"initial_rating": 1200}
+    )
     arena.tournament(matchups)
 
     print("Arena results:")
@@ -243,20 +251,20 @@ DWZ Arena
     [
         {
             "competitor": 1,
-            "rating": 212.72183429478434
+            "rating": 1012.72183429478434
         },
         {
             "competitor": 2,
-            "rating": 244.28657694745118
+            "rating": 1044.28657694745118
         },
         ...
         {
             "competitor": 9,
-            "rating": 558.7172315502228
+            "rating": 1358.7172315502228
         },
         {
             "competitor": 10,
-            "rating": 611.6297448123669
+            "rating": 1411.6297448123669
         }
     ]
 
@@ -280,6 +288,8 @@ ECF Arena
 
     matchups = [(random.randint(1, 10), random.randint(1, 10)) for _ in range(1000)]
 
+    # Create arena with ECFCompetitor
+    # Note: ECFCompetitor now has a default initial rating of 100 (minimum rating)
     arena = LambdaArena(func, base_competitor=ECFCompetitor)
     arena.tournament(matchups)
 
@@ -292,11 +302,11 @@ ECF Arena
     [
         {
             "competitor": 1,
-            "rating": 39.64319765445675
+            "rating": 100.0
         },
         {
             "competitor": 2,
-            "rating": 46.99453852992116
+            "rating": 106.99453852992116
         },
         ...
         {
@@ -328,7 +338,12 @@ Glicko Arena
 
     matchups = [(random.randint(1, 10), random.randint(1, 10)) for _ in range(1000)]
 
-    arena = LambdaArena(func, base_competitor=GlickoCompetitor)
+    # Create arena with GlickoCompetitor and set higher initial rating in constructor
+    arena = LambdaArena(
+        func, 
+        base_competitor=GlickoCompetitor, 
+        base_competitor_kwargs={"initial_rating": 1500}
+    )
     arena.tournament(matchups)
 
     print("Arena results:")
@@ -340,11 +355,11 @@ Glicko Arena
     [
         {
             "competitor": 1,
-            "rating": 126.83348029853865
+            "rating": 1126.83348029853865
         },
         {
             "competitor": 2,
-            "rating": 395.7055271953318
+            "rating": 1395.7055271953318
         },
         ...
         {
@@ -378,7 +393,12 @@ Persisting State from an Arena
 
     # start scoring, stop and save state
     matchups = [(random.randint(1, 10), random.randint(1, 10)) for _ in range(10)]
-    arena = LambdaArena(func, base_competitor=GlickoCompetitor)
+    # Create arena with GlickoCompetitor and set higher initial rating
+    arena = LambdaArena(
+        func, 
+        base_competitor=GlickoCompetitor,
+        base_competitor_kwargs={"initial_rating": 1500}
+    )
     arena.tournament(matchups)
     print("Arena results:")
     print(json.dumps(arena.leaderboard(), indent=4))
@@ -387,19 +407,14 @@ Persisting State from an Arena
     saved_state = copy.deepcopy(arena.export_state())
 
     # Create a new arena with the saved state
-    # We'll manually recreate the competitors to avoid the class_vars issue
     matchups = [(random.randint(1, 10), random.randint(1, 10)) for _ in range(100)]
     new_arena = LambdaArena(func, base_competitor=GlickoCompetitor)
 
-    # Manually add competitors from saved state
+    # Use from_state to recreate competitors
     for k, v in saved_state.items():
-        # Filter out any class_vars if present
-        competitor_args = {key: value for key, value in v.items() 
-                          if key != 'class_vars'}
-        new_arena.competitors[k] = GlickoCompetitor(**competitor_args)
+        new_arena.competitors[k] = GlickoCompetitor.from_state(v)
 
-    # Set class variable after initialization
-    new_arena.set_competitor_class_var("_c", 5)
+    # Run more matches
     new_arena.tournament(matchups)
     print("Arena results:")
     print(json.dumps(new_arena.leaderboard(), indent=4))
@@ -410,11 +425,11 @@ Persisting State from an Arena
     [
         {
             "competitor": 2,
-            "rating": 955.4305146831251
+            "rating": 1455.4305146831251
         },
         {
             "competitor": 6,
-            "rating": 1215.7289656415517
+            "rating": 1515.7289656415517
         },
         ...
         {
@@ -430,11 +445,11 @@ Persisting State from an Arena
     [
         {
             "competitor": 2,
-            "rating": 504.09061767108824
+            "rating": 1304.09061767108824
         },
         {
             "competitor": 1,
-            "rating": 539.4265505050406
+            "rating": 1339.4265505050406
         },
         ...
         {

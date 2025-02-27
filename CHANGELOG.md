@@ -1,3 +1,12 @@
+v1.0.0 (Unreleased)
+======
+
+ * [CORE-1] Fixed minimum rating enforcement across all competitor classes
+ * [CORE-1] Updated documentation examples to use higher initial ratings
+ * [CORE-1] Made `reset` method abstract in `BaseCompetitor` class
+ * [CORE-1] Updated ECFCompetitor default initial rating from 40 to 100
+ * [CORE-1] Fixed benchmark tests to prevent negative ratings
+
 v0.1.0
 ======
 

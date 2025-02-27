@@ -17,12 +17,12 @@ class TestGlicko(unittest.TestCase):
             initial_rating = player1.rating
 
     def test_Decay(self):
-        initial_rating = 800
+        initial_rating = 1500
         player1 = GlickoCompetitor(initial_rating=initial_rating)
 
         # if player1 beats someone with a high rating, their rating should go up.
         for _ in range(10):
-            player2 = GlickoCompetitor(initial_rating=100)
+            player2 = GlickoCompetitor(initial_rating=1000)
             player2.beat(player1)
             self.assertLess(player1.rating, initial_rating)
             initial_rating = player1.rating
@@ -145,8 +145,12 @@ class TestGlicko(unittest.TestCase):
         # Check that the state contains the correct information
         self.assertEqual(state["initial_rating"], 1800)
         self.assertEqual(state["initial_rd"], 100)
-        self.assertEqual(state["class_vars"]["_c"], 1)
-        self.assertEqual(state["class_vars"]["_q"], 0.0057565)
+
+        # Check that class variables are included (without underscore prefix)
+        self.assertIn("c", state["class_vars"])
+        self.assertEqual(state["class_vars"]["c"], 1)
+        self.assertIn("q", state["class_vars"])
+        self.assertEqual(state["class_vars"]["q"], 0.0057565)
 
     def test_exceptions(self):
         """Test that the correct exceptions are raised."""
