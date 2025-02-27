@@ -280,11 +280,14 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="n">b</span>
 
+<span class="c1"># Configure the EloCompetitor class with a moderate k_factor</span>
+<span class="c1"># Note: Using a more moderate k_factor (20) to prevent ratings from changing too drastically</span>
 <span class="n">matchups</span> <span class="o">=</span> <span class="p">[(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)]</span>
 
 <span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-<span class="n">arena</span><span class="o">.</span><span class="n">set_competitor_class_var</span><span class="p">(</span><span class="s1">&#39;_k_factor&#39;</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
-<span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">set_competitor_class_var</span><span class="p">(</span><span class="s1">&#39;_k_factor&#39;</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<span class="c1"># Using 1200 as initial rating (standard chess starting rating) to prevent negative ratings</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">,</span> <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1200</span><span class="p">})</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arena results:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
@@ -294,20 +297,20 @@
 <span class="p">[</span>
     <span class="p">{</span>
         <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">486.7172340293576</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1013.2827659706424</span>
     <span class="p">},</span>
     <span class="p">{</span>
         <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">241.53013991378097</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1058.4698600862191</span>
     <span class="p">},</span>
     <span class="o">...</span>
     <span class="p">{</span>
         <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1028.7158907591229</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1328.7158907591229</span>
     <span class="p">},</span>
     <span class="p">{</span>
         <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1235.6511383857194</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1435.6511383857194</span>
     <span class="p">}</span>
 <span class="p">]</span>
 </pre></div>
@@ -330,7 +333,12 @@
 
 <span class="n">matchups</span> <span class="o">=</span> <span class="p">[(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)]</span>
 
-<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">DWZCompetitor</span><span class="p">)</span>
+<span class="c1"># Create arena with DWZCompetitor and set higher initial rating</span>
+<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span>
+    <span class="n">func</span><span class="p">,</span>
+    <span class="n">base_competitor</span><span class="o">=</span><span class="n">DWZCompetitor</span><span class="p">,</span>
+    <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1200</span><span class="p">}</span>
+<span class="p">)</span>
 <span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arena results:&quot;</span><span class="p">)</span>
@@ -341,20 +349,20 @@
 <span class="p">[</span>
     <span class="p">{</span>
         <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">212.72183429478434</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1012.72183429478434</span>
     <span class="p">},</span>
     <span class="p">{</span>
         <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">244.28657694745118</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1044.28657694745118</span>
     <span class="p">},</span>
     <span class="o">...</span>
     <span class="p">{</span>
         <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">558.7172315502228</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1358.7172315502228</span>
     <span class="p">},</span>
     <span class="p">{</span>
         <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">611.6297448123669</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1411.6297448123669</span>
     <span class="p">}</span>
 <span class="p">]</span>
 </pre></div>
@@ -377,6 +385,8 @@
 
 <span class="n">matchups</span> <span class="o">=</span> <span class="p">[(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)]</span>
 
+<span class="c1"># Create arena with ECFCompetitor</span>
+<span class="c1"># Note: ECFCompetitor now has a default initial rating of 100 (minimum rating)</span>
 <span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">ECFCompetitor</span><span class="p">)</span>
 <span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
 
@@ -388,11 +398,11 @@
 <span class="p">[</span>
     <span class="p">{</span>
         <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">39.64319765445675</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">100.0</span>
     <span class="p">},</span>
     <span class="p">{</span>
         <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">46.99453852992116</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">106.99453852992116</span>
     <span class="p">},</span>
     <span class="o">...</span>
     <span class="p">{</span>
@@ -423,7 +433,12 @@
 
 <span class="n">matchups</span> <span class="o">=</span> <span class="p">[(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)]</span>
 
-<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">GlickoCompetitor</span><span class="p">)</span>
+<span class="c1"># Create arena with GlickoCompetitor and set higher initial rating in constructor</span>
+<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span>
+    <span class="n">func</span><span class="p">,</span>
+    <span class="n">base_competitor</span><span class="o">=</span><span class="n">GlickoCompetitor</span><span class="p">,</span>
+    <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1500</span><span class="p">}</span>
+<span class="p">)</span>
 <span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arena results:&quot;</span><span class="p">)</span>
@@ -434,11 +449,11 @@
 <span class="p">[</span>
     <span class="p">{</span>
         <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">126.83348029853865</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1126.83348029853865</span>
     <span class="p">},</span>
     <span class="p">{</span>
         <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">395.7055271953318</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1395.7055271953318</span>
     <span class="p">},</span>
     <span class="o">...</span>
     <span class="p">{</span>
@@ -471,7 +486,12 @@
 
 <span class="c1"># start scoring, stop and save state</span>
 <span class="n">matchups</span> <span class="o">=</span> <span class="p">[(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
-<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">GlickoCompetitor</span><span class="p">)</span>
+<span class="c1"># Create arena with GlickoCompetitor and set higher initial rating</span>
+<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span>
+    <span class="n">func</span><span class="p">,</span>
+    <span class="n">base_competitor</span><span class="o">=</span><span class="n">GlickoCompetitor</span><span class="p">,</span>
+    <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1500</span><span class="p">}</span>
+<span class="p">)</span>
 <span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arena results:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
@@ -480,19 +500,14 @@
 <span class="n">saved_state</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">export_state</span><span class="p">())</span>
 
 <span class="c1"># Create a new arena with the saved state</span>
-<span class="c1"># We&#39;ll manually recreate the competitors to avoid the class_vars issue</span>
 <span class="n">matchups</span> <span class="o">=</span> <span class="p">[(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">)]</span>
 <span class="n">new_arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">GlickoCompetitor</span><span class="p">)</span>
 
-<span class="c1"># Manually add competitors from saved state</span>
+<span class="c1"># Use from_state to recreate competitors</span>
 <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">saved_state</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="c1"># Filter out any class_vars if present</span>
-    <span class="n">competitor_args</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-                      <span class="k">if</span> <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;class_vars&#39;</span><span class="p">}</span>
-    <span class="n">new_arena</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">GlickoCompetitor</span><span class="p">(</span><span class="o">**</span><span class="n">competitor_args</span><span class="p">)</span>
+    <span class="n">new_arena</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">GlickoCompetitor</span><span class="o">.</span><span class="n">from_state</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
 
-<span class="c1"># Set class variable after initialization</span>
-<span class="n">new_arena</span><span class="o">.</span><span class="n">set_competitor_class_var</span><span class="p">(</span><span class="s2">&quot;_c&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="c1"># Run more matches</span>
 <span class="n">new_arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arena results:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">new_arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
@@ -502,11 +517,11 @@
 <span class="p">[</span>
     <span class="p">{</span>
         <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">955.4305146831251</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1455.4305146831251</span>
     <span class="p">},</span>
     <span class="p">{</span>
         <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1215.7289656415517</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1515.7289656415517</span>
     <span class="p">},</span>
     <span class="o">...</span>
     <span class="p">{</span>
@@ -522,11 +537,11 @@
 <span class="p">[</span>
     <span class="p">{</span>
         <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">504.09061767108824</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1304.09061767108824</span>
     <span class="p">},</span>
     <span class="p">{</span>
         <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">539.4265505050406</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1339.4265505050406</span>
     <span class="p">},</span>
     <span class="o">...</span>
     <span class="p">{</span>

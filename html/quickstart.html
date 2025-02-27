@@ -118,8 +118,8 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span>
 
 <span class="c1"># Create two competitors with different initial ratings</span>
-<span class="n">player1</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
-<span class="n">player2</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1600</span><span class="p">)</span>
+<span class="n">player1</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1200</span><span class="p">)</span>
+<span class="n">player2</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1300</span><span class="p">)</span>
 
 <span class="c1"># Check the probability of player2 beating player1</span>
 <span class="n">win_probability</span> <span class="o">=</span> <span class="n">player2</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player1</span><span class="p">)</span>
@@ -147,8 +147,8 @@
 <p>Elote also supports recording draws between competitors:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span>
 
-<span class="n">player1</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
-<span class="n">player2</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1600</span><span class="p">)</span>
+<span class="n">player1</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1200</span><span class="p">)</span>
+<span class="n">player2</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1300</span><span class="p">)</span>
 
 <span class="c1"># Record a draw</span>
 <span class="n">player1</span><span class="o">.</span><span class="n">tied</span><span class="p">(</span><span class="n">player2</span><span class="p">)</span>
@@ -197,8 +197,11 @@
 <span class="c1"># Generate 1000 random matchups between numbers 1-10</span>
 <span class="n">matchups</span> <span class="o">=</span> <span class="p">[(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)]</span>
 
-<span class="c1"># Create arena and run tournament</span>
-<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">compare_numbers</span><span class="p">)</span>
+<span class="c1"># Create arena and run tournament with appropriate initial ratings</span>
+<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span>
+    <span class="n">compare_numbers</span><span class="p">,</span>
+    <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1200</span><span class="p">}</span>
+<span class="p">)</span>
 <span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
 
 <span class="c1"># Display final rankings</span>
@@ -218,7 +221,7 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">register_competitor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">register_competitor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">rating</span><span class="o">=</span><span class="mi">1200</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">rating</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">record_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name1</span><span class="p">,</span> <span class="n">name2</span><span class="p">,</span> <span class="n">winner</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -269,14 +272,14 @@
 <span class="c1"># Create an ensemble with Elo and Glicko components</span>
 <span class="n">player1</span> <span class="o">=</span> <span class="n">EnsembleCompetitor</span><span class="p">(</span>
     <span class="n">rating_systems</span><span class="o">=</span><span class="p">[</span>
-        <span class="p">(</span><span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">),</span> <span class="mf">0.7</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1200</span><span class="p">),</span> <span class="mf">0.7</span><span class="p">),</span>
         <span class="p">(</span><span class="n">GlickoCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">initial_rd</span><span class="o">=</span><span class="mi">350</span><span class="p">),</span> <span class="mf">0.3</span><span class="p">)</span>
     <span class="p">]</span>
 <span class="p">)</span>
 
 <span class="n">player2</span> <span class="o">=</span> <span class="n">EnsembleCompetitor</span><span class="p">(</span>
     <span class="n">rating_systems</span><span class="o">=</span><span class="p">[</span>
-        <span class="p">(</span><span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1600</span><span class="p">),</span> <span class="mf">0.7</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1300</span><span class="p">),</span> <span class="mf">0.7</span><span class="p">),</span>
         <span class="p">(</span><span class="n">GlickoCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1600</span><span class="p">,</span> <span class="n">initial_rd</span><span class="o">=</span><span class="mi">350</span><span class="p">),</span> <span class="mf">0.3</span><span class="p">)</span>
     <span class="p">]</span>
 <span class="p">)</span>
