@@ -52,6 +52,7 @@ def test_competitor_beat(benchmark, competitor_class):
     """Benchmark the beat method for different competitor types."""
 
     def setup():
+        # Use higher initial ratings to prevent negative ratings
         comp1 = competitor_class(initial_rating=1500)
         comp2 = competitor_class(initial_rating=1200)
         return comp1, comp2
@@ -119,6 +120,7 @@ def test_blended_competitor_beat(benchmark):
     """Benchmark the beat method for BlendedCompetitor."""
 
     def setup():
+        # Use higher initial ratings to prevent negative ratings
         comp1 = BlendedCompetitor(
             competitors=[
                 {"type": "EloCompetitor", "competitor_kwargs": {"initial_rating": 1500}},
@@ -155,7 +157,14 @@ def test_arena_matchup(benchmark, competitor_class):
     """Benchmark the matchup method for different competitor types in an arena."""
 
     def setup():
-        arena = LambdaArena(lambda a, b: a > b, base_competitor=competitor_class)
+        # Use appropriate initial ratings for each competitor type
+        base_competitor_kwargs = {}
+        if competitor_class == ECFCompetitor:
+            base_competitor_kwargs = {"initial_rating": 100}  # Minimum rating for ECF
+
+        arena = LambdaArena(
+            lambda a, b: a > b, base_competitor=competitor_class, base_competitor_kwargs=base_competitor_kwargs
+        )
         return arena
 
     def matchup(arena):
@@ -182,7 +191,10 @@ def test_arena_tournament(benchmark, competitor_class):
     """Benchmark the tournament method for different competitor types in an arena."""
 
     def setup():
-        arena = LambdaArena(lambda a, b: a > b, base_competitor=competitor_class)
+        # Use a base_competitor_kwargs to set higher initial ratings
+        arena = LambdaArena(
+            lambda a, b: a > b, base_competitor=competitor_class, base_competitor_kwargs={"initial_rating": 1500}
+        )
         competitors = list(range(1, 21))  # 20 competitors
         return arena, competitors
 

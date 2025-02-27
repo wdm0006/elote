@@ -23,18 +23,14 @@ print(json.dumps(arena.leaderboard(), indent=4))
 saved_state = copy.deepcopy(arena.export_state())
 
 # Create a new arena with the saved state
-# We'll manually recreate the competitors to avoid the class_vars issue
 matchups = [(random.randint(1, 10), random.randint(1, 10)) for _ in range(100)]
 new_arena = LambdaArena(func, base_competitor=GlickoCompetitor)
 
-# Manually add competitors from saved state
+# Use from_state to recreate competitors
 for k, v in saved_state.items():
-    # Filter out any class_vars if present
-    competitor_args = {key: value for key, value in v.items() if key != "class_vars"}
-    new_arena.competitors[k] = GlickoCompetitor(**competitor_args)
+    new_arena.competitors[k] = GlickoCompetitor.from_state(v)
 
-# Set class variable after initialization
-new_arena.set_competitor_class_var("_c", 5)
+# Run more matches
 new_arena.tournament(matchups)
 print("Arena results:")
 print(json.dumps(new_arena.leaderboard(), indent=4))

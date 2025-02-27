@@ -1,4 +1,4 @@
-from elote import LambdaArena
+from elote import LambdaArena, EloCompetitor
 import json
 import random
 
@@ -11,10 +11,14 @@ def func(a, b):
         return a > b
 
 
-matchups = [(random.randint(1, 10), random.randint(1, 10)) for _ in range(1000)]
+# Configure the EloCompetitor class with a moderate k_factor
+# Note: Using a more moderate k_factor (20) to prevent ratings from changing too drastically
+EloCompetitor.configure_class(k_factor=20)
 
-arena = LambdaArena(func)
-arena.set_competitor_class_var("_k_factor", 50)
+# Create arena with a higher initial rating for all competitors
+# Using 1200 as initial rating (standard chess starting rating) to prevent negative ratings
+matchups = [(random.randint(1, 10), random.randint(1, 10)) for _ in range(1000)]
+arena = LambdaArena(func, base_competitor=EloCompetitor, base_competitor_kwargs={"initial_rating": 1200})
 arena.tournament(matchups)
 
 print("Arena results:")

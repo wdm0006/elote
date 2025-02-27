@@ -32,11 +32,11 @@ install-dev:
 
 # Run tests
 test:
-	uv run pytest
+	uv run pytest $(PYTEST_ARGS)
 
 # Run tests with coverage
 test-cov:
-	uv run pytest --cov=elote --cov-report=term --cov-report=html
+	uv run pytest --cov=elote --cov-report=term --cov-report=html $(PYTEST_ARGS)
 
 # Run linting
 lint:
@@ -90,4 +90,4 @@ test-all:
 
 # Run benchmarks
 benchmark:
-	uv run pytest tests/test_benchmarks.py -v --benchmark-enable 
+	uv run pytest tests/test_benchmarks.py -v --benchmark-enable $(PYTEST_ARGS) 
