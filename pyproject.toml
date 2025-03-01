@@ -23,12 +23,17 @@ classifiers = [
 keywords = ["elo", "scoring", "rating"]
 dependencies = [
     "tqdm==4.66.3",
+    "numpy>=1.20.0",
+    "scipy>=1.7.0",
+    "pandas>=1.3.0",
+    "requests>=2.25.0",
+    "setuptools>=42.0.0"
 ]
 requires-python = ">=3.8"
 
 [project.urls]
-Homepage = "https://github.com/helton-tech/elote"
-"Bug Tracker" = "https://github.com/helton-tech/elote/issues"
+Homepage = "https://github.com/wdm0006/elote"
+"Bug Tracker" = "https://github.com/wdm0006/elote/issues"
 
 [project.optional-dependencies]
 dev = [
@@ -44,9 +49,17 @@ dev = [
     "tox-uv",
     "pytest-benchmark",
 ]
+# Note: For macOS users, you may need to install libomp for XGBoost (used by sportsdataverse):
+#   brew install libomp
+datasets = [
+    "sportsdataverse[all]",
+    "pyzstd>=0.15.0",
+    "python-chess>=1.9.0",
+    "setuptools>=42.0.0",
+]
 
 [tool.setuptools]
-packages = ["elote"]
+packages = ["elote", "elote.competitors", "elote.arenas", "elote.datasets"]
 package-data = {"elote" = ["py.typed"]}
 
 [tool.setuptools.exclude-package-data]
