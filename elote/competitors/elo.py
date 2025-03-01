@@ -64,6 +64,83 @@ class EloCompetitor(BaseCompetitor):
         """
         return f"<EloCompetitor: rating={self._rating}>"
 
+    def _export_parameters(self) -> Dict[str, Any]:
+        """Export the parameters used to initialize this competitor.
+
+        Returns:
+            dict: A dictionary containing the initialization parameters.
+        """
+        return {
+            "initial_rating": self._initial_rating,
+            "k_factor": self._k_factor if self._k_factor != self.__class__._k_factor else None,
+        }
+
+    def _export_current_state(self) -> Dict[str, Any]:
+        """Export the current state variables of this competitor.
+
+        Returns:
+            dict: A dictionary containing the current state variables.
+        """
+        return {
+            "rating": self._rating,
+        }
+
+    def _import_parameters(self, parameters: Dict[str, Any]) -> None:
+        """Import parameters from a state dictionary.
+
+        Args:
+            parameters (dict): A dictionary containing parameters.
+
+        Raises:
+            InvalidParameterException: If any parameter is invalid.
+        """
+        # Validate and set initial_rating
+        initial_rating = parameters.get("initial_rating", 400)
+        if initial_rating < self._minimum_rating:
+            raise InvalidParameterException(
+                f"Initial rating cannot be below the minimum rating of {self._minimum_rating}"
+            )
+        self._initial_rating = initial_rating
+
+        # Validate and set k_factor
+        k_factor = parameters.get("k_factor", None)
+        if k_factor is not None and k_factor <= 0:
+            raise InvalidParameterException("K-factor must be positive")
+        self._k_factor = k_factor if k_factor is not None else self.__class__._k_factor
+
+    def _import_current_state(self, state: Dict[str, Any]) -> None:
+        """Import current state variables from a state dictionary.
+
+        Args:
+            state (dict): A dictionary containing state variables.
+
+        Raises:
+            InvalidParameterException: If any state variable is invalid.
+        """
+        # Validate and set rating
+        rating = state.get("rating", self._initial_rating)
+        if rating < self._minimum_rating:
+            raise InvalidParameterException(f"Rating cannot be below the minimum rating of {self._minimum_rating}")
+        self._rating = rating
+
+    @classmethod
+    def _create_from_parameters(cls: Type[T], parameters: Dict[str, Any]) -> T:
+        """Create a new competitor instance from parameters.
+
+        Args:
+            parameters (dict): A dictionary containing parameters.
+
+        Returns:
+            EloCompetitor: A new competitor instance.
+
+        Raises:
+            InvalidParameterException: If any parameter is invalid.
+        """
+        return cls(
+            initial_rating=parameters.get("initial_rating", 400),
+            k_factor=parameters.get("k_factor", None),
+        )
+
     def export_state(self) -> Dict[str, Any]:
         """Export the current state of this competitor for serialization.
 
@@ -71,14 +148,8 @@ class EloCompetitor(BaseCompetitor):
             dict: A dictionary containing all necessary information to recreate
                  this competitor's current state.
         """
-        return {
-            "initial_rating": self._initial_rating,
-            "current_rating": self._rating,
-            "k_factor": self._k_factor,
-            "class_vars": {
-                "base_rating": self._base_rating,
-            },
-        }
+        # Use the new standardized format
+        return super().export_state()
 
     @classmethod
     def from_state(cls: Type[T], state: Dict[str, Any]) -> T:
@@ -92,27 +163,32 @@ class EloCompetitor(BaseCompetitor):
             EloCompetitor: A new competitor with the same state as the exported one.
 
         Raises:
-            KeyError: If the state dictionary is missing required keys.
+            InvalidParameterException: If any parameter in the state is invalid.
         """
-        # Configure class variables if provided
-        if "class_vars" in state:
-            class_vars = state["class_vars"]
-            if "base_rating" in class_vars:
-                cls._base_rating = class_vars["base_rating"]
+        # Handle legacy state format
+        if "type" not in state:
+            # Configure class variables if provided
+            if "class_vars" in state:
+                class_vars = state["class_vars"]
+                if "base_rating" in class_vars:
+                    cls._base_rating = class_vars["base_rating"]
 
-        # Create a new competitor with the initial rating
-        competitor = cls(initial_rating=state.get("initial_rating", 400), k_factor=state.get("k_factor", None))
+            # Create a new competitor with the initial rating
+            competitor = cls(initial_rating=state.get("initial_rating", 400), k_factor=state.get("k_factor", None))
 
-        # Set the current rating if provided
-        if "current_rating" in state:
-            competitor._rating = state["current_rating"]
+            # Set the current rating if provided
+            if "current_rating" in state:
+                competitor._rating = state["current_rating"]
 
-        return competitor
+            return competitor
+
+        # Use the new standardized format
+        return super().from_state(state)
 
     def reset(self) -> None:
         """Reset this competitor to its initial state.
 
-        This method resets the competitor's rating to the initial value.
+        This method resets the competitor's rating to the initial rating.
         """
         self._rating = self._initial_rating
 
