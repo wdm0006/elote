@@ -461,3 +461,63 @@ Persisting State from an Arena
             "rating": 2403.5118562872744
         }
     ]
+
+Serializing and Deserializing Competitors
+----------------------------------------
+
+Elote provides a standardized serialization format for all competitor types. This example shows how to serialize and deserialize competitors:
+
+.. code-block:: python
+
+    from elote import EloCompetitor
+    import json
+
+    # Create a competitor
+    competitor = EloCompetitor(initial_rating=1500)
+
+    # Simulate some matches
+    competitor.beat(EloCompetitor(initial_rating=1400))
+    competitor.beat(EloCompetitor(initial_rating=1450))
+    competitor.lost_to(EloCompetitor(initial_rating=1600))
+
+    # Serialize to JSON
+    json_str = competitor.to_json()
+
+    # Print the serialized JSON (formatted for readability)
+    print("Serialized competitor:")
+    print(json.dumps(json.loads(json_str), indent=4))
+
+    # Deserialize from JSON
+    new_competitor = EloCompetitor.from_json(json_str)
+
+    # Verify the ratings match
+    print(f"Original rating: {competitor.rating}")
+    print(f"Deserialized rating: {new_competitor.rating}")
+
+    # Continue using the deserialized competitor
+    new_competitor.beat(EloCompetitor(initial_rating=1450))
+    print(f"Updated rating after another match: {new_competitor.rating}")
+
+.. code-block::
+
+    Serialized competitor:
+    {
+        "type": "EloCompetitor",
+        "version": 1,
+        "created_at": 1625097600,
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "parameters": {
+            "initial_rating": 1500
+        },
+        "state": {
+            "rating": 1524.32
+        },
+        "class_vars": {
+            "k_factor": 32
+        },
+        "initial_rating": 1500,
+        "current_rating": 1524.32
+    }
+    Original rating: 1524.32
+    Deserialized rating: 1524.32
+    Updated rating after another match: 1536.64

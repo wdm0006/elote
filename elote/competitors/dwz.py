@@ -1,7 +1,7 @@
 import math
 from typing import Dict, Any, ClassVar, Optional, Type, TypeVar
 
-from elote.competitors.base import BaseCompetitor, InvalidRatingValueException
+from elote.competitors.base import BaseCompetitor, InvalidRatingValueException, InvalidParameterException
 
 T = TypeVar("T", bound="DWZCompetitor")
 
@@ -90,13 +90,88 @@ class DWZCompetitor(BaseCompetitor):
             dict: A dictionary containing all necessary information to recreate
                  this competitor's current state.
         """
+        # Use the new standardized format
+        return super().export_state()
+
+    def _export_parameters(self) -> Dict[str, Any]:
+        """Export the parameters used to initialize this competitor.
+
+        Returns:
+            dict: A dictionary containing the initialization parameters.
+        """
         return {
             "initial_rating": self._initial_rating,
-            "current_rating": self._rating,
+        }
+
+    def _export_current_state(self) -> Dict[str, Any]:
+        """Export the current state variables of this competitor.
+
+        Returns:
+            dict: A dictionary containing the current state variables.
+        """
+        return {
+            "rating": self._rating,
             "count": self._count,
             "initial_count": self._initial_count,
-            "class_vars": {"J": self._J},
         }
+
+    def _import_parameters(self, parameters: Dict[str, Any]) -> None:
+        """Import parameters from a state dictionary.
+
+        Args:
+            parameters (dict): A dictionary containing parameters.
+
+        Raises:
+            InvalidParameterException: If any parameter is invalid.
+        """
+        # Validate and set initial_rating
+        initial_rating = parameters.get("initial_rating", 400)
+        if initial_rating < self._minimum_rating:
+            raise InvalidParameterException(
+                f"Initial rating cannot be below the minimum rating of {self._minimum_rating}"
+            )
+        self._initial_rating = initial_rating
+
+    def _import_current_state(self, state: Dict[str, Any]) -> None:
+        """Import current state variables from a state dictionary.
+
+        Args:
+            state (dict): A dictionary containing state variables.
+
+        Raises:
+            InvalidStateException: If any state variable is invalid.
+        """
+        # Validate and set rating
+        rating = state.get("rating", self._initial_rating)
+        if rating < self._minimum_rating:
+            raise InvalidParameterException(f"Rating cannot be below the minimum rating of {self._minimum_rating}")
+        self._rating = rating
+
+        # Set count and initial_count
+        self._count = state.get("count", 0)
+        self._initial_count = state.get("initial_count", 0)
+
+        # Invalidate cache
+        self._cached_E = None
+        self._cached_rating_for_E = None
+        self._cached_count_for_E = None
+
+    @classmethod
+    def _create_from_parameters(cls: Type[T], parameters: Dict[str, Any]) -> T:
+        """Create a new competitor instance from parameters.
+
+        Args:
+            parameters (dict): A dictionary containing parameters.
+
+        Returns:
+            DWZCompetitor: A new competitor instance.
+
+        Raises:
+            InvalidParameterException: If any parameter is invalid.
+        """
+        return cls(
+            initial_rating=parameters.get("initial_rating", 400),
+        )
 
     @classmethod
     def from_state(cls: Type[T], state: Dict[str, Any]) -> T:
@@ -110,28 +185,33 @@ class DWZCompetitor(BaseCompetitor):
             DWZCompetitor: A new competitor with the same state as the exported one.
 
         Raises:
-            KeyError: If the state dictionary is missing required keys.
+            InvalidParameterException: If any parameter in the state is invalid.
         """
-        # Configure class variables if provided
-        if "class_vars" in state:
-            class_vars = state["class_vars"]
-            if "J" in class_vars:
-                cls._J = class_vars["J"]
+        # Handle legacy state format
+        if "type" not in state:
+            # Configure class variables if provided
+            if "class_vars" in state:
+                class_vars = state["class_vars"]
+                if "J" in class_vars:
+                    cls._J = class_vars["J"]
 
-        # Create a new competitor with the initial rating
-        competitor = cls(initial_rating=state.get("initial_rating", 400))
+            # Create a new competitor with the initial rating
+            competitor = cls(initial_rating=state.get("initial_rating", 400))
 
-        # Set the current rating and count if provided
-        if "current_rating" in state:
-            competitor._rating = state["current_rating"]
-        if "count" in state:
-            competitor._count = state["count"]
-        if "initial_count" in state:
-            competitor._initial_count = state["initial_count"]
-        else:
-            competitor._initial_count = competitor._count
+            # Set the current rating and count if provided
+            if "current_rating" in state:
+                competitor._rating = state["current_rating"]
+            if "count" in state:
+                competitor._count = state["count"]
+            if "initial_count" in state:
+                competitor._initial_count = state["initial_count"]
+            else:
+                competitor._initial_count = competitor._count
 
-        return competitor
+            return competitor
+
+        # Use the new standardized format
+        return super().from_state(state)
 
     def reset(self) -> None:
         """Reset this competitor to its initial state.

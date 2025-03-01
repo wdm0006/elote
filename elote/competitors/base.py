@@ -1,5 +1,7 @@
 import abc
-from typing import Dict, Any, TypeVar, Type, ClassVar
+import json
+import uuid
+from typing import Dict, Any, TypeVar, Type, ClassVar, List
 
 
 class MissMatchedCompetitorTypesException(Exception):
@@ -32,7 +34,21 @@ class InvalidParameterException(Exception):
     pass
 
 
+class InvalidStateException(Exception):
+    """Exception raised when an invalid state is provided for deserialization.
+
+    This exception is raised when a state dictionary is missing required fields
+    or contains invalid values.
+    """
+
+    pass
+
+
 T = TypeVar("T", bound="BaseCompetitor")
+
+
+# Registry to store competitor types
+_competitor_registry: Dict[str, Type["BaseCompetitor"]] = {}
 
 
 class BaseCompetitor(abc.ABC):
@@ -48,26 +64,45 @@ class BaseCompetitor(abc.ABC):
     Class Attributes:
         _minimum_rating (float): The minimum allowed rating value. Default: 100.
                                 This prevents ratings from becoming negative or
-                                unreasonably low. Can be configured using the
-                                configure_class method.
-
-    Example:
-        >>> from elote import EloCompetitor
-        >>> player1 = EloCompetitor(initial_rating=1200)
-        >>> player2 = EloCompetitor(initial_rating=1000)
-        >>> player1.expected_score(player2)
-        0.76
-        >>> player1.beat(player2)  # Update ratings after player1 wins
-        >>> player1.rating
-        1205
-        >>> player2.rating
-        995
-        >>> # Configure the minimum rating for all EloCompetitor instances
-        >>> EloCompetitor.configure_class(minimum_rating=200)
+                                unreasonably low.
     """
 
-    # Default minimum rating to prevent negative or unreasonably low ratings
     _minimum_rating: ClassVar[float] = 100
+
+    def __init_subclass__(cls, **kwargs):
+        """Register subclasses in the competitor registry.
+
+        This method is called automatically when a subclass is created.
+        It registers the subclass in the competitor registry for later retrieval.
+        """
+        super().__init_subclass__(**kwargs)
+        _competitor_registry[cls.__name__] = cls
+
+    @classmethod
+    def get_competitor_class(cls, class_name: str) -> Type["BaseCompetitor"]:
+        """Get a competitor class by name.
+
+        Args:
+            class_name (str): The name of the competitor class.
+
+        Returns:
+            Type[BaseCompetitor]: The competitor class.
+
+        Raises:
+            InvalidParameterException: If the class name is not registered.
+        """
+        if class_name not in _competitor_registry:
+            raise InvalidParameterException(f"Unknown competitor type: {class_name}")
+        return _competitor_registry[class_name]
+
+    @classmethod
+    def list_competitor_types(cls) -> List[str]:
+        """List all registered competitor types.
+
+        Returns:
+            List[str]: A list of registered competitor type names.
+        """
+        return list(_competitor_registry.keys())
 
     @property
     @abc.abstractmethod
@@ -151,20 +186,184 @@ class BaseCompetitor(abc.ABC):
         """
         pass
 
-    @abc.abstractmethod
     def export_state(self) -> Dict[str, Any]:
         """Export the current state of this competitor for serialization.
+
+        This method exports the competitor's state in a standardized format that can be
+        used to recreate the competitor with the same state. The format includes:
+        - type: The class name of the competitor
+        - version: The version of the serialization format
+        - created_at: The timestamp when the state was exported
+        - id: A unique identifier for this state export
+        - parameters: The parameters used to initialize the competitor
+        - state: The current state variables of the competitor
 
         Returns:
             dict: A dictionary containing all necessary information to recreate
                  this competitor's current state.
         """
+        import time
+
+        # Get parameters and current state
+        parameters = self._export_parameters()
+        current_state = self._export_current_state()
+
+        # Create a class_vars dictionary for backward compatibility
+        class_vars = {}
+        for attr in dir(self.__class__):
+            # Skip private attributes, methods, and special attributes
+            if attr.startswith("__") or callable(getattr(self.__class__, attr)) or attr.startswith("_abc_"):
+                continue
+
+            # Get the attribute value
+            value = getattr(self.__class__, attr)
+
+            # Skip non-JSON serializable values
+            try:
+                json.dumps(value)
+                # For class variables with leading underscore, add them without the underscore
+                if attr.startswith("_"):
+                    class_vars[attr[1:]] = value
+                else:
+                    class_vars[attr] = value
+            except (TypeError, OverflowError):
+                pass
+
+        # Create the standardized format
+        state_dict = {
+            "type": self.__class__.__name__,
+            "version": 1,
+            "created_at": int(time.time()),
+            "id": str(uuid.uuid4()),
+            "parameters": parameters,
+            "state": current_state,
+            "class_vars": class_vars,
+        }
+
+        # For backward compatibility, flatten parameters and state into the top-level dictionary
+        for key, value in parameters.items():
+            state_dict[key] = value
+        for key, value in current_state.items():
+            state_dict[key] = value
+
+        return state_dict
+
+    @abc.abstractmethod
+    def _export_parameters(self) -> Dict[str, Any]:
+        """Export the parameters used to initialize this competitor.
+
+        This method should be implemented by subclasses to export the parameters
+        that were used to initialize the competitor.
+
+        Returns:
+            dict: A dictionary containing the initialization parameters.
+        """
+        pass
+
+    @abc.abstractmethod
+    def _export_current_state(self) -> Dict[str, Any]:
+        """Export the current state variables of this competitor.
+
+        This method should be implemented by subclasses to export the current
+        state variables of the competitor.
+
+        Returns:
+            dict: A dictionary containing the current state variables.
+        """
+        pass
+
+    def import_state(self, state: Dict[str, Any]) -> None:
+        """Update this competitor's state from a previously exported state.
+
+        This method updates the current competitor instance with the state from
+        a previously exported state dictionary.
+
+        Args:
+            state (dict): A dictionary containing the state of a competitor,
+                         as returned by export_state().
+
+        Raises:
+            InvalidStateException: If the state dictionary is invalid or incompatible.
+            InvalidParameterException: If any parameter in the state is invalid.
+        """
+        # Validate the state dictionary
+        self._validate_state_dict(state)
+
+        # Check that the competitor type matches
+        if state["type"] != self.__class__.__name__:
+            raise InvalidStateException(
+                f"Mismatched competitor types: expected {self.__class__.__name__}, got {state['type']}"
+            )
+
+        # Import the state
+        self._import_parameters(state["parameters"])
+        self._import_current_state(state["state"])
+
+    def _validate_state_dict(self, state: Dict[str, Any]) -> None:
+        """Validate a state dictionary.
+
+        This method checks that a state dictionary has all required fields and
+        that they have the correct types.
+
+        Args:
+            state (dict): A state dictionary to validate.
+
+        Raises:
+            InvalidStateException: If the state dictionary is invalid.
+        """
+        required_fields = ["type", "version", "parameters", "state"]
+        for field in required_fields:
+            if field not in state:
+                raise InvalidStateException(f"Missing required field: {field}")
+
+        if not isinstance(state["type"], str):
+            raise InvalidStateException("Field 'type' must be a string")
+
+        if not isinstance(state["version"], int):
+            raise InvalidStateException("Field 'version' must be an integer")
+
+        if not isinstance(state["parameters"], dict):
+            raise InvalidStateException("Field 'parameters' must be a dictionary")
+
+        if not isinstance(state["state"], dict):
+            raise InvalidStateException("Field 'state' must be a dictionary")
+
+    @abc.abstractmethod
+    def _import_parameters(self, parameters: Dict[str, Any]) -> None:
+        """Import parameters from a state dictionary.
+
+        This method should be implemented by subclasses to import parameters
+        from a state dictionary.
+
+        Args:
+            parameters (dict): A dictionary containing parameters.
+
+        Raises:
+            InvalidParameterException: If any parameter is invalid.
+        """
+        pass
+
+    @abc.abstractmethod
+    def _import_current_state(self, state: Dict[str, Any]) -> None:
+        """Import current state variables from a state dictionary.
+
+        This method should be implemented by subclasses to import current state
+        variables from a state dictionary.
+
+        Args:
+            state (dict): A dictionary containing state variables.
+
+        Raises:
+            InvalidStateException: If any state variable is invalid.
+        """
         pass
 
     @classmethod
-    @abc.abstractmethod
     def from_state(cls: Type[T], state: Dict[str, Any]) -> T:
         """Create a new competitor from a previously exported state.
+
+        This method creates a new competitor instance from a previously exported
+        state dictionary.
 
         Args:
             state (dict): A dictionary containing the state of a competitor,
@@ -172,54 +371,96 @@ class BaseCompetitor(abc.ABC):
 
         Returns:
             BaseCompetitor: A new competitor with the same state as the exported one.
-        """
-        pass
 
-    @abc.abstractmethod
-    def reset(self) -> None:
-        """Reset this competitor to its initial state.
-
-        This method resets the competitor's rating and any other state to the
-        values it had when it was first created.
+        Raises:
+            InvalidStateException: If the state dictionary is invalid or incompatible.
+            InvalidParameterException: If any parameter in the state is invalid.
         """
-        pass
+        # Validate the state dictionary
+        if not isinstance(state, dict):
+            raise InvalidStateException("State must be a dictionary")
+
+        # Check required fields
+        required_fields = ["type", "version", "parameters", "state"]
+        for field in required_fields:
+            if field not in state:
+                raise InvalidStateException(f"Missing required field: {field}")
+
+        # Get the competitor class
+        competitor_type = state["type"]
+        if competitor_type not in _competitor_registry:
+            raise InvalidParameterException(f"Unknown competitor type: {competitor_type}")
+
+        competitor_class = _competitor_registry[competitor_type]
+
+        # Create a new instance using the parameters
+        instance = competitor_class._create_from_parameters(state["parameters"])
+
+        # Import the current state
+        instance._import_current_state(state["state"])
+
+        return instance
 
     @classmethod
-    def configure_class(cls, **kwargs) -> None:
-        """Configure class-level parameters for this rating system.
+    @abc.abstractmethod
+    def _create_from_parameters(cls: Type[T], parameters: Dict[str, Any]) -> T:
+        """Create a new competitor instance from parameters.
 
-        This method allows setting class-level parameters that affect all
-        instances of this rating system.
+        This method should be implemented by subclasses to create a new instance
+        from parameters.
 
         Args:
-            **kwargs: Keyword arguments for class-level parameters.
+            parameters (dict): A dictionary containing parameters.
+
+        Returns:
+            BaseCompetitor: A new competitor instance.
 
         Raises:
             InvalidParameterException: If any parameter is invalid.
         """
-        for key, value in kwargs.items():
-            if hasattr(cls, f"_{key}"):
-                setattr(cls, f"_{key}", value)
-            else:
-                raise InvalidParameterException(f"Unknown class parameter: {key}")
+        pass
 
-    def configure(self, **kwargs) -> None:
-        """Configure instance-level parameters for this competitor.
+    def to_json(self) -> str:
+        """Convert this competitor's state to a JSON string.
 
-        This method allows setting instance-level parameters that affect only
-        this competitor.
+        Returns:
+            str: A JSON string representing this competitor's state.
+        """
+
+        # Create a custom JSON encoder to handle non-serializable objects
+        class CompetitorEncoder(json.JSONEncoder):
+            def default(self, obj):
+                # Handle types that aren't JSON serializable
+                try:
+                    # Try to convert to a simple type
+                    if hasattr(obj, "__dict__"):
+                        return obj.__dict__
+                    return str(obj)
+                except Exception:
+                    return str(obj)
+
+        return json.dumps(self.export_state(), cls=CompetitorEncoder)
+
+    @classmethod
+    def from_json(cls: Type[T], json_str: str) -> T:
+        """Create a new competitor from a JSON string.
 
         Args:
-            **kwargs: Keyword arguments for instance-level parameters.
+            json_str (str): A JSON string representing a competitor's state.
+
+        Returns:
+            BaseCompetitor: A new competitor with the state from the JSON string.
 
         Raises:
-            InvalidParameterException: If any parameter is invalid.
+            InvalidStateException: If the JSON string is invalid or incompatible.
+            InvalidParameterException: If any parameter in the state is invalid.
         """
-        for key, value in kwargs.items():
-            if hasattr(self, f"_{key}"):
-                setattr(self, f"_{key}", value)
-            else:
-                raise InvalidParameterException(f"Unknown instance parameter: {key}")
+        try:
+            state = json.loads(json_str)
+        except json.JSONDecodeError as e:
+            raise InvalidStateException(f"Invalid JSON: {e}") from e
+
+        return cls.from_state(state)
 
     def verify_competitor_types(self, competitor: "BaseCompetitor") -> None:
         """Verify that the given competitor is of the same type as this one.
@@ -317,3 +558,48 @@ class BaseCompetitor(abc.ABC):
         """
         self.verify_competitor_types(other)
         return self.rating >= other.rating
+
+    @classmethod
+    def configure_class(cls, **kwargs) -> None:
+        """Configure class-level parameters for this rating system.
+
+        This method allows setting class-level parameters that affect all
+        instances of this rating system.
+
+        Args:
+            **kwargs: Keyword arguments for class-level parameters.
+
+        Raises:
+            InvalidParameterException: If any parameter is invalid.
+        """
+        for key, value in kwargs.items():
+            if hasattr(cls, f"_{key}"):
+                setattr(cls, f"_{key}", value)
+            else:
+                raise InvalidParameterException(f"Unknown class parameter: {key}")
+
+    def configure(self, **kwargs) -> None:
+        """Configure instance-level parameters for this competitor.
+
+        This method allows setting instance-level parameters that affect only
+        this competitor.
+
+        Args:
+            **kwargs: Keyword arguments for instance-level parameters.
+
+        Raises:
+            InvalidParameterException: If any parameter is invalid.
+        """
+        for key, value in kwargs.items():
+            if hasattr(self, f"_{key}"):
+                setattr(self, f"_{key}", value)
+            else:
+                raise InvalidParameterException(f"Unknown instance parameter: {key}")
+
+    def reset(self) -> None:
+        """Reset this competitor to its initial state.
+
+        This method resets the competitor's rating and any other state to the
+        values it had when it was first created.
+        """
+        self.rating = self._minimum_rating

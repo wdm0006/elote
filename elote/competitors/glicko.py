@@ -64,6 +64,90 @@ class GlickoCompetitor(BaseCompetitor):
         """
         return f"<GlickoCompetitor: rating={self._rating}, rd={self.rd}>"
 
+    def _export_parameters(self) -> Dict[str, Any]:
+        """Export the parameters used to initialize this competitor.
+
+        Returns:
+            dict: A dictionary containing the initialization parameters.
+        """
+        return {
+            "initial_rating": self._initial_rating,
+            "initial_rd": self._initial_rd,
+        }
+
+    def _export_current_state(self) -> Dict[str, Any]:
+        """Export the current state variables of this competitor.
+
+        Returns:
+            dict: A dictionary containing the current state variables.
+        """
+        return {
+            "rating": self._rating,
+            "rd": self.rd,
+        }
+
+    def _import_parameters(self, parameters: Dict[str, Any]) -> None:
+        """Import parameters from a state dictionary.
+
+        Args:
+            parameters (dict): A dictionary containing parameters.
+
+        Raises:
+            InvalidParameterException: If any parameter is invalid.
+        """
+        # Validate and set initial_rating
+        initial_rating = parameters.get("initial_rating", 1500)
+        if initial_rating < self._minimum_rating:
+            raise InvalidParameterException(
+                f"Initial rating cannot be below the minimum rating of {self._minimum_rating}"
+            )
+        self._initial_rating = initial_rating
+
+        # Validate and set initial_rd
+        initial_rd = parameters.get("initial_rd", 350)
+        if initial_rd <= 0:
+            raise InvalidParameterException("Initial RD must be positive")
+        self._initial_rd = initial_rd
+
+    def _import_current_state(self, state: Dict[str, Any]) -> None:
+        """Import current state variables from a state dictionary.
+
+        Args:
+            state (dict): A dictionary containing state variables.
+
+        Raises:
+            InvalidParameterException: If any state variable is invalid.
+        """
+        # Validate and set rating
+        rating = state.get("rating", self._initial_rating)
+        if rating < self._minimum_rating:
+            raise InvalidParameterException(f"Rating cannot be below the minimum rating of {self._minimum_rating}")
+        self._rating = rating
+
+        # Validate and set rd
+        rd = state.get("rd", self._initial_rd)
+        if rd <= 0:
+            raise InvalidParameterException("RD must be positive")
+        self.rd = rd
+
+    @classmethod
+    def _create_from_parameters(cls: Type[T], parameters: Dict[str, Any]) -> T:
+        """Create a new competitor instance from parameters.
+
+        Args:
+            parameters (dict): A dictionary containing parameters.
+
+        Returns:
+            GlickoCompetitor: A new competitor instance.
+
+        Raises:
+            InvalidParameterException: If any parameter is invalid.
+        """
+        return cls(
+            initial_rating=parameters.get("initial_rating", 1500),
+            initial_rd=parameters.get("initial_rd", 350),
+        )
+
     def export_state(self) -> Dict[str, Any]:
         """Export the current state of this competitor for serialization.
 
@@ -71,13 +155,8 @@ class GlickoCompetitor(BaseCompetitor):
             dict: A dictionary containing all necessary information to recreate
                  this competitor's current state.
         """
-        return {
-            "initial_rating": self._initial_rating,
-            "initial_rd": self._initial_rd,
-            "current_rating": self._rating,
-            "current_rd": self.rd,
-            "class_vars": {"c": self._c, "q": self._q},
-        }
+        # Use the new standardized format
+        return super().export_state()
 
     @classmethod
     def from_state(cls: Type[T], state: Dict[str, Any]) -> T:
@@ -91,26 +170,31 @@ class GlickoCompetitor(BaseCompetitor):
             GlickoCompetitor: A new competitor with the same state as the exported one.
 
         Raises:
-            KeyError: If the state dictionary is missing required keys.
+            InvalidParameterException: If any parameter in the state is invalid.
         """
-        # Configure class variables if provided
-        if "class_vars" in state:
-            class_vars = state["class_vars"]
-            if "c" in class_vars:
-                cls._c = class_vars["c"]
-            if "q" in class_vars:
-                cls._q = class_vars["q"]
+        # Handle legacy state format
+        if "type" not in state:
+            # Configure class variables if provided
+            if "class_vars" in state:
+                class_vars = state["class_vars"]
+                if "c" in class_vars:
+                    cls._c = class_vars["c"]
+                if "q" in class_vars:
+                    cls._q = class_vars["q"]
 
-        # Create a new competitor with the initial rating and RD
-        competitor = cls(initial_rating=state.get("initial_rating", 1500), initial_rd=state.get("initial_rd", 350))
+            # Create a new competitor with the initial rating and RD
+            competitor = cls(initial_rating=state.get("initial_rating", 1500), initial_rd=state.get("initial_rd", 350))
 
-        # Set the current rating and RD if provided
-        if "current_rating" in state:
-            competitor._rating = state["current_rating"]
-        if "current_rd" in state:
-            competitor.rd = state["current_rd"]
+            # Set the current rating and RD if provided
+            if "current_rating" in state:
+                competitor._rating = state["current_rating"]
+            if "current_rd" in state:
+                competitor.rd = state["current_rd"]
 
-        return competitor
+            return competitor
+
+        # Use the new standardized format
+        return super().from_state(state)
 
     def reset(self) -> None:
         """Reset this competitor to its initial state.

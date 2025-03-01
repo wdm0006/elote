@@ -1,7 +1,6 @@
 from elote import LambdaArena, GlickoCompetitor
 import json
 import random
-import copy
 
 
 # sample bout function which just compares the two inputs
@@ -20,7 +19,8 @@ print("Arena results:")
 print(json.dumps(arena.leaderboard(), indent=4))
 
 # Export state and create a deep copy to avoid modifying the original
-saved_state = copy.deepcopy(arena.export_state())
+# Use a simple dict comprehension instead of deepcopy to avoid issues with non-serializable types
+saved_state = {k: v for k, v in arena.export_state().items()}
 
 # Create a new arena with the saved state
 matchups = [(random.randint(1, 10), random.randint(1, 10)) for _ in range(100)]

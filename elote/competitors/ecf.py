@@ -2,7 +2,7 @@ from typing import Dict, Any, ClassVar, Optional, Type, TypeVar
 from collections import deque
 import statistics
 
-from elote.competitors.base import BaseCompetitor, InvalidRatingValueException
+from elote.competitors.base import BaseCompetitor, InvalidRatingValueException, InvalidParameterException
 
 T = TypeVar("T", bound="ECFCompetitor")
 
@@ -144,13 +144,80 @@ class ECFCompetitor(BaseCompetitor):
             dict: A dictionary containing all necessary information to recreate
                  this competitor's current state.
         """
-        scores_list = list(self.scores) if self.scores is not None else []
+        # Use the new standardized format
+        return super().export_state()
 
+    def _export_parameters(self) -> Dict[str, Any]:
+        """Export the parameters used to initialize this competitor.
+
+        Returns:
+            dict: A dictionary containing the initialization parameters.
+        """
         return {
             "initial_rating": self.__initial_rating,
-            "scores": scores_list,
-            "class_vars": {"delta": self._delta, "n_periods": self._n_periods},
         }
+
+    def _export_current_state(self) -> Dict[str, Any]:
+        """Export the current state variables of this competitor.
+
+        Returns:
+            dict: A dictionary containing the current state variables.
+        """
+        scores_list = list(self.scores) if self.scores is not None else []
+        return {
+            "scores": scores_list,
+        }
+
+    def _import_parameters(self, parameters: Dict[str, Any]) -> None:
+        """Import parameters from a state dictionary.
+
+        Args:
+            parameters (dict): A dictionary containing parameters.
+
+        Raises:
+            InvalidParameterException: If any parameter is invalid.
+        """
+        # Validate and set initial_rating
+        initial_rating = parameters.get("initial_rating", 100)
+        if initial_rating < self._minimum_rating:
+            raise InvalidParameterException(
+                f"Initial rating cannot be below the minimum rating of {self._minimum_rating}"
+            )
+        self.__initial_rating = initial_rating
+
+    def _import_current_state(self, state: Dict[str, Any]) -> None:
+        """Import current state variables from a state dictionary.
+
+        Args:
+            state (dict): A dictionary containing state variables.
+
+        Raises:
+            InvalidStateException: If any state variable is invalid.
+        """
+        # Restore the scores if provided
+        scores = state.get("scores", [])
+        if scores:
+            self.scores = deque(scores, maxlen=self._n_periods)
+            self.__cached_rating = None  # Force recalculation
+        else:
+            self.__initialize_ratings()
+
+    @classmethod
+    def _create_from_parameters(cls: Type[T], parameters: Dict[str, Any]) -> T:
+        """Create a new competitor instance from parameters.
+
+        Args:
+            parameters (dict): A dictionary containing parameters.
+
+        Returns:
+            ECFCompetitor: A new competitor instance.
+
+        Raises:
+            InvalidParameterException: If any parameter is invalid.
+        """
+        return cls(
+            initial_rating=parameters.get("initial_rating", 100),
+        )
 
     @classmethod
     def from_state(cls: Type[T], state: Dict[str, Any]) -> T:
@@ -164,25 +231,30 @@ class ECFCompetitor(BaseCompetitor):
             ECFCompetitor: A new competitor with the same state as the exported one.
 
         Raises:
-            KeyError: If the state dictionary is missing required keys.
+            InvalidParameterException: If any parameter in the state is invalid.
         """
-        # Configure class variables if provided
-        if "class_vars" in state:
-            class_vars = state["class_vars"]
-            if "delta" in class_vars:
-                cls._delta = class_vars["delta"]
-            if "n_periods" in class_vars:
-                cls._n_periods = class_vars["n_periods"]
+        # Handle legacy state format
+        if "type" not in state:
+            # Configure class variables if provided
+            if "class_vars" in state:
+                class_vars = state["class_vars"]
+                if "delta" in class_vars:
+                    cls._delta = class_vars["delta"]
+                if "n_periods" in class_vars:
+                    cls._n_periods = class_vars["n_periods"]
 
-        # Create a new competitor with the initial rating
-        competitor = cls(initial_rating=state.get("initial_rating", 40))
+            # Create a new competitor with the initial rating
+            competitor = cls(initial_rating=state.get("initial_rating", 40))
 
-        # Restore the scores if provided
-        if "scores" in state and state["scores"]:
-            competitor.scores = deque(state["scores"], maxlen=cls._n_periods)
-            competitor.__cached_rating = None  # Force recalculation
+            # Restore the scores if provided
+            if "scores" in state and state["scores"]:
+                competitor.scores = deque(state["scores"], maxlen=cls._n_periods)
+                competitor.__cached_rating = None  # Force recalculation
 
-        return competitor
+            return competitor
+
+        # Use the new standardized format
+        return super().from_state(state)
 
     def reset(self) -> None:
         """Reset this competitor to its initial state.

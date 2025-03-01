@@ -32,6 +32,7 @@ Elote makes implementing these systems simple and intuitive, with a clean API th
 
    competitors
    arenas
+   serialization
    
 .. toctree::
    :maxdepth: 1
@@ -66,7 +67,6 @@ Elote makes implementing these systems simple and intuitive, with a clean API th
    :caption: Development
 
    contributing
-   changelog
 
 Indices and tables
 ==================

@@ -1,6 +1,6 @@
 from typing import Dict, Any, List, Type, TypeVar
 
-from elote.competitors.base import BaseCompetitor, InvalidParameterException
+from elote.competitors.base import BaseCompetitor, InvalidParameterException, InvalidStateException
 from elote import EloCompetitor, ECFCompetitor, DWZCompetitor, GlickoCompetitor
 
 T = TypeVar("T", bound="BlendedCompetitor")
@@ -48,18 +48,18 @@ class BlendedCompetitor(BaseCompetitor):
 
         self.sub_competitors: List[BaseCompetitor] = []
         self._initial_competitors = competitors.copy()  # Store for reset
-
-        for competitor in competitors:
-            comp_type_name = competitor.get("type", "EloCompetitor")
-            comp_type = competitor_types.get(comp_type_name)
-
-            if comp_type is None:
-                raise InvalidParameterException(f"Unknown competitor type: {comp_type_name}")
-
-            comp_kwargs = competitor.get("competitor_kwargs", {})
-            self.sub_competitors.append(comp_type(**comp_kwargs))
-
         self.blend_mode = blend_mode
+
+        # Create the sub-competitors
+        for comp_spec in competitors:
+            comp_type_name = comp_spec.get("type", "EloCompetitor")
+            comp_kwargs = comp_spec.get("competitor_kwargs", {})
+
+            # Get the competitor class
+            comp_class = BaseCompetitor.get_competitor_class(comp_type_name)
+
+            # Create the competitor
+            self.sub_competitors.append(comp_class(**comp_kwargs))
 
     def __repr__(self) -> str:
         """Return a string representation of this competitor.
@@ -105,6 +105,87 @@ class BlendedCompetitor(BaseCompetitor):
         """
         raise NotImplementedError("Cannot directly set the rating of a BlendedCompetitor")
 
+    def _export_parameters(self) -> Dict[str, Any]:
+        """Export the parameters used to initialize this competitor.
+
+        Returns:
+            dict: A dictionary containing the initialization parameters.
+        """
+        return {
+            "blend_mode": self.blend_mode,
+            "competitors": self._initial_competitors,
+        }
+
+    def _export_current_state(self) -> Dict[str, Any]:
+        """Export the current state variables of this competitor.
+
+        Returns:
+            dict: A dictionary containing the current state variables.
+        """
+        return {
+            "sub_competitors": [comp.export_state() for comp in self.sub_competitors],
+        }
+
+    def _import_parameters(self, parameters: Dict[str, Any]) -> None:
+        """Import parameters from a state dictionary.
+
+        Args:
+            parameters (dict): A dictionary containing parameters.
+
+        Raises:
+            InvalidParameterException: If any parameter is invalid.
+        """
+        # Validate and set blend_mode
+        blend_mode = parameters.get("blend_mode", "mean")
+        if blend_mode not in ["mean"]:
+            raise InvalidParameterException(f"Blend mode {blend_mode} not supported")
+        self.blend_mode = blend_mode
+
+        # Store the initial competitors specification
+        self._initial_competitors = parameters.get("competitors", [])
+
+    def _import_current_state(self, state: Dict[str, Any]) -> None:
+        """Import current state variables from a state dictionary.
+
+        Args:
+            state (dict): A dictionary containing state variables.
+
+        Raises:
+            InvalidStateException: If any state variable is invalid.
+        """
+        # Get the sub-competitors state
+        sub_competitors_state = state.get("sub_competitors", [])
+
+        # Create new sub-competitors from their state
+        self.sub_competitors = []
+        for comp_state in sub_competitors_state:
+            # Get the competitor type
+            comp_type_name = comp_state.get("type")
+            if not comp_type_name:
+                raise InvalidStateException("Missing competitor type in sub-competitor state")
+
+            # Create the competitor from its state
+            comp_class = BaseCompetitor.get_competitor_class(comp_type_name)
+            self.sub_competitors.append(comp_class.from_state(comp_state))
+
+    @classmethod
+    def _create_from_parameters(cls: Type[T], parameters: Dict[str, Any]) -> T:
+        """Create a new competitor instance from parameters.
+
+        Args:
+            parameters (dict): A dictionary containing parameters.
+
+        Returns:
+            BlendedCompetitor: A new competitor instance.
+
+        Raises:
+            InvalidParameterException: If any parameter is invalid.
+        """
+        return cls(
+            competitors=parameters.get("competitors", []),
+            blend_mode=parameters.get("blend_mode", "mean"),
+        )
+
     def export_state(self) -> Dict[str, Any]:
         """Export the current state of this competitor for serialization.
 
@@ -112,12 +193,8 @@ class BlendedCompetitor(BaseCompetitor):
             dict: A dictionary containing all necessary information to recreate
                  this competitor's current state.
         """
-        return {
-            "blend_mode": self.blend_mode,
-            "competitors": [
-                {"type": type(x).__name__, "competitor_kwargs": x.export_state()} for x in self.sub_competitors
-            ],
-        }
+        # Use the new standardized format
+        return super().export_state()
 
     @classmethod
     def from_state(cls: Type[T], state: Dict[str, Any]) -> T:
@@ -131,44 +208,49 @@ class BlendedCompetitor(BaseCompetitor):
             BlendedCompetitor: A new competitor with the same state as the exported one.
 
         Raises:
-            KeyError: If the state dictionary is missing required keys.
+            InvalidStateException: If the state dictionary is invalid or incompatible.
             InvalidParameterException: If any competitor specification is invalid.
         """
-        blend_mode = state.get("blend_mode", "mean")
-        competitors_state = state.get("competitors", [])
+        # Handle legacy state format
+        if "type" not in state:
+            blend_mode = state.get("blend_mode", "mean")
+            competitors_state = state.get("competitors", [])
 
-        # Create a new list of competitor specifications using from_state
-        competitors = []
-        for comp_state in competitors_state:
-            comp_type_name = comp_state.get("type", "EloCompetitor")
-            comp_type = competitor_types.get(comp_type_name)
+            # Create a new list of competitor specifications using from_state
+            competitors = []
+            for comp_state in competitors_state:
+                comp_type_name = comp_state.get("type", "EloCompetitor")
+                comp_type = competitor_types.get(comp_type_name)
 
-            if comp_type is None:
-                raise InvalidParameterException(f"Unknown competitor type: {comp_type_name}")
+                if comp_type is None:
+                    raise InvalidParameterException(f"Unknown competitor type: {comp_type_name}")
 
-            comp_kwargs = comp_state.get("competitor_kwargs", {})
+                comp_kwargs = comp_state.get("competitor_kwargs", {})
 
-            # Create a new competitor specification with just the initial parameters
-            competitors.append(
-                {
-                    "type": comp_type_name,
-                    "competitor_kwargs": {"initial_rating": comp_kwargs.get("initial_rating", 400)},
-                }
-            )
+                # Create a new competitor specification with just the initial parameters
+                competitors.append(
+                    {
+                        "type": comp_type_name,
+                        "competitor_kwargs": {"initial_rating": comp_kwargs.get("initial_rating", 400)},
+                    }
+                )
 
-        # Create the blended competitor
-        blended = cls(competitors=competitors, blend_mode=blend_mode)
+            # Create the blended competitor
+            blended = cls(competitors=competitors, blend_mode=blend_mode)
 
-        # Now update each sub-competitor with its full state
-        for i, comp_state in enumerate(competitors_state):
-            comp_type_name = comp_state.get("type", "EloCompetitor")
-            comp_type = competitor_types.get(comp_type_name)
-            comp_kwargs = comp_state.get("competitor_kwargs", {})
+            # Now update each sub-competitor with its full state
+            for i, comp_state in enumerate(competitors_state):
+                comp_type_name = comp_state.get("type", "EloCompetitor")
+                comp_type = competitor_types.get(comp_type_name)
+                comp_kwargs = comp_state.get("competitor_kwargs", {})
 
-            # Replace the sub-competitor with one created from the full state
-            blended.sub_competitors[i] = comp_type.from_state(comp_kwargs)
+                # Replace the sub-competitor with one created from the full state
+                blended.sub_competitors[i] = comp_type.from_state(comp_kwargs)
 
-        return blended
+            return blended
+
+        # Use the new standardized format
+        return super().from_state(state)
 
     def reset(self) -> None:
         """Reset this competitor to its initial state.
