@@ -49,6 +49,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="competitors.html">Competitors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="arenas.html">Arenas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
 <ul>
@@ -67,10 +68,14 @@
 <li class="toctree-l1"><a class="reference internal" href="use_cases/matchmaking.html">Matchmaking with Elote</a></li>
 <li class="toctree-l1"><a class="reference internal" href="use_cases/feature_prioritization.html">Feature Prioritization with Elote</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/competitors.html">Competitors API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/arenas.html">Arenas API Reference</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to Elote</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 
         </div>
@@ -100,7 +105,8 @@
 <h1 id="index">Index</h1>
 
 <div class="genindex-jumpbox">
- <a href="#A"><strong>A</strong></a>
+ <a href="#_"><strong>_</strong></a>
+ | <a href="#A"><strong>A</strong></a>
  | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
@@ -108,11 +114,34 @@
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
  
 </div>
+<h2 id="_">_</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/competitors.html#elote.competitors.dwz.DWZCompetitor.__init__">__init__() (elote.competitors.dwz.DWZCompetitor method)</a>
+
+      <ul>
+        <li><a href="api/competitors.html#elote.competitors.ecf.ECFCompetitor.__init__">(elote.competitors.ecf.ECFCompetitor method)</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.elo.EloCompetitor.__init__">(elote.competitors.elo.EloCompetitor method)</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.ensemble.BlendedCompetitor.__init__">(elote.competitors.ensemble.BlendedCompetitor method)</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.glicko.GlickoCompetitor.__init__">(elote.competitors.glicko.GlickoCompetitor method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -128,21 +157,25 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="competitors.html#elote.competitors.dwz.DWZCompetitor.beat">beat() (elote.competitors.dwz.DWZCompetitor method)</a>
+      <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor">BaseCompetitor (class in elote.competitors.base)</a>
+</li>
+      <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.beat">beat() (elote.competitors.base.BaseCompetitor method)</a>
 
       <ul>
-        <li><a href="competitors.html#elote.competitors.ecf.ECFCompetitor.beat">(elote.competitors.ecf.ECFCompetitor method)</a>
+        <li><a href="api/competitors.html#elote.competitors.dwz.DWZCompetitor.beat">(elote.competitors.dwz.DWZCompetitor method)</a>, <a href="competitors.html#elote.competitors.dwz.DWZCompetitor.beat">[1]</a>
 </li>
-        <li><a href="competitors.html#elote.competitors.elo.EloCompetitor.beat">(elote.competitors.elo.EloCompetitor method)</a>
+        <li><a href="api/competitors.html#elote.competitors.ecf.ECFCompetitor.beat">(elote.competitors.ecf.ECFCompetitor method)</a>, <a href="competitors.html#elote.competitors.ecf.ECFCompetitor.beat">[1]</a>
 </li>
-        <li><a href="competitors.html#elote.competitors.ensemble.BlendedCompetitor.beat">(elote.competitors.ensemble.BlendedCompetitor method)</a>
+        <li><a href="api/competitors.html#elote.competitors.elo.EloCompetitor.beat">(elote.competitors.elo.EloCompetitor method)</a>, <a href="competitors.html#elote.competitors.elo.EloCompetitor.beat">[1]</a>
 </li>
-        <li><a href="competitors.html#elote.competitors.glicko.GlickoCompetitor.beat">(elote.competitors.glicko.GlickoCompetitor method)</a>
+        <li><a href="api/competitors.html#elote.competitors.ensemble.BlendedCompetitor.beat">(elote.competitors.ensemble.BlendedCompetitor method)</a>, <a href="competitors.html#elote.competitors.ensemble.BlendedCompetitor.beat">[1]</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.glicko.GlickoCompetitor.beat">(elote.competitors.glicko.GlickoCompetitor method)</a>, <a href="competitors.html#elote.competitors.glicko.GlickoCompetitor.beat">[1]</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="competitors.html#elote.competitors.ensemble.BlendedCompetitor">BlendedCompetitor (class in elote.competitors.ensemble)</a>
+      <li><a href="api/competitors.html#elote.competitors.ensemble.BlendedCompetitor">BlendedCompetitor (class in elote.competitors.ensemble)</a>, <a href="competitors.html#elote.competitors.ensemble.BlendedCompetitor">[1]</a>
 </li>
       <li><a href="arenas.html#elote.arenas.base.Bout">Bout (class in elote.arenas.base)</a>
 </li>
@@ -152,6 +185,12 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.configure">configure() (elote.competitors.base.BaseCompetitor method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.configure_class">configure_class() (elote.competitors.base.BaseCompetitor class method)</a>
+</li>
       <li><a href="arenas.html#elote.arenas.base.History.confusion_matrix">confusion_matrix() (elote.arenas.base.History method)</a>
 </li>
   </ul></td>
@@ -160,7 +199,7 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="competitors.html#elote.competitors.dwz.DWZCompetitor">DWZCompetitor (class in elote.competitors.dwz)</a>
+      <li><a href="api/competitors.html#elote.competitors.dwz.DWZCompetitor">DWZCompetitor (class in elote.competitors.dwz)</a>, <a href="competitors.html#elote.competitors.dwz.DWZCompetitor">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -168,34 +207,82 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="competitors.html#elote.competitors.ecf.ECFCompetitor">ECFCompetitor (class in elote.competitors.ecf)</a>
+      <li><a href="api/competitors.html#elote.competitors.ecf.ECFCompetitor">ECFCompetitor (class in elote.competitors.ecf)</a>, <a href="competitors.html#elote.competitors.ecf.ECFCompetitor">[1]</a>
 </li>
-      <li><a href="competitors.html#elote.competitors.elo.EloCompetitor">EloCompetitor (class in elote.competitors.elo)</a>
+      <li><a href="api/competitors.html#elote.competitors.ecf.ECFCompetitor.elo_conversion">elo_conversion (elote.competitors.ecf.ECFCompetitor property)</a>
 </li>
-      <li><a href="competitors.html#elote.competitors.dwz.DWZCompetitor.expected_score">expected_score() (elote.competitors.dwz.DWZCompetitor method)</a>
+      <li><a href="api/competitors.html#elote.competitors.elo.EloCompetitor">EloCompetitor (class in elote.competitors.elo)</a>, <a href="competitors.html#elote.competitors.elo.EloCompetitor">[1]</a>
+</li>
+      <li>
+    elote.competitors.base
 
       <ul>
-        <li><a href="competitors.html#elote.competitors.ecf.ECFCompetitor.expected_score">(elote.competitors.ecf.ECFCompetitor method)</a>
+        <li><a href="api/competitors.html#module-elote.competitors.base">module</a>
 </li>
-        <li><a href="competitors.html#elote.competitors.elo.EloCompetitor.expected_score">(elote.competitors.elo.EloCompetitor method)</a>
+      </ul></li>
+      <li>
+    elote.competitors.dwz
+
+      <ul>
+        <li><a href="api/competitors.html#module-elote.competitors.dwz">module</a>
 </li>
-        <li><a href="competitors.html#elote.competitors.ensemble.BlendedCompetitor.expected_score">(elote.competitors.ensemble.BlendedCompetitor method)</a>
+      </ul></li>
+      <li>
+    elote.competitors.ecf
+
+      <ul>
+        <li><a href="api/competitors.html#module-elote.competitors.ecf">module</a>
 </li>
-        <li><a href="competitors.html#elote.competitors.glicko.GlickoCompetitor.expected_score">(elote.competitors.glicko.GlickoCompetitor method)</a>
+      </ul></li>
+      <li>
+    elote.competitors.elo
+
+      <ul>
+        <li><a href="api/competitors.html#module-elote.competitors.elo">module</a>
+</li>
+      </ul></li>
+      <li>
+    elote.competitors.ensemble
+
+      <ul>
+        <li><a href="api/competitors.html#module-elote.competitors.ensemble">module</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="competitors.html#elote.competitors.dwz.DWZCompetitor.export_state">export_state() (elote.competitors.dwz.DWZCompetitor method)</a>
+      <li>
+    elote.competitors.glicko
 
       <ul>
-        <li><a href="competitors.html#elote.competitors.ecf.ECFCompetitor.export_state">(elote.competitors.ecf.ECFCompetitor method)</a>
+        <li><a href="api/competitors.html#module-elote.competitors.glicko">module</a>
 </li>
-        <li><a href="competitors.html#elote.competitors.elo.EloCompetitor.export_state">(elote.competitors.elo.EloCompetitor method)</a>
+      </ul></li>
+      <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.expected_score">expected_score() (elote.competitors.base.BaseCompetitor method)</a>
+
+      <ul>
+        <li><a href="api/competitors.html#elote.competitors.dwz.DWZCompetitor.expected_score">(elote.competitors.dwz.DWZCompetitor method)</a>, <a href="competitors.html#elote.competitors.dwz.DWZCompetitor.expected_score">[1]</a>
 </li>
-        <li><a href="competitors.html#elote.competitors.ensemble.BlendedCompetitor.export_state">(elote.competitors.ensemble.BlendedCompetitor method)</a>
+        <li><a href="api/competitors.html#elote.competitors.ecf.ECFCompetitor.expected_score">(elote.competitors.ecf.ECFCompetitor method)</a>, <a href="competitors.html#elote.competitors.ecf.ECFCompetitor.expected_score">[1]</a>
 </li>
-        <li><a href="competitors.html#elote.competitors.glicko.GlickoCompetitor.export_state">(elote.competitors.glicko.GlickoCompetitor method)</a>
+        <li><a href="api/competitors.html#elote.competitors.elo.EloCompetitor.expected_score">(elote.competitors.elo.EloCompetitor method)</a>, <a href="competitors.html#elote.competitors.elo.EloCompetitor.expected_score">[1]</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.ensemble.BlendedCompetitor.expected_score">(elote.competitors.ensemble.BlendedCompetitor method)</a>, <a href="competitors.html#elote.competitors.ensemble.BlendedCompetitor.expected_score">[1]</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.glicko.GlickoCompetitor.expected_score">(elote.competitors.glicko.GlickoCompetitor method)</a>, <a href="competitors.html#elote.competitors.glicko.GlickoCompetitor.expected_score">[1]</a>
+</li>
+      </ul></li>
+      <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.export_state">export_state() (elote.competitors.base.BaseCompetitor method)</a>
+
+      <ul>
+        <li><a href="api/competitors.html#elote.competitors.dwz.DWZCompetitor.export_state">(elote.competitors.dwz.DWZCompetitor method)</a>, <a href="competitors.html#elote.competitors.dwz.DWZCompetitor.export_state">[1]</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.ecf.ECFCompetitor.export_state">(elote.competitors.ecf.ECFCompetitor method)</a>, <a href="competitors.html#elote.competitors.ecf.ECFCompetitor.export_state">[1]</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.elo.EloCompetitor.export_state">(elote.competitors.elo.EloCompetitor method)</a>, <a href="competitors.html#elote.competitors.elo.EloCompetitor.export_state">[1]</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.ensemble.BlendedCompetitor.export_state">(elote.competitors.ensemble.BlendedCompetitor method)</a>, <a href="competitors.html#elote.competitors.ensemble.BlendedCompetitor.export_state">[1]</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.glicko.GlickoCompetitor.export_state">(elote.competitors.glicko.GlickoCompetitor method)</a>, <a href="competitors.html#elote.competitors.glicko.GlickoCompetitor.export_state">[1]</a>
 </li>
       </ul></li>
   </ul></td>
@@ -206,17 +293,49 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="arenas.html#elote.arenas.base.Bout.false_negative">false_negative() (elote.arenas.base.Bout method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="arenas.html#elote.arenas.base.Bout.false_positive">false_positive() (elote.arenas.base.Bout method)</a>
 </li>
+      <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.from_json">from_json() (elote.competitors.base.BaseCompetitor class method)</a>
+
+      <ul>
+        <li><a href="competitors.html#elote.competitors.dwz.DWZCompetitor.from_json">(elote.competitors.dwz.DWZCompetitor class method)</a>
+</li>
+        <li><a href="competitors.html#elote.competitors.ecf.ECFCompetitor.from_json">(elote.competitors.ecf.ECFCompetitor class method)</a>
+</li>
+        <li><a href="competitors.html#elote.competitors.elo.EloCompetitor.from_json">(elote.competitors.elo.EloCompetitor class method)</a>
+</li>
+        <li><a href="competitors.html#elote.competitors.ensemble.BlendedCompetitor.from_json">(elote.competitors.ensemble.BlendedCompetitor class method)</a>
+</li>
+        <li><a href="competitors.html#elote.competitors.glicko.GlickoCompetitor.from_json">(elote.competitors.glicko.GlickoCompetitor class method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.from_state">from_state() (elote.competitors.base.BaseCompetitor class method)</a>
+
+      <ul>
+        <li><a href="api/competitors.html#elote.competitors.dwz.DWZCompetitor.from_state">(elote.competitors.dwz.DWZCompetitor class method)</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.ecf.ECFCompetitor.from_state">(elote.competitors.ecf.ECFCompetitor class method)</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.elo.EloCompetitor.from_state">(elote.competitors.elo.EloCompetitor class method)</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.ensemble.BlendedCompetitor.from_state">(elote.competitors.ensemble.BlendedCompetitor class method)</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.glicko.GlickoCompetitor.from_state">(elote.competitors.glicko.GlickoCompetitor class method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="competitors.html#elote.competitors.glicko.GlickoCompetitor">GlickoCompetitor (class in elote.competitors.glicko)</a>
+      <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.get_competitor_class">get_competitor_class() (elote.competitors.base.BaseCompetitor class method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/competitors.html#elote.competitors.glicko.GlickoCompetitor">GlickoCompetitor (class in elote.competitors.glicko)</a>, <a href="competitors.html#elote.competitors.glicko.GlickoCompetitor">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -226,6 +345,59 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="arenas.html#elote.arenas.base.History">History (class in elote.arenas.base)</a>
 </li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.import_state">import_state() (elote.competitors.base.BaseCompetitor method)</a>
+</li>
+      <li><a href="api/competitors.html#elote.competitors.base.InvalidParameterException">InvalidParameterException</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/competitors.html#elote.competitors.base.InvalidRatingValueException">InvalidRatingValueException</a>
+</li>
+      <li><a href="api/competitors.html#elote.competitors.base.InvalidStateException">InvalidStateException</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.list_competitor_types">list_competitor_types() (elote.competitors.base.BaseCompetitor class method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.lost_to">lost_to() (elote.competitors.base.BaseCompetitor method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/competitors.html#elote.competitors.base.MissMatchedCompetitorTypesException">MissMatchedCompetitorTypesException</a>
+</li>
+      <li>
+    module
+
+      <ul>
+        <li><a href="api/competitors.html#module-elote.competitors.base">elote.competitors.base</a>
+</li>
+        <li><a href="api/competitors.html#module-elote.competitors.dwz">elote.competitors.dwz</a>
+</li>
+        <li><a href="api/competitors.html#module-elote.competitors.ecf">elote.competitors.ecf</a>
+</li>
+        <li><a href="api/competitors.html#module-elote.competitors.elo">elote.competitors.elo</a>
+</li>
+        <li><a href="api/competitors.html#module-elote.competitors.ensemble">elote.competitors.ensemble</a>
+</li>
+        <li><a href="api/competitors.html#module-elote.competitors.glicko">elote.competitors.glicko</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -246,45 +418,99 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="arenas.html#elote.arenas.base.History.random_search">random_search() (elote.arenas.base.History method)</a>
 </li>
-      <li><a href="competitors.html#elote.competitors.dwz.DWZCompetitor.rating">rating (elote.competitors.dwz.DWZCompetitor property)</a>
+      <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.rating">rating (elote.competitors.base.BaseCompetitor property)</a>
 
       <ul>
-        <li><a href="competitors.html#elote.competitors.ecf.ECFCompetitor.rating">(elote.competitors.ecf.ECFCompetitor property)</a>
+        <li><a href="api/competitors.html#elote.competitors.dwz.DWZCompetitor.rating">(elote.competitors.dwz.DWZCompetitor property)</a>, <a href="competitors.html#elote.competitors.dwz.DWZCompetitor.rating">[1]</a>
 </li>
-        <li><a href="competitors.html#elote.competitors.elo.EloCompetitor.rating">(elote.competitors.elo.EloCompetitor property)</a>
+        <li><a href="api/competitors.html#elote.competitors.ecf.ECFCompetitor.rating">(elote.competitors.ecf.ECFCompetitor property)</a>, <a href="competitors.html#elote.competitors.ecf.ECFCompetitor.rating">[1]</a>
 </li>
-        <li><a href="competitors.html#elote.competitors.ensemble.BlendedCompetitor.rating">(elote.competitors.ensemble.BlendedCompetitor property)</a>
+        <li><a href="api/competitors.html#elote.competitors.elo.EloCompetitor.rating">(elote.competitors.elo.EloCompetitor property)</a>, <a href="competitors.html#elote.competitors.elo.EloCompetitor.rating">[1]</a>
 </li>
-        <li><a href="competitors.html#elote.competitors.glicko.GlickoCompetitor.rating">(elote.competitors.glicko.GlickoCompetitor property)</a>
+        <li><a href="api/competitors.html#elote.competitors.ensemble.BlendedCompetitor.rating">(elote.competitors.ensemble.BlendedCompetitor property)</a>, <a href="competitors.html#elote.competitors.ensemble.BlendedCompetitor.rating">[1]</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.glicko.GlickoCompetitor.rating">(elote.competitors.glicko.GlickoCompetitor property)</a>, <a href="competitors.html#elote.competitors.glicko.GlickoCompetitor.rating">[1]</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="arenas.html#elote.arenas.base.History.report_results">report_results() (elote.arenas.base.History method)</a>
 </li>
+      <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.reset">reset() (elote.competitors.base.BaseCompetitor method)</a>
+
+      <ul>
+        <li><a href="api/competitors.html#elote.competitors.dwz.DWZCompetitor.reset">(elote.competitors.dwz.DWZCompetitor method)</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.ecf.ECFCompetitor.reset">(elote.competitors.ecf.ECFCompetitor method)</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.elo.EloCompetitor.reset">(elote.competitors.elo.EloCompetitor method)</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.ensemble.BlendedCompetitor.reset">(elote.competitors.ensemble.BlendedCompetitor method)</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.glicko.GlickoCompetitor.reset">(elote.competitors.glicko.GlickoCompetitor method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="competitors.html#elote.competitors.dwz.DWZCompetitor.tied">tied() (elote.competitors.dwz.DWZCompetitor method)</a>
+      <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.tied">tied() (elote.competitors.base.BaseCompetitor method)</a>
 
       <ul>
-        <li><a href="competitors.html#elote.competitors.ecf.ECFCompetitor.tied">(elote.competitors.ecf.ECFCompetitor method)</a>
+        <li><a href="api/competitors.html#elote.competitors.dwz.DWZCompetitor.tied">(elote.competitors.dwz.DWZCompetitor method)</a>, <a href="competitors.html#elote.competitors.dwz.DWZCompetitor.tied">[1]</a>
 </li>
-        <li><a href="competitors.html#elote.competitors.elo.EloCompetitor.tied">(elote.competitors.elo.EloCompetitor method)</a>
+        <li><a href="api/competitors.html#elote.competitors.ecf.ECFCompetitor.tied">(elote.competitors.ecf.ECFCompetitor method)</a>, <a href="competitors.html#elote.competitors.ecf.ECFCompetitor.tied">[1]</a>
 </li>
-        <li><a href="competitors.html#elote.competitors.ensemble.BlendedCompetitor.tied">(elote.competitors.ensemble.BlendedCompetitor method)</a>
+        <li><a href="api/competitors.html#elote.competitors.elo.EloCompetitor.tied">(elote.competitors.elo.EloCompetitor method)</a>, <a href="competitors.html#elote.competitors.elo.EloCompetitor.tied">[1]</a>
 </li>
-        <li><a href="competitors.html#elote.competitors.glicko.GlickoCompetitor.tied">(elote.competitors.glicko.GlickoCompetitor method)</a>
+        <li><a href="api/competitors.html#elote.competitors.ensemble.BlendedCompetitor.tied">(elote.competitors.ensemble.BlendedCompetitor method)</a>, <a href="competitors.html#elote.competitors.ensemble.BlendedCompetitor.tied">[1]</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.glicko.GlickoCompetitor.tied">(elote.competitors.glicko.GlickoCompetitor method)</a>, <a href="competitors.html#elote.competitors.glicko.GlickoCompetitor.tied">[1]</a>
+</li>
+      </ul></li>
+      <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.to_json">to_json() (elote.competitors.base.BaseCompetitor method)</a>
+
+      <ul>
+        <li><a href="competitors.html#elote.competitors.dwz.DWZCompetitor.to_json">(elote.competitors.dwz.DWZCompetitor method)</a>
+</li>
+        <li><a href="competitors.html#elote.competitors.ecf.ECFCompetitor.to_json">(elote.competitors.ecf.ECFCompetitor method)</a>
+</li>
+        <li><a href="competitors.html#elote.competitors.elo.EloCompetitor.to_json">(elote.competitors.elo.EloCompetitor method)</a>
+</li>
+        <li><a href="competitors.html#elote.competitors.ensemble.BlendedCompetitor.to_json">(elote.competitors.ensemble.BlendedCompetitor method)</a>
+</li>
+        <li><a href="competitors.html#elote.competitors.glicko.GlickoCompetitor.to_json">(elote.competitors.glicko.GlickoCompetitor method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/competitors.html#elote.competitors.glicko.GlickoCompetitor.tranformed_rd">tranformed_rd (elote.competitors.glicko.GlickoCompetitor property)</a>
+</li>
+      <li><a href="api/competitors.html#elote.competitors.ecf.ECFCompetitor.transformed_elo_rating">transformed_elo_rating (elote.competitors.ecf.ECFCompetitor property)</a>
+</li>
+      <li><a href="api/competitors.html#elote.competitors.elo.EloCompetitor.transformed_rating">transformed_rating (elote.competitors.elo.EloCompetitor property)</a>
+</li>
       <li><a href="arenas.html#elote.arenas.base.Bout.true_negative">true_negative() (elote.arenas.base.Bout method)</a>
 </li>
       <li><a href="arenas.html#elote.arenas.base.Bout.true_positive">true_positive() (elote.arenas.base.Bout method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/competitors.html#elote.competitors.glicko.GlickoCompetitor.update_competitor_rating">update_competitor_rating() (elote.competitors.glicko.GlickoCompetitor method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.verify_competitor_types">verify_competitor_types() (elote.competitors.base.BaseCompetitor method)</a>
 </li>
   </ul></td>
 </tr></table>

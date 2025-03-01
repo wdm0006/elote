@@ -49,6 +49,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../competitors.html">Competitors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../arenas.html">Arenas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../serialization.html">Serialization</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
 <ul>
@@ -67,10 +68,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../use_cases/matchmaking.html">Matchmaking with Elote</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../use_cases/feature_prioritization.html">Feature Prioritization with Elote</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/competitors.html">Competitors API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/arenas.html">Arenas API Reference</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to Elote</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
 </ul>
 
         </div>
@@ -124,7 +129,7 @@
     <span class="n">_c</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">_q</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0057565</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_rating</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1500</span><span class="p">,</span> <span class="n">initial_rd</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">350</span><span class="p">):</span>
+<div class="viewcode-block" id="GlickoCompetitor.__init__"><a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.glicko.GlickoCompetitor.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_rating</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1500</span><span class="p">,</span> <span class="n">initial_rd</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">350</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a Glicko competitor.</span>
 
 <span class="sd">        Args:</span>
@@ -146,7 +151,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rd</span> <span class="o">=</span> <span class="n">initial_rd</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="n">initial_rd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="n">initial_rd</span></div>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of this competitor.</span>
@@ -164,6 +169,90 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;GlickoCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="si">}</span><span class="s2">, rd=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rd</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_export_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the parameters used to initialize this competitor.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: A dictionary containing the initialization parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">,</span>
+            <span class="s2">&quot;initial_rd&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rd</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_export_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the current state variables of this competitor.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: A dictionary containing the current state variables.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="p">,</span>
+            <span class="s2">&quot;rd&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">rd</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_import_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Import parameters from a state dictionary.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            parameters (dict): A dictionary containing parameters.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidParameterException: If any parameter is invalid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Validate and set initial_rating</span>
+        <span class="n">initial_rating</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="mi">1500</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">initial_rating</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Initial rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
+
+        <span class="c1"># Validate and set initial_rd</span>
+        <span class="n">initial_rd</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rd&quot;</span><span class="p">,</span> <span class="mi">350</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">initial_rd</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Initial RD must be positive&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rd</span> <span class="o">=</span> <span class="n">initial_rd</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_import_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Import current state variables from a state dictionary.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            state (dict): A dictionary containing state variables.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidParameterException: If any state variable is invalid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Validate and set rating</span>
+        <span class="n">rating</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rating&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rating</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">rating</span>
+
+        <span class="c1"># Validate and set rd</span>
+        <span class="n">rd</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rd&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rd</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rd</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;RD must be positive&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="n">rd</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_from_parameters</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new competitor instance from parameters.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            parameters (dict): A dictionary containing parameters.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            GlickoCompetitor: A new competitor instance.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidParameterException: If any parameter is invalid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">initial_rating</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="mi">1500</span><span class="p">),</span>
+            <span class="n">initial_rd</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rd&quot;</span><span class="p">,</span> <span class="mi">350</span><span class="p">),</span>
+        <span class="p">)</span>
+
 <div class="viewcode-block" id="GlickoCompetitor.export_state"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.glicko.GlickoCompetitor.export_state">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">export_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the current state of this competitor for serialization.</span>
 
@@ -171,15 +260,10 @@
 <span class="sd">            dict: A dictionary containing all necessary information to recreate</span>
 <span class="sd">                 this competitor&#39;s current state.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">,</span>
-            <span class="s2">&quot;initial_rd&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rd</span><span class="p">,</span>
-            <span class="s2">&quot;current_rating&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="p">,</span>
-            <span class="s2">&quot;current_rd&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">rd</span><span class="p">,</span>
-            <span class="s2">&quot;class_vars&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_c</span><span class="p">,</span> <span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_q</span><span class="p">},</span>
-        <span class="p">}</span></div>
+        <span class="c1"># Use the new standardized format</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">export_state</span><span class="p">()</span></div>
 
-    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="GlickoCompetitor.from_state"><a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.glicko.GlickoCompetitor.from_state">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_state</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new competitor from a previously exported state.</span>
 
@@ -191,34 +275,39 @@
 <span class="sd">            GlickoCompetitor: A new competitor with the same state as the exported one.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            KeyError: If the state dictionary is missing required keys.</span>
+<span class="sd">            InvalidParameterException: If any parameter in the state is invalid.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Configure class variables if provided</span>
-        <span class="k">if</span> <span class="s2">&quot;class_vars&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-            <span class="n">class_vars</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;class_vars&quot;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="s2">&quot;c&quot;</span> <span class="ow">in</span> <span class="n">class_vars</span><span class="p">:</span>
-                <span class="bp">cls</span><span class="o">.</span><span class="n">_c</span> <span class="o">=</span> <span class="n">class_vars</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="s2">&quot;q&quot;</span> <span class="ow">in</span> <span class="n">class_vars</span><span class="p">:</span>
-                <span class="bp">cls</span><span class="o">.</span><span class="n">_q</span> <span class="o">=</span> <span class="n">class_vars</span><span class="p">[</span><span class="s2">&quot;q&quot;</span><span class="p">]</span>
+        <span class="c1"># Handle legacy state format</span>
+        <span class="k">if</span> <span class="s2">&quot;type&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+            <span class="c1"># Configure class variables if provided</span>
+            <span class="k">if</span> <span class="s2">&quot;class_vars&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+                <span class="n">class_vars</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;class_vars&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s2">&quot;c&quot;</span> <span class="ow">in</span> <span class="n">class_vars</span><span class="p">:</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">_c</span> <span class="o">=</span> <span class="n">class_vars</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s2">&quot;q&quot;</span> <span class="ow">in</span> <span class="n">class_vars</span><span class="p">:</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">_q</span> <span class="o">=</span> <span class="n">class_vars</span><span class="p">[</span><span class="s2">&quot;q&quot;</span><span class="p">]</span>
 
-        <span class="c1"># Create a new competitor with the initial rating and RD</span>
-        <span class="n">competitor</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="mi">1500</span><span class="p">),</span> <span class="n">initial_rd</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rd&quot;</span><span class="p">,</span> <span class="mi">350</span><span class="p">))</span>
+            <span class="c1"># Create a new competitor with the initial rating and RD</span>
+            <span class="n">competitor</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="mi">1500</span><span class="p">),</span> <span class="n">initial_rd</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rd&quot;</span><span class="p">,</span> <span class="mi">350</span><span class="p">))</span>
 
-        <span class="c1"># Set the current rating and RD if provided</span>
-        <span class="k">if</span> <span class="s2">&quot;current_rating&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-            <span class="n">competitor</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;current_rating&quot;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="s2">&quot;current_rd&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-            <span class="n">competitor</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;current_rd&quot;</span><span class="p">]</span>
+            <span class="c1"># Set the current rating and RD if provided</span>
+            <span class="k">if</span> <span class="s2">&quot;current_rating&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+                <span class="n">competitor</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;current_rating&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">&quot;current_rd&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+                <span class="n">competitor</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;current_rd&quot;</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="n">competitor</span>
+            <span class="k">return</span> <span class="n">competitor</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Use the new standardized format</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">from_state</span><span class="p">(</span><span class="n">state</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GlickoCompetitor.reset"><a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.glicko.GlickoCompetitor.reset">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset this competitor to its initial state.</span>
 
 <span class="sd">        This method resets the competitor&#39;s rating and RD to their initial values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rd</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -338,7 +427,7 @@
         <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">c_new_r</span>
         <span class="n">competitor</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="n">c_new_rd</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">update_competitor_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;GlickoCompetitor&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<div class="viewcode-block" id="GlickoCompetitor.update_competitor_rating"><a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.glicko.GlickoCompetitor.update_competitor_rating">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_competitor_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;GlickoCompetitor&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the rating and RD of this competitor based on a match result.</span>
 
 <span class="sd">        Args:</span>
@@ -356,7 +445,7 @@
         <span class="n">s_new_r</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">,</span> <span class="n">s_new_r</span><span class="p">)</span>
 
         <span class="n">s_new_rd</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">rd</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">d_squared</span><span class="p">)</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">s_new_r</span><span class="p">,</span> <span class="n">s_new_rd</span></div>
+        <span class="k">return</span> <span class="n">s_new_r</span><span class="p">,</span> <span class="n">s_new_rd</span></div></div>
 </pre></div>
 
            </div>

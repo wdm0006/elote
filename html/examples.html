@@ -52,6 +52,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="competitors.html">Competitors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="arenas.html">Arenas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
 <ul>
@@ -74,6 +75,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#ecf-arena">ECF Arena</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#glicko-arena">Glicko Arena</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#persisting-state-from-an-arena">Persisting State from an Arena</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#serializing-and-deserializing-competitors">Serializing and Deserializing Competitors</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="advance_example.html">Advanced Examples</a></li>
@@ -81,10 +83,14 @@
 <li class="toctree-l1"><a class="reference internal" href="use_cases/matchmaking.html">Matchmaking with Elote</a></li>
 <li class="toctree-l1"><a class="reference internal" href="use_cases/feature_prioritization.html">Feature Prioritization with Elote</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/competitors.html">Competitors API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/arenas.html">Arenas API Reference</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to Elote</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 
         </div>
@@ -553,6 +559,63 @@
         <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">2403.5118562872744</span>
     <span class="p">}</span>
 <span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="serializing-and-deserializing-competitors">
+<h2>Serializing and Deserializing Competitors<a class="headerlink" href="#serializing-and-deserializing-competitors" title="Permalink to this heading"></a></h2>
+<p>Elote provides a standardized serialization format for all competitor types. This example shows how to serialize and deserialize competitors:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+<span class="c1"># Create a competitor</span>
+<span class="n">competitor</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
+
+<span class="c1"># Simulate some matches</span>
+<span class="n">competitor</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1400</span><span class="p">))</span>
+<span class="n">competitor</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1450</span><span class="p">))</span>
+<span class="n">competitor</span><span class="o">.</span><span class="n">lost_to</span><span class="p">(</span><span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1600</span><span class="p">))</span>
+
+<span class="c1"># Serialize to JSON</span>
+<span class="n">json_str</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span>
+
+<span class="c1"># Print the serialized JSON (formatted for readability)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Serialized competitor:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_str</span><span class="p">),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+
+<span class="c1"># Deserialize from JSON</span>
+<span class="n">new_competitor</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">json_str</span><span class="p">)</span>
+
+<span class="c1"># Verify the ratings match</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Original rating: </span><span class="si">{</span><span class="n">competitor</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Deserialized rating: </span><span class="si">{</span><span class="n">new_competitor</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Continue using the deserialized competitor</span>
+<span class="n">new_competitor</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1450</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Updated rating after another match: </span><span class="si">{</span><span class="n">new_competitor</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Serialized</span> <span class="n">competitor</span><span class="p">:</span>
+<span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;EloCompetitor&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;created_at&quot;</span><span class="p">:</span> <span class="mi">1625097600</span><span class="p">,</span>
+    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;550e8400-e29b-41d4-a716-446655440000&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1500</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1524.32</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;class_vars&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;k_factor&quot;</span><span class="p">:</span> <span class="mi">32</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1500</span><span class="p">,</span>
+    <span class="s2">&quot;current_rating&quot;</span><span class="p">:</span> <span class="mf">1524.32</span>
+<span class="p">}</span>
+<span class="n">Original</span> <span class="n">rating</span><span class="p">:</span> <span class="mf">1524.32</span>
+<span class="n">Deserialized</span> <span class="n">rating</span><span class="p">:</span> <span class="mf">1524.32</span>
+<span class="n">Updated</span> <span class="n">rating</span> <span class="n">after</span> <span class="n">another</span> <span class="n">match</span><span class="p">:</span> <span class="mf">1536.64</span>
 </pre></div>
 </div>
 </section>
