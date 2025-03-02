@@ -27,15 +27,27 @@ def plot_rating_system_comparison(results: List[Dict[str, Any]],
     Returns:
         The matplotlib figure object.
     """
+    # Filter out results without required metrics
+    valid_results = [r for r in results if all(k in r for k in ['name', 'accuracy', 'precision', 'recall', 'f1'])]
+    
+    if not valid_results:
+        # Create an empty figure if no valid results
+        fig, ax = plt.subplots(figsize=figsize)
+        ax.set_title(title)
+        ax.text(0.5, 0.5, "No valid data to display", 
+                horizontalalignment='center', verticalalignment='center',
+                transform=ax.transAxes, fontsize=14)
+        return fig
+    
     # Sort results by accuracy (descending)
-    results = sorted(results, key=lambda x: x['accuracy'], reverse=True)
+    valid_results = sorted(valid_results, key=lambda x: x['accuracy'], reverse=True)
     
     # Extract data for plotting
-    names = [r['name'] for r in results]
-    accuracy = [r['accuracy'] for r in results]
-    precision = [r['precision'] for r in results]
-    recall = [r['recall'] for r in results]
-    f1 = [r['f1'] for r in results]
+    names = [r['name'] for r in valid_results]
+    accuracy = [r['accuracy'] for r in valid_results]
+    precision = [r['precision'] for r in valid_results]
+    recall = [r['recall'] for r in valid_results]
+    f1 = [r['f1'] for r in valid_results]
     
     # Set up the figure and axes
     fig, axes = plt.subplots(2, 2, figsize=figsize)
@@ -90,11 +102,11 @@ def plot_optimized_accuracy_comparison(results: List[Dict[str, Any]],
                                       figsize: Tuple[int, int] = (10, 6),
                                       title: str = 'Accuracy with Optimized Thresholds'):
     """
-    Create a bar chart comparing the optimized accuracy of different rating systems.
+    Create a bar chart comparing the accuracy of different rating systems with optimized thresholds.
     
     Args:
         results: List of dictionaries containing evaluation results for each rating system.
-                Each dict should have 'name' and 'accuracy_opt' keys.
+                Each dict should have 'name', 'accuracy', and 'optimized_accuracy' keys.
         save_path: Optional path to save the figure. If None, the figure is displayed instead.
         figsize: Figure size as (width, height) in inches.
         title: Title for the figure.
@@ -102,30 +114,50 @@ def plot_optimized_accuracy_comparison(results: List[Dict[str, Any]],
     Returns:
         The matplotlib figure object.
     """
-    # Sort by optimized accuracy
-    results = sorted(results, key=lambda x: x.get('accuracy_opt', 0), reverse=True)
+    # Filter out results without required metrics
+    valid_results = [r for r in results if all(k in r for k in ['name', 'accuracy', 'optimized_accuracy'])]
+    
+    if not valid_results:
+        # Create an empty figure if no valid results
+        fig, ax = plt.subplots(figsize=figsize)
+        ax.set_title(title)
+        ax.text(0.5, 0.5, "No valid data to display", 
+                horizontalalignment='center', verticalalignment='center',
+                transform=ax.transAxes, fontsize=14)
+        return fig
+    
+    # Sort results by optimized accuracy (descending)
+    valid_results = sorted(valid_results, key=lambda x: x['optimized_accuracy'], reverse=True)
     
     # Extract data for plotting
-    names = [r['name'] for r in results]
-    accuracy_opt = [r.get('accuracy_opt', 0) for r in results]
+    names = [r['name'] for r in valid_results]
+    default_accuracy = [r['accuracy'] for r in valid_results]
+    optimized_accuracy = [r['optimized_accuracy'] for r in valid_results]
     
-    # Create the figure
-    plt.figure(figsize=figsize)
+    # Set up the figure and axes
+    fig, ax = plt.subplots(figsize=figsize)
+    fig.suptitle(title, fontsize=16)
     
     # Plot the bars
-    plt.bar(np.arange(len(names)), accuracy_opt, color='purple')
-    plt.title(title)
-    plt.ylim(0, 1)
-    plt.ylabel('Accuracy')
-    plt.xlabel('Rating System')
+    ax.bar(np.arange(len(names)), optimized_accuracy, color='purple')
+    ax.set_title(title)
+    ax.set_ylim(0, 1)
+    ax.set_ylabel('Accuracy')
+    ax.set_xlabel('Rating System')
     plt.xticks(np.arange(len(names)), names, rotation=45, ha='right')
+    
+    # Add default accuracy as a horizontal line
+    ax.axhline(y=max(default_accuracy), color='gray', linestyle='--', label='Default Accuracy')
+    
+    # Adjust layout
     plt.tight_layout()
+    plt.subplots_adjust(top=0.9)
     
     # Save or display
     if save_path:
         plt.savefig(save_path)
     
-    return plt.gcf()
+    return fig
 
 
 def plot_accuracy_by_prior_bouts(results_by_prior_bouts: Dict[str, Dict], 

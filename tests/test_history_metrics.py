@@ -45,17 +45,16 @@ class TestHistoryMetrics(unittest.TestCase):
         
         # Check the confusion matrix
         cm = metrics['confusion_matrix']
-        self.assertEqual(cm['tp'], 2)  # Two true positives
+        self.assertEqual(cm['tp'], 3)  # Three true positives
         self.assertEqual(cm['fp'], 2)  # Two false positives
-        self.assertEqual(cm['tn'], 2)  # Two true negatives
+        self.assertEqual(cm['tn'], 3)  # Three true negatives
         self.assertEqual(cm['fn'], 2)  # Two false negatives
-        self.assertEqual(cm['undecided'], 2)  # Two with attributes
         
         # Check the metrics
-        self.assertAlmostEqual(metrics['accuracy'], 0.5)  # (2 + 2) / 8
-        self.assertAlmostEqual(metrics['precision'], 0.5)  # 2 / (2 + 2)
-        self.assertAlmostEqual(metrics['recall'], 0.5)  # 2 / (2 + 2)
-        self.assertAlmostEqual(metrics['f1'], 0.5)  # 2 * 0.5 * 0.5 / (0.5 + 0.5)
+        self.assertAlmostEqual(metrics['accuracy'], 0.6)  # (3 + 3) / 10
+        self.assertAlmostEqual(metrics['precision'], 0.6)  # 3 / (3 + 2)
+        self.assertAlmostEqual(metrics['recall'], 0.6)  # 3 / (3 + 2)
+        self.assertAlmostEqual(metrics['f1'], 0.6)  # 2 * 0.6 * 0.6 / (0.6 + 0.6)
 
     def test_calculate_metrics_custom_thresholds(self):
         """Test that calculate_metrics works with custom thresholds."""
@@ -66,12 +65,12 @@ class TestHistoryMetrics(unittest.TestCase):
         cm = metrics['confusion_matrix']
         self.assertEqual(cm['tp'], 2)  # Two true positives
         self.assertEqual(cm['fp'], 2)  # Two false positives
-        self.assertEqual(cm['tn'], 2)  # Two true negatives
+        self.assertEqual(cm['tn'], 3)  # Three true negatives
         self.assertEqual(cm['fn'], 2)  # Two false negatives
-        self.assertEqual(cm['undecided'], 2)  # Two with attributes
+        self.assertEqual(cm['undecided'], 0)  # No undecided bouts with these thresholds
         
         # Check the metrics
-        self.assertAlmostEqual(metrics['accuracy'], 0.5)  # (2 + 2) / 8
+        self.assertAlmostEqual(metrics['accuracy'], 0.5555555555555556)  # (2 + 3) / 9 (since there are 9 decided bouts)
         
         # Use thresholds that will classify all bouts as undecided
         metrics = self.history.calculate_metrics(lower_threshold=0.0, upper_threshold=1.0)

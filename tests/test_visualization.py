@@ -20,7 +20,7 @@ class TestVisualization(unittest.TestCase):
                 'precision': 0.80,
                 'recall': 0.70,
                 'f1': 0.75,
-                'accuracy_opt': 0.78
+                'optimized_accuracy': 0.78
             },
             {
                 'name': 'System B',
@@ -28,7 +28,7 @@ class TestVisualization(unittest.TestCase):
                 'precision': 0.70,
                 'recall': 0.60,
                 'f1': 0.65,
-                'accuracy_opt': 0.68
+                'optimized_accuracy': 0.68
             },
             {
                 'name': 'System C',
@@ -36,7 +36,7 @@ class TestVisualization(unittest.TestCase):
                 'precision': 0.90,
                 'recall': 0.80,
                 'f1': 0.85,
-                'accuracy_opt': 0.88
+                'optimized_accuracy': 0.88
             }
         ]
         
