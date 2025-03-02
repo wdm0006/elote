@@ -44,46 +44,16 @@ class TestVisualization(unittest.TestCase):
         self.accuracy_by_prior_bouts = {
             'System A': {
                 'binned': {
-                    0: {'accuracy': 0.60, 'total': 100, 'min_bouts': 0, 'max_bouts': 4,
-                        'tp': 30, 'fp': 20, 'tn': 30, 'fn': 20, 'do_nothing': 0},
-                    1: {'accuracy': 0.70, 'total': 100, 'min_bouts': 5, 'max_bouts': 9,
-                        'tp': 35, 'fp': 15, 'tn': 35, 'fn': 15, 'do_nothing': 0},
-                    2: {'accuracy': 0.80, 'total': 100, 'min_bouts': 10, 'max_bouts': 14,
-                        'tp': 40, 'fp': 10, 'tn': 40, 'fn': 10, 'do_nothing': 0}
+                    0: {'accuracy': 0.60, 'total': 100, 'min_bouts': 0, 'max_bouts': 4},
+                    1: {'accuracy': 0.70, 'total': 100, 'min_bouts': 5, 'max_bouts': 9},
+                    2: {'accuracy': 0.80, 'total': 100, 'min_bouts': 10, 'max_bouts': 14}
                 }
             },
             'System B': {
                 'binned': {
-                    0: {'accuracy': 0.55, 'total': 100, 'min_bouts': 0, 'max_bouts': 4,
-                        'tp': 25, 'fp': 20, 'tn': 30, 'fn': 25, 'do_nothing': 0},
-                    1: {'accuracy': 0.65, 'total': 100, 'min_bouts': 5, 'max_bouts': 9,
-                        'tp': 30, 'fp': 15, 'tn': 35, 'fn': 20, 'do_nothing': 0},
-                    2: {'accuracy': 0.75, 'total': 100, 'min_bouts': 10, 'max_bouts': 14,
-                        'tp': 35, 'fp': 10, 'tn': 40, 'fn': 15, 'do_nothing': 0}
-                }
-            }
-        }
-        
-        # Sample data for accuracy by prior bouts without binning
-        self.accuracy_by_prior_bouts_raw = {
-            'System A': {
-                'by_bout_count': {
-                    0: {'accuracy': 0.60, 'total': 50},
-                    1: {'accuracy': 0.62, 'total': 50},
-                    5: {'accuracy': 0.70, 'total': 50},
-                    6: {'accuracy': 0.72, 'total': 50},
-                    10: {'accuracy': 0.80, 'total': 50},
-                    11: {'accuracy': 0.82, 'total': 50}
-                }
-            },
-            'System B': {
-                'by_bout_count': {
-                    0: {'accuracy': 0.55, 'total': 50},
-                    1: {'accuracy': 0.57, 'total': 50},
-                    5: {'accuracy': 0.65, 'total': 50},
-                    6: {'accuracy': 0.67, 'total': 50},
-                    10: {'accuracy': 0.75, 'total': 50},
-                    11: {'accuracy': 0.77, 'total': 50}
+                    0: {'accuracy': 0.55, 'total': 100, 'min_bouts': 0, 'max_bouts': 4},
+                    1: {'accuracy': 0.65, 'total': 100, 'min_bouts': 5, 'max_bouts': 9},
+                    2: {'accuracy': 0.75, 'total': 100, 'min_bouts': 10, 'max_bouts': 14}
                 }
             }
         }
@@ -161,28 +131,12 @@ class TestVisualization(unittest.TestCase):
         # Test with custom parameters
         fig = plot_accuracy_by_prior_bouts(
             self.accuracy_by_prior_bouts,
-            max_bouts=20,
-            bin_size=10,
             figsize=(12, 8),
             title='Custom Title'
         )
         self.assertEqual(fig.get_figwidth(), 12)
         self.assertEqual(fig.get_figheight(), 8)
         self.assertEqual(fig.axes[0].get_title(), 'Custom Title')
-    
-    def test_plot_accuracy_by_prior_bouts_with_raw_data(self):
-        """Test that plot_accuracy_by_prior_bouts works with raw data."""
-        # Test with raw data
-        fig = plot_accuracy_by_prior_bouts(self.accuracy_by_prior_bouts_raw)
-        self.assertIsNotNone(fig)
-        
-        # Test with saving
-        save_path = os.path.join(self.temp_dir, 'accuracy_by_bouts_raw.png')
-        fig = plot_accuracy_by_prior_bouts(
-            self.accuracy_by_prior_bouts_raw,
-            save_path=save_path
-        )
-        self.assertTrue(os.path.exists(save_path))
     
     def test_plot_accuracy_by_prior_bouts_with_empty_data(self):
         """Test that plot_accuracy_by_prior_bouts handles empty data gracefully."""

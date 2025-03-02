@@ -30,15 +30,6 @@ def plot_rating_system_comparison(results: List[Dict[str, Any]],
     # Filter out results without required metrics
     valid_results = [r for r in results if all(k in r for k in ['name', 'accuracy', 'precision', 'recall', 'f1'])]
     
-    if not valid_results:
-        # Create an empty figure if no valid results
-        fig, ax = plt.subplots(figsize=figsize)
-        ax.set_title(title)
-        ax.text(0.5, 0.5, "No valid data to display", 
-                horizontalalignment='center', verticalalignment='center',
-                transform=ax.transAxes, fontsize=14)
-        return fig
-    
     # Sort results by accuracy (descending)
     valid_results = sorted(valid_results, key=lambda x: x['accuracy'], reverse=True)
     
@@ -117,21 +108,11 @@ def plot_optimized_accuracy_comparison(results: List[Dict[str, Any]],
     # Filter out results without required metrics
     valid_results = [r for r in results if all(k in r for k in ['name', 'accuracy', 'optimized_accuracy'])]
     
-    if not valid_results:
-        # Create an empty figure if no valid results
-        fig, ax = plt.subplots(figsize=figsize)
-        ax.set_title(title)
-        ax.text(0.5, 0.5, "No valid data to display", 
-                horizontalalignment='center', verticalalignment='center',
-                transform=ax.transAxes, fontsize=14)
-        return fig
-    
     # Sort results by optimized accuracy (descending)
     valid_results = sorted(valid_results, key=lambda x: x['optimized_accuracy'], reverse=True)
     
     # Extract data for plotting
     names = [r['name'] for r in valid_results]
-    default_accuracy = [r['accuracy'] for r in valid_results]
     optimized_accuracy = [r['optimized_accuracy'] for r in valid_results]
     
     # Set up the figure and axes
@@ -146,9 +127,6 @@ def plot_optimized_accuracy_comparison(results: List[Dict[str, Any]],
     ax.set_xlabel('Rating System')
     plt.xticks(np.arange(len(names)), names, rotation=45, ha='right')
     
-    # Add default accuracy as a horizontal line
-    ax.axhline(y=max(default_accuracy), color='gray', linestyle='--', label='Default Accuracy')
-    
     # Adjust layout
     plt.tight_layout()
     plt.subplots_adjust(top=0.9)
@@ -161,8 +139,6 @@ def plot_optimized_accuracy_comparison(results: List[Dict[str, Any]],
 
 
 def plot_accuracy_by_prior_bouts(results_by_prior_bouts: Dict[str, Dict], 
-                                max_bouts: int = 30,
-                                bin_size: int = 5,
                                 save_path: Optional[str] = None,
                                 figsize: Tuple[int, int] = (14, 8),
                                 title: str = 'Accuracy vs. Prior Bout Count by Rating System'):
@@ -172,8 +148,6 @@ def plot_accuracy_by_prior_bouts(results_by_prior_bouts: Dict[str, Dict],
     Args:
         results_by_prior_bouts: Dictionary mapping competitor names to their accuracy by prior bout data.
                                Each value should be the output of History.accuracy_by_prior_bouts().
-        max_bouts: Maximum number of prior bouts to include in the plot.
-        bin_size: Size of bins for grouping bout counts.
         save_path: Optional path to save the figure. If None, the figure is displayed instead.
         figsize: Figure size as (width, height) in inches.
         title: Title for the figure.
@@ -188,78 +162,32 @@ def plot_accuracy_by_prior_bouts(results_by_prior_bouts: Dict[str, Dict],
     
     # Plot a line for each competitor type
     for i, (competitor_name, bout_data) in enumerate(results_by_prior_bouts.items()):
-        # If the data is already binned, use it directly
-        if 'binned' in bout_data:
-            binned_data = bout_data['binned']
-            bin_indices = sorted([idx for idx in binned_data.keys() 
-                                if binned_data[idx]['max_bouts'] <= max_bouts])
+        # Skip if no data is available
+        if not bout_data or 'binned' not in bout_data:
+            continue
             
-            if not bin_indices:
-                continue
-                
-            bin_labels = [(binned_data[idx]['min_bouts'] + binned_data[idx]['max_bouts']) // 2 
-                         for idx in bin_indices]
-            bin_accuracies = [binned_data[idx]['accuracy'] for idx in bin_indices]
-            
-            # Plot the line with binned data
-            plt.plot(bin_labels, bin_accuracies, marker='o', linestyle='-', 
-                    linewidth=2, markersize=8,
-                    color=colors[i % len(colors)], label=competitor_name)
+        binned_data = bout_data['binned']
+        bin_indices = sorted(binned_data.keys())
         
-        # If the data is not binned, bin it now
-        else:
-            # Extract bout counts and corresponding accuracies
-            raw_data = bout_data.get('by_bout_count', bout_data)
-            bout_counts = sorted([count for count in raw_data.keys() if count <= max_bouts])
+        if not bin_indices:
+            continue
             
-            # Skip if no data points
-            if not bout_counts:
-                continue
-            
-            # Group data into bins
-            binned_data = {}
-            for count in bout_counts:
-                bin_index = count // bin_size
-                if bin_index not in binned_data:
-                    binned_data[bin_index] = {'accuracy': 0, 'total': 0}
-                
-                metrics = raw_data[count]
-                if isinstance(metrics, dict) and 'accuracy' in metrics and 'total' in metrics:
-                    binned_data[bin_index]['accuracy'] += metrics['accuracy'] * metrics['total']
-                    binned_data[bin_index]['total'] += metrics['total']
-                else:
-                    # If metrics is just a value, assume it's the accuracy and weight is 1
-                    binned_data[bin_index]['accuracy'] += metrics
-                    binned_data[bin_index]['total'] += 1
-            
-            # Calculate average accuracy for each bin
-            bin_counts = sorted(binned_data.keys())
-            bin_labels = [(bin_idx * bin_size) + (bin_size // 2) for bin_idx in bin_counts]
-            bin_accuracies = []
-            
-            for bin_idx in bin_counts:
-                if binned_data[bin_idx]['total'] > 0:
-                    avg_accuracy = binned_data[bin_idx]['accuracy'] / binned_data[bin_idx]['total']
-                    bin_accuracies.append(avg_accuracy)
-                else:
-                    bin_accuracies.append(0)
-            
-            # Plot the line with binned data
-            plt.plot(bin_labels, bin_accuracies, marker='o', linestyle='-', 
-                    linewidth=2, markersize=8,
-                    color=colors[i % len(colors)], label=competitor_name)
+        # Extract x and y values for plotting
+        x_values = [(binned_data[idx]['min_bouts'] + binned_data[idx]['max_bouts']) // 2 
+                   for idx in bin_indices]
+        y_values = [binned_data[idx]['accuracy'] for idx in bin_indices]
+        
+        # Plot the line with binned data
+        plt.plot(x_values, y_values, marker='o', linestyle='-', 
+                linewidth=2, markersize=8,
+                color=colors[i % len(colors)], label=competitor_name)
     
     # Add labels and title
-    plt.xlabel('Prior Bouts for Competitors (binned)', fontsize=12)
+    plt.xlabel('Prior Bouts for Competitors', fontsize=12)
     plt.ylabel('Accuracy', fontsize=12)
     plt.title(title, fontsize=14)
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.legend(fontsize=10)
-    
-    # Set x-axis to show bin centers
-    plt.xticks([(i * bin_size) + (bin_size // 2) for i in range((max_bouts // bin_size) + 1)], 
-              [f"{i*bin_size}-{(i+1)*bin_size-1}" for i in range((max_bouts // bin_size) + 1)],
-              rotation=45)
     
     # Set y-axis limits to match typical accuracy range
     plt.ylim(0, 1)

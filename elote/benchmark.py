@@ -113,6 +113,10 @@ def evaluate_competitor(
     top_teams = sorted(arena.leaderboard(), reverse=True, key=lambda x: x.get("rating"))[:5]
     metrics['top_teams'] = top_teams
     
+    # Add history and arena to metrics
+    metrics['history'] = history
+    metrics['arena'] = arena
+    
     # Calculate accuracy by prior bouts if optimize_thresholds is True
     if optimize_thresholds:
         thresholds = best_thresholds
