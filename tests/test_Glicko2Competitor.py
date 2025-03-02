@@ -1,7 +1,10 @@
 import unittest
-import math
-from elote import Glicko2Competitor, EloCompetitor
-from elote.competitors.base import MissMatchedCompetitorTypesException, InvalidParameterException, InvalidRatingValueException
+from elote import Glicko2Competitor
+from elote.competitors.base import (
+    MissMatchedCompetitorTypesException,
+    InvalidParameterException,
+    InvalidRatingValueException,
+)
 
 
 class TestGlicko2(unittest.TestCase):
@@ -121,7 +124,7 @@ class TestGlicko2(unittest.TestCase):
     def test_exceptions(self):
         """Test that the correct exceptions are raised."""
         player1 = Glicko2Competitor()
-        player2 = Glicko2Competitor()
+        Glicko2Competitor()
 
         # Test mismatched competitor types
         class DummyCompetitor:
@@ -139,17 +142,16 @@ class TestGlicko2(unittest.TestCase):
         """Test that update_ratings processes match results correctly."""
         player1 = Glicko2Competitor(initial_rating=1800, initial_rd=250, initial_volatility=0.08)
         player2 = Glicko2Competitor(initial_rating=1500, initial_rd=350, initial_volatility=0.06)
-    
+
         # Store the ratings before any matches
         pre_match_rating1 = player1.rating
-        pre_match_rd1 = player1.rd
-    
+
         # Player1 beats player2 (this already calls update_ratings internally)
         player1.beat(player2)
-    
+
         # Check that the ratings have changed
         self.assertNotEqual(player1.rating, pre_match_rating1)
-        
+
         # Test that update_ratings with no matches increases RD
         player3 = Glicko2Competitor(initial_rating=1800, initial_rd=100, initial_volatility=0.06)
         initial_rd = player3.rd
@@ -160,18 +162,18 @@ class TestGlicko2(unittest.TestCase):
         """Test that tied matches update ratings correctly."""
         player1 = Glicko2Competitor(initial_rating=1800, initial_rd=100, initial_volatility=0.06)
         player2 = Glicko2Competitor(initial_rating=1500, initial_rd=350, initial_volatility=0.06)
-        
+
         # Store the initial ratings
         initial_rating1 = player1.rating
         initial_rating2 = player2.rating
-        
+
         # Simulate a tie
         player1.tied(player2)
-        
+
         # The higher-rated player should lose rating, and the lower-rated player should gain rating
         self.assertLess(player1.rating, initial_rating1)
         self.assertGreater(player2.rating, initial_rating2)
 
 
 if __name__ == "__main__":
-    unittest.main() 
+    unittest.main()

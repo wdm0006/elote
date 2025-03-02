@@ -164,12 +164,14 @@ class History:
             predicted_outcomes = [bout.predicted_outcome for bout in self.bouts]
             min_outcome = min(predicted_outcomes) if predicted_outcomes else 0
             max_outcome = max(predicted_outcomes) if predicted_outcomes else 1
-            
+
             # Generate two random numbers between min and max
-            thresholds = sorted([
-                min_outcome + random.random() * (max_outcome - min_outcome),
-                min_outcome + random.random() * (max_outcome - min_outcome)
-            ])
+            thresholds = sorted(
+                [
+                    min_outcome + random.random() * (max_outcome - min_outcome),
+                    min_outcome + random.random() * (max_outcome - min_outcome),
+                ]
+            )
             tp, fp, tn, fn, do_nothing = self.confusion_matrix(*thresholds)
             total = tp + fp + tn + fn + do_nothing
             accuracy = (tp + tn) / total
@@ -178,8 +180,8 @@ class History:
                 best_thresholds = thresholds
 
         return best_accuracy, best_thresholds
-    
-    def optimize_thresholds(self, method='L-BFGS-B'):
+
+    def optimize_thresholds(self, method="L-BFGS-B"):
         """Search for optimal prediction thresholds using scipy optimization.
 
         This method uses scipy's optimize module to find the best lower and upper
@@ -192,12 +194,12 @@ class History:
             tuple: A tuple containing (best_accuracy, best_thresholds).
         """
         from scipy import optimize
-        
+
         # Find min and max predicted outcomes in history
         predicted_outcomes = [bout.predicted_outcome for bout in self.bouts]
         min_outcome = min(predicted_outcomes) if predicted_outcomes else 0
         max_outcome = max(predicted_outcomes) if predicted_outcomes else 1
-        
+
         # Define the objective function to minimize (negative accuracy)
         def objective(thresholds):
             # Ensure thresholds are sorted
@@ -206,48 +208,48 @@ class History:
             total = tp + fp + tn + fn + do_nothing
             accuracy = (tp + tn) / total if total > 0 else 0
             return -accuracy  # Negative because we want to maximize accuracy
-        
+
         # Calculate baseline accuracy with (0.5, 0.5) thresholds
         baseline_tp, baseline_fp, baseline_tn, baseline_fn, baseline_do_nothing = self.confusion_matrix(0.5, 0.5)
         baseline_total = baseline_tp + baseline_fp + baseline_tn + baseline_fn + baseline_do_nothing
         baseline_accuracy = (baseline_tp + baseline_tn) / baseline_total if baseline_total > 0 else 0
-        
+
         # Use (0.5, 0.5) as the initial guess
         initial_guess = [0.5, 0.5]
-        
+
         # Bounds for the thresholds
         bounds = [(min_outcome, max_outcome), (min_outcome, max_outcome)]
-        
+
         # Run multiple optimizations with different methods and starting points
         best_accuracy = baseline_accuracy
         best_thresholds = [0.5, 0.5]
-        
+
         # Try different optimization methods
         methods = [method]
-        if method != 'L-BFGS-B':
-            methods.append('L-BFGS-B')
-        if 'Nelder-Mead' not in methods:
-            methods.append('Nelder-Mead')
-        
+        if method != "L-BFGS-B":
+            methods.append("L-BFGS-B")
+        if "Nelder-Mead" not in methods:
+            methods.append("Nelder-Mead")
+
         for opt_method in methods:
             try:
                 # Run the optimization with current method
                 result = optimize.minimize(
-                    objective, 
-                    initial_guess, 
+                    objective,
+                    initial_guess,
                     method=opt_method,
-                    bounds=bounds if opt_method != 'Nelder-Mead' else None,
-                    options={'maxiter': 1000}
+                    bounds=bounds if opt_method != "Nelder-Mead" else None,
+                    options={"maxiter": 1000},
                 )
-                
+
                 # Get the thresholds and ensure they're sorted
                 opt_thresholds = sorted(result.x)
-                
+
                 # Calculate the accuracy
                 tp, fp, tn, fn, do_nothing = self.confusion_matrix(*opt_thresholds)
                 total = tp + fp + tn + fn + do_nothing
                 accuracy = (tp + tn) / total if total > 0 else 0
-                
+
                 # Update best if better than current best
                 if accuracy > best_accuracy:
                     best_accuracy = accuracy
@@ -255,56 +257,50 @@ class History:
             except Exception:
                 # Skip if optimization fails
                 continue
-        
+
         # If optimized accuracy is worse than baseline, use baseline
         if best_accuracy < baseline_accuracy:
             return baseline_accuracy, [0.5, 0.5]
-        
+
         return best_accuracy, best_thresholds
-    
+
     def calculate_metrics(self, lower_threshold=0.5, upper_threshold=0.5):
         """Calculate common evaluation metrics for the bout history.
-        
+
         Args:
             lower_threshold (float): The lower probability threshold for predictions.
             upper_threshold (float): The upper probability threshold for predictions.
-            
+
         Returns:
             dict: A dictionary containing accuracy, precision, recall, and F1 score.
         """
         tp, fp, tn, fn, do_nothing = self.confusion_matrix(lower_threshold, upper_threshold)
-        
+
         total = tp + fp + tn + fn + do_nothing
         accuracy = (tp + tn) / total if total > 0 else 0
         precision = tp / (tp + fp) if (tp + fp) > 0 else 0
         recall = tp / (tp + fn) if (tp + fn) > 0 else 0
         f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0
-        
+
         return {
-            'accuracy': accuracy,
-            'precision': precision,
-            'recall': recall,
-            'f1': f1,
-            'confusion_matrix': {
-                'tp': tp,
-                'fp': fp,
-                'tn': tn,
-                'fn': fn,
-                'undecided': do_nothing
-            }
+            "accuracy": accuracy,
+            "precision": precision,
+            "recall": recall,
+            "f1": f1,
+            "confusion_matrix": {"tp": tp, "fp": fp, "tn": tn, "fn": fn, "undecided": do_nothing},
         }
-    
+
     def accuracy_by_prior_bouts(self, arena, thresholds=None, bin_size=5):
         """Calculate accuracy based on the number of prior bouts for each competitor.
-        
+
         This method analyzes how the accuracy of predictions changes based on how many
         previous matchups each competitor has participated in.
-        
+
         Args:
             arena (BaseArena): The arena containing the competitors and their history
             thresholds (tuple, optional): Tuple of (lower_threshold, upper_threshold) for predictions
             bin_size (int): Size of bins for grouping bout counts
-            
+
         Returns:
             dict: A dictionary with 'binned' key containing binned accuracy data
         """
@@ -313,83 +309,75 @@ class History:
             lower_threshold, upper_threshold = 0.5, 0.5
         else:
             lower_threshold, upper_threshold = thresholds
-        
+
         # Track the number of bouts for each competitor
         competitor_bout_counts = {}
-        
+
         # Count all bouts from arena's history (which includes training data)
-        if hasattr(arena, 'history') and hasattr(arena.history, 'bouts'):
+        if hasattr(arena, "history") and hasattr(arena.history, "bouts"):
             for bout in arena.history.bouts:
                 competitor_bout_counts[bout.a] = competitor_bout_counts.get(bout.a, 0) + 1
                 competitor_bout_counts[bout.b] = competitor_bout_counts.get(bout.b, 0) + 1
-        
+
         # Track accuracy by minimum bout count
         accuracy_by_min_bouts = {}
-        
+
         # Process each bout in the evaluation history
         for bout in self.bouts:
             # Get the current bout count for each competitor
             a_count = competitor_bout_counts.get(bout.a, 0)
             b_count = competitor_bout_counts.get(bout.b, 0)
-            
+
             # Determine the minimum bout count between the two competitors
             min_bout_count = min(a_count, b_count)
-            
+
             # Initialize the bucket if it doesn't exist
             if min_bout_count not in accuracy_by_min_bouts:
-                accuracy_by_min_bouts[min_bout_count] = {
-                    'correct': 0,
-                    'total': 0
-                }
-            
+                accuracy_by_min_bouts[min_bout_count] = {"correct": 0, "total": 0}
+
             # Check if prediction is correct
             if bout.predicted_outcome > upper_threshold and bout.outcome == 1.0:
-                accuracy_by_min_bouts[min_bout_count]['correct'] += 1
+                accuracy_by_min_bouts[min_bout_count]["correct"] += 1
             elif bout.predicted_outcome < lower_threshold and bout.outcome == 0.0:
-                accuracy_by_min_bouts[min_bout_count]['correct'] += 1
-            accuracy_by_min_bouts[min_bout_count]['total'] += 1
-            
+                accuracy_by_min_bouts[min_bout_count]["correct"] += 1
+            accuracy_by_min_bouts[min_bout_count]["total"] += 1
+
             # Update bout counts for both competitors for subsequent bouts in evaluation
             competitor_bout_counts[bout.a] = a_count + 1
             competitor_bout_counts[bout.b] = b_count + 1
-        
+
         # Calculate accuracy for each bucket
-        for bout_count, metrics in accuracy_by_min_bouts.items():
-            if metrics['total'] > 0:
-                metrics['accuracy'] = metrics['correct'] / metrics['total']
+        for _bout_count, metrics in accuracy_by_min_bouts.items():
+            if metrics["total"] > 0:
+                metrics["accuracy"] = metrics["correct"] / metrics["total"]
             else:
-                metrics['accuracy'] = None
-        
+                metrics["accuracy"] = None
+
         # Group data into bins for smoother visualization
         binned_data = {}
         for count, metrics in accuracy_by_min_bouts.items():
             bin_index = count // bin_size
             if bin_index not in binned_data:
-                binned_data[bin_index] = {
-                    'accuracy_sum': 0,
-                    'total': 0
-                }
-            
-            binned_data[bin_index]['accuracy_sum'] += metrics['accuracy'] * metrics['total']
-            binned_data[bin_index]['total'] += metrics['total']
-        
+                binned_data[bin_index] = {"accuracy_sum": 0, "total": 0}
+
+            binned_data[bin_index]["accuracy_sum"] += metrics["accuracy"] * metrics["total"]
+            binned_data[bin_index]["total"] += metrics["total"]
+
         # Calculate average accuracy for each bin
         for bin_idx, bin_data in binned_data.items():
-            if bin_data['total'] > 10:
-                bin_data['accuracy'] = bin_data['accuracy_sum'] / bin_data['total']
-                del bin_data['accuracy_sum']
+            if bin_data["total"] > 10:
+                bin_data["accuracy"] = bin_data["accuracy_sum"] / bin_data["total"]
+                del bin_data["accuracy_sum"]
             else:
-                bin_data['accuracy'] = None
-                del bin_data['accuracy_sum']
-            
+                bin_data["accuracy"] = None
+                del bin_data["accuracy_sum"]
+
             # Add bin range information
-            bin_data['min_bouts'] = bin_idx * bin_size
-            bin_data['max_bouts'] = (bin_idx + 1) * bin_size - 1
-        
+            bin_data["min_bouts"] = bin_idx * bin_size
+            bin_data["max_bouts"] = (bin_idx + 1) * bin_size - 1
+
         # Return only the binned data in the expected format
-        return {
-            'binned': binned_data
-        }
+        return {"binned": binned_data}
 
 
 class Bout:

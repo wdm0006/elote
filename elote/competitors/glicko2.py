@@ -1,5 +1,5 @@
 import math
-from typing import Dict, Any, ClassVar, Tuple, Type, TypeVar, List
+from typing import Dict, Any, ClassVar, Type, TypeVar
 
 from elote.competitors.base import BaseCompetitor, InvalidRatingValueException, InvalidParameterException
 
@@ -492,30 +492,29 @@ class Glicko2Competitor(BaseCompetitor):
         v_inv = 0.0  # Inverse of the variance of the change in rating
 
         # Step 2: Calculate the estimated variance of the player's rating based on game outcomes
-        for opponent, score in self._match_results:
+        for opponent, _score in self._match_results:
             opponent_phi = opponent._phi
             opponent_mu = opponent._mu
             g_phi_j = self._g(opponent_phi)
             E_mu_mu_j_phi_j = self._E(mu, opponent_mu, opponent_phi)
             v_inv += g_phi_j**2 * E_mu_mu_j_phi_j * (1 - E_mu_mu_j_phi_j)
 
-        v = 1.0 / v_inv if v_inv > 0 else float('inf')
+        v = 1.0 / v_inv if v_inv > 0 else float("inf")
 
         # Step 3: Calculate the quantity delta, the estimated improvement in rating
         delta = 0.0
-        for opponent, score in self._match_results:
+        for opponent, _score in self._match_results:
             opponent_phi = opponent._phi
             opponent_mu = opponent._mu
             g_phi_j = self._g(opponent_phi)
             E_mu_mu_j_phi_j = self._E(mu, opponent_mu, opponent_phi)
-            delta += g_phi_j * (score - E_mu_mu_j_phi_j)
+            delta += g_phi_j * (_score - E_mu_mu_j_phi_j)
         delta *= v
 
         # Step 4: Calculate the new volatility sigma'
         # This uses the iterative algorithm described in the Glicko-2 paper
         a = math.log(sigma**2)
         tau = self._tau
-        x0 = a
         epsilon = self._epsilon
 
         # Compute the function f(x) and its derivative f'(x)
@@ -523,11 +522,9 @@ class Glicko2Competitor(BaseCompetitor):
             exp_x = math.exp(x)
             phi_squared = phi**2
             delta_squared = delta**2
-            return (
-                exp_x * (delta_squared - phi_squared - v - exp_x)
-                / (2 * (phi_squared + v + exp_x)**2)
-                - (x - a) / (tau**2)
-            )
+            return exp_x * (delta_squared - phi_squared - v - exp_x) / (2 * (phi_squared + v + exp_x) ** 2) - (
+                x - a
+            ) / (tau**2)
 
         # Find the value x that satisfies f(x) = 0 using the Illinois algorithm
         # (a variant of the regula falsi method)
@@ -588,4 +585,4 @@ class Glicko2Competitor(BaseCompetitor):
         self._rd = self._phi_to_rd(phi_prime)
 
         # Clear the match results
-        self._match_results = [] 
+        self._match_results = []

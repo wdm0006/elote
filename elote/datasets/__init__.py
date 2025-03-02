@@ -11,9 +11,9 @@ from elote.datasets.football import CollegeFootballDataset
 from elote.datasets.synthetic import SyntheticDataset
 
 __all__ = [
-    'BaseDataset',
-    'DataSplit',
-    'ChessDataset',
-    'CollegeFootballDataset',
-    'SyntheticDataset',
-] 
+    "BaseDataset",
+    "DataSplit",
+    "ChessDataset",
+    "CollegeFootballDataset",
+    "SyntheticDataset",
+]

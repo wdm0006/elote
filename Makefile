@@ -51,7 +51,7 @@ lint:
 
 # Run linting and fix auto-fixable issues
 lint-fix:
-	uv run ruff check --fix .
+	uv run ruff check --fix --unsafe-fixes .
 
 # Format code
 format:

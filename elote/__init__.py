@@ -57,40 +57,35 @@ from elote.benchmark import evaluate_competitor, benchmark_competitors
 from elote.visualization import (
     plot_rating_system_comparison,
     plot_optimized_accuracy_comparison,
-    plot_accuracy_by_prior_bouts
+    plot_accuracy_by_prior_bouts,
 )
 
 __all__ = [
     # Competitors
-    'EloCompetitor',
-    'GlickoCompetitor',
-    'Glicko2Competitor',
-    'TrueSkillCompetitor',
-    'ECFCompetitor',
-    'DWZCompetitor',
-    'BlendedCompetitor',
-    
+    "EloCompetitor",
+    "GlickoCompetitor",
+    "Glicko2Competitor",
+    "TrueSkillCompetitor",
+    "ECFCompetitor",
+    "DWZCompetitor",
+    "BlendedCompetitor",
     # Arenas
-    'LambdaArena',
-    
+    "LambdaArena",
     # Datasets
-    'BaseDataset',
-    'DataSplit',
-    'ChessDataset',
-    'CollegeFootballDataset',
-    'SyntheticDataset',
-    
+    "BaseDataset",
+    "DataSplit",
+    "ChessDataset",
+    "CollegeFootballDataset",
+    "SyntheticDataset",
     # Dataset utilities
-    'train_arena_with_dataset',
-    'evaluate_arena_with_dataset',
-    'train_and_evaluate_arena',
-    
+    "train_arena_with_dataset",
+    "evaluate_arena_with_dataset",
+    "train_and_evaluate_arena",
     # Benchmarking
-    'evaluate_competitor',
-    'benchmark_competitors',
-    
+    "evaluate_competitor",
+    "benchmark_competitors",
     # Visualization
-    'plot_rating_system_comparison',
-    'plot_optimized_accuracy_comparison',
-    'plot_accuracy_by_prior_bouts'
+    "plot_rating_system_comparison",
+    "plot_optimized_accuracy_comparison",
+    "plot_accuracy_by_prior_bouts",
 ]

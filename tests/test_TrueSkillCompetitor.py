@@ -9,7 +9,7 @@ class TestTrueSkill(unittest.TestCase):
         """Test that a player's rating improves when they beat higher-rated players."""
         player1 = TrueSkillCompetitor(initial_mu=20, initial_sigma=8.333)
         initial_mu = player1.mu
-        
+
         # If player1 beats someone with a high rating, their mu should go up
         for _ in range(5):
             player2 = TrueSkillCompetitor(initial_mu=30, initial_sigma=8.333)
@@ -20,7 +20,7 @@ class TestTrueSkill(unittest.TestCase):
         """Test that a player's rating decreases when they lose to lower-rated players."""
         player1 = TrueSkillCompetitor(initial_mu=30, initial_sigma=8.333)
         initial_mu = player1.mu
-        
+
         # If player1 loses to someone with a low rating, their mu should go down
         for _ in range(5):
             player2 = TrueSkillCompetitor(initial_mu=20, initial_sigma=8.333)
@@ -58,25 +58,25 @@ class TestTrueSkill(unittest.TestCase):
     def test_rating_properties(self):
         """Test the mu and sigma properties."""
         player = TrueSkillCompetitor(initial_mu=25, initial_sigma=8.333)
-        
+
         # Test getters
         self.assertEqual(player.mu, 25)
         self.assertEqual(player.sigma, 8.333)
         self.assertEqual(player.rating, max(25 - 3 * 8.333, player._minimum_rating))
-        
+
         # Test setters
         player.mu = 30
         self.assertEqual(player.mu, 30)
         player.sigma = 5
         self.assertEqual(player.sigma, 5)
         self.assertEqual(player.rating, max(30 - 3 * 5, player._minimum_rating))
-        
+
         # Test invalid values
         with self.assertRaises(InvalidParameterException):
             player.sigma = 0
         with self.assertRaises(InvalidParameterException):
             player.sigma = -1
-        
+
         # Test that rating cannot be set directly
         with self.assertRaises(NotImplementedError):
             player.rating = 100
@@ -87,7 +87,7 @@ class TestTrueSkill(unittest.TestCase):
         player1 = TrueSkillCompetitor(initial_mu=25, initial_sigma=8.333)
         player2 = TrueSkillCompetitor(initial_mu=25, initial_sigma=8.333)
         self.assertAlmostEqual(player1.expected_score(player2), 0.335, places=3)  # Updated expected value
-        
+
         # Test with different ratings
         player1 = TrueSkillCompetitor(initial_mu=30, initial_sigma=8.333)
         player2 = TrueSkillCompetitor(initial_mu=20, initial_sigma=8.333)
@@ -98,14 +98,14 @@ class TestTrueSkill(unittest.TestCase):
         """Test that tied matches update ratings correctly."""
         player1 = TrueSkillCompetitor(initial_mu=30, initial_sigma=5)
         player2 = TrueSkillCompetitor(initial_mu=20, initial_sigma=5)
-        
+
         # Store the initial ratings
         initial_mu1 = player1.mu
         initial_mu2 = player2.mu
-        
+
         # Simulate a tie
         player1.tied(player2)
-        
+
         # The higher-rated player should lose rating, and the lower-rated player should gain rating
         self.assertGreater(player1.mu, initial_mu1 - 1)  # Allow for small changes
         self.assertLess(player1.mu, initial_mu1 + 1)
@@ -115,14 +115,14 @@ class TestTrueSkill(unittest.TestCase):
     def test_reset(self):
         """Test that reset returns the competitor to its initial state."""
         player = TrueSkillCompetitor(initial_mu=25, initial_sigma=8.333)
-        
+
         # Change the player's state
         player.mu = 30
         player.sigma = 5
-        
+
         # Reset the player
         player.reset()
-        
+
         # Check that the player's state is reset
         self.assertEqual(player.mu, 25)
         self.assertEqual(player.sigma, 8.333)
@@ -130,13 +130,13 @@ class TestTrueSkill(unittest.TestCase):
     def test_export_import_state(self):
         """Test that the state can be exported and imported correctly."""
         player = TrueSkillCompetitor(initial_mu=25, initial_sigma=8.333)
-        
+
         # Export the state
         state = player.export_state()
-        
+
         # Create a new player from the state
         new_player = TrueSkillCompetitor.from_state(state)
-        
+
         # Check that the new player has the same state
         self.assertEqual(new_player.mu, player.mu)
         self.assertEqual(new_player.sigma, player.sigma)
@@ -148,7 +148,7 @@ class TestTrueSkill(unittest.TestCase):
         player2 = TrueSkillCompetitor(initial_mu=25, initial_sigma=8.333)
         quality = TrueSkillCompetitor.match_quality(player1, player2)
         self.assertGreater(quality, 0.4)  # Updated expected value
-        
+
         # Unequal players should have lower match quality
         player1 = TrueSkillCompetitor(initial_mu=30, initial_sigma=5)
         player2 = TrueSkillCompetitor(initial_mu=20, initial_sigma=5)
@@ -159,13 +159,13 @@ class TestTrueSkill(unittest.TestCase):
         """Test that teams can be created correctly."""
         player1 = TrueSkillCompetitor(initial_mu=25, initial_sigma=8.333)
         player2 = TrueSkillCompetitor(initial_mu=30, initial_sigma=5)
-        
+
         # Create a team
         team_mu, team_sigma = TrueSkillCompetitor.create_team([player1, player2])
-        
+
         # Team mu should be the sum of player mus
         self.assertEqual(team_mu, player1.mu + player2.mu)
-        
+
         # Team sigma should be the square root of the sum of squared player sigmas
         self.assertAlmostEqual(team_sigma, math.sqrt(player1.sigma**2 + player2.sigma**2))
 
@@ -188,4 +188,4 @@ class TestTrueSkill(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main() 
+    unittest.main()

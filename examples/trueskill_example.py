@@ -43,10 +43,10 @@ def main():
     print("Simulating matches...")
     print("Match 1: Player 1 beats Player 2 (upset!)")
     player1.beat(player2)
-    
+
     print("Match 2: Player 3 beats Player 1 (another upset!)")
     player3.beat(player1)
-    
+
     print("Match 3: Player 2 and Player 4 tie")
     player2.tied(player4)
     print()
@@ -78,11 +78,11 @@ def main():
     print("Demonstrating serialization and deserialization...")
     state = player1.export_state()
     player1_copy = TrueSkillCompetitor.from_state(state)
-    
+
     print(f"Original player: {player1}")
     print(f"Deserialized player: {player1_copy}")
     print(f"Are they equal? {player1.mu == player1_copy.mu and player1.sigma == player1_copy.sigma}")
 
 
 if __name__ == "__main__":
-    main() 
+    main()

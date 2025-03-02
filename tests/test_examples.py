@@ -16,9 +16,9 @@ class TestExamples(unittest.TestCase):
         # Skip examples that require external API access or take too long to run in tests
         self.skip_examples = [
             "use_cases/cfb_w_lib.py",  # Requires external API access
-            "dataset_example.py",      # Takes too long to run in tests
+            "dataset_example.py",  # Takes too long to run in tests
             "persist_state_arena.py",  # Times out in tests
-            "sample_bout.py"           # Times out in tests
+            "sample_bout.py",  # Times out in tests
         ]
 
     def test_example_scripts(self):
@@ -60,7 +60,9 @@ class TestExamples(unittest.TestCase):
         """Test each example script individually with specific assertions."""
         # Test sample_bout.py - skip if in skip_examples
         if "sample_bout.py" not in self.skip_examples:
-            self._test_specific_example("sample_bout.py", expected_output_contains=["Starting ratings:", "After matches"])
+            self._test_specific_example(
+                "sample_bout.py", expected_output_contains=["Starting ratings:", "After matches"]
+            )
 
         # Test prediction.py
         self._test_specific_example("prediction.py", expected_output_contains=["probability of better beating good"])

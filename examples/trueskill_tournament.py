@@ -13,6 +13,7 @@ from elote import TrueSkillCompetitor, LambdaArena
 
 def main():
     """Run the TrueSkill tournament example."""
+
     # Create a comparison function that compares two numbers
     # Returns True if a beats b (i.e., a > b)
     def comparison_func(a, b):
@@ -22,7 +23,7 @@ def main():
     arena = LambdaArena(
         comparison_func,
         base_competitor=TrueSkillCompetitor,
-        base_competitor_kwargs={"initial_mu": 25.0, "initial_sigma": 8.333}
+        base_competitor_kwargs={"initial_mu": 25.0, "initial_sigma": 8.333},
     )
 
     # Generate 1000 random matchups between numbers 1-10
@@ -56,4 +57,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main() 
+    main()

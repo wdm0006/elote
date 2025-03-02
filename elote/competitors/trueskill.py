@@ -1,9 +1,8 @@
 import math
-import numpy as np
 from scipy import special
-from typing import Dict, Any, ClassVar, Tuple, Type, TypeVar, List, Optional
+from typing import Dict, Any, ClassVar, Tuple, Type, TypeVar, List
 
-from elote.competitors.base import BaseCompetitor, InvalidRatingValueException, InvalidParameterException
+from elote.competitors.base import BaseCompetitor, InvalidParameterException
 
 T = TypeVar("T", bound="TrueSkillCompetitor")
 
@@ -401,11 +400,11 @@ class TrueSkillCompetitor(BaseCompetitor):
     def _calculate_draw_margin(beta: float, draw_probability: float) -> float:
         """
         Calculate the draw margin based on beta and draw probability.
-        
+
         Args:
             beta: The beta parameter
             draw_probability: The probability of a draw
-            
+
         Returns:
             The draw margin
         """
@@ -533,7 +532,7 @@ class TrueSkillCompetitor(BaseCompetitor):
         competitor_ts._sigma = math.sqrt(competitor_ts._sigma**2 + self._tau**2)
 
     @classmethod
-    def match_quality(cls, player1: 'TrueSkillCompetitor', player2: 'TrueSkillCompetitor') -> float:
+    def match_quality(cls, player1: "TrueSkillCompetitor", player2: "TrueSkillCompetitor") -> float:
         """Calculate the match quality between two players.
 
         Match quality is a value between 0 and 1 that represents how evenly matched
@@ -556,13 +555,13 @@ class TrueSkillCompetitor(BaseCompetitor):
         v = math.sqrt(2 * beta_squared + sigma_squared_sum)
 
         # Calculate the match quality
-        exp_term = -mu_diff**2 / (2 * v**2)
+        exp_term = -(mu_diff**2) / (2 * v**2)
         sqrt_term = math.sqrt(2 * beta_squared) / v
-        
+
         return sqrt_term * math.exp(exp_term)
 
     @classmethod
-    def create_team(cls, players: List['TrueSkillCompetitor']) -> Tuple[float, float]:
+    def create_team(cls, players: List["TrueSkillCompetitor"]) -> Tuple[float, float]:
         """Create a virtual team competitor from a list of players.
 
         This method combines the skills of multiple players into a single team skill.
@@ -580,8 +579,14 @@ class TrueSkillCompetitor(BaseCompetitor):
         return team_mu, team_sigma
 
     @classmethod
-    def update_team(cls, team_players: List['TrueSkillCompetitor'], team_mu_diff: float, team_sigma_squared: float, 
-                    v: float, result_func: callable) -> None:
+    def update_team(
+        cls,
+        team_players: List["TrueSkillCompetitor"],
+        team_mu_diff: float,
+        team_sigma_squared: float,
+        v: float,
+        result_func: callable,
+    ) -> None:
         """Update the ratings of players in a team.
 
         Args:
@@ -602,6 +607,6 @@ class TrueSkillCompetitor(BaseCompetitor):
             sigma_squared_to_v_squared = sigma_squared / v**2
             player._mu = player._mu + sigma_squared_to_v_squared * v_value
             player._sigma = math.sqrt(sigma_squared * (1 - sigma_squared_to_v_squared * w_value))
-            
+
             # Apply the dynamic factor to increase uncertainty over time
-            player._sigma = math.sqrt(player._sigma**2 + cls._tau**2) 
+            player._sigma = math.sqrt(player._sigma**2 + cls._tau**2)

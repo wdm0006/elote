@@ -14,22 +14,19 @@ from elote import (
     TrueSkillCompetitor,
     ECFCompetitor,
     DWZCompetitor,
-    CollegeFootballDataset
+    CollegeFootballDataset,
 )
 from elote.benchmark import evaluate_competitor
 from elote.visualization import (
-    plot_rating_system_comparison, 
-    plot_accuracy_by_prior_bouts, 
-    plot_optimized_accuracy_comparison
+    plot_rating_system_comparison,
+    plot_accuracy_by_prior_bouts,
+    plot_optimized_accuracy_comparison,
 )
 
 
 # Set up logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger('cfb_example')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logger = logging.getLogger("cfb_example")
 
 
 def progress_callback(phase, current, total):
@@ -39,33 +36,35 @@ def progress_callback(phase, current, total):
     elif current == total:
         logger.info(f"Completed {phase} phase.")
     elif current % 500 == 0:
-        logger.info(f"{phase.capitalize()} progress: {current}/{total} ({current/total:.1%})")
+        logger.info(f"{phase.capitalize()} progress: {current}/{total} ({current / total:.1%})")
 
 
 def compare_teams(team_a, team_b, attributes=None):
     """Compare two teams based on their scores."""
     logger.debug(f"compare_teams called with team_a={team_a}, team_b={team_b}, attributes={attributes}")
-    
+
     if attributes is None:
         logger.warning(f"No attributes provided for matchup between {team_a} and {team_b}")
         return None
-    
+
     # Check if the expected attributes are present
-    if 'home_score' not in attributes or 'away_score' not in attributes:
-        logger.warning(f"Missing score attributes in matchup between {team_a} and {team_b}. "
-                      f"Available attributes: {attributes}")
+    if "home_score" not in attributes or "away_score" not in attributes:
+        logger.warning(
+            f"Missing score attributes in matchup between {team_a} and {team_b}. Available attributes: {attributes}"
+        )
         return None
-    
+
     # In our dataset, team_a is always the home team
     # and attributes contain home_score and away_score
     home_points = attributes.get("home_score", 0)
     away_points = attributes.get("away_score", 0)
-    
+
     # Log the comparison details
     result = home_points > away_points
-    logger.debug(f"Home team ({team_a}) scored {home_points}, Away team ({team_b}) scored {away_points}. "
-                f"Home team won: {result}")
-    
+    logger.debug(
+        f"Home team ({team_a}) scored {home_points}, Away team ({team_b}) scored {away_points}. Home team won: {result}"
+    )
+
     # Return True if home team (team_a) won, False otherwise
     return result
 
@@ -79,28 +78,30 @@ def ensure_dir_exists(directory):
 
 def log_sample_predictions(competitor_name, history):
     """Log sample predictions for a competitor."""
-    if not history or not hasattr(history, 'bouts') or not history.bouts:
+    if not history or not hasattr(history, "bouts") or not history.bouts:
         return
-    
+
     logger.info(f"\nSample predictions for {competitor_name}:")
     for i, bout in enumerate(history.bouts[:5]):
-        logger.info(f"Game {i+1}: {bout.a} vs {bout.b}")
+        logger.info(f"Game {i + 1}: {bout.a} vs {bout.b}")
         logger.info(f"  Predicted outcome: {bout.predicted_outcome:.4f}")
         logger.info(f"  Actual outcome: {bout.outcome}")
         logger.info(f"  Prediction: {'Home win' if bout.predicted_outcome > 0.5 else 'Away win'}")
-        logger.info(f"  Correct: {(bout.predicted_outcome > 0.5 and bout.outcome == 1.0) or (bout.predicted_outcome < 0.5 and bout.outcome == 0.0)}")
+        logger.info(
+            f"  Correct: {(bout.predicted_outcome > 0.5 and bout.outcome == 1.0) or (bout.predicted_outcome < 0.5 and bout.outcome == 0.0)}"
+        )
 
 
 def log_prediction_distribution(competitor_name, history):
     """Log distribution of predicted outcomes for a competitor."""
-    if not history or not hasattr(history, 'bouts') or not history.bouts:
+    if not history or not hasattr(history, "bouts") or not history.bouts:
         return
-    
+
     predicted_outcomes = [bout.predicted_outcome for bout in history.bouts]
     logger.info(f"\nPredicted outcome distribution for {competitor_name}:")
     logger.info(f"  Min: {min(predicted_outcomes):.4f}")
     logger.info(f"  Max: {max(predicted_outcomes):.4f}")
-    logger.info(f"  Mean: {sum(predicted_outcomes)/len(predicted_outcomes):.4f}")
+    logger.info(f"  Mean: {sum(predicted_outcomes) / len(predicted_outcomes):.4f}")
     logger.info(f"  Values > 0.5: {sum(1 for p in predicted_outcomes if p > 0.5)}/{len(predicted_outcomes)}")
     logger.info(f"  Values < 0.5: {sum(1 for p in predicted_outcomes if p < 0.5)}/{len(predicted_outcomes)}")
     logger.info(f"  Values = 0.5: {sum(1 for p in predicted_outcomes if p == 0.5)}/{len(predicted_outcomes)}")
@@ -108,7 +109,7 @@ def log_prediction_distribution(competitor_name, history):
 
 def log_confusion_matrix(confusion_matrix):
     """Log confusion matrix metrics."""
-    logger.info(f"\nConfusion Matrix:")
+    logger.info("\nConfusion Matrix:")
     logger.info(f"True Positives: {confusion_matrix.get('tp', 0)}")
     logger.info(f"False Positives: {confusion_matrix.get('fp', 0)}")
     logger.info(f"True Negatives: {confusion_matrix.get('tn', 0)}")
@@ -123,65 +124,59 @@ def log_metrics(competitor_name, result):
     logger.info(f"Precision: {result.get('precision', 0):.4f}")
     logger.info(f"Recall: {result.get('recall', 0):.4f}")
     logger.info(f"F1 Score: {result.get('f1', 0):.4f}")
-    
-    if 'accuracy_opt' in result and 'optimized_thresholds' in result:
-        logger.info(f"Accuracy with optimized thresholds {result['optimized_thresholds']}: {result['accuracy_opt']:.4f}")
+
+    if "accuracy_opt" in result and "optimized_thresholds" in result:
+        logger.info(
+            f"Accuracy with optimized thresholds {result['optimized_thresholds']}: {result['accuracy_opt']:.4f}"
+        )
 
 
 def log_top_teams(competitor_name, top_teams):
     """Log top teams according to a competitor."""
     logger.info(f"\nTop 5 teams according to {competitor_name}:")
     for idx, item in enumerate(top_teams[:5]):
-        logger.info(f"{idx+1}. {item.get('competitor')}: {item.get('rating'):.1f}")
+        logger.info(f"{idx + 1}. {item.get('competitor')}: {item.get('rating'):.1f}")
 
 
 def generate_visualizations(results, histories_and_arenas, image_dir):
     """Generate and save visualization charts."""
     # Prepare data for the optimized accuracy chart
     for result in results:
-        if 'accuracy_opt' in result:
-            result['optimized_accuracy'] = result['accuracy_opt']
-    
+        if "accuracy_opt" in result:
+            result["optimized_accuracy"] = result["accuracy_opt"]
+
     # Generate and save charts
     charts = [
         {
-            'name': 'rating_systems_comparison',
-            'title': 'Comparison of Rating Systems Performance',
-            'function': plot_rating_system_comparison,
-            'data': results,
-            'params': {}
+            "name": "rating_systems_comparison",
+            "title": "Comparison of Rating Systems Performance",
+            "function": plot_rating_system_comparison,
+            "data": results,
+            "params": {},
         },
         {
-            'name': 'optimized_accuracy_comparison',
-            'title': 'Optimized Accuracy with Optimized Thresholds',
-            'function': plot_optimized_accuracy_comparison,
-            'data': results,
-            'params': {}
+            "name": "optimized_accuracy_comparison",
+            "title": "Optimized Accuracy with Optimized Thresholds",
+            "function": plot_optimized_accuracy_comparison,
+            "data": results,
+            "params": {},
         },
         {
-            'name': 'accuracy_by_prior_bouts',
-            'title': 'Accuracy vs. Prior Bout Count by Rating System',
-            'function': plot_accuracy_by_prior_bouts,
-            'data': {
-                name: data['history'].accuracy_by_prior_bouts(
-                    data['arena'], 
-                    data['thresholds'],
-                    bin_size=25
-                ) for name, data in histories_and_arenas.items()
+            "name": "accuracy_by_prior_bouts",
+            "title": "Accuracy vs. Prior Bout Count by Rating System",
+            "function": plot_accuracy_by_prior_bouts,
+            "data": {
+                name: data["history"].accuracy_by_prior_bouts(data["arena"], data["thresholds"], bin_size=25)
+                for name, data in histories_and_arenas.items()
             },
-            'params': {}
-        }
+            "params": {},
+        },
     ]
-    
+
     for chart in charts:
         logger.info(f"Generating {chart['name']} chart...")
         chart_path = os.path.join(image_dir, f"{chart['name']}.png")
-        chart['function'](
-            chart['data'],
-            save_path=chart_path,
-            title=chart['title'],
-            **chart['params']
-        )
+        chart["function"](chart["data"], save_path=chart_path, title=chart["title"], **chart["params"])
         logger.info(f"{chart['name']} chart saved as '{chart_path}'")
 
 
@@ -189,75 +184,77 @@ def main():
     # Create image directory
     image_dir = "images/cfb"
     ensure_dir_exists(image_dir)
-    
+
     # Create dataset
     logger.info("Loading college football dataset...")
     dataset = CollegeFootballDataset(start_year=2015, end_year=2021)
-    
+
     # Split the dataset into training and test sets
     logger.info("Splitting dataset into training and test sets...")
     data_split = dataset.time_split(test_ratio=0.5)
     logger.info(f"Split complete: {len(data_split.train)} train games, {len(data_split.test)} test games")
-    
+
     # Define the competitor types to evaluate
     competitors = [
-        {'class': EloCompetitor, 'name': 'Elo', 'params': {'k_factor': 24}},
-        {'class': GlickoCompetitor, 'name': 'Glicko', 'params': {}},
-        {'class': Glicko2Competitor, 'name': 'Glicko-2', 'params': {}},
-        {'class': TrueSkillCompetitor, 'name': 'TrueSkill', 'params': {}},
-        {'class': ECFCompetitor, 'name': 'ECF', 'params': {}},
-        {'class': DWZCompetitor, 'name': 'DWZ', 'params': {}}
+        {"class": EloCompetitor, "name": "Elo", "params": {"k_factor": 24}},
+        {"class": GlickoCompetitor, "name": "Glicko", "params": {}},
+        {"class": Glicko2Competitor, "name": "Glicko-2", "params": {}},
+        {"class": TrueSkillCompetitor, "name": "TrueSkill", "params": {}},
+        {"class": ECFCompetitor, "name": "ECF", "params": {}},
+        {"class": DWZCompetitor, "name": "DWZ", "params": {}},
     ]
-    
+
     # Evaluate each competitor type
     results = []
     histories_and_arenas = {}
-    
+
     for competitor in competitors:
         # Use the library's evaluate_competitor function
-        logger.info(f"\n{'='*20} Evaluating {competitor['name']} {'='*20}")
+        logger.info(f"\n{'=' * 20} Evaluating {competitor['name']} {'=' * 20}")
         result = evaluate_competitor(
-            competitor_class=competitor['class'],
+            competitor_class=competitor["class"],
             data_split=data_split,
             comparison_function=compare_teams,
-            competitor_name=competitor['name'],
-            competitor_params=competitor['params'],
+            competitor_name=competitor["name"],
+            competitor_params=competitor["params"],
             batch_size=500,
             progress_callback=progress_callback,
-            optimize_thresholds=True
+            optimize_thresholds=True,
         )
         results.append(result)
-        
+
         # Log various aspects of the results
-        history = result.get('history', None)
-        log_sample_predictions(competitor['name'], history)
-        log_prediction_distribution(competitor['name'], history)
-        
-        if 'confusion_matrix' in result:
-            log_confusion_matrix(result['confusion_matrix'])
-        
-        log_metrics(competitor['name'], result)
-        
-        if 'top_teams' in result:
-            log_top_teams(competitor['name'], result['top_teams'])
-        
+        history = result.get("history", None)
+        log_sample_predictions(competitor["name"], history)
+        log_prediction_distribution(competitor["name"], history)
+
+        if "confusion_matrix" in result:
+            log_confusion_matrix(result["confusion_matrix"])
+
+        log_metrics(competitor["name"], result)
+
+        if "top_teams" in result:
+            log_top_teams(competitor["name"], result["top_teams"])
+
         # Store history and arena for later visualization
-        if 'history' in result and 'arena' in result:
-            histories_and_arenas[competitor['name']] = {
-                'history': result['history'],
-                'arena': result['arena'],
-                'thresholds': result.get('optimized_thresholds', (0.5, 0.5))
+        if "history" in result and "arena" in result:
+            histories_and_arenas[competitor["name"]] = {
+                "history": result["history"],
+                "arena": result["arena"],
+                "thresholds": result.get("optimized_thresholds", (0.5, 0.5)),
             }
-    
+
     # Generate all visualizations
     generate_visualizations(results, histories_and_arenas, image_dir)
-    
+
     # Print overall summary
     logger.info("\n===== OVERALL SUMMARY =====")
-    for result in sorted(results, key=lambda x: x.get('accuracy', 0), reverse=True):
-        logger.info(f"{result['name']}: Accuracy={result.get('accuracy', 0):.4f}, "
-                   f"Optimized Accuracy={result.get('accuracy_opt', 0):.4f}, "
-                   f"F1 Score={result.get('f1', 0):.4f}")
+    for result in sorted(results, key=lambda x: x.get("accuracy", 0), reverse=True):
+        logger.info(
+            f"{result['name']}: Accuracy={result.get('accuracy', 0):.4f}, "
+            f"Optimized Accuracy={result.get('accuracy_opt', 0):.4f}, "
+            f"F1 Score={result.get('f1', 0):.4f}"
+        )
 
 
 if __name__ == "__main__":
