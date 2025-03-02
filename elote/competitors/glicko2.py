@@ -552,7 +552,12 @@ class Glicko2Competitor(BaseCompetitor):
         # Iterate until convergence
         while abs(B - A) > epsilon:
             # Calculate the new approximation C using the Illinois method
-            C = A + (A - B) * f_A / (f_B - f_A)
+            # Add a check to prevent division by zero
+            if abs(f_B - f_A) < 1e-10:  # Use a small epsilon value to check for near-zero
+                # If the difference is too small, use bisection method instead
+                C = (A + B) / 2
+            else:
+                C = A + (A - B) * f_A / (f_B - f_A)
             f_C = f(C)
 
             # Update the brackets

@@ -113,7 +113,7 @@ class History:
         """Calculate confusion matrix metrics for the bout history.
 
         This method calculates true positives, false positives, true negatives,
-        and false negatives based on the prediction thresholds.
+        false negatives, and correctly/incorrectly predicted draws based on the prediction thresholds.
 
         Args:
             lower_threshold (float): The lower probability threshold for predictions.
@@ -121,42 +121,81 @@ class History:
             attribute_filter (dict, optional): Filter bouts by attributes.
 
         Returns:
-            tuple: A tuple containing (true_positives, false_positives, true_negatives,
-                  false_negatives, do_nothing_count).
+            dict: A dictionary containing confusion matrix metrics including true/false draws.
         """
-        tp, fp, tn, fn, do_nothing = 0, 0, 0, 0, 0
+        tp, fp, tn, fn, true_draw, false_draw = 0, 0, 0, 0, 0, 0
+        
         for bout in self.bouts:
             match = True
             if attribute_filter:
                 for key, value in attribute_filter.items():
                     if bout.attributes.get(key) != value:
                         match = False
-            if match:
-                if upper_threshold > bout.predicted_outcome > lower_threshold:
-                    do_nothing += 1
+            
+            if not match:
+                continue
+                
+            # Check if the prediction is a draw (between thresholds)
+            is_predicted_draw = lower_threshold <= bout.predicted_outcome <= upper_threshold
+            
+            # Check if the actual outcome is a draw (0.5 in numeric format)
+            is_actual_draw = bout.outcome == 0.5
+            
+            if is_predicted_draw:
+                # Predicted a draw
+                if is_actual_draw:
+                    true_draw += 1  # Correctly predicted a draw
                 else:
-                    if bout.true_positive(upper_threshold):
-                        tp += 1
-                    if bout.false_positive(upper_threshold):
-                        fp += 1
-                    if bout.true_negative(lower_threshold):
-                        tn += 1
-                    if bout.false_negative(lower_threshold):
-                        fn += 1
-
-        return tp, fp, tn, fn, do_nothing
+                    false_draw += 1  # Incorrectly predicted a draw
+            else:
+                # Predicted a win for one side
+                if bout.predicted_outcome > upper_threshold:
+                    # Predicted a win for player A
+                    if bout.outcome == 1.0:
+                        tp += 1  # Correctly predicted A wins
+                    elif bout.outcome == 0.0:
+                        fp += 1  # Incorrectly predicted A wins (B actually won)
+                    else:  # bout.outcome == 0.5
+                        fp += 1  # Incorrectly predicted A wins (it was a draw)
+                else:  # bout.predicted_outcome < lower_threshold
+                    # Predicted a win for player B
+                    if bout.outcome == 0.0:
+                        tn += 1  # Correctly predicted B wins
+                    elif bout.outcome == 1.0:
+                        fn += 1  # Incorrectly predicted B wins (A actually won)
+                    else:  # bout.outcome == 0.5
+                        fn += 1  # Incorrectly predicted B wins (it was a draw)
+        
+        # Calculate total correct and total predictions
+        total_correct = tp + tn + true_draw
+        total = tp + fp + tn + fn + true_draw + false_draw
+        
+        # Calculate accuracy
+        accuracy = total_correct / total if total > 0 else 0
+        
+        return {
+            "tp": tp,  # True positives (correctly predicted A wins)
+            "fp": fp,  # False positives (incorrectly predicted A wins)
+            "tn": tn,  # True negatives (correctly predicted B wins)
+            "fn": fn,  # False negatives (incorrectly predicted B wins)
+            "true_draw": true_draw,  # Correctly predicted draws
+            "false_draw": false_draw,  # Incorrectly predicted draws
+            "accuracy": accuracy,  # Overall accuracy including draws
+            "total_correct": total_correct,  # Total correct predictions
+            "total": total  # Total predictions
+        }
 
     def random_search(self, trials=1000):
         """Search for optimal prediction thresholds using random sampling.
 
         This method performs a random search to find the best lower and upper
-        thresholds that maximize the overall accuracy.
+        thresholds that maximize the overall accuracy, including draws.
 
         Args:
             trials (int): The number of random threshold pairs to try.
 
         Returns:
-            tuple: A tuple containing (best_net_performance, best_thresholds).
+            tuple: A tuple containing (best_accuracy, best_thresholds).
         """
         best_accuracy, best_thresholds = 0, list()
         for _ in range(trials):
@@ -172,23 +211,26 @@ class History:
                     min_outcome + random.random() * (max_outcome - min_outcome),
                 ]
             )
-            tp, fp, tn, fn, do_nothing = self.confusion_matrix(*thresholds)
-            total = tp + fp + tn + fn + do_nothing
-            accuracy = (tp + tn) / total
+            
+            # Calculate metrics with the random thresholds
+            metrics = self.calculate_metrics(*thresholds)
+            accuracy = metrics["accuracy"]
+            
             if accuracy > best_accuracy:
                 best_accuracy = accuracy
                 best_thresholds = thresholds
 
         return best_accuracy, best_thresholds
 
-    def optimize_thresholds(self, method="L-BFGS-B"):
+    def optimize_thresholds(self, method="L-BFGS-B", initial_thresholds=(0.5, 0.5)):
         """Search for optimal prediction thresholds using scipy optimization.
 
         This method uses scipy's optimize module to find the best lower and upper
-        thresholds that maximize the overall accuracy.
+        thresholds that maximize the overall accuracy, including draws.
 
         Args:
             method (str): The optimization method to use (default: 'L-BFGS-B').
+            initial_thresholds (tuple): Initial guess for (lower, upper) thresholds.
 
         Returns:
             tuple: A tuple containing (best_accuracy, best_thresholds).
@@ -204,25 +246,22 @@ class History:
         def objective(thresholds):
             # Ensure thresholds are sorted
             sorted_thresholds = sorted(thresholds)
-            tp, fp, tn, fn, do_nothing = self.confusion_matrix(*sorted_thresholds)
-            total = tp + fp + tn + fn + do_nothing
-            accuracy = (tp + tn) / total if total > 0 else 0
-            return -accuracy  # Negative because we want to maximize accuracy
+            metrics = self.calculate_metrics(*sorted_thresholds)
+            return -metrics["accuracy"]  # Negative because we want to maximize accuracy
 
-        # Calculate baseline accuracy with (0.5, 0.5) thresholds
-        baseline_tp, baseline_fp, baseline_tn, baseline_fn, baseline_do_nothing = self.confusion_matrix(0.5, 0.5)
-        baseline_total = baseline_tp + baseline_fp + baseline_tn + baseline_fn + baseline_do_nothing
-        baseline_accuracy = (baseline_tp + baseline_tn) / baseline_total if baseline_total > 0 else 0
+        # Calculate baseline accuracy with initial thresholds
+        baseline_metrics = self.calculate_metrics(*initial_thresholds)
+        baseline_accuracy = baseline_metrics["accuracy"]
 
-        # Use (0.5, 0.5) as the initial guess
-        initial_guess = [0.5, 0.5]
+        # Use initial_thresholds as the initial guess
+        initial_guess = list(initial_thresholds)
 
         # Bounds for the thresholds
         bounds = [(min_outcome, max_outcome), (min_outcome, max_outcome)]
 
         # Run multiple optimizations with different methods and starting points
         best_accuracy = baseline_accuracy
-        best_thresholds = [0.5, 0.5]
+        best_thresholds = list(initial_thresholds)
 
         # Try different optimization methods
         methods = [method]
@@ -246,55 +285,153 @@ class History:
                 opt_thresholds = sorted(result.x)
 
                 # Calculate the accuracy
-                tp, fp, tn, fn, do_nothing = self.confusion_matrix(*opt_thresholds)
-                total = tp + fp + tn + fn + do_nothing
-                accuracy = (tp + tn) / total if total > 0 else 0
+                metrics = self.calculate_metrics(*opt_thresholds)
+                accuracy = metrics["accuracy"]
 
                 # Update best if better than current best
                 if accuracy > best_accuracy:
                     best_accuracy = accuracy
                     best_thresholds = opt_thresholds
+                    
+                # Try with a few random starting points
+                for _ in range(3):
+                    random_guess = [
+                        random.uniform(min_outcome, max_outcome),
+                        random.uniform(min_outcome, max_outcome),
+                    ]
+                    random_guess.sort()
+                    result = optimize.minimize(
+                        objective, random_guess, method=opt_method, bounds=bounds, options={"disp": False}
+                    )
+                    if result.success:
+                        opt_thresholds = sorted(result.x)
+                        metrics = self.calculate_metrics(*opt_thresholds)
+                        accuracy = metrics["accuracy"]
+                        if accuracy > best_accuracy:
+                            best_accuracy = accuracy
+                            best_thresholds = opt_thresholds
             except Exception:
                 # Skip if optimization fails
                 continue
 
         # If optimized accuracy is worse than baseline, use baseline
         if best_accuracy < baseline_accuracy:
-            return baseline_accuracy, [0.5, 0.5]
+            return baseline_accuracy, initial_thresholds
 
         return best_accuracy, best_thresholds
 
     def calculate_metrics(self, lower_threshold=0.5, upper_threshold=0.5):
-        """Calculate common evaluation metrics for the bout history.
+        """Calculate evaluation metrics based on the bout history.
+
+        This method calculates accuracy, precision, recall, and F1 score based on
+        the confusion matrix. It now properly handles draws as a third outcome category.
 
         Args:
             lower_threshold (float): The lower probability threshold for predictions.
             upper_threshold (float): The upper probability threshold for predictions.
 
         Returns:
-            dict: A dictionary containing accuracy, precision, recall, and F1 score.
+            dict: A dictionary containing the calculated metrics.
         """
-        tp, fp, tn, fn, do_nothing = self.confusion_matrix(lower_threshold, upper_threshold)
-
-        total = tp + fp + tn + fn + do_nothing
-        accuracy = (tp + tn) / total if total > 0 else 0
+        cm = self.confusion_matrix(lower_threshold, upper_threshold)
+        
+        # Extract values from confusion matrix
+        tp = cm["tp"]
+        fp = cm["fp"]
+        tn = cm["tn"]
+        fn = cm["fn"]
+        true_draw = cm["true_draw"]
+        false_draw = cm["false_draw"]
+        
+        # Calculate metrics for wins/losses
         precision = tp / (tp + fp) if (tp + fp) > 0 else 0
         recall = tp / (tp + fn) if (tp + fn) > 0 else 0
         f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0
-
+        
+        # Calculate draw metrics if applicable
+        draw_precision = true_draw / (true_draw + false_draw) if (true_draw + false_draw) > 0 else 0
+        
+        # Calculate overall accuracy including draws
+        total_correct = tp + tn + true_draw
+        total_predictions = tp + fp + tn + fn + true_draw + false_draw
+        accuracy = total_correct / total_predictions if total_predictions > 0 else 0
+        
         return {
             "accuracy": accuracy,
             "precision": precision,
             "recall": recall,
             "f1": f1,
-            "confusion_matrix": {"tp": tp, "fp": fp, "tn": tn, "fn": fn, "undecided": do_nothing},
+            "draw_precision": draw_precision,
+            "true_positives": tp,
+            "false_positives": fp,
+            "true_negatives": tn,
+            "false_negatives": fn,
+            "true_draws": true_draw,
+            "false_draws": false_draw
+        }
+
+    def calculate_metrics_with_draws(self, lower_threshold=0.33, upper_threshold=0.66):
+        """Calculate evaluation metrics for the bout history, treating predictions
+        between thresholds as explicit draw predictions.
+
+        Args:
+            lower_threshold (float): The lower probability threshold for predictions.
+            upper_threshold (float): The upper probability threshold for predictions.
+
+        Returns:
+            dict: A dictionary containing accuracy, precision, recall, F1 score, and draw metrics.
+        """
+        cm = self.confusion_matrix(lower_threshold, upper_threshold)
+        
+        # Extract values from confusion matrix
+        tp = cm["tp"]
+        fp = cm["fp"]
+        tn = cm["tn"]
+        fn = cm["fn"]
+        true_draw = cm["true_draw"]
+        false_draw = cm["false_draw"]
+        
+        # Calculate precision, recall, and F1 for wins (not including draws)
+        precision_wins = tp / (tp + fp) if (tp + fp) > 0 else 0
+        recall_wins = tp / (tp + fn) if (tp + fn) > 0 else 0
+        f1_wins = 2 * precision_wins * recall_wins / (precision_wins + recall_wins) if (precision_wins + recall_wins) > 0 else 0
+        
+        # Calculate precision, recall, and F1 for draws
+        precision_draws = true_draw / (true_draw + false_draw) if (true_draw + false_draw) > 0 else 0
+        recall_draws = true_draw / (true_draw + fp + fn) if (true_draw + fp + fn) > 0 else 0
+        f1_draws = 2 * precision_draws * recall_draws / (precision_draws + recall_draws) if (precision_draws + recall_draws) > 0 else 0
+        
+        # Calculate overall metrics
+        total = tp + fp + tn + fn + true_draw + false_draw
+        accuracy = (tp + tn + true_draw) / total if total > 0 else 0
+        
+        # Calculate macro-averaged precision, recall, and F1
+        precision_macro = (precision_wins + precision_draws) / 2
+        recall_macro = (recall_wins + recall_draws) / 2
+        f1_macro = (f1_wins + f1_draws) / 2
+        
+        return {
+            "accuracy": accuracy,
+            "precision": precision_wins,  # For backward compatibility
+            "recall": recall_wins,  # For backward compatibility
+            "f1": f1_wins,  # For backward compatibility
+            "precision_wins": precision_wins,
+            "recall_wins": recall_wins,
+            "f1_wins": f1_wins,
+            "precision_draws": precision_draws,
+            "recall_draws": recall_draws,
+            "f1_draws": f1_draws,
+            "precision_macro": precision_macro,
+            "recall_macro": recall_macro,
+            "f1_macro": f1_macro,
+            "confusion_matrix": cm,
         }
 
     def accuracy_by_prior_bouts(self, arena, thresholds=None, bin_size=5):
         """Calculate accuracy based on the number of prior bouts for each competitor.
 
-        This method analyzes how the accuracy of predictions changes based on how many
-        previous matchups each competitor has participated in.
+        This method analyzes how accuracy changes as competitors participate in more bouts,
+        properly accounting for draws as a third outcome category.
 
         Args:
             arena (BaseArena): The arena containing the competitors and their history
@@ -335,11 +472,15 @@ class History:
             if min_bout_count not in accuracy_by_min_bouts:
                 accuracy_by_min_bouts[min_bout_count] = {"correct": 0, "total": 0}
 
-            # Check if prediction is correct
-            if bout.predicted_outcome > upper_threshold and bout.outcome == 1.0:
+            # Check if prediction is correct, properly handling draws
+            is_predicted_draw = lower_threshold <= bout.predicted_outcome <= upper_threshold
+            is_actual_draw = bout.outcome == 0.5
+            
+            if (is_predicted_draw and is_actual_draw) or \
+               (bout.predicted_outcome > upper_threshold and bout.outcome == 1.0) or \
+               (bout.predicted_outcome < lower_threshold and bout.outcome == 0.0):
                 accuracy_by_min_bouts[min_bout_count]["correct"] += 1
-            elif bout.predicted_outcome < lower_threshold and bout.outcome == 0.0:
-                accuracy_by_min_bouts[min_bout_count]["correct"] += 1
+                
             accuracy_by_min_bouts[min_bout_count]["total"] += 1
 
             # Update bout counts for both competitors for subsequent bouts in evaluation
