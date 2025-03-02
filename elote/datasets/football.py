@@ -91,7 +91,7 @@ class CollegeFootballDataset(BaseDataset):
 
                 if year_data is not None and not year_data.empty:
                     # Keep only completed games
-                    year_data = year_data[year_data["status_type_completed"] == True]
+                    year_data = year_data[year_data["status_type_completed"] == True]  # noqa: E712
                     all_games = pd.concat([all_games, year_data], ignore_index=True)
             except Exception as e:
                 print(f"Error fetching data for year {year}: {e}")
