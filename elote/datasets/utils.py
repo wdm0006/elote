@@ -69,7 +69,7 @@ def train_arena_with_dataset(
                     arena.competitors[b] = arena.base_competitor(**arena.base_competitor_kwargs)
                 
                 # Then, record the draw
-                arena.competitors[a].draw(arena.competitors[b])
+                arena.competitors[a].tied(arena.competitors[b])
         
         # Report progress
         if progress_callback is not None:

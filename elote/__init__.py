@@ -30,6 +30,10 @@ Datasets:
 - Chess: Chess games from the Lichess database
 - College Football: College football games
 - Synthetic: Synthetic data generator for testing
+
+Analysis and Benchmarking:
+- Benchmarking: Tools for comparing different rating systems
+- Visualization: Tools for visualizing rating system performance
 """
 
 from elote.competitors.elo import EloCompetitor
@@ -48,29 +52,45 @@ from elote.datasets.football import CollegeFootballDataset
 from elote.datasets.synthetic import SyntheticDataset
 from elote.datasets.utils import train_arena_with_dataset, evaluate_arena_with_dataset, train_and_evaluate_arena
 
+# Import new benchmark and visualization modules
+from elote.benchmark import evaluate_competitor, benchmark_competitors
+from elote.visualization import (
+    plot_rating_system_comparison,
+    plot_optimized_accuracy_comparison,
+    plot_accuracy_by_prior_bouts
+)
 
 __all__ = [
     # Competitors
-    "EloCompetitor",
-    "ECFCompetitor",
-    "DWZCompetitor",
-    "GlickoCompetitor",
-    "Glicko2Competitor",
-    "TrueSkillCompetitor",
-    "BlendedCompetitor",
+    'EloCompetitor',
+    'GlickoCompetitor',
+    'Glicko2Competitor',
+    'TrueSkillCompetitor',
+    'ECFCompetitor',
+    'DWZCompetitor',
+    'BlendedCompetitor',
     
     # Arenas
-    "LambdaArena",
+    'LambdaArena',
     
     # Datasets
-    "BaseDataset",
-    "DataSplit",
-    "ChessDataset",
-    "CollegeFootballDataset",
-    "SyntheticDataset",
+    'BaseDataset',
+    'DataSplit',
+    'ChessDataset',
+    'CollegeFootballDataset',
+    'SyntheticDataset',
     
     # Dataset utilities
-    "train_arena_with_dataset",
-    "evaluate_arena_with_dataset",
-    "train_and_evaluate_arena",
+    'train_arena_with_dataset',
+    'evaluate_arena_with_dataset',
+    'train_and_evaluate_arena',
+    
+    # Benchmarking
+    'evaluate_competitor',
+    'benchmark_competitors',
+    
+    # Visualization
+    'plot_rating_system_comparison',
+    'plot_optimized_accuracy_comparison',
+    'plot_accuracy_by_prior_bouts'
 ]

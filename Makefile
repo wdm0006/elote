@@ -22,8 +22,9 @@ help:
 # Setup development environment
 setup:
 	pip install uv
-	uv venv --python=3.8
-
+	uv venv --python=3.11
+	brew install libomp
+	
 # Install the package
 install:
 	uv pip install -e .

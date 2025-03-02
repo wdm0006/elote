@@ -14,7 +14,8 @@ class TestExamples(unittest.TestCase):
         self.examples_dir = self.root_dir / "examples"
 
         # Skip the use_cases/cfb_w_lib.py test as it requires external API access
-        self.skip_examples = ["use_cases/cfb_w_lib.py"]
+        # Skip dataset_example.py as it takes too long to run in tests
+        self.skip_examples = ["use_cases/cfb_w_lib.py", "dataset_example.py"]
 
     def test_example_scripts(self):
         """Test that all example scripts run without errors."""

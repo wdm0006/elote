@@ -49,23 +49,24 @@ def evaluate_algorithms_on_dataset(dataset_name, dataset, test_ratio=0.2, seed=4
     
     # Define the algorithms to evaluate
     algorithms = [
-        ("Elo", EloCompetitor),
-        ("Glicko", GlickoCompetitor),
-        ("Glicko-2", Glicko2Competitor),
-        ("TrueSkill", TrueSkillCompetitor),
+        ("Elo", EloCompetitor, {"initial_rating": 1500}),
+        ("Glicko", GlickoCompetitor, {"initial_rating": 1500}),
+        ("Glicko-2", Glicko2Competitor, {"initial_rating": 1500}),
+        ("TrueSkill", TrueSkillCompetitor, {}),
     ]
     
     # Evaluate each algorithm
     results = []
     
-    for algo_name, competitor_class in algorithms:
+    for algo_name, competitor_class, competitor_kwargs in algorithms:
         print(f"\nEvaluating {algo_name}...")
         start_time = time.time()
         
         # Create an arena with the algorithm
         arena = LambdaArena(
-            lambda a, b: True,  # Dummy function, not used in this example
+            lambda a, b, attributes=None: True,  # Dummy function, not used in this example
             base_competitor=competitor_class,
+            base_competitor_kwargs=competitor_kwargs
         )
         
         # Train and evaluate the arena
@@ -77,10 +78,11 @@ def evaluate_algorithms_on_dataset(dataset_name, dataset, test_ratio=0.2, seed=4
         )
         
         # Calculate metrics
-        accuracy = history.confusion_matrix()["accuracy"]
-        precision = history.confusion_matrix()["precision"]
-        recall = history.confusion_matrix()["recall"]
-        f1 = history.confusion_matrix()["f1"]
+        metrics = history.calculate_metrics()
+        accuracy = metrics['accuracy']
+        precision = metrics['precision']
+        recall = metrics['recall']
+        f1 = metrics['f1']
         
         end_time = time.time()
         elapsed_time = end_time - start_time

@@ -1,6 +1,6 @@
 ---
 description: how to use the makefile to run tests
-globs: 
+globs: *
 ---
  # Elote Testing Standards
 
