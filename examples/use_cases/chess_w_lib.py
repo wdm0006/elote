@@ -21,6 +21,8 @@ from elote.visualization import (
     plot_rating_system_comparison,
     plot_accuracy_by_prior_bouts,
     plot_optimized_accuracy_comparison,
+    plot_calibration_curve,
+    plot_calibration_comparison,
 )
 
 
@@ -203,6 +205,20 @@ def generate_visualizations(results, histories_and_arenas, image_dir):
                 for name, data in histories_and_arenas.items()
             },
             "params": {},
+        },
+        {
+            "name": "calibration_curves",
+            "title": "Calibration Curves for Rating Systems",
+            "function": plot_calibration_curve,
+            "data": {name: data["history"] for name, data in histories_and_arenas.items()},
+            "params": {"n_bins": 10},
+        },
+        {
+            "name": "calibration_comparison",
+            "title": "Calibration Comparison for Rating Systems",
+            "function": plot_calibration_comparison,
+            "data": {name: data["history"] for name, data in histories_and_arenas.items()},
+            "params": {"n_bins": 10},
         },
     ]
 

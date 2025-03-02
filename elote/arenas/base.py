@@ -519,6 +519,31 @@ class History:
 
         # Return only the binned data in the expected format
         return {"binned": binned_data}
+        
+    def get_calibration_data(self, n_bins=10):
+        """Compute calibration data from the bout history.
+        
+        This method extracts predicted probabilities and actual outcomes from the bout history
+        and prepares them for calibration curve plotting.
+        
+        Args:
+            n_bins (int): Number of bins to use for calibration curve.
+            
+        Returns:
+            tuple: (y_true, y_prob) where:
+                - y_true: List of actual outcomes (1.0 for wins, 0.0 for losses)
+                - y_prob: List of predicted probabilities
+        """
+        # Extract predicted probabilities and actual outcomes
+        y_prob = [bout.predicted_outcome for bout in self.bouts]
+        
+        # Convert outcomes to binary format (1.0 for wins, 0.0 for losses)
+        # Note: For calibration curves, we treat draws (0.5) as losses (0.0)
+        # since we're evaluating the calibration of the predicted probability
+        # that player A wins.
+        y_true = [1.0 if bout.outcome == 1.0 else 0.0 for bout in self.bouts]
+        
+        return y_true, y_prob
 
 
 class Bout:

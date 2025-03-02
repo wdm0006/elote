@@ -209,3 +209,213 @@ def plot_accuracy_by_prior_bouts(
         plt.savefig(save_path)
 
     return plt.gcf()
+
+
+def compute_calibration_data(history, n_bins=10):
+    """
+    Compute calibration data from a history of bouts without using scikit-learn.
+    
+    Args:
+        history: A History object containing bouts with predicted outcomes and actual outcomes.
+        n_bins: Number of bins to use for calibration curve.
+        
+    Returns:
+        tuple: (prob_true, prob_pred) where:
+            - prob_true: The fraction of positive samples in each bin
+            - prob_pred: The mean predicted probability in each bin
+    """
+    # Get the raw data from the history
+    y_true, y_prob = history.get_calibration_data(n_bins=n_bins)
+    
+    if len(y_true) == 0:
+        return np.array([]), np.array([])
+    
+    # Create bins of equal width
+    bin_edges = np.linspace(0, 1, n_bins + 1)
+    bin_indices = np.digitize(y_prob, bin_edges) - 1
+    
+    # Ensure all indices are within valid range (0 to n_bins-1)
+    bin_indices = np.clip(bin_indices, 0, n_bins - 1)
+    
+    # Calculate mean predicted probability and fraction of positives for each bin
+    prob_pred = np.zeros(n_bins)
+    prob_true = np.zeros(n_bins)
+    bin_counts = np.zeros(n_bins)
+    
+    for i in range(len(y_prob)):
+        bin_idx = bin_indices[i]
+        prob_pred[bin_idx] += y_prob[i]
+        prob_true[bin_idx] += y_true[i]
+        bin_counts[bin_idx] += 1
+    
+    # Calculate means, avoiding division by zero
+    for i in range(n_bins):
+        if bin_counts[i] > 0:
+            prob_pred[i] /= bin_counts[i]
+            prob_true[i] /= bin_counts[i]
+        else:
+            # If a bin is empty, set both values to NaN
+            prob_pred[i] = np.nan
+            prob_true[i] = np.nan
+    
+    # Remove NaN values
+    valid_indices = ~np.isnan(prob_pred)
+    prob_pred = prob_pred[valid_indices]
+    prob_true = prob_true[valid_indices]
+    
+    return prob_true, prob_pred
+
+
+def plot_calibration_curve(
+    histories: Dict[str, Any],
+    save_path: Optional[str] = None,
+    figsize: Tuple[int, int] = (10, 8),
+    title: str = "Calibration Curves",
+    n_bins: int = 10,
+):
+    """
+    Create a calibration curve plot for multiple rating systems.
+    
+    Args:
+        histories: Dictionary mapping rating system names to their History objects.
+        save_path: Optional path to save the figure. If None, the figure is displayed instead.
+        figsize: Figure size as (width, height) in inches.
+        title: Title for the figure.
+        n_bins: Number of bins to use for calibration curve.
+        
+    Returns:
+        The matplotlib figure object.
+    """
+    fig, ax = plt.subplots(figsize=figsize)
+    
+    # Plot the perfectly calibrated line
+    ax.plot([0, 1], [0, 1], "k:", label="Perfectly calibrated")
+    
+    # Define a color map for the different rating systems
+    colors = ["blue", "green", "red", "purple", "orange", "brown", "pink", "gray", "olive", "cyan"]
+    
+    # Plot calibration curve for each rating system
+    for i, (name, history) in enumerate(histories.items()):
+        prob_true, prob_pred = compute_calibration_data(history, n_bins=n_bins)
+        
+        if len(prob_true) > 0:
+            # Plot the calibration curve
+            ax.plot(
+                prob_pred,
+                prob_true,
+                "s-",
+                color=colors[i % len(colors)],
+                label=f"{name}",
+                linewidth=2,
+            )
+    
+    # Add labels and title
+    ax.set_xlabel("Mean predicted probability", fontsize=12)
+    ax.set_ylabel("Fraction of positives", fontsize=12)
+    ax.set_title(title, fontsize=14)
+    ax.legend(loc="best", fontsize=10)
+    
+    # Set axis limits
+    ax.set_xlim([0.0, 1.0])
+    ax.set_ylim([0.0, 1.0])
+    
+    # Add grid
+    ax.grid(True, linestyle="--", alpha=0.7)
+    
+    # Adjust layout
+    plt.tight_layout()
+    
+    # Save or display
+    if save_path:
+        plt.savefig(save_path)
+    
+    return fig
+
+
+def plot_calibration_comparison(
+    histories: Dict[str, Any],
+    save_path: Optional[str] = None,
+    figsize: Tuple[int, int] = (15, 8),
+    title: str = "Calibration Comparison",
+    n_bins: int = 10,
+):
+    """
+    Create a plot with calibration curves and histograms of predicted probabilities.
+    
+    This is similar to sklearn's calibration_display but customized for elote.
+    
+    Args:
+        histories: Dictionary mapping rating system names to their History objects.
+        save_path: Optional path to save the figure. If None, the figure is displayed instead.
+        figsize: Figure size as (width, height) in inches.
+        title: Title for the figure.
+        n_bins: Number of bins to use for calibration curve and histogram.
+        
+    Returns:
+        The matplotlib figure object.
+    """
+    fig, axes = plt.subplots(2, 1, figsize=figsize, gridspec_kw={"height_ratios": [2, 1]})
+    
+    # Define a color map for the different rating systems
+    colors = ["blue", "green", "red", "purple", "orange", "brown", "pink", "gray", "olive", "cyan"]
+    
+    # Plot the perfectly calibrated line
+    axes[0].plot([0, 1], [0, 1], "k:", label="Perfectly calibrated")
+    
+    # Plot calibration curve and histogram for each rating system
+    for i, (name, history) in enumerate(histories.items()):
+        color = colors[i % len(colors)]
+        
+        # Compute calibration curve
+        prob_true, prob_pred = compute_calibration_data(history, n_bins=n_bins)
+        
+        if len(prob_true) > 0:
+            # Plot the calibration curve
+            axes[0].plot(
+                prob_pred,
+                prob_true,
+                "s-",
+                color=color,
+                label=f"{name}",
+                linewidth=2,
+            )
+        
+        # Extract predicted probabilities for histogram
+        y_prob = [bout.predicted_outcome for bout in history.bouts]
+        
+        if len(y_prob) > 0:
+            # Plot histogram of predicted probabilities
+            axes[1].hist(
+                y_prob,
+                range=(0, 1),
+                bins=n_bins,
+                histtype="step",
+                lw=2,
+                color=color,
+                label=name,
+                density=True,
+            )
+    
+    # Configure calibration curve subplot
+    axes[0].set_xlabel("Mean predicted probability", fontsize=12)
+    axes[0].set_ylabel("Fraction of positives", fontsize=12)
+    axes[0].set_title(title, fontsize=14)
+    axes[0].legend(loc="best", fontsize=10)
+    axes[0].set_xlim([0.0, 1.0])
+    axes[0].set_ylim([0.0, 1.0])
+    axes[0].grid(True, linestyle="--", alpha=0.7)
+    
+    # Configure histogram subplot
+    axes[1].set_xlabel("Predicted probability", fontsize=12)
+    axes[1].set_ylabel("Density", fontsize=12)
+    axes[1].set_xlim([0.0, 1.0])
+    axes[1].grid(True, linestyle="--", alpha=0.7)
+    
+    # Adjust layout
+    plt.tight_layout()
+    
+    # Save or display
+    if save_path:
+        plt.savefig(save_path)
+    
+    return fig

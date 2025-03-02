@@ -21,6 +21,8 @@ from elote.visualization import (
     plot_rating_system_comparison,
     plot_accuracy_by_prior_bouts,
     plot_optimized_accuracy_comparison,
+    plot_calibration_curve,
+    plot_calibration_comparison,
 )
 
 
@@ -49,9 +51,7 @@ def compare_teams(team_a, team_b, attributes=None):
 
     # Check if the expected attributes are present
     if "home_score" not in attributes or "away_score" not in attributes:
-        logger.warning(
-            f"Missing score attributes in matchup between {team_a} and {team_b}. Available attributes: {attributes}"
-        )
+        logger.warning(f"Missing score attributes for matchup between {team_a} and {team_b}")
         return None
 
     # In our dataset, team_a is always the home team
@@ -59,14 +59,13 @@ def compare_teams(team_a, team_b, attributes=None):
     home_points = attributes.get("home_score", 0)
     away_points = attributes.get("away_score", 0)
 
-    # Log the comparison details
-    result = home_points > away_points
-    logger.debug(
-        f"Home team ({team_a}) scored {home_points}, Away team ({team_b}) scored {away_points}. Home team won: {result}"
-    )
-
-    # Return True if home team (team_a) won, False otherwise
-    return result
+    # Determine the winner
+    if home_points > away_points:
+        return True  # team_a (home) wins
+    elif away_points > home_points:
+        return False  # team_b (away) wins
+    else:
+        return None  # tie
 
 
 def ensure_dir_exists(directory):
@@ -86,10 +85,7 @@ def log_sample_predictions(competitor_name, history):
         logger.info(f"Game {i + 1}: {bout.a} vs {bout.b}")
         logger.info(f"  Predicted outcome: {bout.predicted_outcome:.4f}")
         logger.info(f"  Actual outcome: {bout.outcome}")
-        logger.info(f"  Prediction: {'Home win' if bout.predicted_outcome > 0.5 else 'Away win'}")
-        logger.info(
-            f"  Correct: {(bout.predicted_outcome > 0.5 and bout.outcome == 1.0) or (bout.predicted_outcome < 0.5 and bout.outcome == 0.0)}"
-        )
+        logger.info(f"  Correct: {bout.predicted_winner() == bout.actual_winner()}")
 
 
 def log_prediction_distribution(competitor_name, history):
@@ -102,9 +98,9 @@ def log_prediction_distribution(competitor_name, history):
     logger.info(f"  Min: {min(predicted_outcomes):.4f}")
     logger.info(f"  Max: {max(predicted_outcomes):.4f}")
     logger.info(f"  Mean: {sum(predicted_outcomes) / len(predicted_outcomes):.4f}")
-    logger.info(f"  Values > 0.5: {sum(1 for p in predicted_outcomes if p > 0.5)}/{len(predicted_outcomes)}")
-    logger.info(f"  Values < 0.5: {sum(1 for p in predicted_outcomes if p < 0.5)}/{len(predicted_outcomes)}")
-    logger.info(f"  Values = 0.5: {sum(1 for p in predicted_outcomes if p == 0.5)}/{len(predicted_outcomes)}")
+    logger.info(f"  Values > 0.75: {sum(1 for p in predicted_outcomes if p > 0.75)}/{len(predicted_outcomes)}")
+    logger.info(f"  Values < 0.25: {sum(1 for p in predicted_outcomes if p < 0.25)}/{len(predicted_outcomes)}")
+    logger.info(f"  0.25 <= Values <= 0.75: {sum(1 for p in predicted_outcomes if 0.25 <= p <= 0.75)}/{len(predicted_outcomes)}")
 
 
 def log_confusion_matrix(confusion_matrix):
@@ -171,6 +167,20 @@ def generate_visualizations(results, histories_and_arenas, image_dir):
             },
             "params": {},
         },
+        {
+            "name": "calibration_curves",
+            "title": "Calibration Curves for Rating Systems",
+            "function": plot_calibration_curve,
+            "data": {name: data["history"] for name, data in histories_and_arenas.items()},
+            "params": {"n_bins": 10},
+        },
+        {
+            "name": "calibration_comparison",
+            "title": "Calibration Comparison for Rating Systems",
+            "function": plot_calibration_comparison,
+            "data": {name: data["history"] for name, data in histories_and_arenas.items()},
+            "params": {"n_bins": 10},
+        },
     ]
 
     for chart in charts:
@@ -187,21 +197,21 @@ def main():
 
     # Create dataset
     logger.info("Loading college football dataset...")
-    dataset = CollegeFootballDataset(start_year=2015, end_year=2021)
+    dataset = CollegeFootballDataset(start_year=2015, end_year=2022)
 
     # Split the dataset into training and test sets
     logger.info("Splitting dataset into training and test sets...")
-    data_split = dataset.time_split(test_ratio=0.5)
+    data_split = dataset.time_split(test_ratio=0.3)
     logger.info(f"Split complete: {len(data_split.train)} train games, {len(data_split.test)} test games")
 
     # Define the competitor types to evaluate
     competitors = [
-        {"class": EloCompetitor, "name": "Elo", "params": {"k_factor": 24}},
-        {"class": GlickoCompetitor, "name": "Glicko", "params": {}},
-        {"class": Glicko2Competitor, "name": "Glicko-2", "params": {}},
-        {"class": TrueSkillCompetitor, "name": "TrueSkill", "params": {}},
-        {"class": ECFCompetitor, "name": "ECF", "params": {}},
-        {"class": DWZCompetitor, "name": "DWZ", "params": {}},
+        {"class": EloCompetitor, "name": "Elo", "params": {"k_factor": 32, "initial_rating": 1500}},
+        {"class": GlickoCompetitor, "name": "Glicko", "params": {"initial_rating": 1500}},
+        {"class": Glicko2Competitor, "name": "Glicko-2", "params": {"initial_rating": 1500}},
+        {"class": TrueSkillCompetitor, "name": "TrueSkill", "params": {"initial_rating": 1500}},
+        {"class": ECFCompetitor, "name": "ECF", "params": {"initial_rating": 1500}},
+        {"class": DWZCompetitor, "name": "DWZ", "params": {"initial_rating": 1500}},
     ]
 
     # Evaluate each competitor type
