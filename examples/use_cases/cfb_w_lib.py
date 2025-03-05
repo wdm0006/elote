@@ -14,6 +14,7 @@ from elote import (
     TrueSkillCompetitor,
     ECFCompetitor,
     DWZCompetitor,
+    ColleyMatrixCompetitor,
     CollegeFootballDataset,
 )
 from elote.benchmark import evaluate_competitor
@@ -100,7 +101,9 @@ def log_prediction_distribution(competitor_name, history):
     logger.info(f"  Mean: {sum(predicted_outcomes) / len(predicted_outcomes):.4f}")
     logger.info(f"  Values > 0.75: {sum(1 for p in predicted_outcomes if p > 0.75)}/{len(predicted_outcomes)}")
     logger.info(f"  Values < 0.25: {sum(1 for p in predicted_outcomes if p < 0.25)}/{len(predicted_outcomes)}")
-    logger.info(f"  0.25 <= Values <= 0.75: {sum(1 for p in predicted_outcomes if 0.25 <= p <= 0.75)}/{len(predicted_outcomes)}")
+    logger.info(
+        f"  0.25 <= Values <= 0.75: {sum(1 for p in predicted_outcomes if 0.25 <= p <= 0.75)}/{len(predicted_outcomes)}"
+    )
 
 
 def log_confusion_matrix(confusion_matrix):
@@ -212,6 +215,7 @@ def main():
         {"class": TrueSkillCompetitor, "name": "TrueSkill", "params": {"initial_rating": 1500}},
         {"class": ECFCompetitor, "name": "ECF", "params": {"initial_rating": 1500}},
         {"class": DWZCompetitor, "name": "DWZ", "params": {"initial_rating": 1500}},
+        {"class": ColleyMatrixCompetitor, "name": "Colley Matrix", "params": {"initial_rating": 0.5}},
     ]
 
     # Evaluate each competitor type

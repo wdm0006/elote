@@ -24,6 +24,7 @@ Available rating systems:
 - TrueSkill: Microsoft's Bayesian skill rating system for multiplayer games
 - ECF: The English Chess Federation rating system
 - DWZ: The Deutsche Wertungszahl (German evaluation number) system
+- Colley Matrix: A least-squares rating system that solves a system of linear equations
 - Ensemble: A meta-rating system that combines multiple rating systems
 
 Datasets:
@@ -42,6 +43,7 @@ from elote.competitors.glicko2 import Glicko2Competitor
 from elote.competitors.trueskill import TrueSkillCompetitor
 from elote.competitors.ecf import ECFCompetitor
 from elote.competitors.dwz import DWZCompetitor
+from elote.competitors.colley import ColleyMatrixCompetitor
 from elote.competitors.ensemble import BlendedCompetitor
 
 from elote.arenas.lambda_arena import LambdaArena
@@ -68,6 +70,7 @@ __all__ = [
     "TrueSkillCompetitor",
     "ECFCompetitor",
     "DWZCompetitor",
+    "ColleyMatrixCompetitor",
     "BlendedCompetitor",
     # Arenas
     "LambdaArena",

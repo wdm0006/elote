@@ -1,5 +1,6 @@
 import abc
 import random
+from typing import Dict
 
 
 class BaseArena:
@@ -109,81 +110,101 @@ class History:
             )
         return report
 
-    def confusion_matrix(self, lower_threshold=0.5, upper_threshold=0.5, attribute_filter=None):
-        """Calculate confusion matrix metrics for the bout history.
-
-        This method calculates true positives, false positives, true negatives,
-        false negatives, and correctly/incorrectly predicted draws based on the prediction thresholds.
+    def confusion_matrix(self, lower_threshold: float = 0.45, upper_threshold: float = 0.55) -> Dict[str, int]:
+        """
+        Calculate the confusion matrix for the history of bouts.
 
         Args:
-            lower_threshold (float): The lower probability threshold for predictions.
-            upper_threshold (float): The upper probability threshold for predictions.
-            attribute_filter (dict, optional): Filter bouts by attributes.
+            lower_threshold: The lower threshold for prediction (below this is a prediction for the second competitor)
+            upper_threshold: The upper threshold for prediction (above this is a prediction for the first competitor)
 
         Returns:
-            dict: A dictionary containing confusion matrix metrics including true/false draws.
+            A dictionary with confusion matrix metrics: {'tp': int, 'fp': int, 'tn': int, 'fn': int}
         """
-        tp, fp, tn, fn, true_draw, false_draw = 0, 0, 0, 0, 0, 0
-        
+        true_positives = 0
+        false_positives = 0
+        true_negatives = 0
+        false_negatives = 0
+
         for bout in self.bouts:
-            match = True
-            if attribute_filter:
-                for key, value in attribute_filter.items():
-                    if bout.attributes.get(key) != value:
-                        match = False
-            
-            if not match:
+            # Extract the actual winner and predicted probability
+            actual_winner = bout.actual_winner()
+            predicted_prob = bout.predicted_outcome
+
+            # Skip if we don't have both actual and predicted values
+            if actual_winner is None or predicted_prob is None:
                 continue
-                
-            # Check if the prediction is a draw (between thresholds)
-            is_predicted_draw = lower_threshold <= bout.predicted_outcome <= upper_threshold
-            
-            # Check if the actual outcome is a draw (0.5 in numeric format)
-            is_actual_draw = bout.outcome == 0.5
-            
-            if is_predicted_draw:
-                # Predicted a draw
-                if is_actual_draw:
-                    true_draw += 1  # Correctly predicted a draw
-                else:
-                    false_draw += 1  # Incorrectly predicted a draw
+
+            # Convert predicted_prob to float if it's a string or None
+            if isinstance(predicted_prob, str):
+                try:
+                    predicted_prob = float(predicted_prob)
+                except ValueError:
+                    # If conversion fails, skip this bout
+                    continue
+            elif predicted_prob is None:
+                continue
+
+            # Determine the predicted winner based on thresholds
+            if predicted_prob > upper_threshold:
+                predicted_winner = "a"
+            elif predicted_prob < lower_threshold:
+                predicted_winner = "b"
             else:
-                # Predicted a win for one side
-                if bout.predicted_outcome > upper_threshold:
-                    # Predicted a win for player A
-                    if bout.outcome == 1.0:
-                        tp += 1  # Correctly predicted A wins
-                    elif bout.outcome == 0.0:
-                        fp += 1  # Incorrectly predicted A wins (B actually won)
-                    else:  # bout.outcome == 0.5
-                        fp += 1  # Incorrectly predicted A wins (it was a draw)
-                else:  # bout.predicted_outcome < lower_threshold
-                    # Predicted a win for player B
-                    if bout.outcome == 0.0:
-                        tn += 1  # Correctly predicted B wins
-                    elif bout.outcome == 1.0:
-                        fn += 1  # Incorrectly predicted B wins (A actually won)
-                    else:  # bout.outcome == 0.5
-                        fn += 1  # Incorrectly predicted B wins (it was a draw)
-        
-        # Calculate total correct and total predictions
-        total_correct = tp + tn + true_draw
-        total = tp + fp + tn + fn + true_draw + false_draw
-        
-        # Calculate accuracy
-        accuracy = total_correct / total if total > 0 else 0
-        
-        return {
-            "tp": tp,  # True positives (correctly predicted A wins)
-            "fp": fp,  # False positives (incorrectly predicted A wins)
-            "tn": tn,  # True negatives (correctly predicted B wins)
-            "fn": fn,  # False negatives (incorrectly predicted B wins)
-            "true_draw": true_draw,  # Correctly predicted draws
-            "false_draw": false_draw,  # Incorrectly predicted draws
-            "accuracy": accuracy,  # Overall accuracy including draws
-            "total_correct": total_correct,  # Total correct predictions
-            "total": total  # Total predictions
-        }
+                # This is a draw prediction - don't skip it
+                predicted_winner = "draw"
+
+            # Normalize actual winner to 'a', 'b', or 'draw'
+            if isinstance(actual_winner, str):
+                actual_winner = actual_winner.lower()
+                if actual_winner in ["a", "win", "true", "1"]:
+                    actual_winner = "a"
+                elif actual_winner in ["b", "loss", "false", "0"]:
+                    actual_winner = "b"
+                else:
+                    # Treat other values as draw
+                    actual_winner = "draw"
+            elif isinstance(actual_winner, (int, float)):
+                if actual_winner == 1:
+                    actual_winner = "a"
+                elif actual_winner == 0:
+                    actual_winner = "b"
+                elif actual_winner == 0.5:
+                    actual_winner = "draw"
+                else:
+                    # Skip if actual winner is not a recognized value
+                    continue
+            else:
+                # Skip if actual winner is not a recognized type
+                continue
+
+            # Update confusion matrix
+            if actual_winner == "a":
+                if predicted_winner == "a":
+                    true_positives += 1
+                elif predicted_winner == "b":
+                    false_negatives += 1
+                else:  # predicted_winner == "draw"
+                    false_negatives += 1  # Predicted draw but was actually a win for a
+            elif actual_winner == "b":
+                if predicted_winner == "b":
+                    true_negatives += 1
+                elif predicted_winner == "a":
+                    false_positives += 1
+                else:  # predicted_winner == "draw"
+                    false_positives += 1  # Predicted draw but was actually a win for b
+            else:  # actual_winner == "draw"
+                if predicted_winner == "draw":
+                    # Correctly predicted a draw - count as both TP and TN
+                    true_positives += 0.5
+                    true_negatives += 0.5
+                elif predicted_winner == "a":
+                    false_positives += 1  # Predicted a win but was a draw
+                else:  # predicted_winner == "b"
+                    false_negatives += 1  # Predicted b win but was a draw
+
+        # Return results as a dictionary
+        return {"tp": true_positives, "fp": false_positives, "tn": true_negatives, "fn": false_negatives}
 
     def random_search(self, trials=1000):
         """Search for optimal prediction thresholds using random sampling.
@@ -197,7 +218,9 @@ class History:
         Returns:
             tuple: A tuple containing (best_accuracy, best_thresholds).
         """
-        best_accuracy, best_thresholds = 0, list()
+        best_accuracy = 0
+        best_thresholds = [0.5, 0.5]  # Initialize with default values
+
         for _ in range(trials):
             # Find min and max predicted outcomes in history
             predicted_outcomes = [bout.predicted_outcome for bout in self.bouts]
@@ -211,11 +234,11 @@ class History:
                     min_outcome + random.random() * (max_outcome - min_outcome),
                 ]
             )
-            
+
             # Calculate metrics with the random thresholds
             metrics = self.calculate_metrics(*thresholds)
             accuracy = metrics["accuracy"]
-            
+
             if accuracy > best_accuracy:
                 best_accuracy = accuracy
                 best_thresholds = thresholds
@@ -292,7 +315,7 @@ class History:
                 if accuracy > best_accuracy:
                     best_accuracy = accuracy
                     best_thresholds = opt_thresholds
-                    
+
                 # Try with a few random starting points
                 for _ in range(3):
                     random_guess = [
@@ -320,55 +343,43 @@ class History:
 
         return best_accuracy, best_thresholds
 
-    def calculate_metrics(self, lower_threshold=0.5, upper_threshold=0.5):
-        """Calculate evaluation metrics based on the bout history.
-
-        This method calculates accuracy, precision, recall, and F1 score based on
-        the confusion matrix. It now properly handles draws as a third outcome category.
+    def calculate_metrics(self, lower_threshold: float = 0.5, upper_threshold: float = 0.5) -> Dict[str, float]:
+        """
+        Calculate performance metrics based on the confusion matrix.
 
         Args:
-            lower_threshold (float): The lower probability threshold for predictions.
-            upper_threshold (float): The upper probability threshold for predictions.
+            lower_threshold: The lower threshold for prediction (below this is a prediction for the second competitor)
+            upper_threshold: The upper threshold for prediction (above this is a prediction for the first competitor)
 
         Returns:
-            dict: A dictionary containing the calculated metrics.
+            A dictionary with metrics including accuracy, precision, recall, F1 score, and the confusion matrix
         """
+        # Get the confusion matrix
         cm = self.confusion_matrix(lower_threshold, upper_threshold)
-        
-        # Extract values from confusion matrix
+
+        # Extract values from the confusion matrix
         tp = cm["tp"]
         fp = cm["fp"]
         tn = cm["tn"]
         fn = cm["fn"]
-        true_draw = cm["true_draw"]
-        false_draw = cm["false_draw"]
-        
-        # Calculate metrics for wins/losses
-        precision = tp / (tp + fp) if (tp + fp) > 0 else 0
-        recall = tp / (tp + fn) if (tp + fn) > 0 else 0
-        f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0
-        
-        # Calculate draw metrics if applicable
-        draw_precision = true_draw / (true_draw + false_draw) if (true_draw + false_draw) > 0 else 0
-        
-        # Calculate overall accuracy including draws
-        total_correct = tp + tn + true_draw
-        total_predictions = tp + fp + tn + fn + true_draw + false_draw
-        accuracy = total_correct / total_predictions if total_predictions > 0 else 0
-        
-        return {
-            "accuracy": accuracy,
-            "precision": precision,
-            "recall": recall,
-            "f1": f1,
-            "draw_precision": draw_precision,
-            "true_positives": tp,
-            "false_positives": fp,
-            "true_negatives": tn,
-            "false_negatives": fn,
-            "true_draws": true_draw,
-            "false_draws": false_draw
-        }
+
+        # Calculate total predictions
+        total = tp + fp + tn + fn
+
+        # Calculate accuracy
+        accuracy = (tp + tn) / total if total > 0 else 0
+
+        # Calculate precision
+        precision = tp / (tp + fp) if (tp + fp) > 0 else float("nan")
+
+        # Calculate recall
+        recall = tp / (tp + fn) if (tp + fn) > 0 else float("nan")
+
+        # Calculate F1 score
+        f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else float("nan")
+
+        # Return all metrics
+        return {"accuracy": accuracy, "precision": precision, "recall": recall, "f1": f1, "confusion_matrix": cm}
 
     def calculate_metrics_with_draws(self, lower_threshold=0.33, upper_threshold=0.66):
         """Calculate evaluation metrics for the bout history, treating predictions
@@ -381,49 +392,71 @@ class History:
         Returns:
             dict: A dictionary containing accuracy, precision, recall, F1 score, and draw metrics.
         """
+        # Count the different prediction outcomes
+        total_bouts = 0
+        correct_predictions = 0
+        true_draw = 0
+        false_draw = 0
+
+        for bout in self.bouts:
+            # Skip if we don't have both actual and predicted values
+            if bout.actual_winner() is None or bout.predicted_outcome is None:
+                continue
+
+            total_bouts += 1
+
+            # Determine predicted outcome
+            if bout.predicted_outcome > upper_threshold:
+                predicted = "a"
+            elif bout.predicted_outcome < lower_threshold:
+                predicted = "b"
+            else:
+                predicted = "draw"
+
+            # Determine actual outcome
+            actual = bout.actual_winner()
+            if isinstance(actual, (int, float)):
+                if actual == 1:
+                    actual = "a"
+                elif actual == 0:
+                    actual = "b"
+                elif actual == 0.5:
+                    actual = "draw"
+            elif isinstance(actual, str):
+                actual = actual.lower()
+                if actual in ["a", "win", "true", "1"]:
+                    actual = "a"
+                elif actual in ["b", "loss", "false", "0"]:
+                    actual = "b"
+                else:
+                    actual = "draw"
+
+            # Count correct predictions
+            if predicted == actual:
+                correct_predictions += 1
+                if predicted == "draw":
+                    true_draw += 1
+            elif predicted == "draw":
+                false_draw += 1
+
+        # Calculate overall accuracy
+        accuracy = correct_predictions / total_bouts if total_bouts > 0 else 0
+
+        # Get standard metrics from confusion matrix
         cm = self.confusion_matrix(lower_threshold, upper_threshold)
-        
-        # Extract values from confusion matrix
-        tp = cm["tp"]
-        fp = cm["fp"]
-        tn = cm["tn"]
-        fn = cm["fn"]
-        true_draw = cm["true_draw"]
-        false_draw = cm["false_draw"]
-        
-        # Calculate precision, recall, and F1 for wins (not including draws)
-        precision_wins = tp / (tp + fp) if (tp + fp) > 0 else 0
-        recall_wins = tp / (tp + fn) if (tp + fn) > 0 else 0
-        f1_wins = 2 * precision_wins * recall_wins / (precision_wins + recall_wins) if (precision_wins + recall_wins) > 0 else 0
-        
-        # Calculate precision, recall, and F1 for draws
-        precision_draws = true_draw / (true_draw + false_draw) if (true_draw + false_draw) > 0 else 0
-        recall_draws = true_draw / (true_draw + fp + fn) if (true_draw + fp + fn) > 0 else 0
-        f1_draws = 2 * precision_draws * recall_draws / (precision_draws + recall_draws) if (precision_draws + recall_draws) > 0 else 0
-        
-        # Calculate overall metrics
-        total = tp + fp + tn + fn + true_draw + false_draw
-        accuracy = (tp + tn + true_draw) / total if total > 0 else 0
-        
-        # Calculate macro-averaged precision, recall, and F1
-        precision_macro = (precision_wins + precision_draws) / 2
-        recall_macro = (recall_wins + recall_draws) / 2
-        f1_macro = (f1_wins + f1_draws) / 2
-        
+
+        # Return combined metrics
         return {
             "accuracy": accuracy,
-            "precision": precision_wins,  # For backward compatibility
-            "recall": recall_wins,  # For backward compatibility
-            "f1": f1_wins,  # For backward compatibility
-            "precision_wins": precision_wins,
-            "recall_wins": recall_wins,
-            "f1_wins": f1_wins,
-            "precision_draws": precision_draws,
-            "recall_draws": recall_draws,
-            "f1_draws": f1_draws,
-            "precision_macro": precision_macro,
-            "recall_macro": recall_macro,
-            "f1_macro": f1_macro,
+            "precision": cm["tp"] / (cm["tp"] + cm["fp"]) if (cm["tp"] + cm["fp"]) > 0 else 0,
+            "recall": cm["tp"] / (cm["tp"] + cm["fn"]) if (cm["tp"] + cm["fn"]) > 0 else 0,
+            "f1": 2 * cm["tp"] / (2 * cm["tp"] + cm["fp"] + cm["fn"])
+            if (2 * cm["tp"] + cm["fp"] + cm["fn"]) > 0
+            else 0,
+            "true_draw": true_draw,
+            "false_draw": false_draw,
+            "draw_rate": (true_draw + false_draw) / total_bouts if total_bouts > 0 else 0,
+            "draw_accuracy": true_draw / (true_draw + false_draw) if (true_draw + false_draw) > 0 else 0,
             "confusion_matrix": cm,
         }
 
@@ -475,12 +508,14 @@ class History:
             # Check if prediction is correct, properly handling draws
             is_predicted_draw = lower_threshold <= bout.predicted_outcome <= upper_threshold
             is_actual_draw = bout.outcome == 0.5
-            
-            if (is_predicted_draw and is_actual_draw) or \
-               (bout.predicted_outcome > upper_threshold and bout.outcome == 1.0) or \
-               (bout.predicted_outcome < lower_threshold and bout.outcome == 0.0):
+
+            if (
+                (is_predicted_draw and is_actual_draw)
+                or (bout.predicted_outcome > upper_threshold and bout.outcome == 1.0)
+                or (bout.predicted_outcome < lower_threshold and bout.outcome == 0.0)
+            ):
                 accuracy_by_min_bouts[min_bout_count]["correct"] += 1
-                
+
             accuracy_by_min_bouts[min_bout_count]["total"] += 1
 
             # Update bout counts for both competitors for subsequent bouts in evaluation
@@ -519,16 +554,16 @@ class History:
 
         # Return only the binned data in the expected format
         return {"binned": binned_data}
-        
+
     def get_calibration_data(self, n_bins=10):
         """Compute calibration data from the bout history.
-        
+
         This method extracts predicted probabilities and actual outcomes from the bout history
         and prepares them for calibration curve plotting.
-        
+
         Args:
             n_bins (int): Number of bins to use for calibration curve.
-            
+
         Returns:
             tuple: (y_true, y_prob) where:
                 - y_true: List of actual outcomes (1.0 for wins, 0.0 for losses)
@@ -536,38 +571,60 @@ class History:
         """
         # Extract predicted probabilities and actual outcomes
         y_prob = [bout.predicted_outcome for bout in self.bouts]
-        
+
         # Convert outcomes to binary format (1.0 for wins, 0.0 for losses)
         # Note: For calibration curves, we treat draws (0.5) as losses (0.0)
         # since we're evaluating the calibration of the predicted probability
         # that player A wins.
         y_true = [1.0 if bout.outcome == 1.0 else 0.0 for bout in self.bouts]
-        
+
         return y_true, y_prob
 
 
 class Bout:
-    """Represents a single matchup (bout) between two competitors.
-
-    This class stores the competitors, the predicted outcome, the actual outcome,
-    and any additional attributes of the bout.
-    """
+    """A single bout between two competitors."""
 
     def __init__(self, a, b, predicted_outcome, outcome, attributes=None):
-        """Initialize a bout between two competitors.
+        """
+        Initialize a bout.
 
         Args:
-            a: The first competitor.
-            b: The second competitor.
-            predicted_outcome (float): The predicted probability of a winning.
-            outcome (str or float): The actual outcome ("win", "loss", "draw" or 1.0, 0.0, 0.5).
-            attributes (dict, optional): Additional attributes of this bout.
+            a: The first competitor
+            b: The second competitor
+            predicted_outcome: The predicted probability of a winning
+            outcome: The actual outcome of the bout
+            attributes: Optional dictionary of additional attributes
         """
         self.a = a
         self.b = b
         self.predicted_outcome = predicted_outcome
         self.outcome = outcome
-        self.attributes = attributes or dict()
+        self.attributes = attributes or {}
+
+    def actual_winner(self):
+        """
+        Return the actual winner of the bout based on the outcome.
+
+        Returns:
+            str or None: 'A' if a won, 'B' if b won, None if it was a draw or unclear
+        """
+        if isinstance(self.outcome, str):
+            outcome_lower = self.outcome.lower()
+            if outcome_lower in ["win", "won", "1", "a", "true", "t", "yes", "y"]:
+                return "A"
+            elif outcome_lower in ["loss", "lost", "0", "b", "false", "f", "no", "n"]:
+                return "B"
+            elif outcome_lower in ["draw", "tie", "tied", "draw", "0.5", "d", "equal", "eq"]:
+                return None
+        elif isinstance(self.outcome, (int, float)):
+            if self.outcome == 1:
+                return "A"
+            elif self.outcome == 0:
+                return "B"
+            elif self.outcome == 0.5:
+                return None
+
+        return None
 
     def true_positive(self, threshold=0.5):
         """Check if this bout is a true positive prediction.
@@ -674,24 +731,3 @@ class Bout:
             return self.a
         else:
             return None
-
-    def actual_winner(self):
-        """Determine the actual winner of this bout.
-
-        Returns:
-            str: The identifier of the actual winner, or None if no winner is determined.
-        """
-        if isinstance(self.outcome, str):
-            if self.outcome == "win":
-                return self.a
-            elif self.outcome == "loss":
-                return self.b
-            else:
-                return None
-        else:  # numeric outcome
-            if self.outcome == 1.0:
-                return self.a
-            elif self.outcome == 0.0:
-                return self.b
-            else:
-                return None

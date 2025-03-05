@@ -43,7 +43,7 @@ def progress_callback(phase, current, total):
 
 def compare_players(player_a, player_b, attributes=None):
     """Compare two chess players based on game outcome.
-    
+
     In chess dataset:
     - player_a is always the white player
     - player_b is always the black player
@@ -51,38 +51,38 @@ def compare_players(player_a, player_b, attributes=None):
       - 1.0 means white (player_a) won
       - 0.0 means black (player_b) won
       - 0.5 means draw
-    
+
     During training and evaluation, this function is called by the benchmark system
     with the outcome already determined from the dataset. We just need to return
     the appropriate boolean value based on the outcome.
-    
+
     When called from train_arena_with_dataset:
       - If outcome is 1.0 (white wins), it calls arena.matchup(a, b)
       - If outcome is 0.0 (black wins), it calls arena.matchup(b, a)
       - If outcome is 0.5 (draw), it handles it specially
-    
+
     When called from evaluate_arena_with_dataset:
       - It gets the expected score from arena.expected_score(a, b)
       - It creates a Bout object with the expected and actual outcomes
-    
+
     In both cases, we don't need to determine the outcome here - it's already
     determined from the dataset. We just need to return the appropriate boolean.
     """
     logger.debug(f"compare_players called with player_a={player_a}, player_b={player_b}, attributes={attributes}")
-    
+
     # In the benchmark system, this function is called in a way where we don't
     # actually need to determine the outcome - it's already determined from the dataset.
     # The function is only used to determine the winner in arena.matchup().
-    
+
     # Since player_a is white and player_b is black, and in the dataset:
     # - 1.0 means white wins
     # - 0.0 means black wins
     # - 0.5 means draw
-    
+
     # For this example, we'll just return True to indicate player_a (white) wins.
     # This is just a placeholder - in a real system, we would determine the winner
     # based on ratings or other factors.
-    
+
     # Return True to indicate player_a (white) wins
     return True
 
@@ -104,7 +104,7 @@ def log_sample_predictions(competitor_name, history):
         logger.info(f"Game {i + 1}: {bout.a} (White) vs {bout.b} (Black)")
         logger.info(f"  Predicted outcome: {bout.predicted_outcome:.4f}")
         logger.info(f"  Actual outcome: {bout.outcome}")
-        
+
         # Interpret the prediction
         if bout.predicted_outcome > 0.66:
             prediction = "White win"
@@ -112,9 +112,9 @@ def log_sample_predictions(competitor_name, history):
             prediction = "Black win"
         else:
             prediction = "Draw"
-            
+
         logger.info(f"  Prediction: {prediction}")
-        
+
         # Determine if prediction was correct
         correct = False
         if bout.predicted_outcome > 0.66 and bout.outcome == 1.0:
@@ -123,7 +123,7 @@ def log_sample_predictions(competitor_name, history):
             correct = True  # Predicted black win, black won
         elif 0.33 <= bout.predicted_outcome <= 0.66 and bout.outcome == 0.5:
             correct = True  # Predicted draw, was a draw
-            
+
         logger.info(f"  Correct: {correct}")
 
 
@@ -137,9 +137,15 @@ def log_prediction_distribution(competitor_name, history):
     logger.info(f"  Min: {min(predicted_outcomes):.4f}")
     logger.info(f"  Max: {max(predicted_outcomes):.4f}")
     logger.info(f"  Mean: {sum(predicted_outcomes) / len(predicted_outcomes):.4f}")
-    logger.info(f"  Values > 0.66 (White win): {sum(1 for p in predicted_outcomes if p > 0.66)}/{len(predicted_outcomes)}")
-    logger.info(f"  Values < 0.33 (Black win): {sum(1 for p in predicted_outcomes if p < 0.33)}/{len(predicted_outcomes)}")
-    logger.info(f"  0.33 <= Values <= 0.66 (Draw): {sum(1 for p in predicted_outcomes if 0.33 <= p <= 0.66)}/{len(predicted_outcomes)}")
+    logger.info(
+        f"  Values > 0.66 (White win): {sum(1 for p in predicted_outcomes if p > 0.66)}/{len(predicted_outcomes)}"
+    )
+    logger.info(
+        f"  Values < 0.33 (Black win): {sum(1 for p in predicted_outcomes if p < 0.33)}/{len(predicted_outcomes)}"
+    )
+    logger.info(
+        f"  0.33 <= Values <= 0.66 (Draw): {sum(1 for p in predicted_outcomes if 0.33 <= p <= 0.66)}/{len(predicted_outcomes)}"
+    )
 
 
 def log_confusion_matrix(confusion_matrix):
@@ -246,7 +252,11 @@ def main():
     # Define the competitor types to evaluate with proper parameter names
     # Note: evaluate_competitor adds an underscore prefix to parameter names
     competitors = [
-        {"class": EloCompetitor, "name": "Elo", "params": {"k_factor": 32, "initial_rating": 1500}},  # Standard chess k-factor
+        {
+            "class": EloCompetitor,
+            "name": "Elo",
+            "params": {"k_factor": 32, "initial_rating": 1500},
+        },  # Standard chess k-factor
         {"class": GlickoCompetitor, "name": "Glicko", "params": {"initial_rating": 1500}},
         {"class": Glicko2Competitor, "name": "Glicko-2", "params": {"initial_rating": 1500}},
         {"class": TrueSkillCompetitor, "name": "TrueSkill", "params": {"initial_rating": 1500}},
@@ -308,4 +318,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main() 
+    main()

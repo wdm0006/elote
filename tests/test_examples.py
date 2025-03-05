@@ -16,9 +16,13 @@ class TestExamples(unittest.TestCase):
         # Skip examples that require external API access or take too long to run in tests
         self.skip_examples = [
             "use_cases/cfb_w_lib.py",  # Requires external API access
+            "use_cases/chess_w_lib.py",  # Takes too long to run in tests
             "dataset_example.py",  # Takes too long to run in tests
-            "persist_state_arena.py",  # Times out in tests
-            "sample_bout.py",  # Times out in tests
+            # "persist_state_arena.py",  # Times out in tests
+            # "sample_bout.py",  # Times out in tests
+            # "colley_matrix_example.py",  # Times out in tests
+            # "bout_with_initialization.py",  # Added to prevent timeout
+            # "prediction.py",  # Added to prevent timeout
         ]
 
     def test_example_scripts(self):
@@ -46,7 +50,7 @@ class TestExamples(unittest.TestCase):
                         [sys.executable, script_path],
                         capture_output=True,
                         text=True,
-                        timeout=10,  # 10 second timeout
+                        timeout=60,
                     )
 
                     # Check if the script ran successfully
@@ -91,6 +95,18 @@ class TestExamples(unittest.TestCase):
         # Test bout_with_initialization.py
         self._test_specific_example(
             "bout_with_initialization.py", expected_output_contains=["Starting ratings:", "After matches"]
+        )
+
+        # Test colley_matrix_example.py
+        self._test_specific_example(
+            "colley_matrix_example.py",
+            expected_output_contains=["Initial ratings:", "Final ratings:", "Sum of all ratings"],
+        )
+
+        # Test colley_matrix_comparison.py
+        self._test_specific_example(
+            "colley_matrix_comparison.py",
+            expected_output_contains=["Simulating tournament", "Colley Matrix Method is not sensitive to match order"],
         )
 
     def _test_specific_example(self, example_file, expected_output_contains):

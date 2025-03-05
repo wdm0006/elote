@@ -1,6 +1,7 @@
 v1.0.0 (Unreleased)
 ======
 
+ * [] Added end to end examples using the chess and cfb datasets
  * [] Added Glicko-2 Competitor 
  * [] Added TrueSkill Competitor
  * [] Added datasets module to read sample data for development

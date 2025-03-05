@@ -1,7 +1,15 @@
 from typing import Dict, Any, List, Type, TypeVar
 
 from elote.competitors.base import BaseCompetitor, InvalidParameterException, InvalidStateException
-from elote import EloCompetitor, ECFCompetitor, DWZCompetitor, GlickoCompetitor, Glicko2Competitor, TrueSkillCompetitor
+from elote import (
+    EloCompetitor,
+    ECFCompetitor,
+    DWZCompetitor,
+    GlickoCompetitor,
+    Glicko2Competitor,
+    TrueSkillCompetitor,
+    ColleyMatrixCompetitor,
+)
 
 T = TypeVar("T", bound="BlendedCompetitor")
 
@@ -13,6 +21,7 @@ competitor_types = {
     "GlickoCompetitor": GlickoCompetitor,
     "Glicko2Competitor": Glicko2Competitor,
     "TrueSkillCompetitor": TrueSkillCompetitor,
+    "ColleyMatrixCompetitor": ColleyMatrixCompetitor,
 }
 
 
