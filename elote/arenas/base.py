@@ -151,8 +151,8 @@ class History:
             elif predicted_prob < lower_threshold:
                 predicted_winner = "b"
             else:
-                # This is a draw prediction - don't skip it
-                predicted_winner = "draw"
+                # This is an uncertain prediction - skip it for confusion matrix calculation
+                continue
 
             # Normalize actual winner to 'a', 'b', or 'draw'
             if isinstance(actual_winner, str):
@@ -184,21 +184,13 @@ class History:
                     true_positives += 1
                 elif predicted_winner == "b":
                     false_negatives += 1
-                else:  # predicted_winner == "draw"
-                    false_negatives += 1  # Predicted draw but was actually a win for a
             elif actual_winner == "b":
                 if predicted_winner == "b":
                     true_negatives += 1
                 elif predicted_winner == "a":
                     false_positives += 1
-                else:  # predicted_winner == "draw"
-                    false_positives += 1  # Predicted draw but was actually a win for b
             else:  # actual_winner == "draw"
-                if predicted_winner == "draw":
-                    # Correctly predicted a draw - count as both TP and TN
-                    true_positives += 0.5
-                    true_negatives += 0.5
-                elif predicted_winner == "a":
+                if predicted_winner == "a":
                     false_positives += 1  # Predicted a win but was a draw
                 else:  # predicted_winner == "b"
                     false_negatives += 1  # Predicted b win but was a draw
@@ -606,21 +598,21 @@ class Bout:
         Return the actual winner of the bout based on the outcome.
 
         Returns:
-            str or None: 'A' if a won, 'B' if b won, None if it was a draw or unclear
+            str or None: 'a' if a won, 'b' if b won, None if it was a draw or unclear
         """
         if isinstance(self.outcome, str):
             outcome_lower = self.outcome.lower()
             if outcome_lower in ["win", "won", "1", "a", "true", "t", "yes", "y"]:
-                return "A"
+                return "a"
             elif outcome_lower in ["loss", "lost", "0", "b", "false", "f", "no", "n"]:
-                return "B"
+                return "b"
             elif outcome_lower in ["draw", "tie", "tied", "draw", "0.5", "d", "equal", "eq"]:
                 return None
         elif isinstance(self.outcome, (int, float)):
             if self.outcome == 1:
-                return "A"
+                return "a"
             elif self.outcome == 0:
-                return "B"
+                return "b"
             elif self.outcome == 0.5:
                 return None
 
@@ -709,9 +701,9 @@ class Bout:
             str: The identifier of the predicted winner, or None if no winner is predicted.
         """
         if self.predicted_outcome > upper_threshold:
-            return self.a
+            return self.a.lower() if isinstance(self.a, str) else self.a
         elif self.predicted_outcome < lower_threshold:
-            return self.b
+            return self.b.lower() if isinstance(self.b, str) else self.b
         else:
             return None
 
@@ -726,8 +718,8 @@ class Bout:
             str: The identifier of the predicted loser, or None if no loser is predicted.
         """
         if self.predicted_outcome > upper_threshold:
-            return self.b
+            return self.b.lower() if isinstance(self.b, str) else self.b
         elif self.predicted_outcome < lower_threshold:
-            return self.a
+            return self.a.lower() if isinstance(self.a, str) else self.a
         else:
             return None
