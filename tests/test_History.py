@@ -237,11 +237,11 @@ class TestBout(unittest.TestCase):
         """Test the predicted_winner method."""
         # If predicted_outcome > upper_threshold, a is the predicted winner
         bout = Bout("A", "B", 0.7, "win")
-        self.assertEqual(bout.predicted_winner(), "A")
+        self.assertEqual(bout.predicted_winner(), "a")
 
         # If predicted_outcome < lower_threshold, b is the predicted winner
         bout = Bout("A", "B", 0.3, "win")
-        self.assertEqual(bout.predicted_winner(), "B")
+        self.assertEqual(bout.predicted_winner(), "b")
 
         # If lower_threshold <= predicted_outcome <= upper_threshold, there is no predicted winner
         bout = Bout("A", "B", 0.5, "win")
@@ -250,17 +250,17 @@ class TestBout(unittest.TestCase):
         # Test with custom thresholds
         bout = Bout("A", "B", 0.6, "win")
         self.assertEqual(bout.predicted_winner(lower_threshold=0.4, upper_threshold=0.7), None)
-        self.assertEqual(bout.predicted_winner(lower_threshold=0.4, upper_threshold=0.5), "A")
+        self.assertEqual(bout.predicted_winner(lower_threshold=0.4, upper_threshold=0.5), "a")
 
     def test_predicted_loser(self):
         """Test the predicted_loser method."""
         # If predicted_outcome > upper_threshold, b is the predicted loser
         bout = Bout("A", "B", 0.7, "win")
-        self.assertEqual(bout.predicted_loser(), "B")
+        self.assertEqual(bout.predicted_loser(), "b")
 
         # If predicted_outcome < lower_threshold, a is the predicted loser
         bout = Bout("A", "B", 0.3, "win")
-        self.assertEqual(bout.predicted_loser(), "A")
+        self.assertEqual(bout.predicted_loser(), "a")
 
         # If lower_threshold <= predicted_outcome <= upper_threshold, there is no predicted loser
         bout = Bout("A", "B", 0.5, "win")
@@ -269,17 +269,17 @@ class TestBout(unittest.TestCase):
         # Test with custom thresholds
         bout = Bout("A", "B", 0.6, "win")
         self.assertEqual(bout.predicted_loser(lower_threshold=0.4, upper_threshold=0.7), None)
-        self.assertEqual(bout.predicted_loser(lower_threshold=0.4, upper_threshold=0.5), "B")
+        self.assertEqual(bout.predicted_loser(lower_threshold=0.4, upper_threshold=0.5), "b")
 
     def test_actual_winner(self):
         """Test the actual_winner method."""
         # If outcome is 'win', a is the actual winner
         bout = Bout("A", "B", 0.7, "win")
-        self.assertEqual(bout.actual_winner(), "A")
+        self.assertEqual(bout.actual_winner(), "a")
 
         # If outcome is 'loss', b is the actual winner
         bout = Bout("A", "B", 0.3, "loss")
-        self.assertEqual(bout.actual_winner(), "B")
+        self.assertEqual(bout.actual_winner(), "b")
 
         # If outcome is 'tie', there is no actual winner
         bout = Bout("A", "B", 0.5, "tie")
