@@ -1,8 +1,8 @@
 """
-Example of using the CollegeFootballDataset to train and evaluate multiple rating systems.
+Example of using the ChessDataset to train and evaluate multiple rating systems.
 
-This example demonstrates how to use the CollegeFootballDataset to train and evaluate
-different rating systems for college football teams and compare their performance.
+This example demonstrates how to use the ChessDataset to train and evaluate
+different rating systems for chess players and compare their performance.
 """
 
 import logging
@@ -14,8 +14,7 @@ from elote import (
     TrueSkillCompetitor,
     ECFCompetitor,
     DWZCompetitor,
-    ColleyMatrixCompetitor,
-    CollegeFootballDataset,
+    ChessDataset,
 )
 from elote.benchmark import evaluate_competitor
 from elote.visualization import (
@@ -29,7 +28,7 @@ from elote.visualization import (
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-logger = logging.getLogger("cfb_example")
+logger = logging.getLogger("chess_example")
 
 
 def progress_callback(phase, current, total):
@@ -42,31 +41,50 @@ def progress_callback(phase, current, total):
         logger.info(f"{phase.capitalize()} progress: {current}/{total} ({current / total:.1%})")
 
 
-def compare_teams(team_a, team_b, attributes=None):
-    """Compare two teams based on their scores."""
-    logger.debug(f"compare_teams called with team_a={team_a}, team_b={team_b}, attributes={attributes}")
+def compare_players(player_a, player_b, attributes=None):
+    """Compare two chess players based on game outcome.
 
-    if attributes is None:
-        logger.warning(f"No attributes provided for matchup between {team_a} and {team_b}")
-        return None
+    In chess dataset:
+    - player_a is always the white player
+    - player_b is always the black player
+    - The outcome is stored in the dataset tuple during training/evaluation
+      - 1.0 means white (player_a) won
+      - 0.0 means black (player_b) won
+      - 0.5 means draw
 
-    # Check if the expected attributes are present
-    if "home_score" not in attributes or "away_score" not in attributes:
-        logger.warning(f"Missing score attributes for matchup between {team_a} and {team_b}")
-        return None
+    During training and evaluation, this function is called by the benchmark system
+    with the outcome already determined from the dataset. We just need to return
+    the appropriate boolean value based on the outcome.
 
-    # In our dataset, team_a is always the home team
-    # and attributes contain home_score and away_score
-    home_points = attributes.get("home_score", 0)
-    away_points = attributes.get("away_score", 0)
+    When called from train_arena_with_dataset:
+      - If outcome is 1.0 (white wins), it calls arena.matchup(a, b)
+      - If outcome is 0.0 (black wins), it calls arena.matchup(b, a)
+      - If outcome is 0.5 (draw), it handles it specially
 
-    # Determine the winner
-    if home_points > away_points:
-        return True  # team_a (home) wins
-    elif away_points > home_points:
-        return False  # team_b (away) wins
-    else:
-        return None  # tie
+    When called from evaluate_arena_with_dataset:
+      - It gets the expected score from arena.expected_score(a, b)
+      - It creates a Bout object with the expected and actual outcomes
+
+    In both cases, we don't need to determine the outcome here - it's already
+    determined from the dataset. We just need to return the appropriate boolean.
+    """
+    logger.debug(f"compare_players called with player_a={player_a}, player_b={player_b}, attributes={attributes}")
+
+    # In the benchmark system, this function is called in a way where we don't
+    # actually need to determine the outcome - it's already determined from the dataset.
+    # The function is only used to determine the winner in arena.matchup().
+
+    # Since player_a is white and player_b is black, and in the dataset:
+    # - 1.0 means white wins
+    # - 0.0 means black wins
+    # - 0.5 means draw
+
+    # For this example, we'll just return True to indicate player_a (white) wins.
+    # This is just a placeholder - in a real system, we would determine the winner
+    # based on ratings or other factors.
+
+    # Return True to indicate player_a (white) wins
+    return True
 
 
 def ensure_dir_exists(directory):
@@ -83,10 +101,30 @@ def log_sample_predictions(competitor_name, history):
 
     logger.info(f"\nSample predictions for {competitor_name}:")
     for i, bout in enumerate(history.bouts[:5]):
-        logger.info(f"Game {i + 1}: {bout.a} vs {bout.b}")
+        logger.info(f"Game {i + 1}: {bout.a} (White) vs {bout.b} (Black)")
         logger.info(f"  Predicted outcome: {bout.predicted_outcome:.4f}")
         logger.info(f"  Actual outcome: {bout.outcome}")
-        logger.info(f"  Correct: {bout.predicted_winner() == bout.actual_winner()}")
+
+        # Interpret the prediction
+        if bout.predicted_outcome > 0.66:
+            prediction = "White win"
+        elif bout.predicted_outcome < 0.33:
+            prediction = "Black win"
+        else:
+            prediction = "Draw"
+
+        logger.info(f"  Prediction: {prediction}")
+
+        # Determine if prediction was correct
+        correct = False
+        if bout.predicted_outcome > 0.66 and bout.outcome == 1.0:
+            correct = True  # Predicted white win, white won
+        elif bout.predicted_outcome < 0.33 and bout.outcome == 0.0:
+            correct = True  # Predicted black win, black won
+        elif 0.33 <= bout.predicted_outcome <= 0.66 and bout.outcome == 0.5:
+            correct = True  # Predicted draw, was a draw
+
+        logger.info(f"  Correct: {correct}")
 
 
 def log_prediction_distribution(competitor_name, history):
@@ -99,10 +137,14 @@ def log_prediction_distribution(competitor_name, history):
     logger.info(f"  Min: {min(predicted_outcomes):.4f}")
     logger.info(f"  Max: {max(predicted_outcomes):.4f}")
     logger.info(f"  Mean: {sum(predicted_outcomes) / len(predicted_outcomes):.4f}")
-    logger.info(f"  Values > 0.75: {sum(1 for p in predicted_outcomes if p > 0.75)}/{len(predicted_outcomes)}")
-    logger.info(f"  Values < 0.25: {sum(1 for p in predicted_outcomes if p < 0.25)}/{len(predicted_outcomes)}")
     logger.info(
-        f"  0.25 <= Values <= 0.75: {sum(1 for p in predicted_outcomes if 0.25 <= p <= 0.75)}/{len(predicted_outcomes)}"
+        f"  Values > 0.66 (White win): {sum(1 for p in predicted_outcomes if p > 0.66)}/{len(predicted_outcomes)}"
+    )
+    logger.info(
+        f"  Values < 0.33 (Black win): {sum(1 for p in predicted_outcomes if p < 0.33)}/{len(predicted_outcomes)}"
+    )
+    logger.info(
+        f"  0.33 <= Values <= 0.66 (Draw): {sum(1 for p in predicted_outcomes if 0.33 <= p <= 0.66)}/{len(predicted_outcomes)}"
     )
 
 
@@ -130,10 +172,10 @@ def log_metrics(competitor_name, result):
         )
 
 
-def log_top_teams(competitor_name, top_teams):
-    """Log top teams according to a competitor."""
-    logger.info(f"\nTop 5 teams according to {competitor_name}:")
-    for idx, item in enumerate(top_teams[:5]):
+def log_top_players(competitor_name, top_players):
+    """Log top players according to a competitor."""
+    logger.info(f"\nTop 5 players according to {competitor_name}:")
+    for idx, item in enumerate(top_players[:5]):
         logger.info(f"{idx + 1}. {item.get('competitor')}: {item.get('rating'):.1f}")
 
 
@@ -195,27 +237,31 @@ def generate_visualizations(results, histories_and_arenas, image_dir):
 
 def main():
     # Create image directory
-    image_dir = "images/cfb"
+    image_dir = "images/chess"
     ensure_dir_exists(image_dir)
 
     # Create dataset
-    logger.info("Loading college football dataset...")
-    dataset = CollegeFootballDataset(start_year=2015, end_year=2022)
+    logger.info("Loading chess dataset...")
+    dataset = ChessDataset(max_games=10000, year=2013, month=1)
 
     # Split the dataset into training and test sets
     logger.info("Splitting dataset into training and test sets...")
     data_split = dataset.time_split(test_ratio=0.3)
     logger.info(f"Split complete: {len(data_split.train)} train games, {len(data_split.test)} test games")
 
-    # Define the competitor types to evaluate
+    # Define the competitor types to evaluate with proper parameter names
+    # Note: evaluate_competitor adds an underscore prefix to parameter names
     competitors = [
-        {"class": EloCompetitor, "name": "Elo", "params": {"k_factor": 32, "initial_rating": 1500}},
+        {
+            "class": EloCompetitor,
+            "name": "Elo",
+            "params": {"k_factor": 32, "initial_rating": 1500},
+        },  # Standard chess k-factor
         {"class": GlickoCompetitor, "name": "Glicko", "params": {"initial_rating": 1500}},
         {"class": Glicko2Competitor, "name": "Glicko-2", "params": {"initial_rating": 1500}},
         {"class": TrueSkillCompetitor, "name": "TrueSkill", "params": {"initial_rating": 1500}},
-        {"class": ECFCompetitor, "name": "ECF", "params": {"initial_rating": 1500}},
-        {"class": DWZCompetitor, "name": "DWZ", "params": {"initial_rating": 1500}},
-        {"class": ColleyMatrixCompetitor, "name": "Colley Matrix", "params": {"initial_rating": 0.5}},
+        {"class": ECFCompetitor, "name": "ECF", "params": {"initial_rating": 1500}},  # English Chess Federation rating
+        {"class": DWZCompetitor, "name": "DWZ", "params": {"initial_rating": 1500}},  # German Chess Federation rating
     ]
 
     # Evaluate each competitor type
@@ -228,7 +274,7 @@ def main():
         result = evaluate_competitor(
             competitor_class=competitor["class"],
             data_split=data_split,
-            comparison_function=compare_teams,
+            comparison_function=compare_players,
             competitor_name=competitor["name"],
             competitor_params=competitor["params"],
             batch_size=500,
@@ -248,7 +294,7 @@ def main():
         log_metrics(competitor["name"], result)
 
         if "top_teams" in result:
-            log_top_teams(competitor["name"], result["top_teams"])
+            log_top_players(competitor["name"], result["top_teams"])
 
         # Store history and arena for later visualization
         if "history" in result and "arena" in result:

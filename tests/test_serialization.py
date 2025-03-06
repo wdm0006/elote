@@ -5,6 +5,7 @@ from elote import (
     EloCompetitor,
     GlickoCompetitor,
     BlendedCompetitor,
+    ColleyMatrixCompetitor,
 )
 from elote.competitors.base import BaseCompetitor, InvalidStateException
 
@@ -112,6 +113,59 @@ class TestStandardizedSerialization(unittest.TestCase):
         self.assertIsInstance(new_competitor, GlickoCompetitor)
         self.assertEqual(new_competitor.rating, 1500)
         self.assertEqual(new_competitor.rd, 200)
+
+    def test_colley_matrix_serialization(self):
+        """Test serialization and deserialization of ColleyMatrixCompetitor."""
+        # Create a competitor
+        competitor = ColleyMatrixCompetitor(initial_rating=0.6)
+
+        # Create some match history
+        opponent = ColleyMatrixCompetitor(initial_rating=0.5)
+        competitor.beat(opponent)
+        competitor.beat(opponent)
+        opponent.beat(competitor)
+
+        # Export the state
+        state = competitor.export_state()
+
+        # Check that the state has the required fields
+        self.assertIn("type", state)
+        self.assertIn("version", state)
+        self.assertIn("created_at", state)
+        self.assertIn("id", state)
+        self.assertIn("parameters", state)
+        self.assertIn("state", state)
+
+        # Check the type and version
+        self.assertEqual(state["type"], "ColleyMatrixCompetitor")
+        self.assertEqual(state["version"], 1)
+
+        # Check the parameters
+        self.assertIn("initial_rating", state["parameters"])
+        self.assertEqual(state["parameters"]["initial_rating"], 0.6)
+
+        # Check the state
+        self.assertIn("rating", state["state"])
+        self.assertAlmostEqual(state["state"]["rating"], competitor.rating)
+        self.assertIn("wins", state["state"])
+        self.assertEqual(state["state"]["wins"], 2)
+        self.assertIn("losses", state["state"])
+        self.assertEqual(state["state"]["losses"], 1)
+        self.assertIn("ties", state["state"])
+        self.assertEqual(state["state"]["ties"], 0)
+
+        # Create a new competitor from the state
+        new_competitor = BaseCompetitor.from_state(state)
+
+        # Check that the new competitor has the same properties
+        self.assertIsInstance(new_competitor, ColleyMatrixCompetitor)
+        self.assertEqual(new_competitor._initial_rating, 0.6)
+        self.assertAlmostEqual(new_competitor.rating, competitor.rating)
+        self.assertEqual(new_competitor._wins, 2)
+        self.assertEqual(new_competitor._losses, 1)
+        self.assertEqual(new_competitor._ties, 0)
+
+        # Note: We can't verify _opponents because that can't be exported/imported
 
     def test_blended_serialization(self):
         """Test serialization and deserialization of BlendedCompetitor."""

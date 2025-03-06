@@ -1,4 +1,4 @@
-.PHONY: help setup install install-dev test test-cov lint format clean build docs lint-fix test-all benchmark
+.PHONY: help setup install install-dev install-datasets test test-cov lint format clean build docs lint-fix test-all benchmark run-example
 
 # Default target
 help:
@@ -6,6 +6,7 @@ help:
 	@echo "  make setup        - Install uv and other required tools"
 	@echo "  make install      - Install the package"
 	@echo "  make install-dev  - Install the package with development dependencies"
+	@echo "  make install-datasets - Install the package with dataset dependencies"
 	@echo "  make test         - Run tests"
 	@echo "  make test-cov     - Run tests with coverage"
 	@echo "  make test-all     - Run tests on all supported Python versions using tox"
@@ -16,12 +17,14 @@ help:
 	@echo "  make clean        - Clean build artifacts"
 	@echo "  make build        - Build package distributions"
 	@echo "  make docs         - Build documentation"
+	@echo "  make run-example EXAMPLE=filename  - Run an example (e.g., make run-example EXAMPLE=trueskill_example.py)"
 
 # Setup development environment
 setup:
 	pip install uv
-	uv venv --python=3.8
-
+	uv venv --python=3.11
+	brew install libomp
+	
 # Install the package
 install:
 	uv pip install -e .
@@ -29,6 +32,10 @@ install:
 # Install the package with development dependencies
 install-dev:
 	uv pip install -e ".[dev]"
+
+# Install the package with dataset dependencies
+install-datasets:
+	uv pip install -e ".[datasets]"
 
 # Run tests
 test:
@@ -44,7 +51,7 @@ lint:
 
 # Run linting and fix auto-fixable issues
 lint-fix:
-	uv run ruff check --fix .
+	uv run ruff check --fix --unsafe-fixes .
 
 # Format code
 format:
@@ -91,3 +98,13 @@ test-all:
 # Run benchmarks
 benchmark:
 	uv run pytest tests/test_benchmarks.py -v --benchmark-enable $(PYTEST_ARGS) 
+
+# Run an example
+run-example:
+	@if [ -z "$(EXAMPLE)" ]; then \
+		echo "Please specify an example file with EXAMPLE=filename.py"; \
+		echo "Available examples:"; \
+		ls examples/*.py | xargs -n1 basename; \
+	else \
+		uv run python examples/$(EXAMPLE); \
+	fi 

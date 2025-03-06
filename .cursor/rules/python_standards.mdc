@@ -4,6 +4,8 @@ globs: *.py
 ---
 # Python Coding Standards
 
+Do not ever include test-specific code into the library implementation. We should never be checking to see if we are running in a test context to modify the output, the library code should work the exact same in both test and non-test use cases.
+
 ## Code Style
 - Follow PEP 8 style guide for Python code
 - Use 4 spaces for indentation (no tabs)

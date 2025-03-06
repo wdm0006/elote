@@ -1,7 +1,14 @@
 v1.0.0 (Unreleased)
 ======
 
- * [CORE-2] Standardized the `Competitor` serialization formats
+ * [] Added end to end examples using the chess and cfb datasets
+ * [] Added Glicko-2 Competitor 
+ * [] Added TrueSkill Competitor
+ * [] Added datasets module to read sample data for development
+ * [] Added a visualization module to plot rating systems performance
+ * [] Added a benchmark module to compare rating systems
+ * [] Added scipy optimization to find optimal thresholds for rating systems
+ * [CORE-3] Standardized the `Competitor` serialization formats
  * [CORE-1] Fixed minimum rating enforcement across all competitor classes
  * [CORE-1] Updated documentation examples to use higher initial ratings
  * [CORE-1] Made `reset` method abstract in `BaseCompetitor` class

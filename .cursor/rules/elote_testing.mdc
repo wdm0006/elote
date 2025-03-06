@@ -1,6 +1,6 @@
 ---
 description: how to use the makefile to run tests
-globs: 
+globs: *
 ---
  # Elote Testing Standards
 
@@ -30,6 +30,9 @@ make test PYTEST_ARGS="tests/test_unified_interface.py::TestUnifiedInterface"
 
 # Run a specific test method
 make test PYTEST_ARGS="tests/test_unified_interface.py::TestUnifiedInterface::test_base_methods_elo"
+
+# Run a specitif example:
+make run-example EXAMPLE=use_cases/chess_w_lib.py
 ```
 
 ### Test Environment

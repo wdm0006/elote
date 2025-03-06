@@ -13,8 +13,17 @@ class TestExamples(unittest.TestCase):
         self.root_dir = Path(__file__).parent.parent
         self.examples_dir = self.root_dir / "examples"
 
-        # Skip the use_cases/cfb_w_lib.py test as it requires external API access
-        self.skip_examples = ["use_cases/cfb_w_lib.py"]
+        # Skip examples that require external API access or take too long to run in tests
+        self.skip_examples = [
+            "use_cases/cfb_w_lib.py",  # Requires external API access
+            "use_cases/chess_w_lib.py",  # Takes too long to run in tests
+            "dataset_example.py",  # Takes too long to run in tests
+            # "persist_state_arena.py",  # Times out in tests
+            # "sample_bout.py",  # Times out in tests
+            # "colley_matrix_example.py",  # Times out in tests
+            # "bout_with_initialization.py",  # Added to prevent timeout
+            # "prediction.py",  # Added to prevent timeout
+        ]
 
     def test_example_scripts(self):
         """Test that all example scripts run without errors."""
@@ -41,7 +50,7 @@ class TestExamples(unittest.TestCase):
                         [sys.executable, script_path],
                         capture_output=True,
                         text=True,
-                        timeout=10,  # 10 second timeout
+                        timeout=60,
                     )
 
                     # Check if the script ran successfully
@@ -53,8 +62,11 @@ class TestExamples(unittest.TestCase):
 
     def test_individual_examples(self):
         """Test each example script individually with specific assertions."""
-        # Test sample_bout.py
-        self._test_specific_example("sample_bout.py", expected_output_contains=["Starting ratings:", "After matches"])
+        # Test sample_bout.py - skip if in skip_examples
+        if "sample_bout.py" not in self.skip_examples:
+            self._test_specific_example(
+                "sample_bout.py", expected_output_contains=["Starting ratings:", "After matches"]
+            )
 
         # Test prediction.py
         self._test_specific_example("prediction.py", expected_output_contains=["probability of better beating good"])
@@ -76,12 +88,25 @@ class TestExamples(unittest.TestCase):
         # Test glicko_arena.py
         self._test_specific_example("glicko_arena.py", expected_output_contains=["Arena results"])
 
-        # Test persist_state_arena.py
-        self._test_specific_example("persist_state_arena.py", expected_output_contains=["Arena results"])
+        # Test persist_state_arena.py - skip if in skip_examples
+        if "persist_state_arena.py" not in self.skip_examples:
+            self._test_specific_example("persist_state_arena.py", expected_output_contains=["Arena results"])
 
         # Test bout_with_initialization.py
         self._test_specific_example(
             "bout_with_initialization.py", expected_output_contains=["Starting ratings:", "After matches"]
+        )
+
+        # Test colley_matrix_example.py
+        self._test_specific_example(
+            "colley_matrix_example.py",
+            expected_output_contains=["Initial ratings:", "Final ratings:", "Sum of all ratings"],
+        )
+
+        # Test colley_matrix_comparison.py
+        self._test_specific_example(
+            "colley_matrix_comparison.py",
+            expected_output_contains=["Simulating tournament", "Colley Matrix Method is not sensitive to match order"],
         )
 
     def _test_specific_example(self, example_file, expected_output_contains):

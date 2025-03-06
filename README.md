@@ -36,6 +36,8 @@ Currently implemented rating systems:
 
 - **Elo** - The classic chess rating system
 - **Glicko-1** - An improvement on Elo that accounts for rating reliability
+- **Glicko-2** - A further improvement on Glicko that adds volatility tracking
+- **TrueSkill** - Microsoft's Bayesian skill rating system for multiplayer games
 - **ECF** - The English Chess Federation rating system
 - **DWZ** - The Deutsche Wertungszahl (German evaluation number) system
 
@@ -199,7 +201,9 @@ For major changes, please open an issue first to discuss what you'd like to chan
 ## References
 
 1. [Glicko Rating System](http://www.glicko.net/glicko/glicko.pdf)
-2. [Massey Ratings](https://masseyratings.com)
-3. Elo, Arpad (1978). The Rating of Chessplayers, Past and Present. Arco. ISBN 0-668-04721-6.
-4. [ECF Grading System](http://www.ecfgrading.org.uk/new/help.php#elo)
-5. [Deutsche Wertungszahl](https://en.wikipedia.org/wiki/Deutsche_Wertungszahl)
+2. [Glicko-2 Rating System](http://www.glicko.net/glicko/glicko2.pdf)
+3. [Massey Ratings](https://masseyratings.com)
+4. Elo, Arpad (1978). The Rating of Chessplayers, Past and Present. Arco. ISBN 0-668-04721-6.
+5. [ECF Grading System](http://www.ecfgrading.org.uk/new/help.php#elo)
+6. [Deutsche Wertungszahl](https://en.wikipedia.org/wiki/Deutsche_Wertungszahl)
+7. [TrueSkill: A Bayesian Skill Rating System](https://www.microsoft.com/en-us/research/publication/trueskilltm-a-bayesian-skill-rating-system/)
