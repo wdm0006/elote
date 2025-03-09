@@ -64,6 +64,12 @@ Elote makes implementing these systems simple and intuitive, with a clean API th
 
 .. toctree::
    :maxdepth: 1
+   :caption: Resources
+
+   blog_posts
+
+.. toctree::
+   :maxdepth: 1
    :caption: Development
 
    contributing
