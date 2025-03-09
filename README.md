@@ -16,6 +16,7 @@
   - [Arenas](#arenas)
 - [Development](#development)
 - [Contributing](#contributing)
+- [Blog Posts](#blog-posts)
 - [References](#references)
 
 ## Overview
@@ -197,6 +198,14 @@ Contributions are welcome! If you'd like to help improve Elote:
 5. Submit a pull request
 
 For major changes, please open an issue first to discuss what you'd like to change.
+
+## Blog Posts
+
+Here are some blog posts about Elote:
+
+- [Elote: A Python Package for Rating Systems](https://mcginniscommawill.com/posts/2017-12-06-elote-python-package-rating-systems/) - Introduction to the library
+- [Using Cursor for Library Maintenance](https://mcginniscommawill.com/posts/2025-03-09-cursor-for-library-maintenance/#how-cursor-helps-with-maintenance) - How Cursor helps maintain Elote
+- [Year's End: Looking Back at 2017](https://mcginniscommawill.com/posts/2017-12-28-years-end-looking-back-2017/) - Reflections including Elote development
 
 ## References
 
