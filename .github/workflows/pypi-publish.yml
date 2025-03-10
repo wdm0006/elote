@@ -8,15 +8,42 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone
-        uses: actions/checkout@v1
-      - name: Build package
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install uv
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install -r requirements-dev.txt
-          python setup.py bdist_wheel sdist
-      - name: Publish package
-        uses: pypa/gh-action-pypi-publish@master
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      
+      - name: Create virtual environment and install dependencies
+        run: |
+          uv venv
+          uv pip install -e ".[dev]"
+          uv pip install build
+      
+      - name: Build source distribution
+        run: |
+          # Clean the build directories first
+          rm -fr build/
+          rm -fr dist/
+          rm -fr .eggs/
+          find . -name '*.egg-info' -exec rm -fr {} +
+          find . -name '*.egg' -exec rm -f {} +
+          find . -name '*.pyc' -exec rm -f {} +
+          find . -name '*.pyo' -exec rm -f {} +
+          find . -name '*~' -exec rm -f {} +
+          find . -name '__pycache__' -exec rm -fr {} +
+          
+          # Build only the source distribution
+          uv run python -m build --sdist
+      
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: willmcg4132
           password: ${{ secrets.pypi_password }}
