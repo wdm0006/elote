@@ -1,0 +1,563 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z43R9PWW0B"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-Z43R9PWW0B');
+    </script>
+    
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feature Prioritization with Elote &mdash; elote 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=af2ce170"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Competitors API Reference" href="../api/competitors.html" />
+    <link rel="prev" title="Matchmaking with Elote" href="matchmaking.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            elote
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick Start Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../competitors.html">Competitors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../arenas.html">Arenas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../serialization.html">Serialization</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/elo.html">Elo Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/ecf.html">ECF Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/dwz.html">DWZ Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/ensemble.html">Ensemble Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/comparison.html">Comparing Rating Systems</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advance_example.html">Advanced Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="product_ranking.html">Product Ranking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="matchmaking.html">Matchmaking with Elote</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Feature Prioritization with Elote</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#basic-implementation">Basic Implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#collecting-comparison-data">Collecting Comparison Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#advanced-implementation-multi-criteria-prioritization">Advanced Implementation: Multi-Criteria Prioritization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#handling-stakeholder-disagreement">Handling Stakeholder Disagreement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#visualizing-prioritization-results">Visualizing Prioritization Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#real-world-applications">Real-World Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#best-practices">Best Practices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#conclusion">Conclusion</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/competitors.html">Competitors API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/arenas.html">Arenas API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../blog_posts.html">Blog Posts</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to Elote</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">elote</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Feature Prioritization with Elote</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/use_cases/feature_prioritization.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="feature-prioritization-with-elote">
+<h1>Feature Prioritization with Elote<a class="headerlink" href="#feature-prioritization-with-elote" title="Permalink to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading"></a></h2>
+<p>Feature prioritization is a critical challenge in product management and software development. With limited resources and time, teams must decide which features to build first to maximize value. Traditional prioritization methods like scoring rubrics or the RICE framework (Reach, Impact, Confidence, Effort) have limitations:</p>
+<ul class="simple">
+<li><p>They often rely on subjective numerical scores</p></li>
+<li><p>Different stakeholders may interpret scoring criteria differently</p></li>
+<li><p>It’s difficult to maintain consistency across many features</p></li>
+<li><p>Comparing features directly is often more intuitive than scoring them individually</p></li>
+</ul>
+<p>Elote offers an elegant solution through pairwise comparison-based ranking. By having stakeholders compare features directly against each other, you can build a more reliable and consensus-driven prioritization system.</p>
+<p>This guide demonstrates how to use Elote for effective feature prioritization.</p>
+</section>
+<section id="basic-implementation">
+<h2>Basic Implementation<a class="headerlink" href="#basic-implementation" title="Permalink to this heading"></a></h2>
+<p>Let’s start with a simple implementation using the Elo rating system:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">FeaturePrioritizer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a feature to the prioritization system&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">feature_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="n">feature_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">feature_id</span><span class="p">,</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">description</span><span class="p">,</span>
+                <span class="s1">&#39;competitor&#39;</span><span class="p">:</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">initial_rating</span><span class="p">),</span>
+                <span class="s1">&#39;comparisons&#39;</span><span class="p">:</span> <span class="mi">0</span>
+            <span class="p">}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="n">feature_id</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">record_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">winner_id</span><span class="p">,</span> <span class="n">loser_id</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record the result of a feature comparison&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">winner_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="ow">or</span> <span class="n">loser_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Both features must be added to the system first&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Update ratings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="n">winner_id</span><span class="p">][</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="n">loser_id</span><span class="p">][</span><span class="s1">&#39;competitor&#39;</span><span class="p">])</span>
+
+        <span class="c1"># Update comparison counts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="n">winner_id</span><span class="p">][</span><span class="s1">&#39;comparisons&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="n">loser_id</span><span class="p">][</span><span class="s1">&#39;comparisons&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_prioritized_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_comparisons</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a prioritized list of features&quot;&quot;&quot;</span>
+        <span class="c1"># Only include features with sufficient comparisons</span>
+        <span class="n">valid_features</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;comparisons&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">min_comparisons</span><span class="p">]</span>
+
+        <span class="c1"># Sort by rating (descending)</span>
+        <span class="n">valid_features</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;rating&#39;</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span>
+                <span class="s1">&#39;comparisons&#39;</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;comparisons&#39;</span><span class="p">]</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">valid_features</span>
+        <span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_next_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the next most informative comparison to make&quot;&quot;&quot;</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+
+        <span class="c1"># Simple strategy: find features with similar ratings</span>
+        <span class="n">features_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">features_list</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># Sort by number of comparisons (ascending)</span>
+        <span class="n">features_list</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;comparisons&#39;</span><span class="p">])</span>
+
+        <span class="c1"># Take the two least-compared features</span>
+        <span class="k">if</span> <span class="n">features_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;comparisons&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">features_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="n">features_list</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+
+        <span class="c1"># Otherwise, find features with similar ratings</span>
+        <span class="n">features_list</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span><span class="p">)</span>
+
+        <span class="c1"># Find adjacent features with closest ratings</span>
+        <span class="n">min_diff</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
+        <span class="n">best_pair</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">features_list</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">diff</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">features_list</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span> <span class="o">-</span> <span class="n">features_list</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">diff</span> <span class="o">&lt;</span> <span class="n">min_diff</span><span class="p">:</span>
+                <span class="n">min_diff</span> <span class="o">=</span> <span class="n">diff</span>
+                <span class="n">best_pair</span> <span class="o">=</span> <span class="p">(</span><span class="n">features_list</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="n">features_list</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">best_pair</span>
+
+<span class="c1"># Usage example</span>
+<span class="n">prioritizer</span> <span class="o">=</span> <span class="n">FeaturePrioritizer</span><span class="p">()</span>
+
+<span class="c1"># Add features</span>
+<span class="n">prioritizer</span><span class="o">.</span><span class="n">add_feature</span><span class="p">(</span><span class="s2">&quot;f1&quot;</span><span class="p">,</span> <span class="s2">&quot;User Authentication&quot;</span><span class="p">,</span> <span class="s2">&quot;Allow users to sign up and log in&quot;</span><span class="p">)</span>
+<span class="n">prioritizer</span><span class="o">.</span><span class="n">add_feature</span><span class="p">(</span><span class="s2">&quot;f2&quot;</span><span class="p">,</span> <span class="s2">&quot;Dashboard&quot;</span><span class="p">,</span> <span class="s2">&quot;Create a dashboard with key metrics&quot;</span><span class="p">)</span>
+<span class="n">prioritizer</span><span class="o">.</span><span class="n">add_feature</span><span class="p">(</span><span class="s2">&quot;f3&quot;</span><span class="p">,</span> <span class="s2">&quot;Export to CSV&quot;</span><span class="p">,</span> <span class="s2">&quot;Add ability to export data to CSV&quot;</span><span class="p">)</span>
+<span class="n">prioritizer</span><span class="o">.</span><span class="n">add_feature</span><span class="p">(</span><span class="s2">&quot;f4&quot;</span><span class="p">,</span> <span class="s2">&quot;Dark Mode&quot;</span><span class="p">,</span> <span class="s2">&quot;Add a dark mode theme option&quot;</span><span class="p">)</span>
+<span class="n">prioritizer</span><span class="o">.</span><span class="n">add_feature</span><span class="p">(</span><span class="s2">&quot;f5&quot;</span><span class="p">,</span> <span class="s2">&quot;Mobile App&quot;</span><span class="p">,</span> <span class="s2">&quot;Create a mobile app version&quot;</span><span class="p">)</span>
+
+<span class="c1"># Record some comparisons</span>
+<span class="n">prioritizer</span><span class="o">.</span><span class="n">record_comparison</span><span class="p">(</span><span class="s2">&quot;f1&quot;</span><span class="p">,</span> <span class="s2">&quot;f3&quot;</span><span class="p">)</span>  <span class="c1"># Auth is more important than CSV export</span>
+<span class="n">prioritizer</span><span class="o">.</span><span class="n">record_comparison</span><span class="p">(</span><span class="s2">&quot;f1&quot;</span><span class="p">,</span> <span class="s2">&quot;f4&quot;</span><span class="p">)</span>  <span class="c1"># Auth is more important than Dark Mode</span>
+<span class="n">prioritizer</span><span class="o">.</span><span class="n">record_comparison</span><span class="p">(</span><span class="s2">&quot;f2&quot;</span><span class="p">,</span> <span class="s2">&quot;f3&quot;</span><span class="p">)</span>  <span class="c1"># Dashboard is more important than CSV export</span>
+<span class="n">prioritizer</span><span class="o">.</span><span class="n">record_comparison</span><span class="p">(</span><span class="s2">&quot;f2&quot;</span><span class="p">,</span> <span class="s2">&quot;f4&quot;</span><span class="p">)</span>  <span class="c1"># Dashboard is more important than Dark Mode</span>
+<span class="n">prioritizer</span><span class="o">.</span><span class="n">record_comparison</span><span class="p">(</span><span class="s2">&quot;f5&quot;</span><span class="p">,</span> <span class="s2">&quot;f4&quot;</span><span class="p">)</span>  <span class="c1"># Mobile App is more important than Dark Mode</span>
+<span class="n">prioritizer</span><span class="o">.</span><span class="n">record_comparison</span><span class="p">(</span><span class="s2">&quot;f1&quot;</span><span class="p">,</span> <span class="s2">&quot;f2&quot;</span><span class="p">)</span>  <span class="c1"># Auth is more important than Dashboard</span>
+<span class="n">prioritizer</span><span class="o">.</span><span class="n">record_comparison</span><span class="p">(</span><span class="s2">&quot;f5&quot;</span><span class="p">,</span> <span class="s2">&quot;f3&quot;</span><span class="p">)</span>  <span class="c1"># Mobile App is more important than CSV export</span>
+<span class="n">prioritizer</span><span class="o">.</span><span class="n">record_comparison</span><span class="p">(</span><span class="s2">&quot;f1&quot;</span><span class="p">,</span> <span class="s2">&quot;f5&quot;</span><span class="p">)</span>  <span class="c1"># Auth is more important than Mobile App</span>
+
+<span class="c1"># Get prioritized list</span>
+<span class="n">prioritized</span> <span class="o">=</span> <span class="n">prioritizer</span><span class="o">.</span><span class="n">get_prioritized_list</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">feature</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">prioritized</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">feature</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> (Rating: </span><span class="si">{</span><span class="n">feature</span><span class="p">[</span><span class="s1">&#39;rating&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="collecting-comparison-data">
+<h2>Collecting Comparison Data<a class="headerlink" href="#collecting-comparison-data" title="Permalink to this heading"></a></h2>
+<p>There are several ways to collect feature comparison data:</p>
+<ol class="arabic simple">
+<li><p><strong>Stakeholder Voting</strong>: Have stakeholders vote on pairs of features</p></li>
+<li><p><strong>Team Meetings</strong>: Conduct structured prioritization sessions</p></li>
+<li><p><strong>User Research</strong>: Ask users to compare feature importance</p></li>
+<li><p><strong>Automated Surveys</strong>: Send regular comparison questions to stakeholders</p></li>
+</ol>
+<p>Here’s an example of a simple web interface for collecting stakeholder votes:</p>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;feature-comparison&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>Which feature is more important?<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;feature-options&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;feature&quot;</span> <span class="na">onclick</span><span class="o">=</span><span class="s">&quot;recordPreference(&#39;f1&#39;)&quot;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">h3</span><span class="p">&gt;</span>User Authentication<span class="p">&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Allow users to sign up and log in<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;feature&quot;</span> <span class="na">onclick</span><span class="o">=</span><span class="s">&quot;recordPreference(&#39;f2&#39;)&quot;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">h3</span><span class="p">&gt;</span>Dashboard<span class="p">&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Create a dashboard with key metrics<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="kd">function</span><span class="w"> </span><span class="nx">recordPreference</span><span class="p">(</span><span class="nx">preferredFeatureId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">otherFeatureId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">preferredFeatureId</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">&#39;f1&#39;</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s1">&#39;f2&#39;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;f1&#39;</span><span class="p">;</span>
+
+<span class="w">  </span><span class="c1">// Send data to your backend</span>
+<span class="w">  </span><span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;/api/record-preference&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">method</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;POST&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">headers</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s1">&#39;Content-Type&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;application/json&#39;</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span>
+<span class="w">      </span><span class="nx">winner</span><span class="o">:</span><span class="w"> </span><span class="nx">preferredFeatureId</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">loser</span><span class="o">:</span><span class="w"> </span><span class="nx">otherFeatureId</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">voter</span><span class="o">:</span><span class="w"> </span><span class="nx">currentUserId</span><span class="p">,</span>
+<span class="w">      </span><span class="nx">timestamp</span><span class="o">:</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Date</span><span class="p">().</span><span class="nx">toISOString</span><span class="p">()</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="w">  </span><span class="p">});</span>
+
+<span class="w">  </span><span class="c1">// Load the next comparison</span>
+<span class="w">  </span><span class="nx">loadNextComparison</span><span class="p">();</span>
+<span class="p">}</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="advanced-implementation-multi-criteria-prioritization">
+<h2>Advanced Implementation: Multi-Criteria Prioritization<a class="headerlink" href="#advanced-implementation-multi-criteria-prioritization" title="Permalink to this heading"></a></h2>
+<p>In real-world scenarios, features are often evaluated on multiple criteria such as:</p>
+<ul class="simple">
+<li><p>Business value</p></li>
+<li><p>User value</p></li>
+<li><p>Implementation effort</p></li>
+<li><p>Technical risk</p></li>
+<li><p>Strategic alignment</p></li>
+</ul>
+<p>We can use Elote’s Ensemble rating system to combine these criteria:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnsembleCompetitor</span><span class="p">,</span> <span class="n">EloCompetitor</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MultiCriteriaFeaturePrioritizer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Default criteria and weights if not provided</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">criteria</span> <span class="o">=</span> <span class="n">criteria</span> <span class="ow">or</span> <span class="p">[</span><span class="s2">&quot;business_value&quot;</span><span class="p">,</span> <span class="s2">&quot;user_value&quot;</span><span class="p">,</span> <span class="s2">&quot;effort&quot;</span><span class="p">,</span> <span class="s2">&quot;risk&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span> <span class="ow">or</span> <span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]</span>
+
+        <span class="c1"># Validate weights sum to 1</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.001</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Weights must sum to 1.0&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">criteria</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must provide a weight for each criterion&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a feature to the prioritization system&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">feature_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">:</span>
+            <span class="c1"># Create a competitor for each criterion</span>
+            <span class="n">rating_systems</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">weight</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">criteria</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">):</span>
+                <span class="n">rating_systems</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">),</span> <span class="n">weight</span><span class="p">))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="n">feature_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">feature_id</span><span class="p">,</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">description</span><span class="p">,</span>
+                <span class="s1">&#39;competitor&#39;</span><span class="p">:</span> <span class="n">EnsembleCompetitor</span><span class="p">(</span><span class="n">rating_systems</span><span class="o">=</span><span class="n">rating_systems</span><span class="p">),</span>
+                <span class="s1">&#39;comparisons&#39;</span><span class="p">:</span> <span class="p">{</span><span class="n">criterion</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">criterion</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">criteria</span><span class="p">},</span>
+                <span class="s1">&#39;total_comparisons&#39;</span><span class="p">:</span> <span class="mi">0</span>
+            <span class="p">}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="n">feature_id</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">record_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">winner_id</span><span class="p">,</span> <span class="n">loser_id</span><span class="p">,</span> <span class="n">criterion</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Record a comparison result</span>
+<span class="sd">        If criterion is None, update the ensemble rating</span>
+<span class="sd">        If criterion is specified, update only that criterion&#39;s rating</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">winner_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="ow">or</span> <span class="n">loser_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Both features must be added to the system first&quot;</span><span class="p">)</span>
+
+        <span class="n">winner</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="n">winner_id</span><span class="p">]</span>
+        <span class="n">loser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="n">loser_id</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">criterion</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Update the ensemble rating</span>
+            <span class="n">winner</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">loser</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">])</span>
+            <span class="n">winner</span><span class="p">[</span><span class="s1">&#39;total_comparisons&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">loser</span><span class="p">[</span><span class="s1">&#39;total_comparisons&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">criterion</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">criteria</span><span class="p">:</span>
+            <span class="c1"># Update a specific criterion</span>
+            <span class="n">criterion_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criteria</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">criterion</span><span class="p">)</span>
+
+            <span class="c1"># Get the specific rating system</span>
+            <span class="n">winner_rating_system</span> <span class="o">=</span> <span class="n">winner</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating_systems</span><span class="p">[</span><span class="n">criterion_index</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">loser_rating_system</span> <span class="o">=</span> <span class="n">loser</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating_systems</span><span class="p">[</span><span class="n">criterion_index</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># Update the rating</span>
+            <span class="n">winner_rating_system</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">loser_rating_system</span><span class="p">)</span>
+
+            <span class="c1"># Update comparison count for this criterion</span>
+            <span class="n">winner</span><span class="p">[</span><span class="s1">&#39;comparisons&#39;</span><span class="p">][</span><span class="n">criterion</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">loser</span><span class="p">[</span><span class="s1">&#39;comparisons&#39;</span><span class="p">][</span><span class="n">criterion</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown criterion: </span><span class="si">{</span><span class="n">criterion</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_prioritized_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_comparisons</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a prioritized list of features&quot;&quot;&quot;</span>
+        <span class="c1"># Only include features with sufficient comparisons</span>
+        <span class="n">valid_features</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;total_comparisons&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">min_comparisons</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Sort by ensemble rating (descending)</span>
+        <span class="n">valid_features</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">valid_features</span><span class="p">:</span>
+            <span class="c1"># Get individual criterion ratings</span>
+            <span class="n">criterion_ratings</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">criterion</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">criteria</span><span class="p">):</span>
+                <span class="n">rating_system</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating_systems</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">criterion_ratings</span><span class="p">[</span><span class="n">criterion</span><span class="p">]</span> <span class="o">=</span> <span class="n">rating_system</span><span class="o">.</span><span class="n">rating</span>
+
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;overall_rating&#39;</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span>
+                <span class="s1">&#39;criterion_ratings&#39;</span><span class="p">:</span> <span class="n">criterion_ratings</span><span class="p">,</span>
+                <span class="s1">&#39;comparisons&#39;</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;comparisons&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;total_comparisons&#39;</span><span class="p">:</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;total_comparisons&#39;</span><span class="p">]</span>
+            <span class="p">})</span>
+
+        <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+</div>
+</section>
+<section id="handling-stakeholder-disagreement">
+<h2>Handling Stakeholder Disagreement<a class="headerlink" href="#handling-stakeholder-disagreement" title="Permalink to this heading"></a></h2>
+<p>Different stakeholders often have different priorities. Here are strategies to handle this:</p>
+<ol class="arabic simple">
+<li><p><strong>Separate Rankings</strong>: Maintain separate rankings for different stakeholder groups</p></li>
+<li><p><strong>Weighted Voting</strong>: Give different weights to different stakeholders</p></li>
+<li><p><strong>Consensus Building</strong>: Use the comparison process to drive discussion and consensus</p></li>
+</ol>
+<p>Here’s an example of weighted voting:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">record_weighted_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">winner_id</span><span class="p">,</span> <span class="n">loser_id</span><span class="p">,</span> <span class="n">voter_id</span><span class="p">,</span> <span class="n">voter_weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Record a comparison with different weights for different voters&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">voter_weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Default weights by role</span>
+        <span class="n">voter_weights</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;executive&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
+            <span class="s2">&quot;product_manager&quot;</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span>
+            <span class="s2">&quot;engineer&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="s2">&quot;designer&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="s2">&quot;sales&quot;</span><span class="p">:</span> <span class="mf">0.8</span>
+        <span class="p">}</span>
+
+    <span class="c1"># Get voter&#39;s role</span>
+    <span class="n">voter_role</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_voter_role</span><span class="p">(</span><span class="n">voter_id</span><span class="p">)</span>
+    <span class="n">weight</span> <span class="o">=</span> <span class="n">voter_weights</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">voter_role</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+
+    <span class="c1"># Apply the comparison multiple times based on weight</span>
+    <span class="n">full_weight</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">full_weight</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">record_comparison</span><span class="p">(</span><span class="n">winner_id</span><span class="p">,</span> <span class="n">loser_id</span><span class="p">)</span>
+
+    <span class="c1"># Handle fractional weight</span>
+    <span class="n">fractional_weight</span> <span class="o">=</span> <span class="n">weight</span> <span class="o">-</span> <span class="n">full_weight</span>
+    <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">fractional_weight</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">record_comparison</span><span class="p">(</span><span class="n">winner_id</span><span class="p">,</span> <span class="n">loser_id</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="visualizing-prioritization-results">
+<h2>Visualizing Prioritization Results<a class="headerlink" href="#visualizing-prioritization-results" title="Permalink to this heading"></a></h2>
+<p>Visualization helps stakeholders understand and buy into the prioritization results:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">visualize_prioritization</span><span class="p">(</span><span class="n">prioritized_features</span><span class="p">,</span> <span class="n">top_n</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a visualization of the prioritization results&quot;&quot;&quot;</span>
+    <span class="c1"># Take top N features</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="n">prioritized_features</span><span class="p">[:</span><span class="n">top_n</span><span class="p">]</span>
+
+    <span class="c1"># Extract data</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">features</span><span class="p">]</span>
+    <span class="n">ratings</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="p">[</span><span class="s1">&#39;rating&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">features</span><span class="p">]</span>
+
+    <span class="c1"># Create horizontal bar chart</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="n">y_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">))</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">y_pos</span><span class="p">,</span> <span class="n">ratings</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">y_pos</span><span class="p">,</span> <span class="n">names</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Rating&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Feature Priority Ranking&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Add rating values at the end of each bar</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ratings</span><span class="p">):</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">v</span> <span class="o">+</span> <span class="mi">10</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;feature_prioritization.png&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="s1">&#39;feature_prioritization.png&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="real-world-applications">
+<h2>Real-World Applications<a class="headerlink" href="#real-world-applications" title="Permalink to this heading"></a></h2>
+<p>Organizations using pairwise comparison for feature prioritization include:</p>
+<ul class="simple">
+<li><p><strong>Microsoft</strong>: Uses similar techniques for Windows feature prioritization</p></li>
+<li><p><strong>Atlassian</strong>: Incorporates pairwise voting in their product planning</p></li>
+<li><p><strong>Spotify</strong>: Uses comparison-based methods for roadmap planning</p></li>
+<li><p><strong>IBM</strong>: Employs similar techniques for enterprise software features</p></li>
+</ul>
+</section>
+<section id="best-practices">
+<h2>Best Practices<a class="headerlink" href="#best-practices" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><strong>Start Small</strong>: Begin with a manageable set of features (15-20)</p></li>
+<li><p><strong>Involve Key Stakeholders</strong>: Ensure all perspectives are represented</p></li>
+<li><p><strong>Provide Context</strong>: Give voters sufficient information about each feature</p></li>
+<li><p><strong>Regular Updates</strong>: Re-prioritize regularly as new information emerges</p></li>
+<li><p><strong>Combine Methods</strong>: Use Elote alongside other prioritization frameworks</p></li>
+<li><p><strong>Document Decisions</strong>: Record the reasoning behind key prioritization decisions</p></li>
+<li><p><strong>Consider Dependencies</strong>: Factor in technical dependencies between features</p></li>
+</ol>
+</section>
+<section id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this heading"></a></h2>
+<p>Elote provides a powerful framework for implementing feature prioritization systems based on pairwise comparisons. This approach offers several advantages over traditional scoring methods:</p>
+<ul class="simple">
+<li><p>More intuitive for stakeholders (comparing is easier than scoring)</p></li>
+<li><p>Reduces individual bias through multiple comparisons</p></li>
+<li><p>Creates a clear, defensible ranking</p></li>
+<li><p>Adapts as new features are added</p></li>
+<li><p>Builds consensus through the comparison process</p></li>
+</ul>
+<p>By leveraging Elote’s implementation of sophisticated rating systems, you can build robust feature prioritization solutions that help your team focus on delivering the highest-value features first.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="matchmaking.html" class="btn btn-neutral float-left" title="Matchmaking with Elote" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../api/competitors.html" class="btn btn-neutral float-right" title="Competitors API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, Will McGinnis.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

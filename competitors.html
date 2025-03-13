@@ -1,0 +1,716 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z43R9PWW0B"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-Z43R9PWW0B');
+    </script>
+    
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Competitors &mdash; elote 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=af2ce170"></script>
+      <script src="_static/doctools.js?v=888ff710"></script>
+      <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Arenas" href="arenas.html" />
+    <link rel="prev" title="Quick Start Guide" href="quickstart.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            elote
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Concepts</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Competitors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#elo-competitor">Elo Competitor</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#elote.competitors.elo.EloCompetitor"><code class="docutils literal notranslate"><span class="pre">EloCompetitor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.elo.EloCompetitor.beat"><code class="docutils literal notranslate"><span class="pre">EloCompetitor.beat()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.elo.EloCompetitor.expected_score"><code class="docutils literal notranslate"><span class="pre">EloCompetitor.expected_score()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.elo.EloCompetitor.export_state"><code class="docutils literal notranslate"><span class="pre">EloCompetitor.export_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.elo.EloCompetitor.from_json"><code class="docutils literal notranslate"><span class="pre">EloCompetitor.from_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.elo.EloCompetitor.rating"><code class="docutils literal notranslate"><span class="pre">EloCompetitor.rating</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.elo.EloCompetitor.tied"><code class="docutils literal notranslate"><span class="pre">EloCompetitor.tied()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.elo.EloCompetitor.to_json"><code class="docutils literal notranslate"><span class="pre">EloCompetitor.to_json()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#glicko-competitor">Glicko Competitor</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#elote.competitors.glicko.GlickoCompetitor"><code class="docutils literal notranslate"><span class="pre">GlickoCompetitor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.glicko.GlickoCompetitor.beat"><code class="docutils literal notranslate"><span class="pre">GlickoCompetitor.beat()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.glicko.GlickoCompetitor.expected_score"><code class="docutils literal notranslate"><span class="pre">GlickoCompetitor.expected_score()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.glicko.GlickoCompetitor.export_state"><code class="docutils literal notranslate"><span class="pre">GlickoCompetitor.export_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.glicko.GlickoCompetitor.from_json"><code class="docutils literal notranslate"><span class="pre">GlickoCompetitor.from_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.glicko.GlickoCompetitor.rating"><code class="docutils literal notranslate"><span class="pre">GlickoCompetitor.rating</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.glicko.GlickoCompetitor.tied"><code class="docutils literal notranslate"><span class="pre">GlickoCompetitor.tied()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.glicko.GlickoCompetitor.to_json"><code class="docutils literal notranslate"><span class="pre">GlickoCompetitor.to_json()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#dwz-competitor">DWZ Competitor</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#elote.competitors.dwz.DWZCompetitor"><code class="docutils literal notranslate"><span class="pre">DWZCompetitor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.dwz.DWZCompetitor.beat"><code class="docutils literal notranslate"><span class="pre">DWZCompetitor.beat()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.dwz.DWZCompetitor.expected_score"><code class="docutils literal notranslate"><span class="pre">DWZCompetitor.expected_score()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.dwz.DWZCompetitor.export_state"><code class="docutils literal notranslate"><span class="pre">DWZCompetitor.export_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.dwz.DWZCompetitor.from_json"><code class="docutils literal notranslate"><span class="pre">DWZCompetitor.from_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.dwz.DWZCompetitor.rating"><code class="docutils literal notranslate"><span class="pre">DWZCompetitor.rating</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.dwz.DWZCompetitor.tied"><code class="docutils literal notranslate"><span class="pre">DWZCompetitor.tied()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.dwz.DWZCompetitor.to_json"><code class="docutils literal notranslate"><span class="pre">DWZCompetitor.to_json()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#ecf-competitor">ECF Competitor</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#elote.competitors.ecf.ECFCompetitor"><code class="docutils literal notranslate"><span class="pre">ECFCompetitor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.ecf.ECFCompetitor.beat"><code class="docutils literal notranslate"><span class="pre">ECFCompetitor.beat()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.ecf.ECFCompetitor.expected_score"><code class="docutils literal notranslate"><span class="pre">ECFCompetitor.expected_score()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.ecf.ECFCompetitor.export_state"><code class="docutils literal notranslate"><span class="pre">ECFCompetitor.export_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.ecf.ECFCompetitor.from_json"><code class="docutils literal notranslate"><span class="pre">ECFCompetitor.from_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.ecf.ECFCompetitor.rating"><code class="docutils literal notranslate"><span class="pre">ECFCompetitor.rating</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.ecf.ECFCompetitor.tied"><code class="docutils literal notranslate"><span class="pre">ECFCompetitor.tied()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.ecf.ECFCompetitor.to_json"><code class="docutils literal notranslate"><span class="pre">ECFCompetitor.to_json()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#blendedcompetitor">BlendedCompetitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#serialization">Serialization</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="arenas.html">Arenas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/elo.html">Elo Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/ecf.html">ECF Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/dwz.html">DWZ Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/ensemble.html">Ensemble Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/comparison.html">Comparing Rating Systems</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advance_example.html">Advanced Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="use_cases/product_ranking.html">Product Ranking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="use_cases/matchmaking.html">Matchmaking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="use_cases/feature_prioritization.html">Feature Prioritization with Elote</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/competitors.html">Competitors API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/arenas.html">Arenas API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="blog_posts.html">Blog Posts</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to Elote</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">elote</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Competitors</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/competitors.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="competitors">
+<h1>Competitors<a class="headerlink" href="#competitors" title="Permalink to this heading"></a></h1>
+<section id="elo-competitor">
+<h2>Elo Competitor<a class="headerlink" href="#elo-competitor" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="elote.competitors.elo.EloCompetitor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">elote.competitors.elo.</span></span><span class="sig-name descname"><span class="pre">EloCompetitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">400</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/elote/competitors/elo.html#EloCompetitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.elo.EloCompetitor" title="Permalink to this definition"></a></dt>
+<dd><p>Elo rating system competitor.</p>
+<p>The Elo rating system is a method for calculating the relative skill levels of players
+in zero-sum games such as chess. It is named after its creator Arpad Elo, a Hungarian-American
+physics professor and chess master.</p>
+<p>In the Elo system, each player’s rating changes based on the outcome of games and the
+rating of their opponents. The difference in ratings between two players determines
+the expected outcome of a match, and the actual outcome is used to update the ratings.</p>
+<dl class="simple">
+<dt>Class Attributes:</dt><dd><p>_base_rating (float): Base rating divisor used in the transformed rating calculation. Default: 400.
+_k_factor (float): Factor that determines how much ratings change after each match. Default: 32.</p>
+</dd>
+</dl>
+<p>Initialize an Elo competitor.</p>
+<dl>
+<dt>Args:</dt><dd><p>initial_rating (float, optional): The initial rating of this competitor. Default: 400.
+k_factor (float, optional): The K-factor to use for this competitor. If None,</p>
+<blockquote>
+<div><p>the class K-factor will be used. Default: None.</p>
+</div></blockquote>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidRatingValueException: If the initial rating is below the minimum rating.
+InvalidParameterException: If the k_factor is negative.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.elo.EloCompetitor.beat">
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/competitors/elo.html#EloCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.elo.EloCompetitor.beat" title="Permalink to this definition"></a></dt>
+<dd><p>Update ratings after this competitor has won against the given competitor.</p>
+<p>This method updates the ratings of both this competitor and the opponent
+based on the match outcome where this competitor won.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.elo.EloCompetitor.expected_score">
+<span class="sig-name descname"><span class="pre">expected_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/elote/competitors/elo.html#EloCompetitor.expected_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.elo.EloCompetitor.expected_score" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the expected score (probability of winning) against another competitor.</p>
+<p>In Elo rating, a player’s expected score is their probability of winning plus half their probability of drawing.
+This is because in Elo rating a draw is not explicitly accounted for, but rather counted as half of a win and
+half of a loss. It can make the expected score a bit difficult to reason about, so be careful.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor to compare against.</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: The probability of winning (between 0 and 1).</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.elo.EloCompetitor.export_state">
+<span class="sig-name descname"><span class="pre">export_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/elote/competitors/elo.html#EloCompetitor.export_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.elo.EloCompetitor.export_state" title="Permalink to this definition"></a></dt>
+<dd><p>Export the current state of this competitor for serialization.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>dict: A dictionary containing all necessary information to recreate</dt><dd><p>this competitor’s current state.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.elo.EloCompetitor.from_json">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="headerlink" href="#elote.competitors.elo.EloCompetitor.from_json" title="Permalink to this definition"></a></dt>
+<dd><p>Create a new competitor from a JSON string.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>json_str (str): A JSON string representing a competitor’s state.</p>
+</dd>
+<dt>Returns:</dt><dd><p>BaseCompetitor: A new competitor with the state from the JSON string.</p>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidStateException: If the JSON string is invalid or incompatible.
+InvalidParameterException: If any parameter in the state is invalid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="elote.competitors.elo.EloCompetitor.rating">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rating</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#elote.competitors.elo.EloCompetitor.rating" title="Permalink to this definition"></a></dt>
+<dd><p>Get the current rating of this competitor.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>float: The current rating.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.elo.EloCompetitor.tied">
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/competitors/elo.html#EloCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.elo.EloCompetitor.tied" title="Permalink to this definition"></a></dt>
+<dd><p>Update ratings after this competitor has tied with the given competitor.</p>
+<p>This method updates the ratings of both this competitor and the opponent
+based on a drawn match outcome.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.elo.EloCompetitor.to_json">
+<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#elote.competitors.elo.EloCompetitor.to_json" title="Permalink to this definition"></a></dt>
+<dd><p>Convert this competitor’s state to a JSON string.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: A JSON string representing this competitor’s state.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="glicko-competitor">
+<h2>Glicko Competitor<a class="headerlink" href="#glicko-competitor" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="elote.competitors.glicko.GlickoCompetitor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">elote.competitors.glicko.</span></span><span class="sig-name descname"><span class="pre">GlickoCompetitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_rd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">350</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/elote/competitors/glicko.html#GlickoCompetitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor" title="Permalink to this definition"></a></dt>
+<dd><p>Glicko rating system competitor.</p>
+<p>The Glicko rating system is an improvement on the Elo rating system that takes
+into account the reliability of a rating. It was developed by Mark Glickman as
+an improvement to the Elo system.</p>
+<p>In addition to a rating, each competitor has a rating deviation (RD) that measures
+the reliability of the rating. A higher RD indicates a less reliable rating.</p>
+<dl class="simple">
+<dt>Class Attributes:</dt><dd><p>_c (float): Constant that determines how quickly the RD increases over time. Default: 1.
+_q (float): Scaling factor used in the rating calculation. Default: 0.0057565.</p>
+</dd>
+</dl>
+<p>Initialize a Glicko competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>initial_rating (float, optional): The initial rating of this competitor. Default: 1500.
+initial_rd (float, optional): The initial rating deviation of this competitor. Default: 350.</p>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidRatingValueException: If the initial rating is below the minimum rating.
+InvalidParameterException: If the initial RD is not positive.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko.GlickoCompetitor.beat">
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.glicko.GlickoCompetitor" title="elote.competitors.glicko.GlickoCompetitor"><span class="pre">GlickoCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/competitors/glicko.html#GlickoCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.beat" title="Permalink to this definition"></a></dt>
+<dd><p>Update ratings after this competitor has won against the given competitor.</p>
+<p>This method updates the ratings of both this competitor and the opponent
+based on the match outcome where this competitor won.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (GlickoCompetitor): The opponent competitor that lost.</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko.GlickoCompetitor.expected_score">
+<span class="sig-name descname"><span class="pre">expected_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/elote/competitors/glicko.html#GlickoCompetitor.expected_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.expected_score" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the expected score (probability of winning) against another competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor to compare against.</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: The probability of winning (between 0 and 1).</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko.GlickoCompetitor.export_state">
+<span class="sig-name descname"><span class="pre">export_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/elote/competitors/glicko.html#GlickoCompetitor.export_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.export_state" title="Permalink to this definition"></a></dt>
+<dd><p>Export the current state of this competitor for serialization.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>dict: A dictionary containing all necessary information to recreate</dt><dd><p>this competitor’s current state.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko.GlickoCompetitor.from_json">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.from_json" title="Permalink to this definition"></a></dt>
+<dd><p>Create a new competitor from a JSON string.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>json_str (str): A JSON string representing a competitor’s state.</p>
+</dd>
+<dt>Returns:</dt><dd><p>BaseCompetitor: A new competitor with the state from the JSON string.</p>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidStateException: If the JSON string is invalid or incompatible.
+InvalidParameterException: If any parameter in the state is invalid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="elote.competitors.glicko.GlickoCompetitor.rating">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rating</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.rating" title="Permalink to this definition"></a></dt>
+<dd><p>Get the current rating of this competitor.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>float: The current rating.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko.GlickoCompetitor.tied">
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.glicko.GlickoCompetitor" title="elote.competitors.glicko.GlickoCompetitor"><span class="pre">GlickoCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/competitors/glicko.html#GlickoCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.tied" title="Permalink to this definition"></a></dt>
+<dd><p>Update ratings after this competitor has tied with the given competitor.</p>
+<p>This method updates the ratings of both this competitor and the opponent
+based on a drawn match outcome.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (GlickoCompetitor): The opponent competitor that tied.</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko.GlickoCompetitor.to_json">
+<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.to_json" title="Permalink to this definition"></a></dt>
+<dd><p>Convert this competitor’s state to a JSON string.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: A JSON string representing this competitor’s state.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="dwz-competitor">
+<h2>DWZ Competitor<a class="headerlink" href="#dwz-competitor" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="elote.competitors.dwz.DWZCompetitor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">elote.competitors.dwz.</span></span><span class="sig-name descname"><span class="pre">DWZCompetitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">400</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/elote/competitors/dwz.html#DWZCompetitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.dwz.DWZCompetitor" title="Permalink to this definition"></a></dt>
+<dd><p>Deutsche Wertungszahl (DWZ) rating system competitor.</p>
+<p>The DWZ is the German chess rating system, similar to Elo but with some
+differences in how ratings are updated after matches.</p>
+<dl class="simple">
+<dt>Class Attributes:</dt><dd><p>_J (int): Development coefficient. Default: 10.</p>
+</dd>
+</dl>
+<p>Initialize a DWZ competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>initial_rating (float, optional): The initial rating of this competitor. Default: 400.</p>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidRatingValueException: If the initial rating is below the minimum rating.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.dwz.DWZCompetitor.beat">
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/competitors/dwz.html#DWZCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.dwz.DWZCompetitor.beat" title="Permalink to this definition"></a></dt>
+<dd><p>Update ratings after this competitor has won against the given competitor.</p>
+<p>This method updates the ratings of both this competitor and the opponent
+based on the match outcome where this competitor won.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.dwz.DWZCompetitor.expected_score">
+<span class="sig-name descname"><span class="pre">expected_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/elote/competitors/dwz.html#DWZCompetitor.expected_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.dwz.DWZCompetitor.expected_score" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the expected score (probability of winning) against another competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor to compare against.</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: The probability of winning (between 0 and 1).</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.dwz.DWZCompetitor.export_state">
+<span class="sig-name descname"><span class="pre">export_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/elote/competitors/dwz.html#DWZCompetitor.export_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.dwz.DWZCompetitor.export_state" title="Permalink to this definition"></a></dt>
+<dd><p>Export the current state of this competitor for serialization.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>dict: A dictionary containing all necessary information to recreate</dt><dd><p>this competitor’s current state.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.dwz.DWZCompetitor.from_json">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="headerlink" href="#elote.competitors.dwz.DWZCompetitor.from_json" title="Permalink to this definition"></a></dt>
+<dd><p>Create a new competitor from a JSON string.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>json_str (str): A JSON string representing a competitor’s state.</p>
+</dd>
+<dt>Returns:</dt><dd><p>BaseCompetitor: A new competitor with the state from the JSON string.</p>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidStateException: If the JSON string is invalid or incompatible.
+InvalidParameterException: If any parameter in the state is invalid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="elote.competitors.dwz.DWZCompetitor.rating">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rating</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#elote.competitors.dwz.DWZCompetitor.rating" title="Permalink to this definition"></a></dt>
+<dd><p>Get the current rating of this competitor.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>float: The current rating.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.dwz.DWZCompetitor.tied">
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/competitors/dwz.html#DWZCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.dwz.DWZCompetitor.tied" title="Permalink to this definition"></a></dt>
+<dd><p>Update ratings after this competitor has tied with the given competitor.</p>
+<p>This method updates the ratings of both this competitor and the opponent
+based on a drawn match outcome.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.dwz.DWZCompetitor.to_json">
+<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#elote.competitors.dwz.DWZCompetitor.to_json" title="Permalink to this definition"></a></dt>
+<dd><p>Convert this competitor’s state to a JSON string.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: A JSON string representing this competitor’s state.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="ecf-competitor">
+<h2>ECF Competitor<a class="headerlink" href="#ecf-competitor" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="elote.competitors.ecf.ECFCompetitor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">elote.competitors.ecf.</span></span><span class="sig-name descname"><span class="pre">ECFCompetitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/elote/competitors/ecf.html#ECFCompetitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.ecf.ECFCompetitor" title="Permalink to this definition"></a></dt>
+<dd><p>English Chess Federation (ECF) rating system competitor.</p>
+<p>The ECF rating system is used by the English Chess Federation to rate chess players.
+It uses a moving average of performance ratings over a number of periods.</p>
+<dl class="simple">
+<dt>Class Attributes:</dt><dd><p>_delta (float): Maximum rating difference considered for updates. Default: 50.
+_n_periods (int): Number of periods to consider for the moving average. Default: 30.</p>
+</dd>
+</dl>
+<p>Initialize an ECF competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>initial_rating (float, optional): The initial rating of this competitor. Default: 100.</p>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidRatingValueException: If the initial rating is below the minimum rating.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.ecf.ECFCompetitor.beat">
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/competitors/ecf.html#ECFCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.ecf.ECFCompetitor.beat" title="Permalink to this definition"></a></dt>
+<dd><p>Update ratings after this competitor has won against the given competitor.</p>
+<p>This method updates the ratings of both this competitor and the opponent
+based on the match outcome where this competitor won.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.ecf.ECFCompetitor.expected_score">
+<span class="sig-name descname"><span class="pre">expected_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/elote/competitors/ecf.html#ECFCompetitor.expected_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.ecf.ECFCompetitor.expected_score" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the expected score (probability of winning) against another competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor to compare against.</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: The probability of winning (between 0 and 1).</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.ecf.ECFCompetitor.export_state">
+<span class="sig-name descname"><span class="pre">export_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/elote/competitors/ecf.html#ECFCompetitor.export_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.ecf.ECFCompetitor.export_state" title="Permalink to this definition"></a></dt>
+<dd><p>Export the current state of this competitor for serialization.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>dict: A dictionary containing all necessary information to recreate</dt><dd><p>this competitor’s current state.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.ecf.ECFCompetitor.from_json">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="headerlink" href="#elote.competitors.ecf.ECFCompetitor.from_json" title="Permalink to this definition"></a></dt>
+<dd><p>Create a new competitor from a JSON string.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>json_str (str): A JSON string representing a competitor’s state.</p>
+</dd>
+<dt>Returns:</dt><dd><p>BaseCompetitor: A new competitor with the state from the JSON string.</p>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidStateException: If the JSON string is invalid or incompatible.
+InvalidParameterException: If any parameter in the state is invalid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="elote.competitors.ecf.ECFCompetitor.rating">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rating</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#elote.competitors.ecf.ECFCompetitor.rating" title="Permalink to this definition"></a></dt>
+<dd><p>Get the current rating of this competitor.</p>
+<p>The rating is the average of all scores in the deque.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>float: The current rating.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.ecf.ECFCompetitor.tied">
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/competitors/ecf.html#ECFCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.ecf.ECFCompetitor.tied" title="Permalink to this definition"></a></dt>
+<dd><p>Update ratings after this competitor has tied with the given competitor.</p>
+<p>This method updates the ratings of both this competitor and the opponent
+based on a drawn match outcome.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.ecf.ECFCompetitor.to_json">
+<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#elote.competitors.ecf.ECFCompetitor.to_json" title="Permalink to this definition"></a></dt>
+<dd><p>Convert this competitor’s state to a JSON string.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: A JSON string representing this competitor’s state.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="blendedcompetitor">
+<h2>BlendedCompetitor<a class="headerlink" href="#blendedcompetitor" title="Permalink to this heading"></a></h2>
+</section>
+<section id="serialization">
+<h2>Serialization<a class="headerlink" href="#serialization" title="Permalink to this heading"></a></h2>
+<p>All competitor types in Elote support a standardized serialization format that allows for saving and loading competitor states.
+The serialization format includes the following fields:</p>
+<ul class="simple">
+<li><p><strong>type</strong>: The class name of the competitor</p></li>
+<li><p><strong>version</strong>: The version of the serialization format</p></li>
+<li><p><strong>created_at</strong>: Timestamp when the state was exported</p></li>
+<li><p><strong>id</strong>: A unique identifier for this state export</p></li>
+<li><p><strong>parameters</strong>: The parameters used to initialize the competitor</p></li>
+<li><p><strong>state</strong>: The current state variables of the competitor</p></li>
+<li><p><strong>class_vars</strong>: Class variables for backward compatibility</p></li>
+</ul>
+<p>To serialize a competitor to JSON:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a competitor</span>
+<span class="n">competitor</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
+
+<span class="c1"># Serialize to JSON</span>
+<span class="n">json_str</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>To deserialize a competitor from JSON:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Deserialize from JSON</span>
+<span class="n">competitor</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">json_str</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For backward compatibility, the serialized format also includes flattened parameters and state variables at the top level of the dictionary.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="quickstart.html" class="btn btn-neutral float-left" title="Quick Start Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="arenas.html" class="btn btn-neutral float-right" title="Arenas" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, Will McGinnis.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

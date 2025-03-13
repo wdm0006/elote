@@ -1,0 +1,293 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z43R9PWW0B"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-Z43R9PWW0B');
+    </script>
+    
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Installation &mdash; elote 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=af2ce170"></script>
+      <script src="_static/doctools.js?v=888ff710"></script>
+      <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Quick Start Guide" href="quickstart.html" />
+    <link rel="prev" title="Getting Started" href="getting_started.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            elote
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#basic-installation">Basic Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#development-installation">Development Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#verifying-installation">Verifying Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-optional-dependencies">Installing Optional Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#troubleshooting">Troubleshooting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#numpy-installation-errors">NumPy Installation Errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-conflicts">Version Conflicts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#permission-errors">Permission Errors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#getting-help">Getting Help</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="competitors.html">Competitors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arenas.html">Arenas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/elo.html">Elo Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/ecf.html">ECF Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/dwz.html">DWZ Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/ensemble.html">Ensemble Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/comparison.html">Comparing Rating Systems</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advance_example.html">Advanced Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="use_cases/product_ranking.html">Product Ranking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="use_cases/matchmaking.html">Matchmaking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="use_cases/feature_prioritization.html">Feature Prioritization with Elote</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/competitors.html">Competitors API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/arenas.html">Arenas API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="blog_posts.html">Blog Posts</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to Elote</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">elote</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Installation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h1>
+<p>This guide covers different ways to install Elote for both users and developers.</p>
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading"></a></h2>
+<p>Elote requires:</p>
+<ul class="simple">
+<li><p>Python 3.8 or higher</p></li>
+<li><p>NumPy (automatically installed as a dependency)</p></li>
+</ul>
+</section>
+<section id="basic-installation">
+<h2>Basic Installation<a class="headerlink" href="#basic-installation" title="Permalink to this heading"></a></h2>
+<p>For most users, the simplest way to install Elote is via pip:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>elote
+</pre></div>
+</div>
+<p>This will install the latest stable release from PyPI along with all required dependencies.</p>
+<p>If you prefer using Conda, you can install Elote via pip within your Conda environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>elote-env<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.9
+conda<span class="w"> </span>activate<span class="w"> </span>elote-env
+pip<span class="w"> </span>install<span class="w"> </span>elote
+</pre></div>
+</div>
+</section>
+<section id="development-installation">
+<h2>Development Installation<a class="headerlink" href="#development-installation" title="Permalink to this heading"></a></h2>
+<p>If you want to contribute to Elote or need the latest development version, you can install directly from the GitHub repository:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Using Make (recommended)</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/yourusername/elote.git
+<span class="nb">cd</span><span class="w"> </span>elote
+make<span class="w"> </span>install-dev
+
+<span class="c1"># Or using pip</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/yourusername/elote.git
+<span class="nb">cd</span><span class="w"> </span>elote
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
+
+<span class="c1"># Or using uv</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/yourusername/elote.git
+<span class="nb">cd</span><span class="w"> </span>elote
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
+</pre></div>
+</div>
+<p>The development installation includes additional dependencies needed for testing, linting, and documentation.</p>
+</section>
+<section id="verifying-installation">
+<h2>Verifying Installation<a class="headerlink" href="#verifying-installation" title="Permalink to this heading"></a></h2>
+<p>To verify that Elote is installed correctly, you can run a simple test in Python:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span>
+
+<span class="c1"># Create two competitors</span>
+<span class="n">player1</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
+<span class="n">player2</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1600</span><span class="p">)</span>
+
+<span class="c1"># Calculate expected score</span>
+<span class="n">expected</span> <span class="o">=</span> <span class="n">player2</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Installation successful! Expected score: </span><span class="si">{</span><span class="n">expected</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If this runs without errors, Elote is installed correctly.</p>
+</section>
+<section id="installing-optional-dependencies">
+<h2>Installing Optional Dependencies<a class="headerlink" href="#installing-optional-dependencies" title="Permalink to this heading"></a></h2>
+<p>Elote has several optional dependency groups that can be installed based on your needs:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install with visualization dependencies</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;elote[viz]&quot;</span>
+
+<span class="c1"># Install with all optional dependencies</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;elote[all]&quot;</span>
+
+<span class="c1"># Install development dependencies</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;elote[dev]&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this heading"></a></h2>
+<p>Common installation issues and their solutions:</p>
+<section id="numpy-installation-errors">
+<h3>NumPy Installation Errors<a class="headerlink" href="#numpy-installation-errors" title="Permalink to this heading"></a></h3>
+<p>If you encounter errors related to NumPy installation:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install NumPy separately first</span>
+pip<span class="w"> </span>install<span class="w"> </span>numpy
+pip<span class="w"> </span>install<span class="w"> </span>elote
+</pre></div>
+</div>
+</section>
+<section id="version-conflicts">
+<h3>Version Conflicts<a class="headerlink" href="#version-conflicts" title="Permalink to this heading"></a></h3>
+<p>If you have version conflicts with other packages:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a virtual environment</span>
+python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>elote-env
+<span class="nb">source</span><span class="w"> </span>elote-env/bin/activate<span class="w">  </span><span class="c1"># On Windows: elote-env\Scripts\activate</span>
+pip<span class="w"> </span>install<span class="w"> </span>elote
+</pre></div>
+</div>
+</section>
+<section id="permission-errors">
+<h3>Permission Errors<a class="headerlink" href="#permission-errors" title="Permalink to this heading"></a></h3>
+<p>If you encounter permission errors during installation:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install for the current user only</span>
+pip<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>elote
+
+<span class="c1"># Or use a virtual environment (recommended)</span>
+python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>elote-env
+<span class="nb">source</span><span class="w"> </span>elote-env/bin/activate
+pip<span class="w"> </span>install<span class="w"> </span>elote
+</pre></div>
+</div>
+</section>
+</section>
+<section id="getting-help">
+<h2>Getting Help<a class="headerlink" href="#getting-help" title="Permalink to this heading"></a></h2>
+<p>If you continue to experience installation issues:</p>
+<ol class="arabic simple">
+<li><p>Check the <a class="reference external" href="https://github.com/yourusername/elote/issues">GitHub Issues</a> to see if others have encountered the same problem</p></li>
+<li><p>Open a new issue with details about your environment and the error messages</p></li>
+<li><p>Reach out to the community for help</p></li>
+</ol>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="quickstart.html" class="btn btn-neutral float-right" title="Quick Start Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, Will McGinnis.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

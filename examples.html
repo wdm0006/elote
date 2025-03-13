@@ -1,0 +1,672 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z43R9PWW0B"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-Z43R9PWW0B');
+    </script>
+    
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Examples &mdash; elote 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=af2ce170"></script>
+      <script src="_static/doctools.js?v=888ff710"></script>
+      <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Advanced Examples" href="advance_example.html" />
+    <link rel="prev" title="Comparing Rating Systems" href="rating_systems/comparison.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            elote
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="competitors.html">Competitors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arenas.html">Arenas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/elo.html">Elo Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/ecf.html">ECF Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/dwz.html">DWZ Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/ensemble.html">Ensemble Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/comparison.html">Comparing Rating Systems</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sample-bout">Sample Bout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#bout-with-initialization">Bout with Initialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#bout-with-ties">Bout with Ties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#prediction">Prediction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sample-arena">Sample Arena</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dwz-arena">DWZ Arena</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ecf-arena">ECF Arena</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#glicko-arena">Glicko Arena</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#persisting-state-from-an-arena">Persisting State from an Arena</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#serializing-and-deserializing-competitors">Serializing and Deserializing Competitors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="advance_example.html">Advanced Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="use_cases/product_ranking.html">Product Ranking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="use_cases/matchmaking.html">Matchmaking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="use_cases/feature_prioritization.html">Feature Prioritization with Elote</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/competitors.html">Competitors API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/arenas.html">Arenas API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="blog_posts.html">Blog Posts</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to Elote</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">elote</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Examples</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/examples.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="examples">
+<h1>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h1>
+<section id="sample-bout">
+<h2>Sample Bout<a class="headerlink" href="#sample-bout" title="Permalink to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span>
+
+<span class="n">good</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">()</span>
+<span class="n">better</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">()</span>
+<span class="n">best</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Starting ratings:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">After matches&#39;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">better</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">good</span><span class="p">)</span>
+    <span class="n">best</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">better</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Starting</span> <span class="n">ratings</span><span class="p">:</span>
+ <span class="mf">400.00</span><span class="p">,</span>  <span class="mf">400.00</span><span class="p">,</span>  <span class="mf">400.00</span>
+
+<span class="n">After</span> <span class="n">matches</span>
+ <span class="mf">384.00</span><span class="p">,</span>  <span class="mf">399.26</span><span class="p">,</span>  <span class="mf">416.74</span>
+ <span class="mf">368.70</span><span class="p">,</span>  <span class="mf">398.66</span><span class="p">,</span>  <span class="mf">432.64</span>
+ <span class="mf">354.08</span><span class="p">,</span>  <span class="mf">398.18</span><span class="p">,</span>  <span class="mf">447.75</span>
+ <span class="mf">340.10</span><span class="p">,</span>  <span class="mf">397.79</span><span class="p">,</span>  <span class="mf">462.11</span>
+ <span class="mf">326.73</span><span class="p">,</span>  <span class="mf">397.49</span><span class="p">,</span>  <span class="mf">475.78</span>
+ <span class="mf">313.95</span><span class="p">,</span>  <span class="mf">397.25</span><span class="p">,</span>  <span class="mf">488.80</span>
+ <span class="mf">301.71</span><span class="p">,</span>  <span class="mf">397.08</span><span class="p">,</span>  <span class="mf">501.21</span>
+ <span class="mf">289.99</span><span class="p">,</span>  <span class="mf">396.95</span><span class="p">,</span>  <span class="mf">513.05</span>
+ <span class="mf">278.77</span><span class="p">,</span>  <span class="mf">396.87</span><span class="p">,</span>  <span class="mf">524.36</span>
+ <span class="mf">268.01</span><span class="p">,</span>  <span class="mf">396.81</span><span class="p">,</span>  <span class="mf">535.18</span>
+</pre></div>
+</div>
+</section>
+<section id="bout-with-initialization">
+<h2>Bout with Initialization<a class="headerlink" href="#bout-with-initialization" title="Permalink to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span>
+
+<span class="n">good</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+<span class="n">better</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">450</span><span class="p">)</span>
+<span class="n">best</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Starting ratings:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">After matches&#39;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+    <span class="n">better</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">good</span><span class="p">)</span>
+    <span class="n">best</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">better</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Starting</span> <span class="n">ratings</span><span class="p">:</span>
+ <span class="mf">500.00</span><span class="p">,</span>  <span class="mf">450.00</span><span class="p">,</span>  <span class="mf">400.00</span>
+
+<span class="n">After</span> <span class="n">matches</span>
+ <span class="mf">481.71</span><span class="p">,</span>  <span class="mf">449.18</span><span class="p">,</span>  <span class="mf">419.10</span>
+ <span class="mf">464.22</span><span class="p">,</span>  <span class="mf">448.50</span><span class="p">,</span>  <span class="mf">437.28</span>
+ <span class="mf">447.50</span><span class="p">,</span>  <span class="mf">447.94</span><span class="p">,</span>  <span class="mf">454.57</span>
+ <span class="mf">431.52</span><span class="p">,</span>  <span class="mf">447.49</span><span class="p">,</span>  <span class="mf">471.00</span>
+ <span class="mf">416.25</span><span class="p">,</span>  <span class="mf">447.13</span><span class="p">,</span>  <span class="mf">486.62</span>
+ <span class="mf">401.67</span><span class="p">,</span>  <span class="mf">446.86</span><span class="p">,</span>  <span class="mf">501.47</span>
+ <span class="mf">387.74</span><span class="p">,</span>  <span class="mf">446.65</span><span class="p">,</span>  <span class="mf">515.61</span>
+ <span class="mf">374.43</span><span class="p">,</span>  <span class="mf">446.51</span><span class="p">,</span>  <span class="mf">529.07</span>
+ <span class="mf">361.70</span><span class="p">,</span>  <span class="mf">446.41</span><span class="p">,</span>  <span class="mf">541.89</span>
+ <span class="mf">349.52</span><span class="p">,</span>  <span class="mf">446.35</span><span class="p">,</span>  <span class="mf">554.13</span>
+ <span class="mf">337.87</span><span class="p">,</span>  <span class="mf">446.32</span><span class="p">,</span>  <span class="mf">565.81</span>
+ <span class="mf">326.71</span><span class="p">,</span>  <span class="mf">446.31</span><span class="p">,</span>  <span class="mf">576.98</span>
+ <span class="mf">316.01</span><span class="p">,</span>  <span class="mf">446.33</span><span class="p">,</span>  <span class="mf">587.66</span>
+ <span class="mf">305.74</span><span class="p">,</span>  <span class="mf">446.36</span><span class="p">,</span>  <span class="mf">597.90</span>
+ <span class="mf">295.89</span><span class="p">,</span>  <span class="mf">446.40</span><span class="p">,</span>  <span class="mf">607.71</span>
+ <span class="mf">286.42</span><span class="p">,</span>  <span class="mf">446.45</span><span class="p">,</span>  <span class="mf">617.13</span>
+ <span class="mf">277.31</span><span class="p">,</span>  <span class="mf">446.51</span><span class="p">,</span>  <span class="mf">626.19</span>
+ <span class="mf">268.53</span><span class="p">,</span>  <span class="mf">446.57</span><span class="p">,</span>  <span class="mf">634.89</span>
+ <span class="mf">260.08</span><span class="p">,</span>  <span class="mf">446.64</span><span class="p">,</span>  <span class="mf">643.28</span>
+ <span class="mf">251.93</span><span class="p">,</span>  <span class="mf">446.70</span><span class="p">,</span>  <span class="mf">651.36</span>
+</pre></div>
+</div>
+</section>
+<section id="bout-with-ties">
+<h2>Bout with Ties<a class="headerlink" href="#bout-with-ties" title="Permalink to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span>
+
+<span class="n">good</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+<span class="n">better</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">450</span><span class="p">)</span>
+<span class="n">best</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+<span class="n">also_best</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Starting ratings:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">also_best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">After matches&#39;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+    <span class="n">better</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">good</span><span class="p">)</span>
+    <span class="n">better</span><span class="o">.</span><span class="n">lost_to</span><span class="p">(</span><span class="n">best</span><span class="p">)</span>
+    <span class="n">best</span><span class="o">.</span><span class="n">tied</span><span class="p">(</span><span class="n">also_best</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">also_best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Starting</span> <span class="n">ratings</span><span class="p">:</span>
+ <span class="mf">500.00</span><span class="p">,</span>  <span class="mf">450.00</span><span class="p">,</span>  <span class="mf">400.00</span><span class="p">,</span>  <span class="mf">400.00</span>
+
+<span class="n">After</span> <span class="n">matches</span>
+ <span class="mf">481.71</span><span class="p">,</span>  <span class="mf">449.18</span><span class="p">,</span>  <span class="mf">418.23</span><span class="p">,</span>  <span class="mf">400.88</span>
+ <span class="mf">464.22</span><span class="p">,</span>  <span class="mf">448.46</span><span class="p">,</span>  <span class="mf">434.81</span><span class="p">,</span>  <span class="mf">402.51</span>
+ <span class="mf">447.49</span><span class="p">,</span>  <span class="mf">447.79</span><span class="p">,</span>  <span class="mf">449.93</span><span class="p">,</span>  <span class="mf">404.78</span>
+ <span class="mf">431.51</span><span class="p">,</span>  <span class="mf">447.14</span><span class="p">,</span>  <span class="mf">463.75</span><span class="p">,</span>  <span class="mf">407.60</span>
+ <span class="mf">416.23</span><span class="p">,</span>  <span class="mf">446.48</span><span class="p">,</span>  <span class="mf">476.42</span><span class="p">,</span>  <span class="mf">410.87</span>
+ <span class="mf">401.62</span><span class="p">,</span>  <span class="mf">445.80</span><span class="p">,</span>  <span class="mf">488.06</span><span class="p">,</span>  <span class="mf">414.53</span>
+ <span class="mf">387.64</span><span class="p">,</span>  <span class="mf">445.07</span><span class="p">,</span>  <span class="mf">498.78</span><span class="p">,</span>  <span class="mf">418.51</span>
+ <span class="mf">374.26</span><span class="p">,</span>  <span class="mf">444.30</span><span class="p">,</span>  <span class="mf">508.69</span><span class="p">,</span>  <span class="mf">422.75</span>
+ <span class="mf">361.44</span><span class="p">,</span>  <span class="mf">443.48</span><span class="p">,</span>  <span class="mf">517.86</span><span class="p">,</span>  <span class="mf">427.22</span>
+ <span class="mf">349.15</span><span class="p">,</span>  <span class="mf">442.60</span><span class="p">,</span>  <span class="mf">526.39</span><span class="p">,</span>  <span class="mf">431.86</span>
+ <span class="mf">337.36</span><span class="p">,</span>  <span class="mf">441.66</span><span class="p">,</span>  <span class="mf">534.33</span><span class="p">,</span>  <span class="mf">436.65</span>
+ <span class="mf">326.02</span><span class="p">,</span>  <span class="mf">440.68</span><span class="p">,</span>  <span class="mf">541.75</span><span class="p">,</span>  <span class="mf">441.55</span>
+ <span class="mf">315.12</span><span class="p">,</span>  <span class="mf">439.64</span><span class="p">,</span>  <span class="mf">548.70</span><span class="p">,</span>  <span class="mf">446.54</span>
+ <span class="mf">304.62</span><span class="p">,</span>  <span class="mf">438.56</span><span class="p">,</span>  <span class="mf">555.22</span><span class="p">,</span>  <span class="mf">451.60</span>
+ <span class="mf">294.50</span><span class="p">,</span>  <span class="mf">437.44</span><span class="p">,</span>  <span class="mf">561.36</span><span class="p">,</span>  <span class="mf">456.71</span>
+ <span class="mf">284.73</span><span class="p">,</span>  <span class="mf">436.28</span><span class="p">,</span>  <span class="mf">567.15</span><span class="p">,</span>  <span class="mf">461.84</span>
+ <span class="mf">275.30</span><span class="p">,</span>  <span class="mf">435.09</span><span class="p">,</span>  <span class="mf">572.62</span><span class="p">,</span>  <span class="mf">466.99</span>
+ <span class="mf">266.18</span><span class="p">,</span>  <span class="mf">433.87</span><span class="p">,</span>  <span class="mf">577.81</span><span class="p">,</span>  <span class="mf">472.14</span>
+ <span class="mf">257.35</span><span class="p">,</span>  <span class="mf">432.62</span><span class="p">,</span>  <span class="mf">582.74</span><span class="p">,</span>  <span class="mf">477.28</span>
+ <span class="mf">248.80</span><span class="p">,</span>  <span class="mf">431.35</span><span class="p">,</span>  <span class="mf">587.44</span><span class="p">,</span>  <span class="mf">482.40</span>
+</pre></div>
+</div>
+</section>
+<section id="prediction">
+<h2>Prediction<a class="headerlink" href="#prediction" title="Permalink to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span>
+
+<span class="n">good</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+<span class="n">better</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;probability of better beating good: </span><span class="si">%5.2f%%</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">better</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">good</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;probability of good beating better: </span><span class="si">%5.2f%%</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">better</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="p">))</span>
+
+<span class="n">good</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">better</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;probability of better beating good: </span><span class="si">%5.2f%%</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">better</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">good</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;probability of good beating better: </span><span class="si">%5.2f%%</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">better</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">probability</span> <span class="n">of</span> <span class="n">better</span> <span class="n">beating</span> <span class="n">good</span><span class="p">:</span> <span class="mf">64.01</span><span class="o">%</span>
+<span class="n">probability</span> <span class="n">of</span> <span class="n">good</span> <span class="n">beating</span> <span class="n">better</span><span class="p">:</span> <span class="mf">35.99</span><span class="o">%</span>
+<span class="n">probability</span> <span class="n">of</span> <span class="n">better</span> <span class="n">beating</span> <span class="n">good</span><span class="p">:</span> <span class="mf">58.42</span><span class="o">%</span>
+<span class="n">probability</span> <span class="n">of</span> <span class="n">good</span> <span class="n">beating</span> <span class="n">better</span><span class="p">:</span> <span class="mf">41.58</span><span class="o">%</span>
+</pre></div>
+</div>
+</section>
+<section id="sample-arena">
+<h2>Sample Arena<a class="headerlink" href="#sample-arena" title="Permalink to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">LambdaArena</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+
+
+<span class="c1"># sample bout function which just compares the two inputs</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">func</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="n">b</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="n">b</span>
+
+<span class="c1"># Configure the EloCompetitor class with a moderate k_factor</span>
+<span class="c1"># Note: Using a more moderate k_factor (20) to prevent ratings from changing too drastically</span>
+<span class="n">matchups</span> <span class="o">=</span> <span class="p">[(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)]</span>
+
+<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">set_competitor_class_var</span><span class="p">(</span><span class="s1">&#39;_k_factor&#39;</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<span class="c1"># Using 1200 as initial rating (standard chess starting rating) to prevent negative ratings</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">,</span> <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1200</span><span class="p">})</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arena results:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Arena</span> <span class="n">results</span><span class="p">:</span>
+<span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1013.2827659706424</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1058.4698600862191</span>
+    <span class="p">},</span>
+    <span class="o">...</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1328.7158907591229</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1435.6511383857194</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="dwz-arena">
+<h2>DWZ Arena<a class="headerlink" href="#dwz-arena" title="Permalink to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">LambdaArena</span><span class="p">,</span> <span class="n">DWZCompetitor</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+
+
+<span class="c1"># sample bout function which just compares the two inputs</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">func</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="n">b</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="n">b</span>
+
+
+<span class="n">matchups</span> <span class="o">=</span> <span class="p">[(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)]</span>
+
+<span class="c1"># Create arena with DWZCompetitor and set higher initial rating</span>
+<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span>
+    <span class="n">func</span><span class="p">,</span>
+    <span class="n">base_competitor</span><span class="o">=</span><span class="n">DWZCompetitor</span><span class="p">,</span>
+    <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1200</span><span class="p">}</span>
+<span class="p">)</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arena results:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Arena</span> <span class="n">results</span><span class="p">:</span>
+<span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1012.72183429478434</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1044.28657694745118</span>
+    <span class="p">},</span>
+    <span class="o">...</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1358.7172315502228</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1411.6297448123669</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="ecf-arena">
+<h2>ECF Arena<a class="headerlink" href="#ecf-arena" title="Permalink to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">LambdaArena</span><span class="p">,</span> <span class="n">ECFCompetitor</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+
+
+<span class="c1"># sample bout function which just compares the two inputs</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">func</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="n">b</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="n">b</span>
+
+
+<span class="n">matchups</span> <span class="o">=</span> <span class="p">[(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)]</span>
+
+<span class="c1"># Create arena with ECFCompetitor</span>
+<span class="c1"># Note: ECFCompetitor now has a default initial rating of 100 (minimum rating)</span>
+<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">ECFCompetitor</span><span class="p">)</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arena results:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Arena</span> <span class="n">results</span><span class="p">:</span>
+<span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">100.0</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">106.99453852992116</span>
+    <span class="p">},</span>
+    <span class="o">...</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">134.9562091605315</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">145.9090955086219</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="glicko-arena">
+<h2>Glicko Arena<a class="headerlink" href="#glicko-arena" title="Permalink to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">LambdaArena</span><span class="p">,</span> <span class="n">GlickoCompetitor</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+
+
+<span class="c1"># sample bout function which just compares the two inputs</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">func</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="n">b</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="n">b</span>
+
+<span class="n">matchups</span> <span class="o">=</span> <span class="p">[(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)]</span>
+
+<span class="c1"># Create arena with GlickoCompetitor and set higher initial rating in constructor</span>
+<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span>
+    <span class="n">func</span><span class="p">,</span>
+    <span class="n">base_competitor</span><span class="o">=</span><span class="n">GlickoCompetitor</span><span class="p">,</span>
+    <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1500</span><span class="p">}</span>
+<span class="p">)</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arena results:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Arena</span> <span class="n">results</span><span class="p">:</span>
+<span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1126.83348029853865</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1395.7055271953318</span>
+    <span class="p">},</span>
+    <span class="o">...</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">2421.232857002417</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">2984.275564273142</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="persisting-state-from-an-arena">
+<h2>Persisting State from an Arena<a class="headerlink" href="#persisting-state-from-an-arena" title="Permalink to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">LambdaArena</span><span class="p">,</span> <span class="n">GlickoCompetitor</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+
+
+<span class="c1"># sample bout function which just compares the two inputs</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">func</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="n">b</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="n">b</span>
+
+
+<span class="c1"># start scoring, stop and save state</span>
+<span class="n">matchups</span> <span class="o">=</span> <span class="p">[(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+<span class="c1"># Create arena with GlickoCompetitor and set higher initial rating</span>
+<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span>
+    <span class="n">func</span><span class="p">,</span>
+    <span class="n">base_competitor</span><span class="o">=</span><span class="n">GlickoCompetitor</span><span class="p">,</span>
+    <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1500</span><span class="p">}</span>
+<span class="p">)</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arena results:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+
+<span class="c1"># Export state and create a deep copy to avoid modifying the original</span>
+<span class="n">saved_state</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">export_state</span><span class="p">())</span>
+
+<span class="c1"># Create a new arena with the saved state</span>
+<span class="n">matchups</span> <span class="o">=</span> <span class="p">[(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">)]</span>
+<span class="n">new_arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">GlickoCompetitor</span><span class="p">)</span>
+
+<span class="c1"># Use from_state to recreate competitors</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">saved_state</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">new_arena</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">GlickoCompetitor</span><span class="o">.</span><span class="n">from_state</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+<span class="c1"># Run more matches</span>
+<span class="n">new_arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arena results:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">new_arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Arena</span> <span class="n">results</span><span class="p">:</span>
+<span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1455.4305146831251</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1515.7289656415517</span>
+    <span class="p">},</span>
+    <span class="o">...</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1673.3452669422734</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1967.7914038679244</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+<span class="n">Arena</span> <span class="n">results</span><span class="p">:</span>
+<span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1304.09061767108824</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1339.4265505050406</span>
+    <span class="p">},</span>
+    <span class="o">...</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">2253.7482792356805</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">2403.5118562872744</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="serializing-and-deserializing-competitors">
+<h2>Serializing and Deserializing Competitors<a class="headerlink" href="#serializing-and-deserializing-competitors" title="Permalink to this heading"></a></h2>
+<p>Elote provides a standardized serialization format for all competitor types. This example shows how to serialize and deserialize competitors:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+<span class="c1"># Create a competitor</span>
+<span class="n">competitor</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
+
+<span class="c1"># Simulate some matches</span>
+<span class="n">competitor</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1400</span><span class="p">))</span>
+<span class="n">competitor</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1450</span><span class="p">))</span>
+<span class="n">competitor</span><span class="o">.</span><span class="n">lost_to</span><span class="p">(</span><span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1600</span><span class="p">))</span>
+
+<span class="c1"># Serialize to JSON</span>
+<span class="n">json_str</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span>
+
+<span class="c1"># Print the serialized JSON (formatted for readability)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Serialized competitor:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_str</span><span class="p">),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+
+<span class="c1"># Deserialize from JSON</span>
+<span class="n">new_competitor</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">json_str</span><span class="p">)</span>
+
+<span class="c1"># Verify the ratings match</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Original rating: </span><span class="si">{</span><span class="n">competitor</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Deserialized rating: </span><span class="si">{</span><span class="n">new_competitor</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Continue using the deserialized competitor</span>
+<span class="n">new_competitor</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1450</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Updated rating after another match: </span><span class="si">{</span><span class="n">new_competitor</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Serialized</span> <span class="n">competitor</span><span class="p">:</span>
+<span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;EloCompetitor&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;created_at&quot;</span><span class="p">:</span> <span class="mi">1625097600</span><span class="p">,</span>
+    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;550e8400-e29b-41d4-a716-446655440000&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1500</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1524.32</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;class_vars&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;k_factor&quot;</span><span class="p">:</span> <span class="mi">32</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1500</span><span class="p">,</span>
+    <span class="s2">&quot;current_rating&quot;</span><span class="p">:</span> <span class="mf">1524.32</span>
+<span class="p">}</span>
+<span class="n">Original</span> <span class="n">rating</span><span class="p">:</span> <span class="mf">1524.32</span>
+<span class="n">Deserialized</span> <span class="n">rating</span><span class="p">:</span> <span class="mf">1524.32</span>
+<span class="n">Updated</span> <span class="n">rating</span> <span class="n">after</span> <span class="n">another</span> <span class="n">match</span><span class="p">:</span> <span class="mf">1536.64</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rating_systems/comparison.html" class="btn btn-neutral float-left" title="Comparing Rating Systems" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="advance_example.html" class="btn btn-neutral float-right" title="Advanced Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, Will McGinnis.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
