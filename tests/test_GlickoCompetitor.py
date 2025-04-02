@@ -1,7 +1,8 @@
 import unittest
 import math
+from datetime import datetime, timedelta
 from elote import GlickoCompetitor, EloCompetitor
-from elote.competitors.base import MissMatchedCompetitorTypesException
+from elote.competitors.base import MissMatchedCompetitorTypesException, InvalidParameterException
 
 
 class TestGlicko(unittest.TestCase):
@@ -44,6 +45,11 @@ class TestGlicko(unittest.TestCase):
         self.assertEqual(player.rating, 2000)
         self.assertEqual(player.rd, 200)
 
+        # Test with initial time
+        initial_time = datetime(2020, 1, 1)
+        player = GlickoCompetitor(initial_rating=1500, initial_rd=350, initial_time=initial_time)
+        self.assertEqual(player._last_activity, initial_time)
+
     def test_transformed_rd(self):
         """Test that the transformed RD is calculated correctly."""
         # Test with default parameters
@@ -52,8 +58,8 @@ class TestGlicko(unittest.TestCase):
 
         # Test with a small RD
         player = GlickoCompetitor(initial_rd=100)
-        # The transformed RD should be sqrt(100^2 + 1^2) = sqrt(10001) ≈ 100.005
-        self.assertAlmostEqual(player.tranformed_rd, math.sqrt(100**2 + 1**2), places=2)
+        # The transformed RD should be sqrt(100^2 + c^2) where c = 34.6
+        self.assertAlmostEqual(player.tranformed_rd, math.sqrt(100**2 + 34.6**2), places=2)
 
         # Test with a large RD
         player = GlickoCompetitor(initial_rd=400)
@@ -97,9 +103,6 @@ class TestGlicko(unittest.TestCase):
 
         self.assertAlmostEqual(player1.expected_score(player2), expected_score, places=5)
 
-        # The sum of expected scores should not necessarily be 1.0 in Glicko
-        # because each player uses their own RD in the calculation
-
     def test_tied_match(self):
         """Test that tied matches update ratings correctly."""
         player1 = GlickoCompetitor(initial_rating=1500, initial_rd=350)
@@ -135,9 +138,65 @@ class TestGlicko(unittest.TestCase):
         self.assertLess(player1.rating, initial_rating1)
         self.assertGreater(player2.rating, initial_rating2)
 
+    def test_time_based_rd_update(self):
+        """Test that RD increases correctly over time."""
+        initial_time = datetime(2020, 1, 1)
+        player = GlickoCompetitor(initial_rating=1500, initial_rd=50, initial_time=initial_time)
+
+        # Test RD increase after one rating period (1 day by default)
+        current_time = initial_time + timedelta(days=1)
+        player.update_rd_for_inactivity(current_time)
+        expected_rd = math.sqrt(50**2 + 34.6**2)  # One period of RD increase
+        self.assertAlmostEqual(player.rd, expected_rd, places=2)
+
+        # Test RD increase after 100 rating periods
+        current_time = initial_time + timedelta(days=100)
+        player = GlickoCompetitor(initial_rating=1500, initial_rd=50, initial_time=initial_time)
+        player.update_rd_for_inactivity(current_time)
+        # After 100 periods, RD should be close to 350 as per Glickman's paper
+        self.assertAlmostEqual(player.rd, 350, delta=1)
+
+        # Test that RD is capped at 350
+        current_time = initial_time + timedelta(days=200)
+        player = GlickoCompetitor(initial_rating=1500, initial_rd=50, initial_time=initial_time)
+        player.update_rd_for_inactivity(current_time)
+        self.assertEqual(player.rd, 350)
+
+    def test_match_with_time(self):
+        """Test that matches can be recorded with specific times."""
+        initial_time = datetime(2020, 1, 1)
+        match_time = datetime(2020, 1, 10)  # 10 days later
+
+        player1 = GlickoCompetitor(initial_rating=1500, initial_rd=50, initial_time=initial_time)
+        player2 = GlickoCompetitor(initial_rating=1500, initial_rd=50, initial_time=initial_time)
+
+        # RD should increase for both players due to inactivity
+        player1.beat(player2, match_time=match_time)
+
+        # Both players should have their last activity time updated
+        self.assertEqual(player1._last_activity, match_time)
+        self.assertEqual(player2._last_activity, match_time)
+
+        # RDs should have increased before the match
+        self.assertGreater(player1.rd, 50)
+        self.assertGreater(player2.rd, 50)
+
+    def test_invalid_match_time(self):
+        """Test that matches cannot be recorded with invalid times."""
+        initial_time = datetime(2020, 1, 10)
+        match_time = datetime(2020, 1, 1)  # Before initial time
+
+        player1 = GlickoCompetitor(initial_rating=1500, initial_rd=50, initial_time=initial_time)
+        player2 = GlickoCompetitor(initial_rating=1500, initial_rd=50, initial_time=initial_time)
+
+        # Should raise an exception for match time before initial time
+        with self.assertRaises(InvalidParameterException):
+            player1.beat(player2, match_time=match_time)
+
     def test_export_state(self):
         """Test that the state can be exported correctly."""
-        player = GlickoCompetitor(initial_rating=1800, initial_rd=100)
+        initial_time = datetime(2020, 1, 1)
+        player = GlickoCompetitor(initial_rating=1800, initial_rd=100, initial_time=initial_time)
 
         # Export the state
         state = player.export_state()
@@ -145,12 +204,15 @@ class TestGlicko(unittest.TestCase):
         # Check that the state contains the correct information
         self.assertEqual(state["initial_rating"], 1800)
         self.assertEqual(state["initial_rd"], 100)
+        self.assertEqual(state["last_activity"], initial_time.isoformat())
 
         # Check that class variables are included (without underscore prefix)
         self.assertIn("c", state["class_vars"])
-        self.assertEqual(state["class_vars"]["c"], 1)
+        self.assertEqual(state["class_vars"]["c"], 34.6)
         self.assertIn("q", state["class_vars"])
         self.assertEqual(state["class_vars"]["q"], 0.0057565)
+        self.assertIn("rating_period_days", state["class_vars"])
+        self.assertEqual(state["class_vars"]["rating_period_days"], 1.0)
 
     def test_exceptions(self):
         """Test that the correct exceptions are raised."""

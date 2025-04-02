@@ -45,7 +45,7 @@ except ImportError:
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "sphinx.ext.autodoc", 
+    "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
     "sphinx_rtd_dark_mode",
     "sphinxcontrib.googleanalytics",

@@ -119,12 +119,13 @@ class History:
             upper_threshold: The upper threshold for prediction (above this is a prediction for the first competitor)
 
         Returns:
-            A dictionary with confusion matrix metrics: {'tp': int, 'fp': int, 'tn': int, 'fn': int}
+            A dictionary with confusion matrix metrics: {'tp': int, 'fp': int, 'tn': int, 'fn': int, 'undecided': int}
         """
         true_positives = 0
         false_positives = 0
         true_negatives = 0
         false_negatives = 0
+        undecided = 0
 
         for bout in self.bouts:
             # Extract the actual winner and predicted probability
@@ -145,14 +146,13 @@ class History:
             elif predicted_prob is None:
                 continue
 
-            # Determine the predicted winner based on thresholds
+            # Determine the predicted outcome
             if predicted_prob > upper_threshold:
                 predicted_winner = "a"
             elif predicted_prob < lower_threshold:
                 predicted_winner = "b"
             else:
-                # This is an uncertain prediction - skip it for confusion matrix calculation
-                continue
+                predicted_winner = "draw"
 
             # Normalize actual winner to 'a', 'b', or 'draw'
             if isinstance(actual_winner, str):
@@ -162,7 +162,6 @@ class History:
                 elif actual_winner in ["b", "loss", "false", "0"]:
                     actual_winner = "b"
                 else:
-                    # Treat other values as draw
                     actual_winner = "draw"
             elif isinstance(actual_winner, (int, float)):
                 if actual_winner == 1:
@@ -179,24 +178,32 @@ class History:
                 continue
 
             # Update confusion matrix
-            if actual_winner == "a":
-                if predicted_winner == "a":
+            if predicted_winner == "draw":
+                if actual_winner == "draw":
+                    true_positives += 1  # Correctly predicted draw
+                else:
+                    false_positives += 1  # Incorrectly predicted draw
+            elif actual_winner == "draw":
+                false_negatives += 1  # Failed to predict draw
+            elif predicted_winner == "a":
+                if actual_winner == "a":
                     true_positives += 1
-                elif predicted_winner == "b":
-                    false_negatives += 1
-            elif actual_winner == "b":
-                if predicted_winner == "b":
-                    true_negatives += 1
-                elif predicted_winner == "a":
+                else:
                     false_positives += 1
-            else:  # actual_winner == "draw"
-                if predicted_winner == "a":
-                    false_positives += 1  # Predicted a win but was a draw
-                else:  # predicted_winner == "b"
-                    false_negatives += 1  # Predicted b win but was a draw
+            elif predicted_winner == "b":
+                if actual_winner == "b":
+                    true_negatives += 1
+                else:
+                    false_negatives += 1
 
         # Return results as a dictionary
-        return {"tp": true_positives, "fp": false_positives, "tn": true_negatives, "fn": false_negatives}
+        return {
+            "tp": true_positives,
+            "fp": false_positives,
+            "tn": true_negatives,
+            "fn": false_negatives,
+            "undecided": undecided,
+        }
 
     def random_search(self, trials=1000):
         """Search for optimal prediction thresholds using random sampling.

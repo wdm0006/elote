@@ -1,5 +1,6 @@
 import math
-from typing import Dict, Any, ClassVar, Tuple, Type, TypeVar
+from typing import Dict, Any, ClassVar, Tuple, Type, TypeVar, Optional
+from datetime import datetime
 
 from elote.competitors.base import BaseCompetitor, InvalidRatingValueException, InvalidParameterException
 
@@ -17,19 +18,25 @@ class GlickoCompetitor(BaseCompetitor):
     the reliability of the rating. A higher RD indicates a less reliable rating.
 
     Class Attributes:
-        _c (float): Constant that determines how quickly the RD increases over time. Default: 1.
+        _c (float): Rating volatility constant that determines how quickly the RD increases over time.
+                   Default: 34.6, which is calibrated so that it takes about 100 rating periods
+                   for a player's RD to grow from 50 to 350 (maximum uncertainty).
         _q (float): Scaling factor used in the rating calculation. Default: 0.0057565.
+        _rating_period_days (float): Number of days that constitute one rating period.
+                                   Default: 1.0 (one day per rating period).
     """
 
-    _c: ClassVar[float] = 1
+    _c: ClassVar[float] = 34.6  # sqrt((350^2 - 50^2)/100) as per Glickman's paper
     _q: ClassVar[float] = 0.0057565
+    _rating_period_days: ClassVar[float] = 1.0
 
-    def __init__(self, initial_rating: float = 1500, initial_rd: float = 350):
+    def __init__(self, initial_rating: float = 1500, initial_rd: float = 350, initial_time: Optional[datetime] = None):
         """Initialize a Glicko competitor.
 
         Args:
             initial_rating (float, optional): The initial rating of this competitor. Default: 1500.
             initial_rd (float, optional): The initial rating deviation of this competitor. Default: 350.
+            initial_time (datetime, optional): The initial timestamp for this competitor. Default: current time.
 
         Raises:
             InvalidRatingValueException: If the initial rating is below the minimum rating.
@@ -47,6 +54,7 @@ class GlickoCompetitor(BaseCompetitor):
         self._initial_rd = initial_rd
         self._rating = initial_rating
         self.rd = initial_rd
+        self._last_activity = initial_time if initial_time is not None else datetime.now()
 
     def __repr__(self) -> str:
         """Return a string representation of this competitor.
@@ -84,6 +92,7 @@ class GlickoCompetitor(BaseCompetitor):
         return {
             "rating": self._rating,
             "rd": self.rd,
+            "last_activity": self._last_activity.isoformat(),
         }
 
     def _import_parameters(self, parameters: Dict[str, Any]) -> None:
@@ -129,6 +138,12 @@ class GlickoCompetitor(BaseCompetitor):
         if rd <= 0:
             raise InvalidParameterException("RD must be positive")
         self.rd = rd
+
+        # Set last activity time
+        if "last_activity" in state:
+            self._last_activity = datetime.fromisoformat(state["last_activity"])
+        else:
+            self._last_activity = datetime.now()
 
     @classmethod
     def _create_from_parameters(cls: Type[T], parameters: Dict[str, Any]) -> T:
@@ -268,7 +283,7 @@ class GlickoCompetitor(BaseCompetitor):
         E = 1 / (1 + 10 ** ((-1 * g_term * (self._rating - competitor.rating)) / 400))
         return E
 
-    def beat(self, competitor: "GlickoCompetitor") -> None:
+    def beat(self, competitor: "GlickoCompetitor", match_time: Optional[datetime] = None) -> None:
         """Update ratings after this competitor has won against the given competitor.
 
         This method updates the ratings of both this competitor and the opponent
@@ -276,14 +291,15 @@ class GlickoCompetitor(BaseCompetitor):
 
         Args:
             competitor (GlickoCompetitor): The opponent competitor that lost.
+            match_time (datetime, optional): The time when the match occurred. Default: current time.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
-        self._compute_match_result(competitor, s=1)
+        self._compute_match_result(competitor, s=1, match_time=match_time)
 
-    def tied(self, competitor: "GlickoCompetitor") -> None:
+    def tied(self, competitor: "GlickoCompetitor", match_time: Optional[datetime] = None) -> None:
         """Update ratings after this competitor has tied with the given competitor.
 
         This method updates the ratings of both this competitor and the opponent
@@ -291,23 +307,41 @@ class GlickoCompetitor(BaseCompetitor):
 
         Args:
             competitor (GlickoCompetitor): The opponent competitor that tied.
+            match_time (datetime, optional): The time when the match occurred. Default: current time.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
-        self._compute_match_result(competitor, s=0.5)
+        self._compute_match_result(competitor, s=0.5, match_time=match_time)
 
-    def _compute_match_result(self, competitor: "GlickoCompetitor", s: float) -> None:
+    def _compute_match_result(
+        self, competitor: "GlickoCompetitor", s: float, match_time: Optional[datetime] = None
+    ) -> None:
         """Compute the result of a match and update ratings.
 
         Args:
             competitor (GlickoCompetitor): The opponent competitor.
             s (float): The score of this competitor (1 for win, 0.5 for draw, 0 for loss).
+            match_time (datetime, optional): The time when the match occurred. Default: current time.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
+            InvalidParameterException: If the match time is before either competitor's last activity.
         """
+        # Get the match time
+        current_time = match_time if match_time is not None else datetime.now()
+
+        # Validate match time is not before last activity
+        if current_time < self._last_activity:
+            raise InvalidParameterException("Match time cannot be before competitor's last activity time")
+        if current_time < competitor._last_activity:
+            raise InvalidParameterException("Match time cannot be before opponent's last activity time")
+
+        # Update RDs for both competitors based on inactivity
+        self.update_rd_for_inactivity(current_time)
+        competitor.update_rd_for_inactivity(current_time)
+
         self.verify_competitor_types(competitor)
         # first we update ourselves
         s_new_r, s_new_rd = self.update_competitor_rating(competitor, s)
@@ -322,6 +356,10 @@ class GlickoCompetitor(BaseCompetitor):
         competitor.rating = c_new_r
         competitor.rd = c_new_rd
 
+        # Update last activity time for both competitors
+        self._last_activity = current_time
+        competitor._last_activity = current_time
+
     def update_competitor_rating(self, competitor: "GlickoCompetitor", s: float) -> Tuple[float, float]:
         """Update the rating and RD of this competitor based on a match result.
 
@@ -333,11 +371,39 @@ class GlickoCompetitor(BaseCompetitor):
             tuple: A tuple containing the new rating and RD.
         """
         E_term = self.expected_score(competitor)
-        d_squared = (self._q**2 * (self._g(competitor.rd) ** 2 * E_term * (1 - E_term))) ** -1
-        s_new_r = self._rating + (self._q / (1 / self.rd**2 + 1 / d_squared)) * self._g(competitor.rd) * (s - E_term)
+        g = self._g(competitor.rd**2)
+        d_squared = (self._q**2 * (g**2 * E_term * (1 - E_term))) ** -1
+
+        # The rating change is proportional to 1/RD^2, so a higher RD means a larger change
+        rating_change = (self._q / (1 / self.rd**2 + 1 / d_squared)) * g * (s - E_term)
+        s_new_r = self._rating + rating_change
 
         # Ensure the new rating doesn't go below the minimum rating
         s_new_r = max(self._minimum_rating, s_new_r)
 
+        # The new RD is smaller (more certain) after a match
         s_new_rd = math.sqrt((1 / self.rd**2 + 1 / d_squared) ** -1)
         return s_new_r, s_new_rd
+
+    def update_rd_for_inactivity(self, current_time: datetime = None) -> None:
+        """Update the rating deviation based on time elapsed since last activity.
+
+        This implements Glickman's formula for increasing uncertainty in ratings
+        over time when a player is inactive. The RD increase is controlled by the _c parameter
+        and the number of rating periods that have passed.
+
+        Args:
+            current_time (datetime, optional): The current time to calculate inactivity against.
+                If None, uses the current system time.
+        """
+        if current_time is None:
+            current_time = datetime.now()
+
+        # Calculate number of rating periods (can be fractional)
+        days_inactive = (current_time - self._last_activity).total_seconds() / (24 * 3600)
+        rating_periods = days_inactive / self._rating_period_days
+
+        if rating_periods > 0:
+            # Use Glickman's formula for RD increase over time
+            new_rd = min([350, math.sqrt(self.rd**2 + (self._c**2 * rating_periods))])
+            self.rd = new_rd
