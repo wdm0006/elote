@@ -197,13 +197,7 @@ class History:
                     false_negatives += 1
 
         # Return results as a dictionary
-        return {
-            "tp": true_positives,
-            "fp": false_positives,
-            "tn": true_negatives,
-            "fn": false_negatives,
-            "undecided": undecided,
-        }
+        return {"tp": true_positives, "fp": false_positives, "tn": true_negatives, "fn": false_negatives}
 
     def random_search(self, trials=1000):
         """Search for optimal prediction thresholds using random sampling.

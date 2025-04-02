@@ -1,4 +1,10 @@
-v1.0.0 (Unreleased)
+v1.1.0
+======
+
+ * Glicko and Glicko-2 now properly handle time since last match 
+ * Bugfix in evaluation of draws in benchmarking
+
+v1.0.0
 ======
 
  * [] Added end to end examples using the chess and cfb datasets

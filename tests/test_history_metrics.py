@@ -36,9 +36,9 @@ class TestHistoryMetrics(unittest.TestCase):
         # False negative: actual='a', predicted < lower_threshold
         self.history.add_bout(Bout("a", "b", 0.1, "a"))
 
-        # Uncertain predictions (between thresholds) - these should be skipped
-        self.history.add_bout(Bout("a", "b", 0.5, "a"))
-        self.history.add_bout(Bout("a", "b", 0.5, "b"))
+        # Uncertain predictions (between thresholds) - these should be counted as false positives when not draws
+        self.history.add_bout(Bout("a", "b", 0.5, "a"))  # Predicting draw when actual='a' is a false positive
+        self.history.add_bout(Bout("a", "b", 0.5, "b"))  # Predicting draw when actual='b' is a false positive
 
     def test_calculate_metrics_default_thresholds(self):
         """Test that calculate_metrics works with default thresholds."""
@@ -52,19 +52,29 @@ class TestHistoryMetrics(unittest.TestCase):
         self.assertIn("f1", metrics)
         self.assertIn("confusion_matrix", metrics)
 
-        # With default thresholds, only the 0.7, 0.8, and 0.9 predictions are above the threshold
-        # and only the 0.1, 0.2, and 0.3 predictions are below the threshold
+        # With default thresholds:
+        # - Three true positives (0.7, 0.8, 0.9 with actual='a')
+        # - Three false positives (0.7 with actual='b' and two 0.5 predictions that should be a/b)
+        # - Two true negatives (0.2, 0.3 with actual='b')
+        # - One false negative (0.1 with actual='a')
         cm = metrics["confusion_matrix"]
         self.assertEqual(cm["tp"], 3)  # Three true positives (0.7, 0.8, 0.9 with actual='a')
-        self.assertEqual(cm["fp"], 1)  # One false positive (0.7 with actual='b')
+        self.assertEqual(
+            cm["fp"], 3
+        )  # One false positive (0.7 with actual='b') plus two draw predictions that should be a/b
         self.assertEqual(cm["tn"], 2)  # Two true negatives (0.2, 0.3 with actual='b')
         self.assertEqual(cm["fn"], 1)  # One false negative (0.1 with actual='a')
 
         # Check the calculated metrics
-        self.assertAlmostEqual(metrics["accuracy"], 5 / 7, places=5)
-        self.assertAlmostEqual(metrics["precision"], 3 / 4, places=5)
-        self.assertAlmostEqual(metrics["recall"], 3 / 4, places=5)
-        self.assertAlmostEqual(metrics["f1"], 3 / 4, places=5)
+        total = cm["tp"] + cm["fp"] + cm["tn"] + cm["fn"]
+        self.assertAlmostEqual(metrics["accuracy"], (cm["tp"] + cm["tn"]) / total, places=5)
+        self.assertAlmostEqual(metrics["precision"], cm["tp"] / (cm["tp"] + cm["fp"]), places=5)
+        self.assertAlmostEqual(metrics["recall"], cm["tp"] / (cm["tp"] + cm["fn"]), places=5)
+        self.assertAlmostEqual(
+            metrics["f1"],
+            2 * metrics["precision"] * metrics["recall"] / (metrics["precision"] + metrics["recall"]),
+            places=5,
+        )
 
     def test_calculate_metrics_custom_thresholds(self):
         """Test that calculate_metrics works with custom thresholds."""
@@ -74,7 +84,7 @@ class TestHistoryMetrics(unittest.TestCase):
         # With these thresholds:
         # - Predictions 0.7, 0.8, 0.9 are above the upper threshold (0.6)
         # - Predictions 0.1, 0.2, 0.3 are below the lower threshold (0.4)
-        # - Predictions 0.4, 0.5, 0.6 are in the uncertain range
+        # - Predictions 0.5 are in the uncertain range and count as false positives when not draws
 
         # Check confusion matrix values
         cm = metrics["confusion_matrix"]
@@ -83,13 +93,12 @@ class TestHistoryMetrics(unittest.TestCase):
         # In our setup: 0.7, 0.8, 0.9 with actual='a' = 3 cases
         self.assertEqual(cm["tp"], 3)
 
-        # False positives: predictions > 0.6 with actual='b'
-        # In our setup: 0.7 with actual='b' = 1 case
-        self.assertEqual(cm["fp"], 1)
+        # False positives: predictions > 0.6 with actual='b' plus uncertain predictions that should be a/b
+        # In our setup: 0.7 with actual='b' plus two 0.5 predictions = 3 cases
+        self.assertEqual(cm["fp"], 3)
 
         # True negatives: predictions < 0.4 with actual='b'
         # In our setup: 0.2, 0.3 with actual='b' = 2 cases
-        # Note: There's no bout with 0.1 and actual='b' in the setup
         self.assertEqual(cm["tn"], 2)
 
         # False negatives: predictions < 0.4 with actual='a'
@@ -97,15 +106,15 @@ class TestHistoryMetrics(unittest.TestCase):
         self.assertEqual(cm["fn"], 1)
 
         # Check metrics
-        # With 3 TP, 1 FP, 2 TN, 1 FN:
-        # Accuracy = (TP + TN) / (TP + TN + FP + FN) = (3 + 2) / (3 + 2 + 1 + 1) = 5/7
-        self.assertAlmostEqual(metrics["accuracy"], 5 / 7, places=5)
-        # Precision = TP / (TP + FP) = 3 / (3 + 1) = 3/4
-        self.assertAlmostEqual(metrics["precision"], 3 / 4, places=5)
-        # Recall = TP / (TP + FN) = 3 / (3 + 1) = 3/4
-        self.assertAlmostEqual(metrics["recall"], 3 / 4, places=5)
-        # F1 = 2 * (precision * recall) / (precision + recall) = 2 * (3/4 * 3/4) / (3/4 + 3/4) = 2 * 9/16 / 6/4 = 2 * 9/16 * 4/6 = 2 * 6/16 = 12/16 = 3/4
-        self.assertAlmostEqual(metrics["f1"], 3 / 4, places=5)
+        total = cm["tp"] + cm["fp"] + cm["tn"] + cm["fn"]
+        self.assertAlmostEqual(metrics["accuracy"], (cm["tp"] + cm["tn"]) / total, places=5)
+        self.assertAlmostEqual(metrics["precision"], cm["tp"] / (cm["tp"] + cm["fp"]), places=5)
+        self.assertAlmostEqual(metrics["recall"], cm["tp"] / (cm["tp"] + cm["fn"]), places=5)
+        self.assertAlmostEqual(
+            metrics["f1"],
+            2 * metrics["precision"] * metrics["recall"] / (metrics["precision"] + metrics["recall"]),
+            places=5,
+        )
 
     def test_calculate_metrics_edge_cases(self):
         """Test that calculate_metrics handles edge cases correctly."""
@@ -130,24 +139,24 @@ class TestHistoryMetrics(unittest.TestCase):
 
         # Create a history with only uncertain predictions
         uncertain_history = History()
-        uncertain_history.add_bout(Bout("a", "b", 0.5, "a"))
-        uncertain_history.add_bout(Bout("a", "b", 0.5, "b"))
+        uncertain_history.add_bout(Bout("a", "b", 0.5, "a"))  # Should be false positive since actual is 'a'
+        uncertain_history.add_bout(Bout("a", "b", 0.5, "b"))  # Should be false positive since actual is 'b'
 
         # Calculate metrics
         metrics = uncertain_history.calculate_metrics()
 
-        # Check the confusion matrix (should be all zeros since all predictions are uncertain)
+        # Check the confusion matrix
         cm = metrics["confusion_matrix"]
         self.assertEqual(cm["tp"], 0)
-        self.assertEqual(cm["fp"], 0)
+        self.assertEqual(cm["fp"], 2)  # Both uncertain predictions are false positives since actuals are not draws
         self.assertEqual(cm["tn"], 0)
         self.assertEqual(cm["fn"], 0)
 
         # Check the metrics
-        self.assertEqual(metrics["accuracy"], 0)
-        self.assertTrue(math.isnan(metrics["precision"]))
-        self.assertTrue(math.isnan(metrics["recall"]))
-        self.assertTrue(math.isnan(metrics["f1"]))
+        self.assertEqual(metrics["accuracy"], 0)  # No correct predictions
+        self.assertEqual(metrics["precision"], 0)  # No true positives
+        self.assertTrue(math.isnan(metrics["recall"]))  # No true positives or false negatives
+        self.assertTrue(math.isnan(metrics["f1"]))  # Precision or recall is NaN
 
     def test_accuracy_by_prior_bouts_basic(self):
         """Test that accuracy_by_prior_bouts works with a simple arena."""
