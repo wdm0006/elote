@@ -14,7 +14,7 @@
     </script>
     
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>elote.competitors.glicko &mdash; elote 1.0.0 documentation</title>
+  <title>elote.competitors.glicko &mdash; elote 1.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
@@ -23,7 +23,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=af2ce170"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=def9ab29"></script>
       <script src="../../../_static/doctools.js?v=888ff710"></script>
       <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
       <script src="../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
@@ -121,7 +121,8 @@
              
   <h1>Source code for elote.competitors.glicko</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote.competitors.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="n">InvalidRatingValueException</span><span class="p">,</span> <span class="n">InvalidParameterException</span>
 
@@ -139,19 +140,25 @@
 <span class="sd">    the reliability of the rating. A higher RD indicates a less reliable rating.</span>
 
 <span class="sd">    Class Attributes:</span>
-<span class="sd">        _c (float): Constant that determines how quickly the RD increases over time. Default: 1.</span>
+<span class="sd">        _c (float): Rating volatility constant that determines how quickly the RD increases over time.</span>
+<span class="sd">                   Default: 34.6, which is calibrated so that it takes about 100 rating periods</span>
+<span class="sd">                   for a player&#39;s RD to grow from 50 to 350 (maximum uncertainty).</span>
 <span class="sd">        _q (float): Scaling factor used in the rating calculation. Default: 0.0057565.</span>
+<span class="sd">        _rating_period_days (float): Number of days that constitute one rating period.</span>
+<span class="sd">                                   Default: 1.0 (one day per rating period).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">_c</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">_c</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">34.6</span>  <span class="c1"># sqrt((350^2 - 50^2)/100) as per Glickman&#39;s paper</span>
     <span class="n">_q</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0057565</span>
+    <span class="n">_rating_period_days</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
 
-<div class="viewcode-block" id="GlickoCompetitor.__init__"><a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.glicko.GlickoCompetitor.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_rating</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1500</span><span class="p">,</span> <span class="n">initial_rd</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">350</span><span class="p">):</span>
+<div class="viewcode-block" id="GlickoCompetitor.__init__"><a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.glicko.GlickoCompetitor.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_rating</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1500</span><span class="p">,</span> <span class="n">initial_rd</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">350</span><span class="p">,</span> <span class="n">initial_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a Glicko competitor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            initial_rating (float, optional): The initial rating of this competitor. Default: 1500.</span>
 <span class="sd">            initial_rd (float, optional): The initial rating deviation of this competitor. Default: 350.</span>
+<span class="sd">            initial_time (datetime, optional): The initial timestamp for this competitor. Default: current time.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidRatingValueException: If the initial rating is below the minimum rating.</span>
@@ -168,7 +175,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rd</span> <span class="o">=</span> <span class="n">initial_rd</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="n">initial_rd</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="n">initial_rd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="n">initial_time</span> <span class="k">if</span> <span class="n">initial_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span></div>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of this competitor.</span>
@@ -206,6 +214,7 @@
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="p">,</span>
             <span class="s2">&quot;rd&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">rd</span><span class="p">,</span>
+            <span class="s2">&quot;last_activity&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
         <span class="p">}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_import_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -251,6 +260,12 @@
         <span class="k">if</span> <span class="n">rd</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;RD must be positive&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="n">rd</span>
+
+        <span class="c1"># Set last activity time</span>
+        <span class="k">if</span> <span class="s2">&quot;last_activity&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s2">&quot;last_activity&quot;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_from_parameters</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
@@ -390,7 +405,7 @@
         <span class="n">E</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">((</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">g_term</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">-</span> <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span><span class="p">))</span> <span class="o">/</span> <span class="mi">400</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">E</span></div>
 
-<div class="viewcode-block" id="GlickoCompetitor.beat"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.glicko.GlickoCompetitor.beat">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;GlickoCompetitor&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="GlickoCompetitor.beat"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.glicko.GlickoCompetitor.beat">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;GlickoCompetitor&quot;</span><span class="p">,</span> <span class="n">match_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has won against the given competitor.</span>
 
 <span class="sd">        This method updates the ratings of both this competitor and the opponent</span>
@@ -398,14 +413,15 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            competitor (GlickoCompetitor): The opponent competitor that lost.</span>
+<span class="sd">            match_time (datetime, optional): The time when the match occurred. Default: current time.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_compute_match_result</span><span class="p">(</span><span class="n">competitor</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_compute_match_result</span><span class="p">(</span><span class="n">competitor</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">match_time</span><span class="o">=</span><span class="n">match_time</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="GlickoCompetitor.tied"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.glicko.GlickoCompetitor.tied">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;GlickoCompetitor&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="GlickoCompetitor.tied"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.glicko.GlickoCompetitor.tied">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;GlickoCompetitor&quot;</span><span class="p">,</span> <span class="n">match_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has tied with the given competitor.</span>
 
 <span class="sd">        This method updates the ratings of both this competitor and the opponent</span>
@@ -413,23 +429,41 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            competitor (GlickoCompetitor): The opponent competitor that tied.</span>
+<span class="sd">            match_time (datetime, optional): The time when the match occurred. Default: current time.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_compute_match_result</span><span class="p">(</span><span class="n">competitor</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_compute_match_result</span><span class="p">(</span><span class="n">competitor</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">match_time</span><span class="o">=</span><span class="n">match_time</span><span class="p">)</span></div>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_compute_match_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;GlickoCompetitor&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compute_match_result</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;GlickoCompetitor&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">match_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the result of a match and update ratings.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            competitor (GlickoCompetitor): The opponent competitor.</span>
 <span class="sd">            s (float): The score of this competitor (1 for win, 0.5 for draw, 0 for loss).</span>
+<span class="sd">            match_time (datetime, optional): The time when the match occurred. Default: current time.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
+<span class="sd">            InvalidParameterException: If the match time is before either competitor&#39;s last activity.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get the match time</span>
+        <span class="n">current_time</span> <span class="o">=</span> <span class="n">match_time</span> <span class="k">if</span> <span class="n">match_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="c1"># Validate match time is not before last activity</span>
+        <span class="k">if</span> <span class="n">current_time</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Match time cannot be before competitor&#39;s last activity time&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">current_time</span> <span class="o">&lt;</span> <span class="n">competitor</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Match time cannot be before opponent&#39;s last activity time&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Update RDs for both competitors based on inactivity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_rd_for_inactivity</span><span class="p">(</span><span class="n">current_time</span><span class="p">)</span>
+        <span class="n">competitor</span><span class="o">.</span><span class="n">update_rd_for_inactivity</span><span class="p">(</span><span class="n">current_time</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="c1"># first we update ourselves</span>
         <span class="n">s_new_r</span><span class="p">,</span> <span class="n">s_new_rd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_competitor_rating</span><span class="p">(</span><span class="n">competitor</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
@@ -444,6 +478,10 @@
         <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">c_new_r</span>
         <span class="n">competitor</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="n">c_new_rd</span>
 
+        <span class="c1"># Update last activity time for both competitors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="n">current_time</span>
+        <span class="n">competitor</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="n">current_time</span>
+
 <div class="viewcode-block" id="GlickoCompetitor.update_competitor_rating"><a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.glicko.GlickoCompetitor.update_competitor_rating">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_competitor_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;GlickoCompetitor&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the rating and RD of this competitor based on a match result.</span>
 
@@ -455,14 +493,42 @@
 <span class="sd">            tuple: A tuple containing the new rating and RD.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">E_term</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
-        <span class="n">d_squared</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_q</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g</span><span class="p">(</span><span class="n">competitor</span><span class="o">.</span><span class="n">rd</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">E_term</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">E_term</span><span class="p">)))</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="n">s_new_r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_q</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">rd</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">d_squared</span><span class="p">))</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span><span class="p">(</span><span class="n">competitor</span><span class="o">.</span><span class="n">rd</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">s</span> <span class="o">-</span> <span class="n">E_term</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span><span class="p">(</span><span class="n">competitor</span><span class="o">.</span><span class="n">rd</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">d_squared</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_q</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">g</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">E_term</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">E_term</span><span class="p">)))</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="c1"># The rating change is proportional to 1/RD^2, so a higher RD means a larger change</span>
+        <span class="n">rating_change</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_q</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">rd</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">d_squared</span><span class="p">))</span> <span class="o">*</span> <span class="n">g</span> <span class="o">*</span> <span class="p">(</span><span class="n">s</span> <span class="o">-</span> <span class="n">E_term</span><span class="p">)</span>
+        <span class="n">s_new_r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">+</span> <span class="n">rating_change</span>
 
         <span class="c1"># Ensure the new rating doesn&#39;t go below the minimum rating</span>
         <span class="n">s_new_r</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">,</span> <span class="n">s_new_r</span><span class="p">)</span>
 
+        <span class="c1"># The new RD is smaller (more certain) after a match</span>
         <span class="n">s_new_rd</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">rd</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">d_squared</span><span class="p">)</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">s_new_r</span><span class="p">,</span> <span class="n">s_new_rd</span></div></div>
+        <span class="k">return</span> <span class="n">s_new_r</span><span class="p">,</span> <span class="n">s_new_rd</span></div>
+
+<div class="viewcode-block" id="GlickoCompetitor.update_rd_for_inactivity"><a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.glicko.GlickoCompetitor.update_rd_for_inactivity">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_rd_for_inactivity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_time</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the rating deviation based on time elapsed since last activity.</span>
+
+<span class="sd">        This implements Glickman&#39;s formula for increasing uncertainty in ratings</span>
+<span class="sd">        over time when a player is inactive. The RD increase is controlled by the _c parameter</span>
+<span class="sd">        and the number of rating periods that have passed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            current_time (datetime, optional): The current time to calculate inactivity against.</span>
+<span class="sd">                If None, uses the current system time.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">current_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">current_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="c1"># Calculate number of rating periods (can be fractional)</span>
+        <span class="n">days_inactive</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span><span class="mi">24</span> <span class="o">*</span> <span class="mi">3600</span><span class="p">)</span>
+        <span class="n">rating_periods</span> <span class="o">=</span> <span class="n">days_inactive</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating_period_days</span>
+
+        <span class="k">if</span> <span class="n">rating_periods</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># Use Glickman&#39;s formula for RD increase over time</span>
+            <span class="n">new_rd</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="mi">350</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rd</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_c</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">rating_periods</span><span class="p">))])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="n">new_rd</span></div></div>
 </pre></div>
 
            </div>

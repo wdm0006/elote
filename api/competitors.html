@@ -15,7 +15,7 @@
     </script>
     
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Competitors API Reference &mdash; elote 1.0.0 documentation</title>
+  <title>Competitors API Reference &mdash; elote 1.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/dark_mode_css/general.css?v=c0a7eb24" />
@@ -24,7 +24,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=af2ce170"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=def9ab29"></script>
       <script src="../_static/doctools.js?v=888ff710"></script>
       <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
       <script src="../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
@@ -140,6 +140,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#elote.competitors.glicko.GlickoCompetitor.tied"><code class="docutils literal notranslate"><span class="pre">GlickoCompetitor.tied()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#elote.competitors.glicko.GlickoCompetitor.tranformed_rd"><code class="docutils literal notranslate"><span class="pre">GlickoCompetitor.tranformed_rd</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#elote.competitors.glicko.GlickoCompetitor.update_competitor_rating"><code class="docutils literal notranslate"><span class="pre">GlickoCompetitor.update_competitor_rating()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.glicko.GlickoCompetitor.update_rd_for_inactivity"><code class="docutils literal notranslate"><span class="pre">GlickoCompetitor.update_rd_for_inactivity()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -654,7 +655,7 @@ based on a drawn match outcome.</p>
 <h2>Glicko Competitor<a class="headerlink" href="#glicko-competitor" title="Permalink to this heading"></a></h2>
 <span class="target" id="module-elote.competitors.glicko"></span><dl class="py class">
 <dt class="sig sig-object py" id="elote.competitors.glicko.GlickoCompetitor">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">elote.competitors.glicko.</span></span><span class="sig-name descname"><span class="pre">GlickoCompetitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_rd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">350</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/competitors/glicko.html#GlickoCompetitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">elote.competitors.glicko.</span></span><span class="sig-name descname"><span class="pre">GlickoCompetitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_rd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">350</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/competitors/glicko.html#GlickoCompetitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCompetitor</span></code></a></p>
 <p>Glicko rating system competitor.</p>
 <p>The Glicko rating system is an improvement on the Elo rating system that takes
@@ -662,15 +663,24 @@ into account the reliability of a rating. It was developed by Mark Glickman as
 an improvement to the Elo system.</p>
 <p>In addition to a rating, each competitor has a rating deviation (RD) that measures
 the reliability of the rating. A higher RD indicates a less reliable rating.</p>
-<dl class="simple">
-<dt>Class Attributes:</dt><dd><p>_c (float): Constant that determines how quickly the RD increases over time. Default: 1.
-_q (float): Scaling factor used in the rating calculation. Default: 0.0057565.</p>
+<dl>
+<dt>Class Attributes:</dt><dd><dl class="simple">
+<dt>_c (float): Rating volatility constant that determines how quickly the RD increases over time.</dt><dd><p>Default: 34.6, which is calibrated so that it takes about 100 rating periods
+for a player’s RD to grow from 50 to 350 (maximum uncertainty).</p>
+</dd>
+</dl>
+<p>_q (float): Scaling factor used in the rating calculation. Default: 0.0057565.
+_rating_period_days (float): Number of days that constitute one rating period.</p>
+<blockquote>
+<div><p>Default: 1.0 (one day per rating period).</p>
+</div></blockquote>
 </dd>
 </dl>
 <p>Initialize a Glicko competitor.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>initial_rating (float, optional): The initial rating of this competitor. Default: 1500.
-initial_rd (float, optional): The initial rating deviation of this competitor. Default: 350.</p>
+initial_rd (float, optional): The initial rating deviation of this competitor. Default: 350.
+initial_time (datetime, optional): The initial timestamp for this competitor. Default: current time.</p>
 </dd>
 <dt>Raises:</dt><dd><p>InvalidRatingValueException: If the initial rating is below the minimum rating.
 InvalidParameterException: If the initial RD is not positive.</p>
@@ -678,11 +688,12 @@ InvalidParameterException: If the initial RD is not positive.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.glicko.GlickoCompetitor.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_rd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">350</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/competitors/glicko.html#GlickoCompetitor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_rd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">350</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/competitors/glicko.html#GlickoCompetitor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.__init__" title="Permalink to this definition"></a></dt>
 <dd><p>Initialize a Glicko competitor.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>initial_rating (float, optional): The initial rating of this competitor. Default: 1500.
-initial_rd (float, optional): The initial rating deviation of this competitor. Default: 350.</p>
+initial_rd (float, optional): The initial rating deviation of this competitor. Default: 350.
+initial_time (datetime, optional): The initial timestamp for this competitor. Default: current time.</p>
 </dd>
 <dt>Raises:</dt><dd><p>InvalidRatingValueException: If the initial rating is below the minimum rating.
 InvalidParameterException: If the initial RD is not positive.</p>
@@ -692,12 +703,13 @@ InvalidParameterException: If the initial RD is not positive.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.glicko.GlickoCompetitor.beat">
-<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../competitors.html#elote.competitors.glicko.GlickoCompetitor" title="elote.competitors.glicko.GlickoCompetitor"><span class="pre">GlickoCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko.html#GlickoCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.beat" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../competitors.html#elote.competitors.glicko.GlickoCompetitor" title="elote.competitors.glicko.GlickoCompetitor"><span class="pre">GlickoCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko.html#GlickoCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.beat" title="Permalink to this definition"></a></dt>
 <dd><p>Update ratings after this competitor has won against the given competitor.</p>
 <p>This method updates the ratings of both this competitor and the opponent
 based on the match outcome where this competitor won.</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>competitor (GlickoCompetitor): The opponent competitor that lost.</p>
+<dt>Args:</dt><dd><p>competitor (GlickoCompetitor): The opponent competitor that lost.
+match_time (datetime, optional): The time when the match occurred. Default: current time.</p>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
@@ -767,12 +779,13 @@ based on the match outcome where this competitor won.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.glicko.GlickoCompetitor.tied">
-<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../competitors.html#elote.competitors.glicko.GlickoCompetitor" title="elote.competitors.glicko.GlickoCompetitor"><span class="pre">GlickoCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko.html#GlickoCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.tied" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../competitors.html#elote.competitors.glicko.GlickoCompetitor" title="elote.competitors.glicko.GlickoCompetitor"><span class="pre">GlickoCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko.html#GlickoCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.tied" title="Permalink to this definition"></a></dt>
 <dd><p>Update ratings after this competitor has tied with the given competitor.</p>
 <p>This method updates the ratings of both this competitor and the opponent
 based on a drawn match outcome.</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>competitor (GlickoCompetitor): The opponent competitor that tied.</p>
+<dt>Args:</dt><dd><p>competitor (GlickoCompetitor): The opponent competitor that tied.
+match_time (datetime, optional): The time when the match occurred. Default: current time.</p>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
@@ -799,6 +812,22 @@ based on a drawn match outcome.</p>
 s (float): The score of this competitor (1 for win, 0.5 for draw, 0 for loss).</p>
 </dd>
 <dt>Returns:</dt><dd><p>tuple: A tuple containing the new rating and RD.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko.GlickoCompetitor.update_rd_for_inactivity">
+<span class="sig-name descname"><span class="pre">update_rd_for_inactivity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko.html#GlickoCompetitor.update_rd_for_inactivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.update_rd_for_inactivity" title="Permalink to this definition"></a></dt>
+<dd><p>Update the rating deviation based on time elapsed since last activity.</p>
+<p>This implements Glickman’s formula for increasing uncertainty in ratings
+over time when a player is inactive. The RD increase is controlled by the _c parameter
+and the number of rating periods that have passed.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>current_time (datetime, optional): The current time to calculate inactivity against.</dt><dd><p>If None, uses the current system time.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
