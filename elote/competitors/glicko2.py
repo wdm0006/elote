@@ -1,5 +1,6 @@
 import math
-from typing import Dict, Any, ClassVar, Type, TypeVar
+from typing import Dict, Any, ClassVar, Type, TypeVar, Optional, List, Tuple
+from datetime import datetime
 
 from elote.competitors.base import BaseCompetitor, InvalidRatingValueException, InvalidParameterException
 
@@ -24,20 +25,29 @@ class Glicko2Competitor(BaseCompetitor):
         _epsilon (float): Convergence tolerance for the volatility iteration. Default: 0.000001.
         _default_volatility (float): Default volatility for new competitors. Default: 0.06.
         _scale_factor (float): Scale factor for converting between Glicko-2 and original scales. Default: 173.7178.
+        _rating_period_days (float): Number of days that constitute one rating period. Default: 1.0.
     """
 
     _tau: ClassVar[float] = 0.5
     _epsilon: ClassVar[float] = 0.000001
     _default_volatility: ClassVar[float] = 0.06
     _scale_factor: ClassVar[float] = 173.7178
+    _rating_period_days: ClassVar[float] = 1.0
 
-    def __init__(self, initial_rating: float = 1500, initial_rd: float = 350, initial_volatility: float = None):
+    def __init__(
+        self,
+        initial_rating: float = 1500,
+        initial_rd: float = 350,
+        initial_volatility: float = None,
+        initial_time: Optional[datetime] = None,
+    ):
         """Initialize a Glicko-2 competitor.
 
         Args:
             initial_rating (float, optional): The initial rating of this competitor. Default: 1500.
             initial_rd (float, optional): The initial rating deviation of this competitor. Default: 350.
             initial_volatility (float, optional): The initial volatility of this competitor. Default: _default_volatility.
+            initial_time (datetime, optional): The initial timestamp for this competitor. Default: current time.
 
         Raises:
             InvalidRatingValueException: If the initial rating is below the minimum rating.
@@ -69,8 +79,9 @@ class Glicko2Competitor(BaseCompetitor):
         self._rating = initial_rating
         self._rd = initial_rd
 
-        # Store match results for rating period
-        self._match_results = []
+        # Store match results for rating period and track last activity
+        self._match_results: List[Tuple["Glicko2Competitor", float, datetime]] = []
+        self._last_activity = initial_time if initial_time is not None else datetime.now()
 
     def __repr__(self) -> str:
         """Return a string representation of this competitor.
@@ -112,6 +123,7 @@ class Glicko2Competitor(BaseCompetitor):
             "volatility": self._sigma,
             "mu": self._mu,
             "phi": self._phi,
+            "last_activity": self._last_activity.isoformat(),
         }
 
     def _import_parameters(self, parameters: Dict[str, Any]) -> None:
@@ -173,6 +185,12 @@ class Glicko2Competitor(BaseCompetitor):
         # Set internal Glicko-2 scale values
         self._mu = state.get("mu", self._rating_to_mu(rating))
         self._phi = state.get("phi", self._rd_to_phi(rd))
+
+        # Set last activity time
+        if "last_activity" in state:
+            self._last_activity = datetime.fromisoformat(state["last_activity"])
+        else:
+            self._last_activity = datetime.now()
 
     @classmethod
     def _create_from_parameters(cls: Type[T], parameters: Dict[str, Any]) -> T:
@@ -266,6 +284,7 @@ class Glicko2Competitor(BaseCompetitor):
         self._mu = self._rating_to_mu(self._initial_rating)
         self._phi = self._rd_to_phi(self._initial_rd)
         self._match_results = []
+        self._last_activity = datetime.now()
 
     @property
     def rating(self) -> float:
@@ -422,7 +441,141 @@ class Glicko2Competitor(BaseCompetitor):
         competitor_glicko2 = competitor  # type: Glicko2Competitor
         return self._E(self._mu, competitor_glicko2._mu, competitor_glicko2._phi)
 
-    def beat(self, competitor: BaseCompetitor) -> None:
+    def update_rd_for_inactivity(self, current_time: datetime = None) -> None:
+        """Update the rating deviation based on time elapsed since last activity.
+
+        This implements Glickman's formula for increasing uncertainty in ratings
+        over time when a player is inactive. In Glicko-2, the phi (internal RD)
+        increases based on the current volatility (sigma) parameter and the number
+        of rating periods that have passed.
+
+        Args:
+            current_time (datetime, optional): The current time to calculate inactivity against.
+                If None, uses the current system time.
+        """
+        if current_time is None:
+            current_time = datetime.now()
+
+        # Calculate number of rating periods (can be fractional)
+        days_inactive = (current_time - self._last_activity).total_seconds() / (24 * 3600)
+        rating_periods = days_inactive / self._rating_period_days
+
+        if rating_periods > 0:
+            # In Glicko-2, phi increases based on the current volatility (sigma)
+            # over the inactive period
+            self._phi = math.sqrt(self._phi**2 + rating_periods * self._sigma**2)
+            # Convert back to original scale RD
+            self._rd = self._phi_to_rd(self._phi)
+            # Cap RD at 350 in the original scale
+            if self._rd > 350:
+                self._rd = 350
+                self._phi = self._rd_to_phi(350)
+
+    def update_ratings(self) -> None:
+        """Update ratings based on recorded match results.
+
+        This method implements the Glicko-2 rating system update algorithm.
+        It processes all recorded match results and updates the rating, RD, and volatility.
+        If no matches were played, it updates the RD based on inactivity.
+        After updating, the match results are cleared.
+        """
+        if not self._match_results:
+            # Update RD for inactivity up to current time
+            self.update_rd_for_inactivity()
+            return
+
+        # Get the most recent match time
+        current_time = max(match_time for _, _, match_time in self._match_results)
+
+        # Update RD for inactivity before processing matches
+        self.update_rd_for_inactivity(current_time)
+
+        if not self._match_results:
+            return
+
+        # Step 1: Initialize values
+        mu = self._mu
+        phi = self._phi
+        sigma = self._sigma
+
+        # Step 2: For each opponent j, compute g(phi_j) and E(mu, mu_j, phi_j)
+        v_inv = 0
+        delta_sum = 0
+        for opponent, score, _ in self._match_results:
+            g_j = self._g(opponent._phi)
+            E_j = self._E(mu, opponent._mu, opponent._phi)
+            v_inv += g_j**2 * E_j * (1 - E_j)
+            delta_sum += g_j * (score - E_j)
+
+        # Step 3: Compute v and delta
+        v = 1 / v_inv
+        delta = v * delta_sum
+
+        # Step 4: Determine new volatility sigma'
+        def f(x):
+            """Function to find the root of to determine new volatility."""
+            exp_term = math.exp(x)
+            a = exp_term * (delta**2 - phi**2 - v - exp_term)
+            b = 2 * ((phi**2 + v + exp_term) ** 2)
+            c = x - math.log(sigma**2)
+            return a / b - c / self._tau**2
+
+        # Find new volatility using iteration
+        A = math.log(sigma**2)
+        if delta**2 > phi**2 + v:
+            B = math.log(delta**2 - phi**2 - v)
+        else:
+            k = 1
+            while f(A - k * self._tau) < 0:
+                k += 1
+            B = A - k * self._tau
+
+        fa = f(A)
+        fb = f(B)
+
+        # Iterate until convergence
+        while abs(B - A) > self._epsilon:
+            C = A + (A - B) * fa / (fb - fa)
+            fc = f(C)
+            if fc * fb < 0:
+                A = B
+                fa = fb
+            else:
+                fa = fa / 2
+            B = C
+            fb = fc
+
+        sigma_prime = math.exp(A / 2)
+
+        # Step 5: Update phi* and phi
+        phi_star = math.sqrt(phi**2 + sigma_prime**2)
+        phi_prime = 1 / math.sqrt(1 / phi_star**2 + 1 / v)
+
+        # Step 6: Update mu
+        mu_prime = mu + phi_prime**2 * delta_sum
+
+        # Step 7: Convert back to original scale
+        self._rating = self._mu_to_rating(mu_prime)
+        self._rd = self._phi_to_rd(phi_prime)
+        self._sigma = sigma_prime
+
+        # Ensure rating doesn't go below minimum
+        self._rating = max(self._minimum_rating, self._rating)
+
+        # Cap RD at 350
+        if self._rd > 350:
+            self._rd = 350
+            self._phi = self._rd_to_phi(350)
+
+        # Update internal values
+        self._mu = mu_prime
+        self._phi = phi_prime
+
+        # Update last activity time and clear match results
+        self._last_activity = current_time
+        self._match_results = []
+
+    def beat(self, competitor: BaseCompetitor, match_time: Optional[datetime] = None) -> None:
         """Update ratings after this competitor has won against the given competitor.
 
         This method records the match result for later processing during the rating period update.
@@ -430,24 +583,39 @@ class Glicko2Competitor(BaseCompetitor):
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that lost.
+            match_time (datetime, optional): The time when the match occurred. Default: current time.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
+            InvalidParameterException: If the match time is before either competitor's last activity.
         """
         self.verify_competitor_types(competitor)
         competitor_glicko2 = competitor  # type: Glicko2Competitor
 
+        # Get the match time
+        current_time = match_time if match_time is not None else datetime.now()
+
+        # Validate match time is not before last activity
+        if current_time < self._last_activity:
+            raise InvalidParameterException("Match time cannot be before competitor's last activity time")
+        if current_time < competitor_glicko2._last_activity:
+            raise InvalidParameterException("Match time cannot be before opponent's last activity time")
+
+        # Update RDs for both competitors based on inactivity before recording match
+        self.update_rd_for_inactivity(current_time)
+        competitor_glicko2.update_rd_for_inactivity(current_time)
+
         # Record the match result for this competitor
-        self._match_results.append((competitor_glicko2, 1.0))
+        self._match_results.append((competitor_glicko2, 1.0, current_time))
 
         # Record the match result for the opponent
-        competitor_glicko2._match_results.append((self, 0.0))
+        competitor_glicko2._match_results.append((self, 0.0, current_time))
 
         # Update ratings immediately
         self.update_ratings()
         competitor_glicko2.update_ratings()
 
-    def tied(self, competitor: BaseCompetitor) -> None:
+    def tied(self, competitor: BaseCompetitor, match_time: Optional[datetime] = None) -> None:
         """Update ratings after this competitor has tied with the given competitor.
 
         This method records the match result for later processing during the rating period update.
@@ -455,139 +623,34 @@ class Glicko2Competitor(BaseCompetitor):
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that tied.
+            match_time (datetime, optional): The time when the match occurred. Default: current time.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
+            InvalidParameterException: If the match time is before either competitor's last activity.
         """
         self.verify_competitor_types(competitor)
         competitor_glicko2 = competitor  # type: Glicko2Competitor
 
+        # Get the match time
+        current_time = match_time if match_time is not None else datetime.now()
+
+        # Validate match time is not before last activity
+        if current_time < self._last_activity:
+            raise InvalidParameterException("Match time cannot be before competitor's last activity time")
+        if current_time < competitor_glicko2._last_activity:
+            raise InvalidParameterException("Match time cannot be before opponent's last activity time")
+
+        # Update RDs for both competitors based on inactivity before recording match
+        self.update_rd_for_inactivity(current_time)
+        competitor_glicko2.update_rd_for_inactivity(current_time)
+
         # Record the match result for this competitor
-        self._match_results.append((competitor_glicko2, 0.5))
+        self._match_results.append((competitor_glicko2, 0.5, current_time))
 
         # Record the match result for the opponent
-        competitor_glicko2._match_results.append((self, 0.5))
+        competitor_glicko2._match_results.append((self, 0.5, current_time))
 
         # Update ratings immediately
         self.update_ratings()
         competitor_glicko2.update_ratings()
-
-    def update_ratings(self) -> None:
-        """Update ratings based on recorded match results.
-
-        This method implements the Glicko-2 rating system update algorithm.
-        It processes all recorded match results and updates the rating, RD, and volatility.
-        After updating, the match results are cleared.
-        """
-        if not self._match_results:
-            # If no matches were played, increase the RD
-            self._phi = math.sqrt(self._phi**2 + self._sigma**2)
-            self._rd = self._phi_to_rd(self._phi)
-            return
-
-        # Step 1: Initialize values
-        mu = self._mu
-        phi = self._phi
-        sigma = self._sigma
-        v_inv = 0.0  # Inverse of the variance of the change in rating
-
-        # Step 2: Calculate the estimated variance of the player's rating based on game outcomes
-        for opponent, _score in self._match_results:
-            opponent_phi = opponent._phi
-            opponent_mu = opponent._mu
-            g_phi_j = self._g(opponent_phi)
-            E_mu_mu_j_phi_j = self._E(mu, opponent_mu, opponent_phi)
-            v_inv += g_phi_j**2 * E_mu_mu_j_phi_j * (1 - E_mu_mu_j_phi_j)
-
-        v = 1.0 / v_inv if v_inv > 0 else float("inf")
-
-        # Step 3: Calculate the quantity delta, the estimated improvement in rating
-        delta = 0.0
-        for opponent, _score in self._match_results:
-            opponent_phi = opponent._phi
-            opponent_mu = opponent._mu
-            g_phi_j = self._g(opponent_phi)
-            E_mu_mu_j_phi_j = self._E(mu, opponent_mu, opponent_phi)
-            delta += g_phi_j * (_score - E_mu_mu_j_phi_j)
-        delta *= v
-
-        # Step 4: Calculate the new volatility sigma'
-        # This uses the iterative algorithm described in the Glicko-2 paper
-        a = math.log(sigma**2)
-        tau = self._tau
-        epsilon = self._epsilon
-
-        # Compute the function f(x) and its derivative f'(x)
-        def f(x):
-            exp_x = math.exp(x)
-            phi_squared = phi**2
-            delta_squared = delta**2
-            return exp_x * (delta_squared - phi_squared - v - exp_x) / (2 * (phi_squared + v + exp_x) ** 2) - (
-                x - a
-            ) / (tau**2)
-
-        # Find the value x that satisfies f(x) = 0 using the Illinois algorithm
-        # (a variant of the regula falsi method)
-        # First, bracket the root
-        if delta**2 > phi**2 + v:
-            B = math.log(delta**2 - phi**2 - v)
-        else:
-            k = 1
-            while f(a - k * tau) < 0:
-                k += 1
-            B = a - k * tau
-
-        A = a
-        f_A = f(A)
-        f_B = f(B)
-
-        # If the signs of f(A) and f(B) are the same, adjust B
-        if f_A * f_B > 0:
-            if f_A < 0:
-                B = A + tau
-            else:
-                B = A - tau
-            f_B = f(B)
-
-        # Iterate until convergence
-        while abs(B - A) > epsilon:
-            # Calculate the new approximation C using the Illinois method
-            # Add a check to prevent division by zero
-            if abs(f_B - f_A) < 1e-10:  # Use a small epsilon value to check for near-zero
-                # If the difference is too small, use bisection method instead
-                C = (A + B) / 2
-            else:
-                C = A + (A - B) * f_A / (f_B - f_A)
-            f_C = f(C)
-
-            # Update the brackets
-            if f_C * f_A < 0:
-                B = A
-                f_B = f_A
-            else:
-                f_B *= 0.5  # Illinois method adjustment
-
-            A = C
-            f_A = f_C
-
-        # The new volatility sigma' is e^(A/2)
-        sigma_prime = math.exp(A / 2)
-
-        # Step 5: Calculate the new phi* (pre-update phi)
-        phi_star = math.sqrt(phi**2 + sigma_prime**2)
-
-        # Step 6: Calculate the new phi' (post-update phi)
-        phi_prime = 1.0 / math.sqrt(1.0 / phi_star**2 + 1.0 / v)
-
-        # Step 7: Calculate the new mu' (post-update mu)
-        mu_prime = mu + phi_prime**2 * delta / v
-
-        # Step 8: Convert back to the original scale
-        self._mu = mu_prime
-        self._phi = phi_prime
-        self._sigma = sigma_prime
-        self._rating = self._mu_to_rating(mu_prime)
-        self._rd = self._phi_to_rd(phi_prime)
-
-        # Clear the match results
-        self._match_results = []

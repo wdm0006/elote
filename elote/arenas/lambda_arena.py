@@ -73,7 +73,7 @@ class LambdaArena(BaseArena):
         for data in tqdm(matchups):
             self.matchup(*data)
 
-    def matchup(self, a, b, attributes=None):
+    def matchup(self, a, b, attributes=None, match_time=None):
         """Process a single matchup between two competitors.
 
         This method handles a matchup between two competitors, creating them
@@ -84,6 +84,7 @@ class LambdaArena(BaseArena):
             a: The first competitor or competitor identifier.
             b: The second competitor or competitor identifier.
             attributes (dict, optional): Additional attributes to record with this bout.
+            match_time (datetime, optional): The time when the match occurred.
 
         Returns:
             The result of the matchup.
@@ -100,14 +101,26 @@ class LambdaArena(BaseArena):
         else:
             res = self.func(a, b)
 
+        # Check if the competitor supports time-based ratings
+        supports_time = hasattr(self.competitors[a], "_last_activity")
+
         if res is None:
-            self.competitors[a].tied(self.competitors[b])
+            if supports_time:
+                self.competitors[a].tied(self.competitors[b], match_time=match_time)
+            else:
+                self.competitors[a].tied(self.competitors[b])
             self.history.add_bout(Bout(a, b, predicted_outcome, outcome="tie", attributes=attributes))
         elif res is True:
-            self.competitors[a].beat(self.competitors[b])
+            if supports_time:
+                self.competitors[a].beat(self.competitors[b], match_time=match_time)
+            else:
+                self.competitors[a].beat(self.competitors[b])
             self.history.add_bout(Bout(a, b, predicted_outcome, outcome="win", attributes=attributes))
         else:
-            self.competitors[b].beat(self.competitors[a])
+            if supports_time:
+                self.competitors[b].beat(self.competitors[a], match_time=match_time)
+            else:
+                self.competitors[b].beat(self.competitors[a])
             self.history.add_bout(Bout(a, b, predicted_outcome, outcome="loss", attributes=attributes))
 
     def expected_score(self, a, b):
