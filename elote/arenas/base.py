@@ -119,13 +119,12 @@ class History:
             upper_threshold: The upper threshold for prediction (above this is a prediction for the first competitor)
 
         Returns:
-            A dictionary with confusion matrix metrics: {'tp': int, 'fp': int, 'tn': int, 'fn': int, 'undecided': int}
+            A dictionary with confusion matrix metrics: {'tp': int, 'fp': int, 'tn': int, 'fn': int}
         """
         true_positives = 0
         false_positives = 0
         true_negatives = 0
         false_negatives = 0
-        undecided = 0
 
         for bout in self.bouts:
             # Extract the actual winner and predicted probability
@@ -197,7 +196,12 @@ class History:
                     false_negatives += 1
 
         # Return results as a dictionary
-        return {"tp": true_positives, "fp": false_positives, "tn": true_negatives, "fn": false_negatives}
+        return {
+            "tp": true_positives,
+            "fp": false_positives,
+            "tn": true_negatives,
+            "fn": false_negatives
+        }
 
     def random_search(self, trials=1000):
         """Search for optimal prediction thresholds using random sampling.
