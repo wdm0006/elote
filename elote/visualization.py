@@ -7,7 +7,7 @@ including comparison charts and accuracy analysis.
 
 import matplotlib.pyplot as plt
 import numpy as np
-from typing import Dict, List, Tuple, Optional, Any
+from typing import Dict, List, Tuple, Optional, Any, Union, cast
 
 
 def plot_rating_system_comparison(
@@ -15,7 +15,7 @@ def plot_rating_system_comparison(
     save_path: Optional[str] = None,
     figsize: Tuple[int, int] = (15, 10),
     title: str = "Comparison of Rating Systems Performance",
-):
+) -> plt.Figure:
     """
     Create bar charts comparing the performance of different rating systems.
 
@@ -95,7 +95,7 @@ def plot_optimized_accuracy_comparison(
     save_path: Optional[str] = None,
     figsize: Tuple[int, int] = (10, 6),
     title: str = "Accuracy with Optimized Thresholds",
-):
+) -> plt.Figure:
     """
     Create a bar chart comparing the accuracy of different rating systems with optimized thresholds.
 
@@ -143,11 +143,11 @@ def plot_optimized_accuracy_comparison(
 
 
 def plot_accuracy_by_prior_bouts(
-    results_by_prior_bouts: Dict[str, Dict],
+    results_by_prior_bouts: Dict[str, Dict[str, Any]],
     save_path: Optional[str] = None,
     figsize: Tuple[int, int] = (14, 8),
     title: str = "Accuracy vs. Prior Bout Count by Rating System",
-):
+) -> plt.Figure:
     """
     Create a line chart showing accuracy vs. prior bout count for each competitor type.
 
@@ -211,7 +211,7 @@ def plot_accuracy_by_prior_bouts(
     return plt.gcf()
 
 
-def compute_calibration_data(history, n_bins=10):
+def compute_calibration_data(history: Any, n_bins: int = 10) -> Tuple[np.ndarray, np.ndarray]:
     """
     Compute calibration data from a history of bouts without using scikit-learn.
 
@@ -243,7 +243,7 @@ def compute_calibration_data(history, n_bins=10):
     bin_counts = np.zeros(n_bins)
 
     for i in range(len(y_prob)):
-        bin_idx = bin_indices[i]
+        bin_idx = cast(int, bin_indices[i])
         prob_pred[bin_idx] += y_prob[i]
         prob_true[bin_idx] += y_true[i]
         bin_counts[bin_idx] += 1
@@ -272,7 +272,7 @@ def plot_calibration_curve(
     figsize: Tuple[int, int] = (10, 8),
     title: str = "Calibration Curves",
     n_bins: int = 10,
-):
+) -> plt.Figure:
     """
     Create a calibration curve plot for multiple rating systems.
 
@@ -338,7 +338,7 @@ def plot_calibration_comparison(
     figsize: Tuple[int, int] = (15, 8),
     title: str = "Calibration Comparison",
     n_bins: int = 10,
-):
+) -> plt.Figure:
     """
     Create a plot with calibration curves and histograms of predicted probabilities.
 
