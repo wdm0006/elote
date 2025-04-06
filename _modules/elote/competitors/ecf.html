@@ -120,7 +120,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for elote.competitors.ecf</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">cast</span><span class="p">,</span> <span class="n">Deque</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">deque</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">statistics</span>
 
@@ -158,7 +158,7 @@
             <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__initial_rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">deque</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Deque</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__cached_rating</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Cache for the rating calculation</span>
 
         <span class="c1"># Cache for transformed rating calculation</span>
@@ -184,8 +184,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">__initialize_ratings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the ratings deque with the initial rating.&quot;&quot;&quot;</span>
         <span class="c1"># Initialize with a single value instead of a full deque of None values</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_periods</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__initial_rating</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="n">deque</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">__initial_rating</span><span class="p">],</span> <span class="n">maxlen</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_periods</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__cached_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__initial_rating</span>  <span class="c1"># Initialize the cache</span>
 
     <span class="nd">@property</span>
@@ -221,6 +220,8 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__cached_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__initial_rating</span>
 
+        <span class="c1"># Assert that cache is now float before returning</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_rating</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_rating</span>
 
     <span class="nd">@rating</span><span class="o">.</span><span class="n">setter</span>
@@ -250,6 +251,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__initialize_ratings</span><span class="p">()</span>
+            <span class="c1"># Assert scores is now initialized</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
         <span class="c1"># Invalidate the cache when updating scores</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__cached_rating</span> <span class="o">=</span> <span class="kc">None</span>
@@ -421,10 +424,11 @@
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">competitor_ecf</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">ECFCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
 
-        <span class="c1"># Calculate directly to avoid multiple property accesses</span>
+        <span class="c1"># Use transformed Elo ratings for comparison</span>
         <span class="n">my_transformed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformed_elo_rating</span>
-        <span class="n">their_transformed</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">transformed_elo_rating</span>
+        <span class="n">their_transformed</span> <span class="o">=</span> <span class="n">competitor_ecf</span><span class="o">.</span><span class="n">transformed_elo_rating</span>
         <span class="k">return</span> <span class="n">my_transformed</span> <span class="o">/</span> <span class="p">(</span><span class="n">their_transformed</span> <span class="o">+</span> <span class="n">my_transformed</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ECFCompetitor.beat"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.ecf.ECFCompetitor.beat">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -440,24 +444,27 @@
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">competitor_ecf</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">ECFCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
 
+        <span class="c1"># Revert to original logic, using casted opponent</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__initialize_ratings</span><span class="p">()</span>
 
-        <span class="c1"># store the at-scoring-time ratings for both competitors</span>
         <span class="n">self_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rating</span>
-        <span class="n">competitors_rating</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span>
+        <span class="n">competitors_rating</span> <span class="o">=</span> <span class="n">competitor_ecf</span><span class="o">.</span><span class="n">rating</span>
 
-        <span class="c1"># limit the competitors based on the class delta value</span>
         <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">self_rating</span> <span class="o">-</span> <span class="n">competitors_rating</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">self_rating</span> <span class="o">&gt;</span> <span class="n">competitors_rating</span><span class="p">:</span>
                 <span class="n">competitors_rating</span> <span class="o">=</span> <span class="n">self_rating</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">competitors_rating</span> <span class="o">=</span> <span class="n">self_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span>
 
-        <span class="c1"># Update both competitors in one go</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">competitors_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span><span class="p">)</span>
-        <span class="n">competitor</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">self_rating</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span><span class="p">)</span></div>
+        <span class="n">performance_rating_self</span> <span class="o">=</span> <span class="n">competitors_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span>
+        <span class="n">performance_rating_competitor</span> <span class="o">=</span> <span class="n">self_rating</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span>
+
+        <span class="c1"># Update scores</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">performance_rating_self</span><span class="p">)</span>
+        <span class="n">competitor_ecf</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">performance_rating_competitor</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ECFCompetitor.tied"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.ecf.ECFCompetitor.tied">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has tied with the given competitor.</span>
@@ -472,24 +479,27 @@
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">competitor_ecf</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">ECFCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
 
+        <span class="c1"># Revert to original logic, using casted opponent</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__initialize_ratings</span><span class="p">()</span>
 
-        <span class="c1"># store the at-scoring-time ratings for both competitors</span>
         <span class="n">self_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rating</span>
-        <span class="n">competitors_rating</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span>
+        <span class="n">competitors_rating</span> <span class="o">=</span> <span class="n">competitor_ecf</span><span class="o">.</span><span class="n">rating</span>
 
-        <span class="c1"># limit the competitors based on the class delta value</span>
         <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">self_rating</span> <span class="o">-</span> <span class="n">competitors_rating</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">self_rating</span> <span class="o">&gt;</span> <span class="n">competitors_rating</span><span class="p">:</span>
                 <span class="n">competitors_rating</span> <span class="o">=</span> <span class="n">self_rating</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">competitors_rating</span> <span class="o">=</span> <span class="n">self_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span>
 
-        <span class="c1"># Update both competitors in one go</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">competitors_rating</span><span class="p">)</span>
-        <span class="n">competitor</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">self_rating</span><span class="p">)</span></div></div>
+        <span class="n">performance_rating_self</span> <span class="o">=</span> <span class="n">competitors_rating</span>
+        <span class="n">performance_rating_competitor</span> <span class="o">=</span> <span class="n">self_rating</span>
+
+        <span class="c1"># Update scores</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">performance_rating_self</span><span class="p">)</span>
+        <span class="n">competitor_ecf</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">performance_rating_competitor</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

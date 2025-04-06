@@ -168,7 +168,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">=</span> <span class="n">k_factor</span> <span class="k">if</span> <span class="n">k_factor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">=</span> <span class="n">k_factor</span> <span class="k">if</span> <span class="n">k_factor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">EloCompetitor</span><span class="o">.</span><span class="n">_k_factor</span></div>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of this competitor.</span>
@@ -228,7 +228,7 @@
         <span class="n">k_factor</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;k_factor&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">k_factor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">k_factor</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;K-factor must be positive&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">=</span> <span class="n">k_factor</span> <span class="k">if</span> <span class="n">k_factor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">_k_factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">=</span> <span class="n">k_factor</span> <span class="k">if</span> <span class="n">k_factor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">EloCompetitor</span><span class="o">.</span><span class="n">_k_factor</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_import_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Import current state variables from a state dictionary.</span>
@@ -365,7 +365,7 @@
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformed_rating</span> <span class="o">/</span> <span class="p">(</span><span class="n">competitor</span><span class="o">.</span><span class="n">transformed_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformed_rating</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformed_rating</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transformed_rating</span> <span class="o">+</span> <span class="n">competitor</span><span class="o">.</span><span class="n">transformed_rating</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="EloCompetitor.beat"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.elo.EloCompetitor.beat">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has won against the given competitor.</span>
@@ -380,14 +380,11 @@
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
-
+        <span class="c1"># Revert to original logic</span>
         <span class="n">win_es</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="n">lose_es</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="c1"># update the winner&#39;s rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">win_es</span><span class="p">)</span>
-
-        <span class="c1"># update the loser&#39;s rating</span>
         <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">*</span> <span class="p">(</span><span class="mi">0</span> <span class="o">-</span> <span class="n">lose_es</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="EloCompetitor.tied"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.elo.EloCompetitor.tied">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -403,14 +400,11 @@
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
-
+        <span class="c1"># Revert to original logic</span>
         <span class="n">win_es</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="n">lose_es</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="c1"># update the winner&#39;s rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">-</span> <span class="n">win_es</span><span class="p">)</span>
-
-        <span class="c1"># update the loser&#39;s rating</span>
         <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">-</span> <span class="n">lose_es</span><span class="p">)</span></div></div>
 </pre></div>
 

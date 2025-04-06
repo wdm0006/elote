@@ -441,7 +441,8 @@ match_time (datetime, optional): The time when the match occurred. Default: curr
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">elote.competitors.dwz.</span></span><span class="sig-name descname"><span class="pre">DWZCompetitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">400</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/elote/competitors/dwz.html#DWZCompetitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.dwz.DWZCompetitor" title="Permalink to this definition"></a></dt>
 <dd><p>Deutsche Wertungszahl (DWZ) rating system competitor.</p>
 <p>The DWZ is the German chess rating system, similar to Elo but with some
-differences in how ratings are updated after matches.</p>
+differences in how ratings are updated after matches, including factors
+based on player age and performance.</p>
 <dl class="simple">
 <dt>Class Attributes:</dt><dd><p>_J (int): Development coefficient. Default: 10.</p>
 </dd>
@@ -455,12 +456,14 @@ differences in how ratings are updated after matches.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.dwz.DWZCompetitor.beat">
-<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/competitors/dwz.html#DWZCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.dwz.DWZCompetitor.beat" title="Permalink to this definition"></a></dt>
-<dd><p>Update ratings after this competitor has won against the given competitor.</p>
-<p>This method updates the ratings of both this competitor and the opponent
-based on the match outcome where this competitor won.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.</p>
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">age</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/competitors/dwz.html#DWZCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.dwz.DWZCompetitor.beat" title="Permalink to this definition"></a></dt>
+<dd><p>Update ratings after this competitor wins against another.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor.
+age (Optional[int]): The age of this competitor at the time of the match.</p>
+<blockquote>
+<div><p>Used for DWZ calculation. Defaults to 26 (adult).</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
@@ -521,12 +524,14 @@ InvalidParameterException: If any parameter in the state is invalid.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.dwz.DWZCompetitor.tied">
-<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/competitors/dwz.html#DWZCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.dwz.DWZCompetitor.tied" title="Permalink to this definition"></a></dt>
-<dd><p>Update ratings after this competitor has tied with the given competitor.</p>
-<p>This method updates the ratings of both this competitor and the opponent
-based on a drawn match outcome.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.</p>
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">age</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/competitors/dwz.html#DWZCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.dwz.DWZCompetitor.tied" title="Permalink to this definition"></a></dt>
+<dd><p>Update ratings after this competitor ties with another.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor.
+age (Optional[int]): The age of this competitor at the time of the match.</p>
+<blockquote>
+<div><p>Used for DWZ calculation. Defaults to 26 (adult).</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>

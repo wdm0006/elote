@@ -121,7 +121,7 @@
              
   <h1>Source code for elote.competitors.dwz</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote.competitors.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="n">InvalidRatingValueException</span><span class="p">,</span> <span class="n">InvalidParameterException</span>
 
@@ -132,7 +132,8 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Deutsche Wertungszahl (DWZ) rating system competitor.</span>
 
 <span class="sd">    The DWZ is the German chess rating system, similar to Elo but with some</span>
-<span class="sd">    differences in how ratings are updated after matches.</span>
+<span class="sd">    differences in how ratings are updated after matches, including factors</span>
+<span class="sd">    based on player age and performance.</span>
 
 <span class="sd">    Class Attributes:</span>
 <span class="sd">        _J (int): Development coefficient. Default: 10.</span>
@@ -157,10 +158,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_count</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_E</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_rating_for_E</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_count_for_E</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">initial_rating</span></div>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of this competitor.</span>
@@ -201,9 +199,6 @@
             <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">value</span>
-        <span class="c1"># Invalidate cache when rating changes</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_E</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_rating_for_E</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="DWZCompetitor.export_state"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.dwz.DWZCompetitor.export_state">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">export_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the current state of this competitor for serialization.</span>
@@ -273,11 +268,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;count&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_count</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_count&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-        <span class="c1"># Invalidate cache</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_E</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_rating_for_E</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_count_for_E</span> <span class="o">=</span> <span class="kc">None</span>
-
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_from_parameters</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new competitor instance from parameters.</span>
@@ -311,12 +301,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Handle legacy state format</span>
         <span class="k">if</span> <span class="s2">&quot;type&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-            <span class="c1"># Configure class variables if provided</span>
-            <span class="k">if</span> <span class="s2">&quot;class_vars&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-                <span class="n">class_vars</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;class_vars&quot;</span><span class="p">]</span>
-                <span class="k">if</span> <span class="s2">&quot;J&quot;</span> <span class="ow">in</span> <span class="n">class_vars</span><span class="p">:</span>
-                    <span class="bp">cls</span><span class="o">.</span><span class="n">_J</span> <span class="o">=</span> <span class="n">class_vars</span><span class="p">[</span><span class="s2">&quot;J&quot;</span><span class="p">]</span>
-
             <span class="c1"># Create a new competitor with the initial rating</span>
             <span class="n">competitor</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="mi">400</span><span class="p">))</span>
 
@@ -341,10 +325,7 @@
 <span class="sd">        This method resets the competitor&#39;s rating and count to their initial values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_count</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_E</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_rating_for_E</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_count_for_E</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_count</span></div>
 
 <div class="viewcode-block" id="DWZCompetitor.expected_score"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.dwz.DWZCompetitor.expected_score">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the expected score (probability of winning) against another competitor.</span>
@@ -359,117 +340,132 @@
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">competitor_dwz</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">DWZCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
 
         <span class="c1"># Direct calculation to avoid property access overhead</span>
-        <span class="n">competitor_rating</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">_rating</span>
-        <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">((</span><span class="n">competitor_rating</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="p">)</span> <span class="o">/</span> <span class="mi">400</span><span class="p">))</span></div>
+        <span class="n">competitor_rating</span> <span class="o">=</span> <span class="n">competitor_dwz</span><span class="o">.</span><span class="n">_rating</span>
+        <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">((</span><span class="n">competitor_rating</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="p">)</span> <span class="o">/</span> <span class="mf">400.0</span><span class="p">))</span></div>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_E</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the development coefficient E.</span>
-
-<span class="sd">        The development coefficient determines how much a player&#39;s rating changes</span>
-<span class="sd">        after a match, based on their current rating and number of games played.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            int: The development coefficient.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Check if we can use cached value</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_cached_E</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_rating_for_E</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span>
-            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_count_for_E</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count</span>
-        <span class="p">):</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cached_E</span>
-
-        <span class="c1"># Calculate E</span>
-        <span class="n">E0</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">**</span> <span class="mi">4</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_J</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="nb">min</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">/</span> <span class="mi">2000</span><span class="p">,</span> <span class="mi">1</span><span class="p">])])</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">&lt;</span> <span class="mi">1300</span><span class="p">:</span>
-            <span class="n">B</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="mi">1300</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="p">)</span> <span class="o">/</span> <span class="mi">150</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">B</span> <span class="o">=</span> <span class="mi">0</span>
-
-        <span class="n">E</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">E0</span> <span class="o">+</span> <span class="n">B</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">B</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="nb">min</span><span class="p">([</span><span class="n">E</span><span class="p">,</span> <span class="nb">min</span><span class="p">([</span><span class="mi">30</span><span class="p">,</span> <span class="mi">5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count</span><span class="p">])])])</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="nb">min</span><span class="p">([</span><span class="n">E</span><span class="p">,</span> <span class="mi">150</span><span class="p">])])</span>
-
-        <span class="c1"># Cache the result</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_E</span> <span class="o">=</span> <span class="n">result</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_rating_for_E</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_count_for_E</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count</span>
-
-        <span class="k">return</span> <span class="n">result</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_new_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;DWZCompetitor&quot;</span><span class="p">,</span> <span class="n">W_a</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the new rating after a match.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_E</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">age</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">W_a</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">W_e</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the development coefficient E for a specific match context.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            competitor (DWZCompetitor): The opponent competitor.</span>
-<span class="sd">            W_a (float): The actual outcome of the match (1 for win, 0.5 for draw, 0 for loss).</span>
+<span class="sd">            age (Optional[int]): The age of the player at the time of the match. Defaults to 26 if None.</span>
+<span class="sd">            W_a (float): Achieved points in the match (1.0 for win, 0.5 for draw, 0.0 for loss).</span>
+<span class="sd">            W_e (float): Expected points in the match.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The calculated development coefficient E.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Determine J based on age (default to adult &gt; 25 if None)</span>
+        <span class="n">current_age</span> <span class="o">=</span> <span class="n">age</span> <span class="k">if</span> <span class="n">age</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">26</span>
+        <span class="k">if</span> <span class="n">current_age</span> <span class="o">&lt;=</span> <span class="mi">20</span><span class="p">:</span>
+            <span class="n">J</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="k">elif</span> <span class="mi">21</span> <span class="o">&lt;=</span> <span class="n">current_age</span> <span class="o">&lt;=</span> <span class="mi">25</span><span class="p">:</span>
+            <span class="n">J</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># age &gt; 25 or default</span>
+            <span class="n">J</span> <span class="o">=</span> <span class="mi">15</span>
+
+        <span class="c1"># Calculate E0</span>
+        <span class="n">Z_A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span>
+        <span class="n">E0</span> <span class="o">=</span> <span class="p">(</span><span class="n">Z_A</span> <span class="o">/</span> <span class="mf">1000.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">J</span>
+
+        <span class="c1"># Calculate acceleration factor &#39;a&#39;</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="k">if</span> <span class="n">current_age</span> <span class="o">&lt;=</span> <span class="mi">20</span> <span class="ow">and</span> <span class="n">W_a</span> <span class="o">&gt;</span> <span class="n">W_e</span><span class="p">:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">Z_A</span> <span class="o">/</span> <span class="mf">2000.0</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span>  <span class="c1"># Clamp a between 0.5 and 1.0</span>
+
+        <span class="c1"># Calculate braking value &#39;B&#39;</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">if</span> <span class="n">Z_A</span> <span class="o">&lt;</span> <span class="mi">1300</span> <span class="ow">and</span> <span class="n">W_a</span> <span class="o">&lt;=</span> <span class="n">W_e</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">B</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="mf">1300.0</span> <span class="o">-</span> <span class="n">Z_A</span><span class="p">)</span> <span class="o">/</span> <span class="mf">150.0</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span>
+            <span class="k">except</span> <span class="ne">OverflowError</span><span class="p">:</span>
+                <span class="n">B</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>  <span class="c1"># Handle potential overflow for very low ratings</span>
+
+        <span class="c1"># Calculate E</span>
+        <span class="n">E</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">E0</span> <span class="o">+</span> <span class="n">B</span>
+
+        <span class="c1"># Apply bounds based on tournament index &#39;i&#39; (using game count + 1)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">+</span> <span class="mi">1</span>  <span class="c1"># Game count before this match + 1</span>
+        <span class="k">if</span> <span class="n">B</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">E_upper_bound</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">5.0</span> <span class="o">*</span> <span class="n">i</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">E_upper_bound</span> <span class="o">=</span> <span class="mf">150.0</span>
+
+        <span class="n">E</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">E_upper_bound</span><span class="p">))</span>  <span class="c1"># Clamp E: 5 &lt;= E &lt;= E_upper_bound</span>
+
+        <span class="k">return</span> <span class="n">E</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_new_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;DWZCompetitor&quot;</span><span class="p">,</span> <span class="n">W_a</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">age</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the new DWZ rating after a match.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            competitor (DWZCompetitor): The opponent.</span>
+<span class="sd">            W_a (float): The actual score achieved against the opponent (1.0, 0.5, or 0.0).</span>
+<span class="sd">            age (Optional[int]): The age of this competitor at the time of the match. Defaults to 26.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            float: The new rating.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Calculate expected score directly to avoid multiple property accesses</span>
-        <span class="n">expected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
-        <span class="n">E_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_E</span>  <span class="c1"># Get E value once</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">+</span> <span class="p">(</span><span class="mi">800</span> <span class="o">/</span> <span class="p">(</span><span class="n">E_value</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">W_a</span> <span class="o">-</span> <span class="n">expected</span><span class="p">)</span>
+        <span class="n">W_e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">E</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_E</span><span class="p">(</span><span class="n">age</span><span class="o">=</span><span class="n">age</span><span class="p">,</span> <span class="n">W_a</span><span class="o">=</span><span class="n">W_a</span><span class="p">,</span> <span class="n">W_e</span><span class="o">=</span><span class="n">W_e</span><span class="p">)</span>
 
-<div class="viewcode-block" id="DWZCompetitor.beat"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.dwz.DWZCompetitor.beat">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has won against the given competitor.</span>
+        <span class="c1"># Formula uses n = number of games in evaluation period. Assuming game-by-game update, n=1.</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">new_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">+</span> <span class="p">(</span><span class="mf">800.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">E</span> <span class="o">+</span> <span class="n">n</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">W_a</span> <span class="o">-</span> <span class="n">W_e</span><span class="p">)</span>
 
-<span class="sd">        This method updates the ratings of both this competitor and the opponent</span>
-<span class="sd">        based on the match outcome where this competitor won.</span>
+        <span class="c1"># Ensure rating doesn&#39;t fall below minimum</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">,</span> <span class="n">new_rating</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DWZCompetitor.beat"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.dwz.DWZCompetitor.beat">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="n">age</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor wins against another.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            competitor (BaseCompetitor): The opponent competitor that lost.</span>
+<span class="sd">            competitor (BaseCompetitor): The opponent competitor.</span>
+<span class="sd">            age (Optional[int]): The age of this competitor at the time of the match.</span>
+<span class="sd">                                 Used for DWZ calculation. Defaults to 26 (adult).</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">competitor_dwz</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">DWZCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
 
-        <span class="c1"># Calculate new ratings</span>
-        <span class="n">self_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_rating</span><span class="p">(</span><span class="n">competitor</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">competitor_rating</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">_new_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># Calculate new ratings using the age parameter</span>
+        <span class="n">my_new_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_rating</span><span class="p">(</span><span class="n">competitor_dwz</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="n">age</span><span class="p">)</span>
+        <span class="n">opponent_new_rating</span> <span class="o">=</span> <span class="n">competitor_dwz</span><span class="o">.</span><span class="n">_new_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># Opponent age not needed here</span>
 
-        <span class="c1"># Update ratings and counts in one go</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">self_rating</span>
+        <span class="c1"># Update ratings and counts simultaneously</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">my_new_rating</span>
+        <span class="n">competitor_dwz</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">opponent_new_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_E</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Invalidate cache</span>
+        <span class="n">competitor_dwz</span><span class="o">.</span><span class="n">_count</span> <span class="o">+=</span> <span class="mi">1</span></div>
 
-        <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">competitor_rating</span>
-        <span class="n">competitor</span><span class="o">.</span><span class="n">_count</span> <span class="o">+=</span> <span class="mi">1</span></div>
-
-<div class="viewcode-block" id="DWZCompetitor.tied"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.dwz.DWZCompetitor.tied">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has tied with the given competitor.</span>
-
-<span class="sd">        This method updates the ratings of both this competitor and the opponent</span>
-<span class="sd">        based on a drawn match outcome.</span>
+<div class="viewcode-block" id="DWZCompetitor.tied"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.dwz.DWZCompetitor.tied">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="n">age</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor ties with another.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            competitor (BaseCompetitor): The opponent competitor that tied.</span>
+<span class="sd">            competitor (BaseCompetitor): The opponent competitor.</span>
+<span class="sd">            age (Optional[int]): The age of this competitor at the time of the match.</span>
+<span class="sd">                                 Used for DWZ calculation. Defaults to 26 (adult).</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">competitor_dwz</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">DWZCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
 
-        <span class="c1"># Calculate new ratings</span>
-        <span class="n">self_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_rating</span><span class="p">(</span><span class="n">competitor</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
-        <span class="n">competitor_rating</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">_new_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+        <span class="c1"># Calculate new ratings using the age parameter</span>
+        <span class="n">my_new_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_rating</span><span class="p">(</span><span class="n">competitor_dwz</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="n">age</span><span class="p">)</span>
+        <span class="n">opponent_new_rating</span> <span class="o">=</span> <span class="n">competitor_dwz</span><span class="o">.</span><span class="n">_new_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># Opponent age not needed here</span>
 
-        <span class="c1"># Update ratings and counts in one go</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">self_rating</span>
+        <span class="c1"># Update ratings and counts simultaneously</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">my_new_rating</span>
+        <span class="n">competitor_dwz</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">opponent_new_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_E</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Invalidate cache</span>
-
-        <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">competitor_rating</span>
-        <span class="n">competitor</span><span class="o">.</span><span class="n">_count</span> <span class="o">+=</span> <span class="mi">1</span></div></div>
+        <span class="n">competitor_dwz</span><span class="o">.</span><span class="n">_count</span> <span class="o">+=</span> <span class="mi">1</span></div></div>
 </pre></div>
 
            </div>
