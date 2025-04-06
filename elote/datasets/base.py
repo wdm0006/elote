@@ -7,7 +7,7 @@ for evaluating different rating algorithms.
 
 import abc
 from dataclasses import dataclass
-from typing import List, Tuple, Dict, Any, Optional
+from typing import List, Tuple, Dict, Any, Optional, Sequence, Set
 import datetime
 import pandas as pd
 import numpy as np
@@ -23,14 +23,14 @@ class DataSplit:
         test: List of matchup tuples (competitor_a, competitor_b, outcome, timestamp, attributes)
     """
 
-    train: List[Tuple[Any, Any, float, Optional[datetime.datetime], Optional[Dict[str, Any]]]]
-    test: List[Tuple[Any, Any, float, Optional[datetime.datetime], Optional[Dict[str, Any]]]]
+    train: Sequence[Tuple[Any, Any, float, Optional[datetime.datetime], Optional[Dict[str, Any]]]]
+    test: Sequence[Tuple[Any, Any, float, Optional[datetime.datetime], Optional[Dict[str, Any]]]]
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Return the total number of matchups in both train and test sets."""
         return len(self.train) + len(self.test)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return a string representation of the data split."""
         return f"DataSplit(train={len(self.train)}, test={len(self.test)})"
 
@@ -63,7 +63,7 @@ class BaseDataset(abc.ABC):
             cache_dir: Directory to cache downloaded data. If None, a temporary directory will be used.
         """
         self.cache_dir = cache_dir
-        self._data = None
+        self._data: Optional[List[Tuple[Any, Any, float, Optional[datetime.datetime], Optional[Dict[str, Any]]]]] = None
 
     @abc.abstractmethod
     def download(self) -> None:
@@ -178,22 +178,22 @@ class BaseDataset(abc.ABC):
             np.random.seed(seed)
 
         # Get all unique competitors
-        all_competitors = set()
+        all_competitors: Set[Any] = set()
         for a, b, _, _, _ in data:
             all_competitors.add(a)
             all_competitors.add(b)
 
-        all_competitors = list(all_competitors)
-        np.random.shuffle(all_competitors)
+        all_competitors_list: List[Any] = list(all_competitors)
+        np.random.shuffle(all_competitors_list)
 
         # Split competitors
-        split_idx = int(len(all_competitors) * (1 - test_ratio))
-        train_competitors = set(all_competitors[:split_idx])
-        test_competitors = set(all_competitors[split_idx:])
+        split_idx = int(len(all_competitors_list) * (1 - test_ratio))
+        train_competitors: Set[Any] = set(all_competitors_list[:split_idx])
+        test_competitors: Set[Any] = set(all_competitors_list[split_idx:])
 
         # Split data based on competitors
-        train_data = []
-        test_data = []
+        train_data: List[Tuple[Any, Any, float, Optional[datetime.datetime], Optional[Dict[str, Any]]]] = []
+        test_data: List[Tuple[Any, Any, float, Optional[datetime.datetime], Optional[Dict[str, Any]]]] = []
 
         for matchup in data:
             a, b = matchup[0], matchup[1]

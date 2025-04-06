@@ -1,5 +1,5 @@
 import math
-from typing import Dict, Any, ClassVar, Type, TypeVar, Optional, List, Tuple
+from typing import Dict, Any, ClassVar, Type, TypeVar, Optional, List, Tuple, cast
 from datetime import datetime
 
 from elote.competitors.base import BaseCompetitor, InvalidRatingValueException, InvalidParameterException
@@ -38,7 +38,7 @@ class Glicko2Competitor(BaseCompetitor):
         self,
         initial_rating: float = 1500,
         initial_rd: float = 350,
-        initial_volatility: float = None,
+        initial_volatility: Optional[float] = None,
         initial_time: Optional[datetime] = None,
     ):
         """Initialize a Glicko-2 competitor.
@@ -62,7 +62,7 @@ class Glicko2Competitor(BaseCompetitor):
             raise InvalidParameterException("Initial RD must be positive")
 
         if initial_volatility is None:
-            initial_volatility = self._default_volatility
+            initial_volatility = self._default_volatility  # type: ignore[unreachable]
         elif initial_volatility <= 0:
             raise InvalidParameterException("Initial volatility must be positive")
 
@@ -438,10 +438,11 @@ class Glicko2Competitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
-        competitor_glicko2 = competitor  # type: Glicko2Competitor
-        return self._E(self._mu, competitor_glicko2._mu, competitor_glicko2._phi)
+        competitor_glicko2 = cast(Glicko2Competitor, competitor)
+        self._phi_j = self._rd_to_phi(competitor.rd)
+        return self._E(self._mu, competitor_glicko2._mu, self._phi_j)
 
-    def update_rd_for_inactivity(self, current_time: datetime = None) -> None:
+    def update_rd_for_inactivity(self, current_time: Optional[datetime] = None) -> None:
         """Update the rating deviation based on time elapsed since last activity.
 
         This implements Glickman's formula for increasing uncertainty in ratings
@@ -454,7 +455,7 @@ class Glicko2Competitor(BaseCompetitor):
                 If None, uses the current system time.
         """
         if current_time is None:
-            current_time = datetime.now()
+            current_time = datetime.now()  # type: ignore[unreachable]
 
         # Calculate number of rating periods (can be fractional)
         days_inactive = (current_time - self._last_activity).total_seconds() / (24 * 3600)
@@ -499,11 +500,14 @@ class Glicko2Competitor(BaseCompetitor):
         sigma = self._sigma
 
         # Step 2: For each opponent j, compute g(phi_j) and E(mu, mu_j, phi_j)
-        v_inv = 0
-        delta_sum = 0
+        v_inv = 0.0
+        delta_sum = 0.0
         for opponent, score, _ in self._match_results:
-            g_j = self._g(opponent._phi)
-            E_j = self._E(mu, opponent._mu, opponent._phi)
+            self.verify_competitor_types(opponent)
+            opponent_glicko2 = cast(Glicko2Competitor, opponent)
+            phi_j = self._rd_to_phi(opponent.rd)
+            g_j = self._g(phi_j)
+            E_j = self._E(mu, opponent_glicko2._mu, phi_j)
             v_inv += g_j**2 * E_j * (1 - E_j)
             delta_sum += g_j * (score - E_j)
 
@@ -512,11 +516,11 @@ class Glicko2Competitor(BaseCompetitor):
         delta = v * delta_sum
 
         # Step 4: Determine new volatility sigma'
-        def f(x):
+        def f(x: float) -> float:
             """Function to find the root of to determine new volatility."""
-            exp_term = math.exp(x)
-            a = exp_term * (delta**2 - phi**2 - v - exp_term)
-            b = 2 * ((phi**2 + v + exp_term) ** 2)
+            e_x = math.exp(x)
+            a = e_x * (delta**2 - phi**2 - v - e_x)
+            b = 2 * ((phi**2 + v + e_x) ** 2)
             c = x - math.log(sigma**2)
             return a / b - c / self._tau**2
 
@@ -590,7 +594,7 @@ class Glicko2Competitor(BaseCompetitor):
             InvalidParameterException: If the match time is before either competitor's last activity.
         """
         self.verify_competitor_types(competitor)
-        competitor_glicko2 = competitor  # type: Glicko2Competitor
+        competitor_glicko2 = cast(Glicko2Competitor, competitor)
 
         # Get the match time
         current_time = match_time if match_time is not None else datetime.now()
@@ -630,7 +634,7 @@ class Glicko2Competitor(BaseCompetitor):
             InvalidParameterException: If the match time is before either competitor's last activity.
         """
         self.verify_competitor_types(competitor)
-        competitor_glicko2 = competitor  # type: Glicko2Competitor
+        competitor_glicko2 = cast(Glicko2Competitor, competitor)
 
         # Get the match time
         current_time = match_time if match_time is not None else datetime.now()

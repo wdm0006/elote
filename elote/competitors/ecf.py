@@ -1,4 +1,4 @@
-from typing import Dict, Any, ClassVar, Optional, Type, TypeVar
+from typing import Dict, Any, ClassVar, Optional, Type, TypeVar, cast, Deque
 from collections import deque
 import statistics
 
@@ -36,7 +36,7 @@ class ECFCompetitor(BaseCompetitor):
             )
 
         self.__initial_rating = initial_rating
-        self.scores: Optional[deque] = None
+        self.scores: Optional[Deque[float]] = None
         self.__cached_rating: Optional[float] = None  # Cache for the rating calculation
 
         # Cache for transformed rating calculation
@@ -62,8 +62,7 @@ class ECFCompetitor(BaseCompetitor):
     def __initialize_ratings(self) -> None:
         """Initialize the ratings deque with the initial rating."""
         # Initialize with a single value instead of a full deque of None values
-        self.scores = deque(maxlen=self._n_periods)
-        self.scores.append(self.__initial_rating)
+        self.scores = deque([self.__initial_rating], maxlen=self._n_periods)
         self.__cached_rating = self.__initial_rating  # Initialize the cache
 
     @property
@@ -99,6 +98,8 @@ class ECFCompetitor(BaseCompetitor):
         else:
             self.__cached_rating = self.__initial_rating
 
+        # Assert that cache is now float before returning
+        assert self.__cached_rating is not None
         return self.__cached_rating
 
     @rating.setter
@@ -128,6 +129,8 @@ class ECFCompetitor(BaseCompetitor):
         """
         if self.scores is None:
             self.__initialize_ratings()
+            # Assert scores is now initialized
+            assert self.scores is not None
 
         # Invalidate the cache when updating scores
         self.__cached_rating = None
@@ -299,10 +302,11 @@ class ECFCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        competitor_ecf = cast(ECFCompetitor, competitor)
 
-        # Calculate directly to avoid multiple property accesses
+        # Use transformed Elo ratings for comparison
         my_transformed = self.transformed_elo_rating
-        their_transformed = competitor.transformed_elo_rating
+        their_transformed = competitor_ecf.transformed_elo_rating
         return my_transformed / (their_transformed + my_transformed)
 
     def beat(self, competitor: BaseCompetitor) -> None:
@@ -318,24 +322,27 @@ class ECFCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        competitor_ecf = cast(ECFCompetitor, competitor)
 
+        # Revert to original logic, using casted opponent
         if self.scores is None:
             self.__initialize_ratings()
 
-        # store the at-scoring-time ratings for both competitors
         self_rating = self.rating
-        competitors_rating = competitor.rating
+        competitors_rating = competitor_ecf.rating
 
-        # limit the competitors based on the class delta value
         if abs(self_rating - competitors_rating) > self._delta:
             if self_rating > competitors_rating:
                 competitors_rating = self_rating - self._delta
             else:
                 competitors_rating = self_rating + self._delta
 
-        # Update both competitors in one go
-        self._update(competitors_rating + self._delta)
-        competitor._update(self_rating - self._delta)
+        performance_rating_self = competitors_rating + self._delta
+        performance_rating_competitor = self_rating - self._delta
+
+        # Update scores
+        self._update(performance_rating_self)
+        competitor_ecf._update(performance_rating_competitor)
 
     def tied(self, competitor: BaseCompetitor) -> None:
         """Update ratings after this competitor has tied with the given competitor.
@@ -350,21 +357,24 @@ class ECFCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        competitor_ecf = cast(ECFCompetitor, competitor)
 
+        # Revert to original logic, using casted opponent
         if self.scores is None:
             self.__initialize_ratings()
 
-        # store the at-scoring-time ratings for both competitors
         self_rating = self.rating
-        competitors_rating = competitor.rating
+        competitors_rating = competitor_ecf.rating
 
-        # limit the competitors based on the class delta value
         if abs(self_rating - competitors_rating) > self._delta:
             if self_rating > competitors_rating:
                 competitors_rating = self_rating - self._delta
             else:
                 competitors_rating = self_rating + self._delta
 
-        # Update both competitors in one go
-        self._update(competitors_rating)
-        competitor._update(self_rating)
+        performance_rating_self = competitors_rating
+        performance_rating_competitor = self_rating
+
+        # Update scores
+        self._update(performance_rating_self)
+        competitor_ecf._update(performance_rating_competitor)

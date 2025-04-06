@@ -69,7 +69,7 @@ class BaseCompetitor(abc.ABC):
 
     _minimum_rating: ClassVar[float] = 100
 
-    def __init_subclass__(cls, **kwargs):
+    def __init_subclass__(cls, **kwargs: Any) -> None:
         """Register subclasses in the competitor registry.
 
         This method is called automatically when a subclass is created.
@@ -273,14 +273,13 @@ class BaseCompetitor(abc.ABC):
         pass
 
     def import_state(self, state: Dict[str, Any]) -> None:
-        """Update this competitor's state from a previously exported state.
+        """Import the competitor's state from a dictionary.
 
-        This method updates the current competitor instance with the state from
-        a previously exported state dictionary.
+        This method updates the competitor's state based on the provided dictionary,
+        including parameters and current state variables.
 
         Args:
-            state (dict): A dictionary containing the state of a competitor,
-                         as returned by export_state().
+            state (dict): A dictionary containing the state of a competitor.
 
         Raises:
             InvalidStateException: If the state dictionary is invalid or incompatible.
@@ -300,10 +299,7 @@ class BaseCompetitor(abc.ABC):
         self._import_current_state(state["state"])
 
     def _validate_state_dict(self, state: Dict[str, Any]) -> None:
-        """Validate a state dictionary.
-
-        This method checks that a state dictionary has all required fields and
-        that they have the correct types.
+        """Validate the structure and content of a state dictionary.
 
         Args:
             state (dict): A state dictionary to validate.
@@ -345,7 +341,7 @@ class BaseCompetitor(abc.ABC):
 
     @abc.abstractmethod
     def _import_current_state(self, state: Dict[str, Any]) -> None:
-        """Import current state variables from a state dictionary.
+        """Import the current state variables from a dictionary.
 
         This method should be implemented by subclasses to import current state
         variables from a state dictionary.
@@ -429,8 +425,9 @@ class BaseCompetitor(abc.ABC):
 
         # Create a custom JSON encoder to handle non-serializable objects
         class CompetitorEncoder(json.JSONEncoder):
-            def default(self, obj):
+            def default(self, obj: Any) -> Any:
                 # Handle types that aren't JSON serializable
+                # For example, convert datetime objects to ISO format string
                 try:
                     # Try to convert to a simple type
                     if hasattr(obj, "__dict__"):
@@ -463,10 +460,7 @@ class BaseCompetitor(abc.ABC):
         return cls.from_state(state)
 
     def verify_competitor_types(self, competitor: "BaseCompetitor") -> None:
-        """Verify that the given competitor is of the same type as this one.
-
-        This method ensures that operations between competitors are only performed
-        when they use the same rating system.
+        """Verify that the competitor types match.
 
         Args:
             competitor (BaseCompetitor): The competitor to verify.
@@ -560,7 +554,7 @@ class BaseCompetitor(abc.ABC):
         return self.rating >= other.rating
 
     @classmethod
-    def configure_class(cls, **kwargs) -> None:
+    def configure_class(cls, **kwargs: Any) -> None:
         """Configure class-level parameters for this rating system.
 
         This method allows setting class-level parameters that affect all
@@ -578,7 +572,7 @@ class BaseCompetitor(abc.ABC):
             else:
                 raise InvalidParameterException(f"Unknown class parameter: {key}")
 
-    def configure(self, **kwargs) -> None:
+    def configure(self, **kwargs: Any) -> None:
         """Configure instance-level parameters for this competitor.
 
         This method allows setting instance-level parameters that affect only
@@ -596,10 +590,13 @@ class BaseCompetitor(abc.ABC):
             else:
                 raise InvalidParameterException(f"Unknown instance parameter: {key}")
 
+    @abc.abstractmethod
     def reset(self) -> None:
-        """Reset this competitor to its initial state.
+        """Reset the competitor's state to its initial configuration.
 
-        This method resets the competitor's rating and any other state to the
-        values it had when it was first created.
+        This method should revert any changes made through updates (beat, lost_to, tied)
+        and re-import the initial parameters and state.
+        Note: Actual implementation might be needed depending on how initial state is stored.
         """
-        self.rating = self._minimum_rating
+        # TODO: Implement actual reset logic if needed, possibly by restoring from initial state
+        pass

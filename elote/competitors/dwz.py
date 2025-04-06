@@ -1,5 +1,5 @@
 import math
-from typing import Dict, Any, ClassVar, Optional, Type, TypeVar
+from typing import Dict, Any, ClassVar, Optional, Type, TypeVar, cast
 
 from elote.competitors.base import BaseCompetitor, InvalidRatingValueException, InvalidParameterException
 
@@ -237,20 +237,21 @@ class DWZCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        competitor_dwz = cast(DWZCompetitor, competitor)
 
         # Direct calculation to avoid property access overhead
-        competitor_rating = competitor._rating
-        return 1 / (1 + 10 ** ((competitor_rating - self._rating) / 400))
+        competitor_rating = competitor_dwz._rating
+        return 1.0 / (1.0 + 10 ** ((competitor_rating - self._rating) / 400.0))
 
     @property
-    def _E(self) -> int:
+    def _E(self) -> float:
         """Calculate the development coefficient E.
 
         The development coefficient determines how much a player's rating changes
         after a match, based on their current rating and number of games played.
 
         Returns:
-            int: The development coefficient.
+            float: The development coefficient.
         """
         # Check if we can use cached value
         if (
@@ -310,18 +311,21 @@ class DWZCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        competitor_dwz = cast(DWZCompetitor, competitor)
 
-        # Calculate new ratings
-        self_rating = self._new_rating(competitor, 1)
-        competitor_rating = competitor._new_rating(self, 0)
+        # Calculate new ratings based on the win
+        self_rating = self._new_rating(competitor_dwz, 1.0)
+        competitor_rating = competitor_dwz._new_rating(self, 0.0)
 
-        # Update ratings and counts in one go
-        self._rating = self_rating
+        # Ensure ratings don't fall below the minimum
+        self._rating = max(self_rating, self._minimum_rating)
+
+        # Update opponent's state
+        competitor_dwz.rating = max(competitor_rating, competitor_dwz._minimum_rating)
+        competitor_dwz._count += 1
+
+        # Update own count
         self._count += 1
-        self._cached_E = None  # Invalidate cache
-
-        competitor.rating = competitor_rating
-        competitor._count += 1
 
     def tied(self, competitor: BaseCompetitor) -> None:
         """Update ratings after this competitor has tied with the given competitor.
@@ -336,15 +340,18 @@ class DWZCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        competitor_dwz = cast(DWZCompetitor, competitor)
 
-        # Calculate new ratings
-        self_rating = self._new_rating(competitor, 0.5)
-        competitor_rating = competitor._new_rating(self, 0.5)
+        # Calculate new ratings based on the tie
+        self_rating = self._new_rating(competitor_dwz, 0.5)
+        competitor_rating = competitor_dwz._new_rating(self, 0.5)
 
-        # Update ratings and counts in one go
-        self._rating = self_rating
+        # Ensure ratings don't fall below the minimum
+        self._rating = max(self_rating, self._minimum_rating)
+
+        # Update opponent's state
+        competitor_dwz.rating = max(competitor_rating, competitor_dwz._minimum_rating)
+        competitor_dwz._count += 1
+
+        # Update own count
         self._count += 1
-        self._cached_E = None  # Invalidate cache
-
-        competitor.rating = competitor_rating
-        competitor._count += 1

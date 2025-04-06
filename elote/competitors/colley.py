@@ -11,7 +11,7 @@ References:
 """
 
 import numpy as np
-from typing import Dict, Any, ClassVar, Type, TypeVar, List, Optional
+from typing import Dict, Any, ClassVar, Type, TypeVar, List, Optional, cast, Set
 from .base import BaseCompetitor, InvalidRatingValueException
 import datetime
 
@@ -57,8 +57,8 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         self._wins = 0
         self._losses = 0
         self._ties = 0
-        self._opponents = {}  # Dictionary mapping opponents to number of games played
-        self._head_to_head = {}  # Dictionary mapping opponents to wins against them
+        self._opponents: Dict["ColleyMatrixCompetitor", int] = {}  # Opponent -> num games
+        self._head_to_head: Dict["ColleyMatrixCompetitor", int] = {}  # Opponent -> wins against
         # Add a unique ID for hashing
         self._id = id(self)
 
@@ -110,11 +110,12 @@ class ColleyMatrixCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        competitor_colley = cast(ColleyMatrixCompetitor, competitor)
 
         # To convert Colley ratings (which are between 0 and 1) to win probabilities,
         # we need to map them to a reasonable probability scale
         # A simple approach is to use a logistic function based on rating difference
-        rating_diff = self._rating - competitor.rating
+        rating_diff = self._rating - competitor_colley.rating
         return 1 / (1 + np.exp(-4 * rating_diff))
 
     def beat(self, competitor: BaseCompetitor) -> None:
@@ -130,6 +131,7 @@ class ColleyMatrixCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        competitor_colley = cast(ColleyMatrixCompetitor, competitor)
 
         # Record the win for this competitor
         self._wins += 1
@@ -139,7 +141,7 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         self._head_to_head[competitor] = self._head_to_head.get(competitor, 0) + 1
 
         # Record the loss for the opponent
-        competitor_typed = competitor  # type: ColleyMatrixCompetitor
+        competitor_typed = competitor_colley
         competitor_typed._losses += 1
         competitor_typed._opponents[self] = competitor_typed._opponents.get(self, 0) + 1
 
@@ -156,13 +158,14 @@ class ColleyMatrixCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        competitor_colley = cast(ColleyMatrixCompetitor, competitor)
 
         # Record the tie for this competitor
         self._ties += 1
         self._opponents[competitor] = self._opponents.get(competitor, 0) + 1
 
         # Record the tie for the opponent
-        competitor_typed = competitor  # type: ColleyMatrixCompetitor
+        competitor_typed = competitor_colley
         competitor_typed._ties += 1
         competitor_typed._opponents[self] = competitor_typed._opponents.get(self, 0) + 1
 
@@ -188,8 +191,8 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         Returns:
             List[ColleyMatrixCompetitor]: A list of all connected competitors.
         """
-        visited = set()
-        to_visit = [self]
+        visited: Set["ColleyMatrixCompetitor"] = set()
+        to_visit: List["ColleyMatrixCompetitor"] = [self]
         all_competitors = []
 
         while to_visit:
@@ -486,7 +489,7 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         """
         return cls(initial_rating=params.get("initial_rating", cls._default_initial_rating))
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         """Check if two competitors are equal based on their unique ID.
 
         Args:
@@ -496,10 +499,10 @@ class ColleyMatrixCompetitor(BaseCompetitor):
             bool: True if the competitors are the same object, False otherwise.
         """
         if not isinstance(other, ColleyMatrixCompetitor):
-            return False
+            return NotImplemented
         return self._id == other._id
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """Get a hash value for this competitor based on its unique ID.
 
         Returns:

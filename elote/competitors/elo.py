@@ -46,7 +46,7 @@ class EloCompetitor(BaseCompetitor):
 
         self._initial_rating = initial_rating
         self._rating = initial_rating
-        self._k_factor = k_factor if k_factor is not None else self._k_factor
+        self._k_factor = k_factor if k_factor is not None else EloCompetitor._k_factor
 
     def __repr__(self) -> str:
         """Return a string representation of this competitor.
@@ -106,7 +106,7 @@ class EloCompetitor(BaseCompetitor):
         k_factor = parameters.get("k_factor", None)
         if k_factor is not None and k_factor <= 0:
             raise InvalidParameterException("K-factor must be positive")
-        self._k_factor = k_factor if k_factor is not None else self.__class__._k_factor
+        self._k_factor = k_factor if k_factor is not None else EloCompetitor._k_factor
 
     def _import_current_state(self, state: Dict[str, Any]) -> None:
         """Import current state variables from a state dictionary.
@@ -243,7 +243,7 @@ class EloCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
-        return self.transformed_rating / (competitor.transformed_rating + self.transformed_rating)
+        return self.transformed_rating / (self.transformed_rating + competitor.transformed_rating)
 
     def beat(self, competitor: BaseCompetitor) -> None:
         """Update ratings after this competitor has won against the given competitor.
@@ -258,14 +258,11 @@ class EloCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
-
+        # Revert to original logic
         win_es = self.expected_score(competitor)
         lose_es = competitor.expected_score(self)
 
-        # update the winner's rating
         self._rating = self._rating + self._k_factor * (1 - win_es)
-
-        # update the loser's rating
         competitor.rating = competitor.rating + self._k_factor * (0 - lose_es)
 
     def tied(self, competitor: BaseCompetitor) -> None:
@@ -281,12 +278,9 @@ class EloCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
-
+        # Revert to original logic
         win_es = self.expected_score(competitor)
         lose_es = competitor.expected_score(self)
 
-        # update the winner's rating
         self._rating = self._rating + self._k_factor * (0.5 - win_es)
-
-        # update the loser's rating
         competitor.rating = competitor.rating + self._k_factor * (0.5 - lose_es)
