@@ -208,14 +208,12 @@ class EloCompetitor(BaseCompetitor):
 
     @property
     def transformed_rating(self) -> float:
-        """Get the transformed rating of this competitor.
-
-        The transformed rating is used in the expected score calculation.
+        """Get the transformed rating for this competitor.
 
         Returns:
             float: The transformed rating.
         """
-        return 10 ** (self._rating / self._base_rating)
+        return float(10 ** (self.rating / 400))
 
     @property
     def rating(self) -> float:
@@ -242,25 +240,17 @@ class EloCompetitor(BaseCompetitor):
             raise InvalidRatingValueException(f"Rating cannot be below the minimum rating of {self._minimum_rating}")
         self._rating = value
 
-    def expected_score(self, competitor: BaseCompetitor) -> float:
-        """Calculate the expected score (probability of winning) against another competitor.
-
-        In Elo rating, a player's expected score is their probability of winning plus half their probability of drawing.
-        This is because in Elo rating a draw is not explicitly accounted for, but rather counted as half of a win and
-        half of a loss. It can make the expected score a bit difficult to reason about, so be careful.
+    def expected_score(self, competitor: "BaseCompetitor") -> float:
+        """Calculate the expected score against another competitor.
 
         Args:
-            competitor (BaseCompetitor): The opponent competitor to compare against.
+            competitor (BaseCompetitor): The competitor to compare against.
 
         Returns:
-            float: The probability of winning (between 0 and 1).
-
-        Raises:
-            MissMatchedCompetitorTypesException: If the competitor types don't match.
+            float: The expected score (probability of winning).
         """
         self.verify_competitor_types(competitor)
-        logger.debug("Calculating expected score between %s and %s", self, competitor)
-        return self.transformed_rating / (self.transformed_rating + competitor.transformed_rating)
+        return float(self.transformed_rating / (self.transformed_rating + competitor.transformed_rating))
 
     def beat(self, competitor: BaseCompetitor) -> None:
         """Update ratings after this competitor has won against the given competitor.

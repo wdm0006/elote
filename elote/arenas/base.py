@@ -79,7 +79,7 @@ class History:
 
     def __init__(self) -> None:
         """Initialize an empty history of bouts."""
-        self.bouts = []
+        self.bouts: List[Bout] = []
         logger.debug("History initialized.")
 
     def add_bout(self, bout: "Bout") -> None:
@@ -281,17 +281,19 @@ class History:
     def optimize_thresholds(
         self, method: str = "L-BFGS-B", initial_thresholds: Tuple[float, float] = (0.5, 0.5)
     ) -> Tuple[float, List[float]]:
-        """Search for optimal prediction thresholds using scipy optimization.
+        """Optimize prediction thresholds using scipy.optimize.
 
-        This method uses scipy's optimize module to find the best lower and upper
-        thresholds that maximize the overall accuracy, including draws.
+        This method uses scipy's optimization algorithms to find the best thresholds
+        for maximizing prediction accuracy.
 
         Args:
-            method (str): The optimization method to use (default: 'L-BFGS-B').
-            initial_thresholds (tuple): Initial guess for (lower, upper) thresholds.
+            method (str): The optimization method to use (e.g., 'L-BFGS-B', 'Nelder-Mead')
+            initial_thresholds (tuple): Initial guess for (lower_threshold, upper_threshold)
 
         Returns:
-            tuple: A tuple containing (best_accuracy, best_thresholds).
+            tuple: (best_accuracy, best_thresholds) where:
+                - best_accuracy: The accuracy achieved with the optimized thresholds
+                - best_thresholds: List of [lower_threshold, upper_threshold]
         """
         from scipy import optimize
 
@@ -408,12 +410,12 @@ class History:
                 best_accuracy,
                 baseline_accuracy,
             )
-            return baseline_accuracy, initial_thresholds
+            return baseline_accuracy, list(initial_thresholds)
 
         logger.info(
             "Optimization complete. Best accuracy: %.4f with thresholds [%.2f, %.2f]", best_accuracy, *best_thresholds
         )
-        return best_accuracy, best_thresholds
+        return best_accuracy, list(best_thresholds)
 
     def calculate_metrics(self, lower_threshold: float = 0.5, upper_threshold: float = 0.5) -> Dict[str, float]:
         """
@@ -591,7 +593,7 @@ class History:
             )
 
         # Track the number of bouts for each competitor
-        competitor_bout_counts = {}
+        competitor_bout_counts: Dict[Any, int] = {}
 
         # Count all bouts from arena's history (which includes training data)
         if hasattr(arena, "history") and hasattr(arena.history, "bouts"):
@@ -677,7 +679,7 @@ class History:
         logger.info("Completed accuracy by prior bouts calculation with bin size %d.", bin_size)
         return {"binned": binned_data}
 
-    def get_calibration_data(self, n_bins: int = 10) -> Dict[str, List[float]]:
+    def get_calibration_data(self, n_bins: int = 10) -> Tuple[List[float], List[float]]:
         """Compute calibration data from the bout history.
 
         This method extracts predicted probabilities and actual outcomes from the bout history
@@ -775,11 +777,13 @@ class Bout:
         Returns:
             bool: True if this bout is a true positive, False otherwise.
         """
+        if self.predicted_outcome is None or self.outcome is None:
+            return False
         if self.predicted_outcome > threshold:
             if isinstance(self.outcome, str):
-                return self.outcome == "win"
+                return bool(self.outcome == "win")
             else:
-                return self.outcome == 1.0
+                return bool(self.outcome == 1.0)
         return False
 
     def false_positive(self, threshold: float = 0.5) -> bool:
@@ -793,11 +797,13 @@ class Bout:
         Returns:
             bool: True if this bout is a false positive, False otherwise.
         """
+        if self.predicted_outcome is None or self.outcome is None:
+            return False
         if self.predicted_outcome > threshold:
             if isinstance(self.outcome, str):
-                return self.outcome != "win"
+                return bool(self.outcome != "win")
             else:
-                return self.outcome != 1.0
+                return bool(self.outcome != 1.0)
         return False
 
     def true_negative(self, threshold: float = 0.5) -> bool:
@@ -811,11 +817,13 @@ class Bout:
         Returns:
             bool: True if this bout is a true negative, False otherwise.
         """
+        if self.predicted_outcome is None or self.outcome is None:
+            return False
         if self.predicted_outcome <= threshold:
             if isinstance(self.outcome, str):
-                return self.outcome == "loss"
+                return bool(self.outcome == "loss")
             else:
-                return self.outcome == 0.0
+                return bool(self.outcome == 0.0)
         return False
 
     def false_negative(self, threshold: float = 0.5) -> bool:
@@ -829,11 +837,13 @@ class Bout:
         Returns:
             bool: True if this bout is a false negative, False otherwise.
         """
+        if self.predicted_outcome is None or self.outcome is None:
+            return False
         if self.predicted_outcome <= threshold:
             if isinstance(self.outcome, str):
-                return self.outcome != "loss"
+                return bool(self.outcome != "loss")
             else:
-                return self.outcome != 0.0
+                return bool(self.outcome != 0.0)
         return False
 
     def predicted_winner(self, lower_threshold: float = 0.5, upper_threshold: float = 0.5) -> Optional[str]:

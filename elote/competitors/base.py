@@ -1,7 +1,7 @@
 import abc
 import json
 import uuid
-from typing import Dict, Any, TypeVar, Type, ClassVar, List
+from typing import Dict, Any, TypeVar, Type, ClassVar, List, cast
 
 from elote.logging import logger
 
@@ -390,54 +390,35 @@ class BaseCompetitor(abc.ABC):
 
     @classmethod
     def from_state(cls: Type[T], state: Dict[str, Any]) -> T:
-        """Create a new competitor from a previously exported state.
-
-        This method creates a new competitor instance from a previously exported
-        state dictionary.
+        """Create a new competitor from a state dictionary.
 
         Args:
-            state (dict): A dictionary containing the state of a competitor,
-                         as returned by export_state().
+            state: A dictionary containing the state of a competitor, including its type and parameters.
 
         Returns:
-            BaseCompetitor: A new competitor with the same state as the exported one.
+            A new competitor of the same type as the exported one.
 
         Raises:
-            InvalidStateException: If the state dictionary is invalid or incompatible.
-            InvalidParameterException: If any parameter in the state is invalid.
+            InvalidStateException: If the state format is invalid or missing required fields.
         """
-        # Validate the state dictionary
-        logger.debug("Creating competitor from state: %s", state)
-        if not isinstance(state, dict):
-            logger.error("from_state failed: State must be a dictionary, got %s", type(state))
-            raise InvalidStateException("State must be a dictionary")
-
-        # Check required fields
-        required_fields = ["type", "version", "parameters", "state"]
+        # Validate required fields
+        required_fields = ["type", "parameters", "state"]
         for field in required_fields:
             if field not in state:
-                logger.error("from_state failed: Missing required field '%s' in state", field)
-                raise InvalidStateException(f"Missing required field: {field}")
+                msg = f"State must contain a '{field}' field"
+                logger.error(msg)
+                raise InvalidStateException(msg)
 
-        # Get the competitor class
-        competitor_type = state["type"]
-        logger.debug("Attempting to create competitor of type: %s", competitor_type)
-        if competitor_type not in _competitor_registry:
-            logger.error("from_state failed: Unknown competitor type '%s'", competitor_type)
-            raise InvalidParameterException(f"Unknown competitor type: {competitor_type}")
+        competitor_class = cls.get_competitor_class(state["type"])
+        if competitor_class is None:
+            msg = f"Unknown competitor type: {state['type']}"
+            logger.error(msg)
+            raise InvalidStateException(msg)
 
-        competitor_class = _competitor_registry[competitor_type]
-
-        # Create a new instance using the parameters
-        logger.debug("Creating new instance of %s using parameters: %s", competitor_type, state["parameters"])
+        logger.debug(f"Creating competitor of type {state['type']} from state")
         instance = competitor_class._create_from_parameters(state["parameters"])
-
-        # Import the current state
-        logger.debug("Importing current state into new instance: %s", state["state"])
         instance._import_current_state(state["state"])
-
-        logger.info("Successfully created competitor %s from state", instance)
-        return instance
+        return cast(T, instance)
 
     @classmethod
     @abc.abstractmethod
