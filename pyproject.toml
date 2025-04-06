@@ -121,6 +121,8 @@ show_error_codes = true
 show_column_numbers = true
 pretty = true
 ignore_missing_imports = true
+disallow_any_unimported = true
+disallow_untyped_calls = true
 disable_error_code = ["attr-defined", "assignment", "index", "call-arg", "arg-type", "valid-type", "misc", "override", "union-attr", "safe-super", "dict-item", "call-overload"]
 files = ["elote"]
 exclude = ["tests/.*", "examples/.*", "scripts/.*", "docs/.*"]
@@ -129,10 +131,13 @@ exclude = ["tests/.*", "examples/.*", "scripts/.*", "docs/.*"]
 [[tool.mypy.overrides]]
 module = [
     "numpy.*",
-    "pandas.*",
     "matplotlib.*",
     "tqdm.*",
     "sportsdataverse.*",
     "scipy.*",
 ]
-ignore_missing_imports = true 
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["pandas"]
+ignore_missing_imports = false 
