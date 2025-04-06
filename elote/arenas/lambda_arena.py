@@ -1,16 +1,20 @@
+import datetime
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type
+
 from tqdm import tqdm
 from elote import EloCompetitor
 from elote.arenas.base import BaseArena, Bout, History
+from elote.competitors.base import BaseCompetitor
 
 
 class LambdaArena(BaseArena):
     def __init__(
         self,
-        func,
-        base_competitor=EloCompetitor,
-        base_competitor_kwargs=None,
-        initial_state=None,
-    ):
+        func: Callable[..., Optional[bool]],
+        base_competitor: Type[BaseCompetitor] = EloCompetitor,
+        base_competitor_kwargs: Optional[Dict[str, Any]] = None,
+        initial_state: Optional[Dict[Any, Dict[str, Any]]] = None,
+    ) -> None:
         """Initialize a LambdaArena with a comparison function.
 
         The LambdaArena uses a provided function to determine the outcome of matchups
@@ -27,9 +31,11 @@ class LambdaArena(BaseArena):
             initial_state (dict, optional): Initial state for competitors, mapping
                 competitor IDs to their initial parameters.
         """
-        self.func = func
-        self.competitors = dict()
-        self.base_competitor = base_competitor
+        self.func: Callable[..., Optional[bool]] = func
+        self.competitors: Dict[Any, BaseCompetitor] = dict()
+        self.base_competitor: Type[BaseCompetitor] = base_competitor
+        # Define type hint once for the instance variable
+        self.base_competitor_kwargs: Dict[str, Any]
         if base_competitor_kwargs is None:
             self.base_competitor_kwargs = dict()
         else:
@@ -40,13 +46,13 @@ class LambdaArena(BaseArena):
             for k, v in initial_state.items():
                 self.competitors[k] = self.base_competitor(**v)
 
-        self.history = History()
+        self.history: History = History()
 
-    def clear_history(self):
+    def clear_history(self) -> None:
         """Clear the history of bouts in this arena."""
         self.history = History()
 
-    def set_competitor_class_var(self, name, value):
+    def set_competitor_class_var(self, name: str, value: Any) -> None:
         """Set a class variable on the base competitor class.
 
         This method allows for global configuration of all competitors
@@ -58,7 +64,7 @@ class LambdaArena(BaseArena):
         """
         setattr(self.base_competitor, name, value)
 
-    def tournament(self, matchups):
+    def tournament(self, matchups: List[Tuple[Any, Any]]) -> None:
         """Run a tournament with the given matchups.
 
         Process multiple matchups between competitors, updating ratings
@@ -66,14 +72,17 @@ class LambdaArena(BaseArena):
 
         Args:
             matchups (list): A list of (competitor_a, competitor_b) tuples.
-
-        Returns:
-            list: A list of bout results.
         """
         for data in tqdm(matchups):
             self.matchup(*data)
 
-    def matchup(self, a, b, attributes=None, match_time=None):
+    def matchup(
+        self,
+        a: Any,
+        b: Any,
+        attributes: Optional[Dict[str, Any]] = None,
+        match_time: Optional[datetime.datetime] = None,
+    ) -> None:
         """Process a single matchup between two competitors.
 
         This method handles a matchup between two competitors, creating them
@@ -85,16 +94,13 @@ class LambdaArena(BaseArena):
             b: The second competitor or competitor identifier.
             attributes (dict, optional): Additional attributes to record with this bout.
             match_time (datetime, optional): The time when the match occurred.
-
-        Returns:
-            The result of the matchup.
         """
         if a not in self.competitors:
             self.competitors[a] = self.base_competitor(**self.base_competitor_kwargs)
         if b not in self.competitors:
             self.competitors[b] = self.base_competitor(**self.base_competitor_kwargs)
 
-        predicted_outcome = self.expected_score(a, b)
+        predicted_outcome: float = self.expected_score(a, b)
 
         if attributes:
             res = self.func(a, b, attributes=attributes)
@@ -106,24 +112,27 @@ class LambdaArena(BaseArena):
 
         if res is None:
             if supports_time:
+                # type: ignore[call-arg]
                 self.competitors[a].tied(self.competitors[b], match_time=match_time)
             else:
                 self.competitors[a].tied(self.competitors[b])
             self.history.add_bout(Bout(a, b, predicted_outcome, outcome="tie", attributes=attributes))
         elif res is True:
             if supports_time:
+                # type: ignore[call-arg]
                 self.competitors[a].beat(self.competitors[b], match_time=match_time)
             else:
                 self.competitors[a].beat(self.competitors[b])
             self.history.add_bout(Bout(a, b, predicted_outcome, outcome="win", attributes=attributes))
         else:
             if supports_time:
+                # type: ignore[call-arg]
                 self.competitors[b].beat(self.competitors[a], match_time=match_time)
             else:
                 self.competitors[b].beat(self.competitors[a])
             self.history.add_bout(Bout(a, b, predicted_outcome, outcome="loss", attributes=attributes))
 
-    def expected_score(self, a, b):
+    def expected_score(self, a: Any, b: Any) -> float:
         """Calculate the expected score for a matchup between two competitors.
 
         This method returns the probability that competitor a will beat competitor b.
@@ -142,24 +151,27 @@ class LambdaArena(BaseArena):
 
         return self.competitors[a].expected_score(self.competitors[b])
 
-    def export_state(self):
+    def export_state(self) -> Dict[Any, Dict[str, Any]]:
         """Export the current state of this arena for serialization.
 
         Returns:
             dict: A dictionary containing the state of all competitors in this arena.
         """
-        state = dict()
+        state: Dict[Any, Dict[str, Any]] = dict()
         for k, v in self.competitors.items():
             state[k] = v.export_state()
         return state
 
-    def leaderboard(self):
+    # type: ignore[override]
+    def leaderboard(self) -> List[Dict[str, Any]]:
         """Generate a leaderboard of all competitors.
 
         Returns:
             list: A list of dictionaries containing competitor IDs and their ratings,
                  sorted by rating in descending order.
         """
-        lb = [{"competitor": k, "rating": v.rating} for k, v in self.competitors.items()]
+        # Restore original implementation returning list of dicts
+        lb: List[Dict[str, Any]] = [{"competitor": k, "rating": v.rating} for k, v in self.competitors.items()]
 
-        return sorted(lb, key=lambda x: x.get("rating"))
+        # Restore original sorting key and add ignores for mypy errors
+        return sorted(lb, key=lambda x: x.get("rating"))  # type: ignore[arg-type, return-value]

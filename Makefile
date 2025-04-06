@@ -1,4 +1,4 @@
-.PHONY: help setup install install-dev install-datasets test test-cov lint format clean build docs lint-fix test-all benchmark run-example
+.PHONY: help setup install install-dev install-datasets test test-cov lint format clean build docs lint-fix test-all benchmark run-example typecheck
 
 # Default target
 help:
@@ -13,6 +13,8 @@ help:
 	@echo "  make benchmark    - Run performance benchmarks"
 	@echo "  make lint         - Run linting checks"
 	@echo "  make lint-fix     - Run linting checks and fix auto-fixable issues"
+	@echo "  make typecheck    - Run mypy type checking"
+	@echo "  make typecheck [FILE=path] - Run mypy type checking (optionally on a specific file)"
 	@echo "  make format       - Format code with ruff"
 	@echo "  make clean        - Clean build artifacts"
 	@echo "  make build        - Build package distributions"
@@ -52,6 +54,18 @@ lint:
 # Run linting and fix auto-fixable issues
 lint-fix:
 	uv run ruff check --fix --unsafe-fixes .
+
+# Run mypy type checking
+typecheck:
+	@if [ -z "$(FILE)" ]; then \
+		echo "Running mypy on the entire elote package..."; \
+		uv run mypy elote; \
+		echo mypy elote; \
+	else \
+		echo "Running mypy on $(FILE)..."; \
+		uv run mypy $(FILE); \
+		echo mypy $(FILE); \
+	fi
 
 # Format code
 format:
