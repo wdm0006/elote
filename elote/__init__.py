@@ -62,6 +62,9 @@ from elote.visualization import (
     plot_accuracy_by_prior_bouts,
 )
 
+# Make logging easily accessible
+from .logging import logger, set_level, add_handler, basic_config
+
 __all__ = [
     # Competitors
     "EloCompetitor",
@@ -91,4 +94,8 @@ __all__ = [
     "plot_rating_system_comparison",
     "plot_optimized_accuracy_comparison",
     "plot_accuracy_by_prior_bouts",
+    "logger",
+    "set_level",
+    "add_handler",
+    "basic_config",
 ]

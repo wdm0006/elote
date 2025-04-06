@@ -12,8 +12,10 @@ References:
 
 import numpy as np
 from typing import Dict, Any, ClassVar, Type, TypeVar, List, Optional, cast, Set
-from .base import BaseCompetitor, InvalidRatingValueException
+from elote.competitors.base import BaseCompetitor, InvalidRatingValueException
 import datetime
+
+from elote.logging import logger
 
 T = TypeVar("T", bound="ColleyMatrixCompetitor")
 
@@ -49,6 +51,7 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         Raises:
             InvalidRatingValueException: If the initial rating is below the minimum rating.
         """
+        super().__init__()  # Call base class constructor
         if initial_rating is not None and initial_rating < self._minimum_rating:
             raise InvalidRatingValueException(f"Initial rating must be at least {self._minimum_rating}")
 
@@ -61,6 +64,7 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         self._head_to_head: Dict["ColleyMatrixCompetitor", int] = {}  # Opponent -> wins against
         # Add a unique ID for hashing
         self._id = id(self)
+        logger.debug("Initialized ColleyMatrixCompetitor %d with initial rating %.3f", self._id, self._initial_rating)
 
     @property
     def rating(self) -> float:
@@ -81,7 +85,11 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         Raises:
             InvalidRatingValueException: If the rating value is below the minimum rating.
         """
+        logger.debug("Setting rating for competitor %d to %.3f", self._id, value)
         if value < self._minimum_rating:
+            logger.warning(
+                "Attempted to set rating %.3f below minimum %.3f for %d", value, self._minimum_rating, self._id
+            )
             raise InvalidRatingValueException(f"Rating cannot be below the minimum rating of {self._minimum_rating}")
         self._rating = value
 
@@ -109,6 +117,7 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
+        logger.debug("Calculating expected score between %s and %s", self, competitor)
         self.verify_competitor_types(competitor)
         competitor_colley = cast(ColleyMatrixCompetitor, competitor)
 
@@ -130,6 +139,7 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
+        logger.debug("Competitor %s beat %s", self, competitor)
         self.verify_competitor_types(competitor)
         competitor_colley = cast(ColleyMatrixCompetitor, competitor)
 
@@ -145,6 +155,7 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         competitor_typed._losses += 1
         competitor_typed._opponents[self] = competitor_typed._opponents.get(self, 0) + 1
 
+        logger.debug("Recorded win for %d, loss for %d", self._id, competitor_typed._id)
         # Recalculate ratings for all connected competitors
         self._recalculate_ratings()
 
@@ -157,6 +168,7 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
+        logger.debug("Competitor %s tied with %s", self, competitor)
         self.verify_competitor_types(competitor)
         competitor_colley = cast(ColleyMatrixCompetitor, competitor)
 
@@ -169,6 +181,7 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         competitor_typed._ties += 1
         competitor_typed._opponents[self] = competitor_typed._opponents.get(self, 0) + 1
 
+        logger.debug("Recorded tie for %d and %d", self._id, competitor_typed._id)
         # Recalculate ratings for all connected competitors
         self._recalculate_ratings()
 
@@ -181,6 +194,7 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
+        logger.debug("Competitor %s lost to %s", self, competitor)
         competitor.beat(self)
 
     def _get_connected_competitors(self) -> List["ColleyMatrixCompetitor"]:
@@ -195,6 +209,7 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         to_visit: List["ColleyMatrixCompetitor"] = [self]
         all_competitors = []
 
+        logger.debug("Finding connected competitors starting from %s", self)
         while to_visit:
             current = to_visit.pop()
             if current in visited:
@@ -207,6 +222,7 @@ class ColleyMatrixCompetitor(BaseCompetitor):
                 if opponent not in visited:
                     to_visit.append(opponent)
 
+        logger.debug("Found %d connected competitors: %s", len(all_competitors), [c._id for c in all_competitors])
         return all_competitors
 
     def _recalculate_ratings(self) -> None:
@@ -223,11 +239,13 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         - r is the rating vector we're solving for
         """
         # Get all competitors in the connected network
+        logger.info("Recalculating Colley Matrix ratings starting from competitor %d", self._id)
         competitors = self._get_connected_competitors()
         n = len(competitors)
 
         # If there's only one competitor, rating stays at initial value
         if n <= 1:
+            logger.debug("Only one competitor in network, skipping recalculation.")
             return
 
         # Create a mapping of competitors to their index in the matrix
@@ -237,6 +255,7 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         C = np.zeros((n, n))
         b = np.zeros(n)
 
+        logger.debug("Building Colley Matrix (%d x %d)", n, n)
         # Initialize C with 2 on the diagonal (base Colley matrix)
         for i in range(n):
             C[i, i] = 2
@@ -271,9 +290,11 @@ class ColleyMatrixCompetitor(BaseCompetitor):
 
         try:
             # Solve the system Cr = b
+            logger.debug("Solving linear system Cr = b")
             r = np.linalg.solve(C, b)
 
             # Update ratings
+            logger.debug("Updating ratings for %d competitors", n)
             for i, comp in enumerate(competitors):
                 comp._rating = r[i]
 
@@ -288,11 +309,15 @@ class ColleyMatrixCompetitor(BaseCompetitor):
             total_rating = sum(comp._rating for comp in competitors)
             target_sum = n / 2
             if abs(total_rating - target_sum) > 1e-10:
+                logger.debug("Normalizing ratings. Total: %.4f, Target: %.4f", total_rating, target_sum)
                 scale_factor = target_sum / total_rating
                 for comp in competitors:
                     comp._rating *= scale_factor
 
         except np.linalg.LinAlgError:
+            logger.warning(
+                "Colley Matrix is singular. Falling back to win percentage rating calculation for %d competitors.", n
+            )
             # If the matrix is singular, fall back to a simpler approach
             # This can happen with certain network structures
             for _, comp in enumerate(competitors):
@@ -320,6 +345,7 @@ class ColleyMatrixCompetitor(BaseCompetitor):
             # Normalize ratings to ensure sum is n/2
             total_rating = sum(comp._rating for comp in competitors)
             target_sum = n / 2
+            logger.debug("Normalizing fallback ratings. Total: %.4f, Target: %.4f", total_rating, target_sum)
             if total_rating != 0:  # Avoid division by zero
                 scale_factor = target_sum / total_rating
                 for comp in competitors:
@@ -427,8 +453,16 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         Raises:
             KeyError: If the state dictionary is missing required keys.
         """
+        # Check if all required keys exist (from both parameters and state)
+        required_keys = ["initial_rating", "rating", "wins", "losses", "ties"]
+        missing_keys = [key for key in required_keys if key not in state]
+        if missing_keys:
+            logger.error("Missing keys in ColleyMatrixCompetitor state: %s", missing_keys)
+            raise KeyError(f"Missing keys in ColleyMatrixCompetitor state: {missing_keys}")
+
         # Configure class variables if provided
         if "class_vars" in state:
+            logger.debug("Applying class variables from state: %s", state["class_vars"])
             class_vars = state["class_vars"]
             if "minimum_rating" in class_vars:
                 cls._minimum_rating = class_vars["minimum_rating"]
@@ -437,9 +471,14 @@ class ColleyMatrixCompetitor(BaseCompetitor):
 
         # Create a new competitor with the initial rating
         competitor = cls(initial_rating=state.get("initial_rating", cls._default_initial_rating))
+        logger.debug(
+            "Created new ColleyMatrixCompetitor from state with initial rating: %.3f", competitor._initial_rating
+        )
 
         # Set the current rating if provided
-        if "current_rating" in state:
+        if "rating" in state:
+            competitor._rating = state["rating"]
+        elif "current_rating" in state:  # Backward compatibility
             competitor._rating = state["current_rating"]
 
         # Set match statistics
@@ -450,10 +489,12 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         # Note: We can't restore the opponent list from state
         # This would require reconstructing the entire match history
 
+        logger.info("Successfully created ColleyMatrixCompetitor %d from state.", competitor._id)
         return competitor
 
     def reset(self) -> None:
         """Reset this competitor to its initial state."""
+        logger.info("Resetting ColleyMatrixCompetitor %d to initial state.", self._id)
         self._rating = self._initial_rating
         self._wins = 0
         self._losses = 0

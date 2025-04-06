@@ -2,6 +2,7 @@ import math
 from typing import Dict, Any, ClassVar, Optional, Type, TypeVar, cast
 
 from elote.competitors.base import BaseCompetitor, InvalidRatingValueException, InvalidParameterException
+from elote.logging import logger  # Import directly from the logging submodule
 
 T = TypeVar("T", bound="DWZCompetitor")
 
@@ -28,6 +29,7 @@ class DWZCompetitor(BaseCompetitor):
         Raises:
             InvalidRatingValueException: If the initial rating is below the minimum rating.
         """
+        super().__init__()  # Call base class constructor
         if initial_rating < self._minimum_rating:
             raise InvalidRatingValueException(
                 f"Initial rating cannot be below the minimum rating of {self._minimum_rating}"
@@ -37,6 +39,7 @@ class DWZCompetitor(BaseCompetitor):
         self._count = 0
         self._initial_count = 0
         self._rating = initial_rating
+        logger.debug("Initialized DWZCompetitor with initial rating %.1f", initial_rating)
 
     def __repr__(self) -> str:
         """Return a string representation of this competitor.
@@ -73,7 +76,9 @@ class DWZCompetitor(BaseCompetitor):
         Raises:
             InvalidRatingValueException: If the rating value is below the minimum rating.
         """
+        logger.debug("Setting rating for DWZCompetitor to %.1f", value)
         if value < self._minimum_rating:
+            logger.warning("Attempted to set rating %.1f below minimum %.1f", value, self._minimum_rating)
             raise InvalidRatingValueException(f"Rating cannot be below the minimum rating of {self._minimum_rating}")
 
         self._rating = value
@@ -120,8 +125,10 @@ class DWZCompetitor(BaseCompetitor):
             InvalidParameterException: If any parameter is invalid.
         """
         # Validate and set initial_rating
+        logger.debug("Importing parameters for DWZCompetitor: %s", parameters)
         initial_rating = parameters.get("initial_rating", 400)
         if initial_rating < self._minimum_rating:
+            logger.error("Invalid initial_rating in state: %.1f (minimum %.1f)", initial_rating, self._minimum_rating)
             raise InvalidParameterException(
                 f"Initial rating cannot be below the minimum rating of {self._minimum_rating}"
             )
@@ -137,8 +144,10 @@ class DWZCompetitor(BaseCompetitor):
             InvalidStateException: If any state variable is invalid.
         """
         # Validate and set rating
+        logger.debug("Importing current state for DWZCompetitor: %s", state)
         rating = state.get("rating", self._initial_rating)
         if rating < self._minimum_rating:
+            logger.error("Invalid rating in state: %.1f (minimum %.1f)", rating, self._minimum_rating)
             raise InvalidParameterException(f"Rating cannot be below the minimum rating of {self._minimum_rating}")
         self._rating = rating
 
@@ -177,8 +186,10 @@ class DWZCompetitor(BaseCompetitor):
         Raises:
             InvalidParameterException: If any parameter in the state is invalid.
         """
+        logger.debug("Creating DWZCompetitor from state: %s", state)
         # Handle legacy state format
         if "type" not in state:
+            logger.warning("Using legacy state format for DWZCompetitor.from_state")
             # Create a new competitor with the initial rating
             competitor = cls(initial_rating=state.get("initial_rating", 400))
 
@@ -202,6 +213,11 @@ class DWZCompetitor(BaseCompetitor):
 
         This method resets the competitor's rating and count to their initial values.
         """
+        logger.info(
+            "Resetting DWZCompetitor to initial state (rating=%.1f, count=%d)",
+            self._initial_rating,
+            self._initial_count,
+        )
         self._rating = self._initial_rating
         self._count = self._initial_count
 
@@ -219,6 +235,7 @@ class DWZCompetitor(BaseCompetitor):
         """
         self.verify_competitor_types(competitor)
         competitor_dwz = cast(DWZCompetitor, competitor)
+        logger.debug("Calculating expected score between %s and %s", self, competitor_dwz)
 
         # Direct calculation to avoid property access overhead
         competitor_rating = competitor_dwz._rating
@@ -236,7 +253,11 @@ class DWZCompetitor(BaseCompetitor):
             float: The calculated development coefficient E.
         """
         # Determine J based on age (default to adult > 25 if None)
-        current_age = age if age is not None else 26
+        current_age = age if age is not None else 26  # Use a default age if None
+        logger.debug(
+            "Calculating E coefficient: age=%d, Wa=%.1f, We=%.3f, rating=%.1f", current_age, W_a, W_e, self._rating
+        )
+        # Determine J based on age
         if current_age <= 20:
             J = 5
         elif 21 <= current_age <= 25:
@@ -266,6 +287,7 @@ class DWZCompetitor(BaseCompetitor):
         E = a * E0 + B
 
         # Apply bounds based on tournament index 'i' (using game count + 1)
+        logger.debug("Calculated E components: J=%d, E0=%.2f, a=%.2f, B=%.2f, Unbounded E=%.2f", J, E0, a, B, E)
         i = self._count + 1  # Game count before this match + 1
         if B == 0.0:
             E_upper_bound = min(30.0, 5.0 * i)
@@ -274,6 +296,7 @@ class DWZCompetitor(BaseCompetitor):
 
         E = max(5.0, min(E, E_upper_bound))  # Clamp E: 5 <= E <= E_upper_bound
 
+        logger.debug("Final E coefficient clamped between 5.0 and %.2f: E = %.2f", E_upper_bound, E)
         return E
 
     def _new_rating(self, competitor: "DWZCompetitor", W_a: float, age: Optional[int] = None) -> float:
@@ -287,6 +310,9 @@ class DWZCompetitor(BaseCompetitor):
         Returns:
             float: The new rating.
         """
+        logger.debug(
+            "Calculating new rating for %s after match against %s (Score=%.1f, Age=%s)", self, competitor, W_a, age
+        )
         W_e = self.expected_score(competitor)
         E = self._calculate_E(age=age, W_a=W_a, W_e=W_e)
 
@@ -295,7 +321,9 @@ class DWZCompetitor(BaseCompetitor):
         new_rating = self._rating + (800.0 / (E + n)) * (W_a - W_e)
 
         # Ensure rating doesn't fall below minimum
-        return max(self._minimum_rating, new_rating)
+        new_rating_clamped = max(self._minimum_rating, new_rating)
+        logger.debug("New rating calculated: %.1f (Clamped: %.1f)", new_rating, new_rating_clamped)
+        return new_rating_clamped
 
     def beat(self, competitor: BaseCompetitor, age: Optional[int] = None) -> None:
         """Update ratings after this competitor wins against another.
@@ -310,6 +338,7 @@ class DWZCompetitor(BaseCompetitor):
         """
         self.verify_competitor_types(competitor)
         competitor_dwz = cast(DWZCompetitor, competitor)
+        logger.debug("%s beat %s (age=%s)", self, competitor_dwz, age)
 
         # Calculate new ratings using the age parameter
         my_new_rating = self._new_rating(competitor_dwz, 1.0, age=age)
@@ -334,6 +363,7 @@ class DWZCompetitor(BaseCompetitor):
         """
         self.verify_competitor_types(competitor)
         competitor_dwz = cast(DWZCompetitor, competitor)
+        logger.debug("%s tied with %s (age=%s)", self, competitor_dwz, age)
 
         # Calculate new ratings using the age parameter
         my_new_rating = self._new_rating(competitor_dwz, 0.5, age=age)

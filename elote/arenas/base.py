@@ -2,6 +2,8 @@ import abc
 import random
 from typing import Dict, Any, List, Tuple, Optional
 
+from elote.logging import logger
+
 
 class BaseArena:
     """Base abstract class for all arena implementations.
@@ -78,6 +80,7 @@ class History:
     def __init__(self) -> None:
         """Initialize an empty history of bouts."""
         self.bouts = []
+        logger.debug("History initialized.")
 
     def add_bout(self, bout: "Bout") -> None:
         """Add a bout to the history.
@@ -86,6 +89,7 @@ class History:
             bout (Bout): The bout object to add to the history.
         """
         self.bouts.append(bout)
+        logger.debug("Added bout between %s and %s", bout.a, bout.b)
 
     def report_results(self, lower_threshold: float = 0.5, upper_threshold: float = 0.5) -> List[Dict[str, Any]]:
         """Generate a report of the results in this history.
@@ -98,6 +102,7 @@ class History:
             list: A list of dictionaries containing the results of each bout.
         """
         report = list()
+        logger.info("Generating results report for %d bouts", len(self.bouts))
         for bout in self.bouts:
             report.append(
                 {
@@ -125,6 +130,14 @@ class History:
         false_positives = 0
         true_negatives = 0
         false_negatives = 0
+        skipped_bouts = 0
+
+        logger.info(
+            "Calculating confusion matrix for %d bouts with thresholds: [%.2f, %.2f]",
+            len(self.bouts),
+            lower_threshold,
+            upper_threshold,
+        )
 
         for bout in self.bouts:
             # Extract the actual winner and predicted probability
@@ -133,6 +146,7 @@ class History:
 
             # Skip if we don't have both actual and predicted values
             if actual_winner is None or predicted_prob is None:
+                skipped_bouts += 1
                 continue
 
             # Convert predicted_prob to float if it's a string or None
@@ -141,8 +155,13 @@ class History:
                     predicted_prob = float(predicted_prob)
                 except ValueError:
                     # If conversion fails, skip this bout
+                    logger.warning(
+                        "Could not convert predicted_prob '%s' to float, skipping bout.", bout.predicted_outcome
+                    )
+                    skipped_bouts += 1
                     continue
             elif predicted_prob is None:
+                skipped_bouts += 1
                 continue
 
             # Determine the predicted outcome
@@ -171,9 +190,13 @@ class History:
                     actual_winner = "draw"
                 else:
                     # Skip if actual winner is not a recognized value
+                    logger.debug("Unrecognized actual_winner value: %s, skipping bout.", bout.outcome)
+                    skipped_bouts += 1
                     continue
             else:
                 # Skip if actual winner is not a recognized type
+                logger.debug("Unrecognized actual_winner type: %s, skipping bout.", type(bout.outcome))
+                skipped_bouts += 1
                 continue
 
             # Update confusion matrix
@@ -195,13 +218,11 @@ class History:
                 else:
                     false_negatives += 1
 
+        if skipped_bouts > 0:
+            logger.info("Skipped %d bouts during confusion matrix calculation due to missing data.", skipped_bouts)
+
         # Return results as a dictionary
-        return {
-            "tp": true_positives,
-            "fp": false_positives,
-            "tn": true_negatives,
-            "fn": false_negatives
-        }
+        return {"tp": true_positives, "fp": false_positives, "tn": true_negatives, "fn": false_negatives}
 
     def random_search(self, trials: int = 1000) -> Tuple[float, List[float]]:
         """Search for optimal prediction thresholds using random sampling.
@@ -217,10 +238,16 @@ class History:
         """
         best_accuracy = 0
         best_thresholds = [0.5, 0.5]  # Initialize with default values
+        num_bouts = len(self.bouts)
+        logger.info("Performing random search for optimal thresholds with %d trials on %d bouts.", trials, num_bouts)
 
-        for _ in range(trials):
+        if num_bouts == 0:
+            logger.warning("Cannot perform random search on empty history.")
+            return best_accuracy, best_thresholds
+
+        for i in range(trials):
             # Find min and max predicted outcomes in history
-            predicted_outcomes = [bout.predicted_outcome for bout in self.bouts]
+            predicted_outcomes = [bout.predicted_outcome for bout in self.bouts if bout.predicted_outcome is not None]
             min_outcome = min(predicted_outcomes) if predicted_outcomes else 0
             max_outcome = max(predicted_outcomes) if predicted_outcomes else 1
 
@@ -239,7 +266,16 @@ class History:
             if accuracy > best_accuracy:
                 best_accuracy = accuracy
                 best_thresholds = thresholds
+                logger.debug(
+                    "Random search trial %d: New best accuracy %.4f with thresholds [%.2f, %.2f]",
+                    i + 1,
+                    best_accuracy,
+                    *best_thresholds,
+                )
 
+        logger.info(
+            "Random search complete. Best accuracy: %.4f with thresholds [%.2f, %.2f]", best_accuracy, *best_thresholds
+        )
         return best_accuracy, best_thresholds
 
     def optimize_thresholds(
@@ -259,10 +295,21 @@ class History:
         """
         from scipy import optimize
 
+        num_bouts = len(self.bouts)
+        logger.info("Optimizing thresholds using scipy ('%s') on %d bouts.", method, num_bouts)
+
+        if num_bouts == 0:
+            logger.warning("Cannot optimize thresholds on empty history.")
+            return 0.0, list(initial_thresholds)
+
         # Find min and max predicted outcomes in history
-        predicted_outcomes = [bout.predicted_outcome for bout in self.bouts]
-        min_outcome = min(predicted_outcomes) if predicted_outcomes else 0
-        max_outcome = max(predicted_outcomes) if predicted_outcomes else 1
+        predicted_outcomes = [bout.predicted_outcome for bout in self.bouts if bout.predicted_outcome is not None]
+        if not predicted_outcomes:
+            logger.warning("No valid predicted outcomes found in history. Cannot optimize.")
+            return 0.0, list(initial_thresholds)
+        min_outcome = min(predicted_outcomes)
+        max_outcome = max(predicted_outcomes)
+        logger.debug("Predicted outcome range: [%.4f, %.4f]", min_outcome, max_outcome)
 
         # Define the objective function to minimize (negative accuracy)
         def objective(thresholds: List[float]) -> float:
@@ -274,6 +321,9 @@ class History:
         # Calculate baseline accuracy with initial thresholds
         baseline_metrics = self.calculate_metrics(*initial_thresholds)
         baseline_accuracy = baseline_metrics["accuracy"]
+        logger.debug(
+            "Baseline accuracy with initial thresholds [%.2f, %.2f]: %.4f", *initial_thresholds, baseline_accuracy
+        )
 
         # Use initial_thresholds as the initial guess
         initial_guess = list(initial_thresholds)
@@ -295,6 +345,7 @@ class History:
         for opt_method in methods:
             try:
                 # Run the optimization with current method
+                logger.debug("Running optimization with method: %s", opt_method)
                 result = optimize.minimize(
                     objective,
                     initial_guess,
@@ -312,11 +363,17 @@ class History:
 
                 # Update best if better than current best
                 if accuracy > best_accuracy:
+                    logger.debug(
+                        "Optimization (%s): New best accuracy %.4f with thresholds [%.2f, %.2f]",
+                        opt_method,
+                        accuracy,
+                        *opt_thresholds,
+                    )
                     best_accuracy = accuracy
                     best_thresholds = opt_thresholds
 
                 # Try with a few random starting points
-                for _ in range(3):
+                for j in range(3):
                     random_guess = [
                         random.uniform(min_outcome, max_outcome),
                         random.uniform(min_outcome, max_outcome),
@@ -330,16 +387,32 @@ class History:
                         metrics = self.calculate_metrics(*opt_thresholds)
                         accuracy = metrics["accuracy"]
                         if accuracy > best_accuracy:
+                            logger.debug(
+                                "Optimization (%s, random start %d): New best accuracy %.4f with thresholds [%.2f, %.2f]",
+                                opt_method,
+                                j + 1,
+                                accuracy,
+                                *opt_thresholds,
+                            )
                             best_accuracy = accuracy
                             best_thresholds = opt_thresholds
-            except Exception:
+            except Exception as e:
                 # Skip if optimization fails
+                logger.warning("Optimization with method '%s' failed: %s", opt_method, e)
                 continue
 
         # If optimized accuracy is worse than baseline, use baseline
         if best_accuracy < baseline_accuracy:
+            logger.info(
+                "Optimized accuracy (%.4f) is worse than baseline (%.4f). Reverting to baseline thresholds.",
+                best_accuracy,
+                baseline_accuracy,
+            )
             return baseline_accuracy, initial_thresholds
 
+        logger.info(
+            "Optimization complete. Best accuracy: %.4f with thresholds [%.2f, %.2f]", best_accuracy, *best_thresholds
+        )
         return best_accuracy, best_thresholds
 
     def calculate_metrics(self, lower_threshold: float = 0.5, upper_threshold: float = 0.5) -> Dict[str, float]:
@@ -355,6 +428,7 @@ class History:
         """
         # Get the confusion matrix
         cm = self.confusion_matrix(lower_threshold, upper_threshold)
+        logger.debug("Calculated confusion matrix: %s", cm)
 
         # Extract values from the confusion matrix
         tp = cm["tp"]
@@ -377,6 +451,10 @@ class History:
         # Calculate F1 score
         f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else float("nan")
 
+        logger.debug(
+            "Calculated metrics: Accuracy=%.4f, Precision=%.4f, Recall=%.4f, F1=%.4f", accuracy, precision, recall, f1
+        )
+
         # Return all metrics
         return {"accuracy": accuracy, "precision": precision, "recall": recall, "f1": f1, "confusion_matrix": cm}
 
@@ -398,10 +476,19 @@ class History:
         correct_predictions = 0
         true_draw = 0
         false_draw = 0
+        skipped_bouts = 0
+
+        logger.info(
+            "Calculating metrics with draws for %d bouts using thresholds [%.2f, %.2f]",
+            len(self.bouts),
+            lower_threshold,
+            upper_threshold,
+        )
 
         for bout in self.bouts:
             # Skip if we don't have both actual and predicted values
             if bout.actual_winner() is None or bout.predicted_outcome is None:
+                skipped_bouts += 1
                 continue
 
             total_bouts += 1
@@ -439,6 +526,20 @@ class History:
                     true_draw += 1
             elif predicted == "draw":
                 false_draw += 1
+
+        if total_bouts == 0:
+            logger.warning("No valid bouts found to calculate metrics with draws.")
+            return {
+                "accuracy": 0,
+                "precision": 0,
+                "recall": 0,
+                "f1": 0,
+                "true_draw": 0,
+                "false_draw": 0,
+                "draw_rate": 0,
+                "draw_accuracy": 0,
+                "confusion_matrix": self.confusion_matrix(lower_threshold, upper_threshold),
+            }
 
         # Calculate overall accuracy
         accuracy = correct_predictions / total_bouts if total_bouts > 0 else 0
@@ -480,20 +581,30 @@ class History:
         # Default thresholds if not provided
         if thresholds is None:
             lower_threshold, upper_threshold = 0.5, 0.5
+            logger.debug(
+                "Using default thresholds for accuracy by prior bouts: [%.2f, %.2f]", lower_threshold, upper_threshold
+            )
         else:
             lower_threshold, upper_threshold = thresholds
+            logger.debug(
+                "Using provided thresholds for accuracy by prior bouts: [%.2f, %.2f]", lower_threshold, upper_threshold
+            )
 
         # Track the number of bouts for each competitor
         competitor_bout_counts = {}
 
         # Count all bouts from arena's history (which includes training data)
         if hasattr(arena, "history") and hasattr(arena.history, "bouts"):
+            logger.debug("Populating initial bout counts from arena history (%d bouts)", len(arena.history.bouts))
             for bout in arena.history.bouts:
                 competitor_bout_counts[bout.a] = competitor_bout_counts.get(bout.a, 0) + 1
                 competitor_bout_counts[bout.b] = competitor_bout_counts.get(bout.b, 0) + 1
+        else:
+            logger.warning("Arena history not found or empty. Initial bout counts will be zero.")
 
         # Track accuracy by minimum bout count
         accuracy_by_min_bouts = {}
+        logger.info("Calculating accuracy by prior bouts for %d evaluation bouts.", len(self.bouts))
 
         # Process each bout in the evaluation history
         for bout in self.bouts:
@@ -537,9 +648,16 @@ class History:
         for count, metrics in accuracy_by_min_bouts.items():
             bin_index = count // bin_size
             if bin_index not in binned_data:
+                logger.debug(
+                    "Creating new bin %d (counts %d-%d)",
+                    bin_index,
+                    bin_index * bin_size,
+                    (bin_index + 1) * bin_size - 1,
+                )
                 binned_data[bin_index] = {"accuracy_sum": 0, "total": 0}
 
-            binned_data[bin_index]["accuracy_sum"] += metrics["accuracy"] * metrics["total"]
+            if metrics["accuracy"] is not None:
+                binned_data[bin_index]["accuracy_sum"] += metrics["accuracy"] * metrics["total"]
             binned_data[bin_index]["total"] += metrics["total"]
 
         # Calculate average accuracy for each bin
@@ -556,6 +674,7 @@ class History:
             bin_data["max_bouts"] = (bin_idx + 1) * bin_size - 1
 
         # Return only the binned data in the expected format
+        logger.info("Completed accuracy by prior bouts calculation with bin size %d.", bin_size)
         return {"binned": binned_data}
 
     def get_calibration_data(self, n_bins: int = 10) -> Dict[str, List[float]]:
@@ -573,14 +692,23 @@ class History:
                 - y_prob: List of predicted probabilities
         """
         # Extract predicted probabilities and actual outcomes
-        y_prob = [bout.predicted_outcome for bout in self.bouts]
+        y_prob = []
+        y_true = []
+        skipped_bouts = 0
+        logger.info("Extracting calibration data for %d bouts.", len(self.bouts))
 
-        # Convert outcomes to binary format (1.0 for wins, 0.0 for losses)
-        # Note: For calibration curves, we treat draws (0.5) as losses (0.0)
-        # since we're evaluating the calibration of the predicted probability
-        # that player A wins.
-        y_true = [1.0 if bout.outcome == 1.0 else 0.0 for bout in self.bouts]
+        for bout in self.bouts:
+            if bout.predicted_outcome is None or bout.outcome is None:
+                skipped_bouts += 1
+                continue
+            y_prob.append(bout.predicted_outcome)
+            # Convert outcomes to binary format (1.0 for wins, 0.0 for losses/draws)
+            y_true.append(1.0 if bout.outcome == 1.0 else 0.0)
 
+        if skipped_bouts > 0:
+            logger.warning("Skipped %d bouts while extracting calibration data due to missing values.", skipped_bouts)
+
+        logger.debug("Extracted %d valid data points for calibration.", len(y_true))
         return y_true, y_prob
 
 

@@ -3,6 +3,8 @@ import json
 import uuid
 from typing import Dict, Any, TypeVar, Type, ClassVar, List
 
+from elote.logging import logger
+
 
 class MissMatchedCompetitorTypesException(Exception):
     """Exception raised when attempting to compare or update competitors of different types.
@@ -69,6 +71,12 @@ class BaseCompetitor(abc.ABC):
 
     _minimum_rating: ClassVar[float] = 100
 
+    @abc.abstractmethod
+    def __init__(self, **kwargs: Any) -> None:
+        """Initialize base competitor state."""
+        # Placeholder for potential future base initialization
+        pass
+
     def __init_subclass__(cls, **kwargs: Any) -> None:
         """Register subclasses in the competitor registry.
 
@@ -77,6 +85,7 @@ class BaseCompetitor(abc.ABC):
         """
         super().__init_subclass__(**kwargs)
         _competitor_registry[cls.__name__] = cls
+        logger.debug("Registered competitor class: %s", cls.__name__)
 
     @classmethod
     def get_competitor_class(cls, class_name: str) -> Type["BaseCompetitor"]:
@@ -92,7 +101,9 @@ class BaseCompetitor(abc.ABC):
             InvalidParameterException: If the class name is not registered.
         """
         if class_name not in _competitor_registry:
+            logger.error("Attempted to get unknown competitor type: %s", class_name)
             raise InvalidParameterException(f"Unknown competitor type: {class_name}")
+        logger.debug("Retrieved competitor class: %s", class_name)
         return _competitor_registry[class_name]
 
     @classmethod
@@ -102,6 +113,7 @@ class BaseCompetitor(abc.ABC):
         Returns:
             List[str]: A list of registered competitor type names.
         """
+        logger.debug("Listing registered competitor types: %s", list(_competitor_registry.keys()))
         return list(_competitor_registry.keys())
 
     @property
@@ -168,6 +180,7 @@ class BaseCompetitor(abc.ABC):
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
+        logger.debug("Competitor %s lost to %s. Calling beat() on winner.", self, competitor)
         self.verify_competitor_types(competitor)
         competitor.beat(self)
 
@@ -203,6 +216,8 @@ class BaseCompetitor(abc.ABC):
                  this competitor's current state.
         """
         import time
+
+        logger.debug("Exporting state for competitor %s", self)
 
         # Get parameters and current state
         parameters = self._export_parameters()
@@ -246,6 +261,7 @@ class BaseCompetitor(abc.ABC):
         for key, value in current_state.items():
             state_dict[key] = value
 
+        logger.debug("Exported state: %s", state_dict)
         return state_dict
 
     @abc.abstractmethod
@@ -287,16 +303,25 @@ class BaseCompetitor(abc.ABC):
         """
         # Validate the state dictionary
         self._validate_state_dict(state)
+        logger.debug("Importing state into competitor %s", self)
 
         # Check that the competitor type matches
         if state["type"] != self.__class__.__name__:
+            logger.error(
+                "State import failed: Mismatched competitor types. Expected %s, got %s",
+                self.__class__.__name__,
+                state["type"],
+            )
             raise InvalidStateException(
                 f"Mismatched competitor types: expected {self.__class__.__name__}, got {state['type']}"
             )
 
         # Import the state
+        logger.debug("Importing parameters: %s", state["parameters"])
         self._import_parameters(state["parameters"])
+        logger.debug("Importing current state: %s", state["state"])
         self._import_current_state(state["state"])
+        logger.info("Successfully imported state for competitor %s", self)
 
     def _validate_state_dict(self, state: Dict[str, Any]) -> None:
         """Validate the structure and content of a state dictionary.
@@ -308,21 +333,30 @@ class BaseCompetitor(abc.ABC):
             InvalidStateException: If the state dictionary is invalid.
         """
         required_fields = ["type", "version", "parameters", "state"]
+        logger.debug("Validating state dictionary: %s", state)
         for field in required_fields:
             if field not in state:
+                logger.error("State validation failed: Missing required field '%s'", field)
                 raise InvalidStateException(f"Missing required field: {field}")
 
         if not isinstance(state["type"], str):
+            logger.error("State validation failed: Field 'type' is not a string (%s)", type(state["type"]))
             raise InvalidStateException("Field 'type' must be a string")
 
         if not isinstance(state["version"], int):
+            logger.error("State validation failed: Field 'version' is not an integer (%s)", type(state["version"]))
             raise InvalidStateException("Field 'version' must be an integer")
 
         if not isinstance(state["parameters"], dict):
+            logger.error(
+                "State validation failed: Field 'parameters' is not a dictionary (%s)", type(state["parameters"])
+            )
             raise InvalidStateException("Field 'parameters' must be a dictionary")
 
         if not isinstance(state["state"], dict):
+            logger.error("State validation failed: Field 'state' is not a dictionary (%s)", type(state["state"]))
             raise InvalidStateException("Field 'state' must be a dictionary")
+        logger.debug("State dictionary validation passed.")
 
     @abc.abstractmethod
     def _import_parameters(self, parameters: Dict[str, Any]) -> None:
@@ -373,28 +407,36 @@ class BaseCompetitor(abc.ABC):
             InvalidParameterException: If any parameter in the state is invalid.
         """
         # Validate the state dictionary
+        logger.debug("Creating competitor from state: %s", state)
         if not isinstance(state, dict):
+            logger.error("from_state failed: State must be a dictionary, got %s", type(state))
             raise InvalidStateException("State must be a dictionary")
 
         # Check required fields
         required_fields = ["type", "version", "parameters", "state"]
         for field in required_fields:
             if field not in state:
+                logger.error("from_state failed: Missing required field '%s' in state", field)
                 raise InvalidStateException(f"Missing required field: {field}")
 
         # Get the competitor class
         competitor_type = state["type"]
+        logger.debug("Attempting to create competitor of type: %s", competitor_type)
         if competitor_type not in _competitor_registry:
+            logger.error("from_state failed: Unknown competitor type '%s'", competitor_type)
             raise InvalidParameterException(f"Unknown competitor type: {competitor_type}")
 
         competitor_class = _competitor_registry[competitor_type]
 
         # Create a new instance using the parameters
+        logger.debug("Creating new instance of %s using parameters: %s", competitor_type, state["parameters"])
         instance = competitor_class._create_from_parameters(state["parameters"])
 
         # Import the current state
+        logger.debug("Importing current state into new instance: %s", state["state"])
         instance._import_current_state(state["state"])
 
+        logger.info("Successfully created competitor %s from state", instance)
         return instance
 
     @classmethod
@@ -454,7 +496,9 @@ class BaseCompetitor(abc.ABC):
         """
         try:
             state = json.loads(json_str)
+            logger.debug("Successfully parsed JSON string to state dictionary.")
         except json.JSONDecodeError as e:
+            logger.error("Failed to decode JSON string: %s", e)
             raise InvalidStateException(f"Invalid JSON: {e}") from e
 
         return cls.from_state(state)
@@ -469,6 +513,7 @@ class BaseCompetitor(abc.ABC):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         if not isinstance(competitor, self.__class__):
+            logger.warning("Type mismatch detected: %s vs %s", type(self), type(competitor))
             raise MissMatchedCompetitorTypesException(
                 f"Competitor types {type(competitor)} and {type(self)} cannot be co-mingled"
             )
@@ -566,10 +611,13 @@ class BaseCompetitor(abc.ABC):
         Raises:
             InvalidParameterException: If any parameter is invalid.
         """
+        logger.debug("Configuring class %s with parameters: %s", cls.__name__, kwargs)
         for key, value in kwargs.items():
             if hasattr(cls, f"_{key}"):
                 setattr(cls, f"_{key}", value)
+                logger.debug("Set class parameter '_%s' to %s", key, value)
             else:
+                logger.error("Attempted to configure unknown class parameter '_%s' for %s", key, cls.__name__)
                 raise InvalidParameterException(f"Unknown class parameter: {key}")
 
     def configure(self, **kwargs: Any) -> None:
@@ -584,10 +632,13 @@ class BaseCompetitor(abc.ABC):
         Raises:
             InvalidParameterException: If any parameter is invalid.
         """
+        logger.debug("Configuring instance %s with parameters: %s", self, kwargs)
         for key, value in kwargs.items():
             if hasattr(self, f"_{key}"):
                 setattr(self, f"_{key}", value)
+                logger.debug("Set instance parameter '_%s' to %s", key, value)
             else:
+                logger.error("Attempted to configure unknown instance parameter '_%s' for %s", key, self)
                 raise InvalidParameterException(f"Unknown instance parameter: {key}")
 
     @abc.abstractmethod
@@ -599,4 +650,5 @@ class BaseCompetitor(abc.ABC):
         Note: Actual implementation might be needed depending on how initial state is stored.
         """
         # TODO: Implement actual reset logic if needed, possibly by restoring from initial state
+        logger.info("Resetting competitor %s to initial state.", self)
         pass

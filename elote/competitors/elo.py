@@ -1,6 +1,7 @@
 from typing import Dict, Any, ClassVar, Optional, Type, TypeVar
 
 from elote.competitors.base import BaseCompetitor, InvalidRatingValueException, InvalidParameterException
+from elote.logging import logger  # Import directly from the logging submodule
 
 T = TypeVar("T", bound="EloCompetitor")
 
@@ -36,6 +37,7 @@ class EloCompetitor(BaseCompetitor):
             InvalidRatingValueException: If the initial rating is below the minimum rating.
             InvalidParameterException: If the k_factor is negative.
         """
+        super().__init__()  # Call base class constructor
         if initial_rating < self._minimum_rating:
             raise InvalidRatingValueException(
                 f"Initial rating cannot be below the minimum rating of {self._minimum_rating}"
@@ -47,6 +49,9 @@ class EloCompetitor(BaseCompetitor):
         self._initial_rating = initial_rating
         self._rating = initial_rating
         self._k_factor = k_factor if k_factor is not None else EloCompetitor._k_factor
+        logger.debug(
+            "Initialized EloCompetitor with initial rating %.1f, k_factor=%.1f", self._initial_rating, self._k_factor
+        )
 
     def __repr__(self) -> str:
         """Return a string representation of this competitor.
@@ -95,8 +100,10 @@ class EloCompetitor(BaseCompetitor):
             InvalidParameterException: If any parameter is invalid.
         """
         # Validate and set initial_rating
+        logger.debug("Importing parameters for EloCompetitor: %s", parameters)
         initial_rating = parameters.get("initial_rating", 400)
         if initial_rating < self._minimum_rating:
+            logger.error("Invalid initial_rating in state: %.1f (minimum %.1f)", initial_rating, self._minimum_rating)
             raise InvalidParameterException(
                 f"Initial rating cannot be below the minimum rating of {self._minimum_rating}"
             )
@@ -118,8 +125,10 @@ class EloCompetitor(BaseCompetitor):
             InvalidParameterException: If any state variable is invalid.
         """
         # Validate and set rating
+        logger.debug("Importing current state for EloCompetitor: %s", state)
         rating = state.get("rating", self._initial_rating)
         if rating < self._minimum_rating:
+            logger.error("Invalid rating in state: %.1f (minimum %.1f)", rating, self._minimum_rating)
             raise InvalidParameterException(f"Rating cannot be below the minimum rating of {self._minimum_rating}")
         self._rating = rating
 
@@ -165,10 +174,14 @@ class EloCompetitor(BaseCompetitor):
         Raises:
             InvalidParameterException: If any parameter in the state is invalid.
         """
+        # Validate and set initial_rating
+        logger.debug("Creating EloCompetitor from state: %s", state)
         # Handle legacy state format
         if "type" not in state:
+            logger.warning("Using legacy state format for EloCompetitor.from_state")
             # Configure class variables if provided
             if "class_vars" in state:
+                logger.debug("Applying legacy class variables: %s", state["class_vars"])
                 class_vars = state["class_vars"]
                 if "base_rating" in class_vars:
                     cls._base_rating = class_vars["base_rating"]
@@ -190,6 +203,7 @@ class EloCompetitor(BaseCompetitor):
 
         This method resets the competitor's rating to the initial rating.
         """
+        logger.info("Resetting EloCompetitor to initial state (rating=%.1f)", self._initial_rating)
         self._rating = self._initial_rating
 
     @property
@@ -222,7 +236,9 @@ class EloCompetitor(BaseCompetitor):
         Raises:
             InvalidRatingValueException: If the rating value is below the minimum rating.
         """
+        logger.debug("Setting rating for EloCompetitor to %.1f", value)
         if value < self._minimum_rating:
+            logger.warning("Attempted to set rating %.1f below minimum %.1f", value, self._minimum_rating)
             raise InvalidRatingValueException(f"Rating cannot be below the minimum rating of {self._minimum_rating}")
         self._rating = value
 
@@ -243,6 +259,7 @@ class EloCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        logger.debug("Calculating expected score between %s and %s", self, competitor)
         return self.transformed_rating / (self.transformed_rating + competitor.transformed_rating)
 
     def beat(self, competitor: BaseCompetitor) -> None:
@@ -258,6 +275,7 @@ class EloCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        logger.debug("%s beat %s", self, competitor)
         # Revert to original logic
         win_es = self.expected_score(competitor)
         lose_es = competitor.expected_score(self)
@@ -278,6 +296,7 @@ class EloCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        logger.debug("%s tied with %s", self, competitor)
         # Revert to original logic
         win_es = self.expected_score(competitor)
         lose_es = competitor.expected_score(self)

@@ -3,6 +3,7 @@ from scipy import special
 from typing import Dict, Any, ClassVar, Tuple, Type, TypeVar, List
 
 from elote.competitors.base import BaseCompetitor, InvalidParameterException
+from elote.logging import logger  # Import directly from the logging submodule
 
 T = TypeVar("T", bound="TrueSkillCompetitor")
 
@@ -45,6 +46,7 @@ class TrueSkillCompetitor(BaseCompetitor):
         Raises:
             InvalidParameterException: If the initial sigma is not positive.
         """
+        super().__init__()  # Call base class constructor
         # Set default values if not provided
         if initial_mu is None:
             initial_mu = self._default_mu
@@ -61,6 +63,7 @@ class TrueSkillCompetitor(BaseCompetitor):
         # Current skill parameters
         self._mu = initial_mu
         self._sigma = initial_sigma
+        logger.debug("Initialized TrueSkillCompetitor: mu=%.2f, sigma=%.2f", self._mu, self._sigma)
 
     def __repr__(self) -> str:
         """Return a string representation of this competitor.
@@ -110,6 +113,7 @@ class TrueSkillCompetitor(BaseCompetitor):
             InvalidParameterException: If any parameter is invalid.
         """
         # Validate and set initial_mu
+        logger.debug("Importing parameters for TrueSkillCompetitor: %s", parameters)
         initial_mu = parameters.get("initial_mu", self._default_mu)
         self._initial_mu = initial_mu
 
@@ -129,6 +133,7 @@ class TrueSkillCompetitor(BaseCompetitor):
             InvalidParameterException: If any state variable is invalid.
         """
         # Validate and set mu
+        logger.debug("Importing current state for TrueSkillCompetitor: %s", state)
         mu = state.get("mu", self._initial_mu)
         self._mu = mu
 
@@ -180,10 +185,13 @@ class TrueSkillCompetitor(BaseCompetitor):
         Raises:
             InvalidParameterException: If any parameter in the state is invalid.
         """
+        logger.debug("Creating TrueSkillCompetitor from state: %s", state)
         # Handle legacy state format
         if "type" not in state:
+            logger.warning("Using legacy state format for TrueSkillCompetitor.from_state")
             # Configure class variables if provided
             if "class_vars" in state:
+                logger.debug("Applying legacy class variables: %s", state["class_vars"])
                 class_vars = state["class_vars"]
                 if "beta" in class_vars:
                     cls._beta = class_vars["beta"]
@@ -218,6 +226,11 @@ class TrueSkillCompetitor(BaseCompetitor):
 
         This method resets the competitor's mu and sigma to their initial values.
         """
+        logger.info(
+            "Resetting TrueSkillCompetitor to initial state (mu=%.2f, sigma=%.2f)",
+            self._initial_mu,
+            self._initial_sigma,
+        )
         self._mu = self._initial_mu
         self._sigma = self._initial_sigma
 
@@ -248,6 +261,7 @@ class TrueSkillCompetitor(BaseCompetitor):
         Raises:
             NotImplementedError: Always, as setting the rating directly is not supported.
         """
+        logger.warning("Attempted to set rating directly on TrueSkillCompetitor, which is not supported.")
         raise NotImplementedError("Cannot directly set the rating of a TrueSkillCompetitor. Set mu and sigma instead.")
 
     @property
@@ -267,6 +281,7 @@ class TrueSkillCompetitor(BaseCompetitor):
             value (float): The new mean skill value.
         """
         self._mu = value
+        logger.debug("Set TrueSkillCompetitor mu to %.2f", value)
 
     @property
     def sigma(self) -> float:
@@ -288,8 +303,10 @@ class TrueSkillCompetitor(BaseCompetitor):
             InvalidParameterException: If the standard deviation is not positive.
         """
         if value <= 0:
+            logger.error("Attempted to set non-positive sigma: %.2f", value)
             raise InvalidParameterException("Sigma must be positive")
         self._sigma = value
+        logger.debug("Set TrueSkillCompetitor sigma to %.2f", value)
 
     def _v(self, beta_squared: float, sigma_squared: float) -> float:
         """Calculate the skill variance factor.
@@ -423,6 +440,7 @@ class TrueSkillCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        logger.debug("Calculating expected score between %s and %s", self, competitor)
         competitor_ts = competitor  # type: TrueSkillCompetitor
 
         # Calculate the skill difference
@@ -444,6 +462,14 @@ class TrueSkillCompetitor(BaseCompetitor):
         # Adjust win probability to account for draws
         adjusted_win_prob = win_prob - draw_prob / 2
 
+        logger.debug(
+            "Expected score calculation: mu_diff=%.2f, v=%.2f, win_prob=%.4f, draw_prob=%.4f, adjusted_win_prob=%.4f",
+            mu_diff,
+            v,
+            win_prob,
+            draw_prob,
+            adjusted_win_prob,
+        )
         return adjusted_win_prob
 
     def beat(self, competitor: BaseCompetitor) -> None:
@@ -456,6 +482,7 @@ class TrueSkillCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        logger.debug("%s beat %s", self, competitor)
         competitor_ts = competitor  # type: TrueSkillCompetitor
 
         # Calculate the skill difference
@@ -478,10 +505,14 @@ class TrueSkillCompetitor(BaseCompetitor):
         self._mu = self._mu + sigma_squared_to_v_squared * v_win_value
         self._sigma = math.sqrt(sigma_squared_1 * (1 - sigma_squared_to_v_squared * w_win_value))
 
+        logger.debug("Winner update: new_mu=%.2f, new_sigma=%.2f", self._mu, self._sigma)
         # Update the loser's mu and sigma
         sigma_squared_to_v_squared = sigma_squared_2 / v**2
         competitor_ts._mu = competitor_ts._mu - sigma_squared_to_v_squared * v_win_value
         competitor_ts._sigma = math.sqrt(sigma_squared_2 * (1 - sigma_squared_to_v_squared * w_win_value))
+        logger.debug(
+            "Loser update (%s): new_mu=%.2f, new_sigma=%.2f", competitor_ts, competitor_ts._mu, competitor_ts._sigma
+        )
 
         # Apply the dynamic factor to increase uncertainty over time
         self._sigma = math.sqrt(self._sigma**2 + self._tau**2)
@@ -497,6 +528,7 @@ class TrueSkillCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        logger.debug("%s tied with %s", self, competitor)
         competitor_ts = competitor  # type: TrueSkillCompetitor
 
         # Calculate the skill difference
@@ -522,10 +554,17 @@ class TrueSkillCompetitor(BaseCompetitor):
         self._mu = self._mu + sigma_squared_to_v_squared * v_draw_value
         self._sigma = math.sqrt(sigma_squared_1 * (1 - sigma_squared_to_v_squared * w_draw_value))
 
+        logger.debug("Player 1 tie update: new_mu=%.2f, new_sigma=%.2f", self._mu, self._sigma)
         # Update the second player's mu and sigma
         sigma_squared_to_v_squared = sigma_squared_2 / v**2
         competitor_ts._mu = competitor_ts._mu - sigma_squared_to_v_squared * v_draw_value
         competitor_ts._sigma = math.sqrt(sigma_squared_2 * (1 - sigma_squared_to_v_squared * w_draw_value))
+        logger.debug(
+            "Player 2 tie update (%s): new_mu=%.2f, new_sigma=%.2f",
+            competitor_ts,
+            competitor_ts._mu,
+            competitor_ts._sigma,
+        )
 
         # Apply the dynamic factor to increase uncertainty over time
         self._sigma = math.sqrt(self._sigma**2 + self._tau**2)
@@ -546,6 +585,7 @@ class TrueSkillCompetitor(BaseCompetitor):
         Returns:
             float: The match quality (between 0 and 1).
         """
+        logger.debug("Calculating match quality between %s and %s", player1, player2)
         # Calculate the skill difference
         mu_diff = player1._mu - player2._mu
 
@@ -558,7 +598,9 @@ class TrueSkillCompetitor(BaseCompetitor):
         exp_term = -(mu_diff**2) / (2 * v**2)
         sqrt_term = math.sqrt(2 * beta_squared) / v
 
-        return sqrt_term * math.exp(exp_term)
+        quality = sqrt_term * math.exp(exp_term)
+        logger.debug("Match quality calculated: %.4f", quality)
+        return quality
 
     @classmethod
     def create_team(cls, players: List["TrueSkillCompetitor"]) -> Tuple[float, float]:
@@ -574,8 +616,10 @@ class TrueSkillCompetitor(BaseCompetitor):
         Returns:
             Tuple[float, float]: The team's mu and sigma.
         """
+        logger.debug("Creating TrueSkill team from %d players", len(players))
         team_mu = sum(player._mu for player in players)
         team_sigma = math.sqrt(sum(player._sigma**2 for player in players))
+        logger.debug("Team created: team_mu=%.2f, team_sigma=%.2f", team_mu, team_sigma)
         return team_mu, team_sigma
 
     @classmethod
@@ -596,6 +640,7 @@ class TrueSkillCompetitor(BaseCompetitor):
             v (float): The skill variance factor.
             result_func (callable): The function to calculate the performance update.
         """
+        logger.debug("Updating TrueSkill team (%d players)", len(team_players))
         # Calculate the performance update
         t = team_mu_diff / v
         v_value = result_func(t)
@@ -608,5 +653,7 @@ class TrueSkillCompetitor(BaseCompetitor):
             player._mu = player._mu + sigma_squared_to_v_squared * v_value
             player._sigma = math.sqrt(sigma_squared * (1 - sigma_squared_to_v_squared * w_value))
 
+            logger.debug("Updated player %s: new_mu=%.2f, new_sigma=%.2f", player, player._mu, player._sigma)
             # Apply the dynamic factor to increase uncertainty over time
             player._sigma = math.sqrt(player._sigma**2 + cls._tau**2)
+            logger.debug("Applied dynamic factor to player %s: sigma=%.2f", player, player._sigma)

@@ -3,6 +3,7 @@ from collections import deque
 import statistics
 
 from elote.competitors.base import BaseCompetitor, InvalidRatingValueException, InvalidParameterException
+from elote.logging import logger  # Import directly from the logging submodule
 
 T = TypeVar("T", bound="ECFCompetitor")
 
@@ -30,6 +31,7 @@ class ECFCompetitor(BaseCompetitor):
         Raises:
             InvalidRatingValueException: If the initial rating is below the minimum rating.
         """
+        super().__init__()  # Call base class constructor
         if initial_rating < self._minimum_rating:
             raise InvalidRatingValueException(
                 f"Initial rating cannot be below the minimum rating of {self._minimum_rating}"
@@ -42,6 +44,12 @@ class ECFCompetitor(BaseCompetitor):
         # Cache for transformed rating calculation
         self._cached_transformed_elo_rating: Optional[float] = None
         self._cached_elo_conversion_for_transform: Optional[float] = None
+        logger.debug(
+            "Initialized ECFCompetitor with initial rating %.1f, delta=%.1f, n_periods=%d",
+            initial_rating,
+            self._delta,
+            self._n_periods,
+        )
 
     def __repr__(self) -> str:
         """Return a string representation of this competitor.
@@ -62,6 +70,7 @@ class ECFCompetitor(BaseCompetitor):
     def __initialize_ratings(self) -> None:
         """Initialize the ratings deque with the initial rating."""
         # Initialize with a single value instead of a full deque of None values
+        logger.debug("Initializing scores deque with initial rating %.1f", self.__initial_rating)
         self.scores = deque([self.__initial_rating], maxlen=self._n_periods)
         self.__cached_rating = self.__initial_rating  # Initialize the cache
 
@@ -85,6 +94,8 @@ class ECFCompetitor(BaseCompetitor):
         """
         if self.scores is None:
             self.__initialize_ratings()
+            # The assertion below handles the Optional type, no need for another check
+            assert self.scores is not None
             return self.__cached_rating
 
         # Return cached value if available
@@ -94,8 +105,11 @@ class ECFCompetitor(BaseCompetitor):
         # Calculate and cache the mean
         valid_scores = [_ for _ in self.scores if _ is not None]
         if valid_scores:
+            mean_rating = statistics.mean(valid_scores)
             self.__cached_rating = statistics.mean(valid_scores)
+            logger.debug("Calculated rating from %d scores: %.1f", len(valid_scores), mean_rating)
         else:
+            logger.debug("No valid scores in deque, using initial rating %.1f", self.__initial_rating)
             self.__cached_rating = self.__initial_rating
 
         # Assert that cache is now float before returning
@@ -116,7 +130,9 @@ class ECFCompetitor(BaseCompetitor):
         Raises:
             InvalidRatingValueException: If the rating value is below the minimum rating.
         """
+        logger.debug("Setting rating for ECFCompetitor via score update: %.1f", value)
         if value < self._minimum_rating:
+            logger.warning("Attempted to set rating %.1f below minimum %.1f", value, self._minimum_rating)
             raise InvalidRatingValueException(f"Rating cannot be below the minimum rating of {self._minimum_rating}")
 
         self._update(value)
@@ -127,6 +143,7 @@ class ECFCompetitor(BaseCompetitor):
         Args:
             rating (float): The new rating to add to the scores deque.
         """
+        logger.debug("Adding rating %.1f to scores deque", rating)
         if self.scores is None:
             self.__initialize_ratings()
             # Assert scores is now initialized
@@ -181,8 +198,10 @@ class ECFCompetitor(BaseCompetitor):
             InvalidParameterException: If any parameter is invalid.
         """
         # Validate and set initial_rating
+        logger.debug("Importing parameters for ECFCompetitor: %s", parameters)
         initial_rating = parameters.get("initial_rating", 100)
         if initial_rating < self._minimum_rating:
+            logger.error("Invalid initial_rating in state: %.1f (minimum %.1f)", initial_rating, self._minimum_rating)
             raise InvalidParameterException(
                 f"Initial rating cannot be below the minimum rating of {self._minimum_rating}"
             )
@@ -198,11 +217,14 @@ class ECFCompetitor(BaseCompetitor):
             InvalidStateException: If any state variable is invalid.
         """
         # Restore the scores if provided
+        logger.debug("Importing current state for ECFCompetitor: %s", state)
         scores = state.get("scores", [])
         if scores:
             self.scores = deque(scores, maxlen=self._n_periods)
+            logger.debug("Restored %d scores from state", len(scores))
             self.__cached_rating = None  # Force recalculation
         else:
+            logger.debug("No scores found in state, initializing scores deque.")
             self.__initialize_ratings()
 
     @classmethod
@@ -238,8 +260,10 @@ class ECFCompetitor(BaseCompetitor):
         """
         # Handle legacy state format
         if "type" not in state:
+            logger.warning("Using legacy state format for ECFCompetitor.from_state")
             # Configure class variables if provided
             if "class_vars" in state:
+                logger.debug("Applying legacy class variables: %s", state["class_vars"])
                 class_vars = state["class_vars"]
                 if "delta" in class_vars:
                     cls._delta = class_vars["delta"]
@@ -264,6 +288,7 @@ class ECFCompetitor(BaseCompetitor):
 
         This method resets the competitor's scores deque to contain only the initial rating.
         """
+        logger.info("Resetting ECFCompetitor to initial state (rating=%.1f)", self.__initial_rating)
         self.scores = deque(maxlen=self._n_periods)
         self.scores.append(self.__initial_rating)
         self.__cached_rating = self.__initial_rating
@@ -303,6 +328,7 @@ class ECFCompetitor(BaseCompetitor):
         """
         self.verify_competitor_types(competitor)
         competitor_ecf = cast(ECFCompetitor, competitor)
+        logger.debug("Calculating expected score between %s and %s", self, competitor_ecf)
 
         # Use transformed Elo ratings for comparison
         my_transformed = self.transformed_elo_rating
@@ -323,6 +349,7 @@ class ECFCompetitor(BaseCompetitor):
         """
         self.verify_competitor_types(competitor)
         competitor_ecf = cast(ECFCompetitor, competitor)
+        logger.debug("%s beat %s", self, competitor_ecf)
 
         # Revert to original logic, using casted opponent
         if self.scores is None:
@@ -358,6 +385,7 @@ class ECFCompetitor(BaseCompetitor):
         """
         self.verify_competitor_types(competitor)
         competitor_ecf = cast(ECFCompetitor, competitor)
+        logger.debug("%s tied with %s", self, competitor_ecf)
 
         # Revert to original logic, using casted opponent
         if self.scores is None:
