@@ -196,7 +196,12 @@ class History:
                     false_negatives += 1
 
         # Return results as a dictionary
-        return {"tp": true_positives, "fp": false_positives, "tn": true_negatives, "fn": false_negatives}
+        return {
+            "tp": true_positives,
+            "fp": false_positives,
+            "tn": true_negatives,
+            "fn": false_negatives
+        }
 
     def random_search(self, trials: int = 1000) -> Tuple[float, List[float]]:
         """Search for optimal prediction thresholds using random sampling.
