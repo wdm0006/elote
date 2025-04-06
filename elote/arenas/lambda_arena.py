@@ -5,6 +5,7 @@ from tqdm import tqdm
 from elote import EloCompetitor
 from elote.arenas.base import BaseArena, Bout, History
 from elote.competitors.base import BaseCompetitor
+from elote.logging import logger
 
 
 class LambdaArena(BaseArena):
@@ -31,6 +32,8 @@ class LambdaArena(BaseArena):
             initial_state (dict, optional): Initial state for competitors, mapping
                 competitor IDs to their initial parameters.
         """
+        super().__init__()
+        logger.debug("Initializing LambdaArena with competitor type: %s", base_competitor.__name__)
         self.func: Callable[..., Optional[bool]] = func
         self.competitors: Dict[Any, BaseCompetitor] = dict()
         self.base_competitor: Type[BaseCompetitor] = base_competitor
@@ -47,6 +50,8 @@ class LambdaArena(BaseArena):
                 self.competitors[k] = self.base_competitor(**v)
 
         self.history: History = History()
+        self.eval_history = History()
+        self.validation_history = History()
 
     def clear_history(self) -> None:
         """Clear the history of bouts in this arena."""
@@ -175,3 +180,163 @@ class LambdaArena(BaseArena):
 
         # Restore original sorting key and add ignores for mypy errors
         return sorted(lb, key=lambda x: x.get("rating"))  # type: ignore[arg-type, return-value]
+
+    def _get_or_create_competitor(self, id_val: str) -> BaseCompetitor:
+        if id_val not in self.competitors:
+            comp = self.base_competitor(**self.base_competitor_kwargs)
+            self.competitors[id_val] = comp
+            logger.debug("Created new competitor '%s' of type %s", id_val, self.base_competitor.__name__)
+        return self.competitors[id_val]
+
+    def process_history(self, bouts: List[Tuple[str, str, Optional[float]]], progress_bar: bool = True) -> None:
+        iterator = tqdm(bouts) if progress_bar else bouts
+        total_bouts = len(bouts)
+        skipped_bouts = 0
+        logger.info("Processing %d bouts for training history", total_bouts)
+        for i, (a, b, outcome) in enumerate(iterator):
+            # Get or create competitors
+            c_a = self._get_or_create_competitor(a)
+            c_b = self._get_or_create_competitor(b)
+
+            if outcome is not None:
+                predicted_outcome = self.expected_score(c_a, c_b)
+                if outcome == 1:
+                    c_a.beat(c_b)
+                elif outcome == 0:
+                    c_b.beat(c_a)
+                else:
+                    c_a.tied(c_b)
+                new_bout = Bout(
+                    a=a, b=b, outcome=outcome, timestamp=datetime.datetime.now(), predicted_outcome=predicted_outcome
+                )
+                self.history.add_bout(bout=new_bout)
+            else:
+                skipped_bouts += 1
+                logger.debug("Skipping bout %d/%d: outcome value is None", i + 1, total_bouts)
+
+        if skipped_bouts > 0:
+            logger.info(
+                "Skipped %d/%d bouts during training history processing due to None outcome", skipped_bouts, total_bouts
+            )
+        logger.info("Finished processing training history. %d competitors tracked.", len(self.competitors))
+
+    def evaluate_performance(
+        self, eval_bouts: List[Tuple[str, str, Optional[float]]], progress_bar: bool = True
+    ) -> None:
+        """Evaluate the performance of the competitors based on a list of evaluation bouts.
+
+        Args:
+            eval_bouts (list): A list of (competitor_a, competitor_b, outcome) tuples.
+            progress_bar (bool, optional): Whether to display a progress bar.
+        """
+        iterator = tqdm(eval_bouts) if progress_bar else eval_bouts
+        total_bouts = len(eval_bouts)
+        skipped_bouts = 0
+        logger.info("Evaluating performance using %d bouts", total_bouts)
+        for i, (a, b, outcome) in enumerate(iterator):
+            # Get or create competitors
+            try:
+                c_a = self._get_or_create_competitor(a)
+                c_b = self._get_or_create_competitor(b)
+            except KeyError as e:
+                # If a competitor is not found, skip this bout
+                skipped_bouts += 1
+                logger.warning(
+                    "Skipping evaluation bout %d/%d: Competitor '%s' not found in training history.",
+                    i + 1,
+                    total_bouts,
+                    e,
+                )
+                continue
+
+            # Skip bouts where the actual outcome is None
+            if outcome is None:
+                skipped_bouts += 1
+                continue
+
+            # Calculate the expected outcome
+            predicted_outcome = self.expected_score(c_a, c_b)
+            new_bout = Bout(
+                a=a, b=b, outcome=outcome, timestamp=datetime.datetime.now(), predicted_outcome=predicted_outcome
+            )
+            self.eval_history.add_bout(bout=new_bout)
+
+        if skipped_bouts > 0:
+            logger.info(
+                "Skipped %d/%d bouts during evaluation due to missing competitors or None outcome.",
+                skipped_bouts,
+                total_bouts,
+            )
+        logger.info("Finished performance evaluation.")
+
+    def validate(self, validation_bouts: List[Tuple[str, str, Optional[float]]], progress_bar: bool = True) -> None:
+        """Run a validation set through the arena without updating ratings, only recording predictions.
+
+        Args:
+            validation_bouts (list): A list of (competitor_a, competitor_b, outcome) tuples.
+            progress_bar (bool, optional): Whether to display a progress bar.
+        """
+        iterator = tqdm(validation_bouts) if progress_bar else validation_bouts
+        total_bouts = len(validation_bouts)
+        skipped_bouts = 0
+        logger.info("Validating model using %d bouts", total_bouts)
+        for i, (a, b, outcome) in enumerate(iterator):
+            # Get or create competitors
+            try:
+                c_a = self._get_or_create_competitor(a)
+                c_b = self._get_or_create_competitor(b)
+            except KeyError as e:
+                # If a competitor is not found, skip this bout
+                skipped_bouts += 1
+                logger.warning(
+                    "Skipping validation bout %d/%d: Competitor '%s' not found in training history.",
+                    i + 1,
+                    total_bouts,
+                    e,
+                )
+                continue
+
+            # Skip bouts where the actual outcome is None
+            if outcome is None:
+                skipped_bouts += 1
+                continue
+
+            # Calculate the expected outcome
+            predicted_outcome = self.expected_score(c_a, c_b)
+            new_bout = Bout(
+                a=a, b=b, outcome=outcome, timestamp=datetime.datetime.now(), predicted_outcome=predicted_outcome
+            )
+            self.validation_history.add_bout(bout=new_bout)
+
+        if skipped_bouts > 0:
+            logger.info(
+                "Skipped %d/%d bouts during validation due to missing competitors or None outcome.",
+                skipped_bouts,
+                total_bouts,
+            )
+        logger.info("Finished model validation.")
+
+    def get_competitor_by_id(self, id_val: str) -> Optional[BaseCompetitor]:
+        """Retrieve a competitor by their ID.
+
+        Args:
+            id_val (str): The ID of the competitor to retrieve.
+
+        Returns:
+            Optional[BaseCompetitor]: The retrieved competitor, or None if not found.
+        """
+        comp = self.competitors.get(id_val)
+        if comp is None:
+            logger.debug("Competitor with ID '%s' not found.", id_val)
+        else:
+            logger.debug("Retrieved competitor '%s'", id_val)
+        return comp
+
+    def get_all_competitors(self) -> List[BaseCompetitor]:
+        """Retrieve a list of all competitors in the arena.
+
+        Returns:
+            list: A list of all competitors.
+        """
+        logger.debug("Retrieving all %d competitors.", len(self.competitors))
+        return list(self.competitors.values())

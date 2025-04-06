@@ -3,6 +3,7 @@ from typing import Dict, Any, ClassVar, Type, TypeVar, Optional, List, Tuple, ca
 from datetime import datetime
 
 from elote.competitors.base import BaseCompetitor, InvalidRatingValueException, InvalidParameterException
+from elote.logging import logger  # Import directly from the logging submodule
 
 T = TypeVar("T", bound="Glicko2Competitor")
 
@@ -53,6 +54,7 @@ class Glicko2Competitor(BaseCompetitor):
             InvalidRatingValueException: If the initial rating is below the minimum rating.
             InvalidParameterException: If the initial RD is not positive or if the initial volatility is not positive.
         """
+        super().__init__()  # Call base class constructor
         if initial_rating < self._minimum_rating:
             raise InvalidRatingValueException(
                 f"Initial rating cannot be below the minimum rating of {self._minimum_rating}"
@@ -82,6 +84,16 @@ class Glicko2Competitor(BaseCompetitor):
         # Store match results for rating period and track last activity
         self._match_results: List[Tuple["Glicko2Competitor", float, datetime]] = []
         self._last_activity = initial_time if initial_time is not None else datetime.now()
+
+        logger.debug(
+            "Initialized Glicko2Competitor: rating=%.1f, rd=%.1f, volatility=%.3f, mu=%.3f, phi=%.3f, time=%s",
+            self._rating,
+            self._rd,
+            self._sigma,
+            self._mu,
+            self._phi,
+            self._last_activity.isoformat(),
+        )
 
     def __repr__(self) -> str:
         """Return a string representation of this competitor.
@@ -136,8 +148,10 @@ class Glicko2Competitor(BaseCompetitor):
             InvalidParameterException: If any parameter is invalid.
         """
         # Validate and set initial_rating
+        logger.debug("Importing parameters for Glicko2Competitor: %s", parameters)
         initial_rating = parameters.get("initial_rating", 1500)
         if initial_rating < self._minimum_rating:
+            logger.error("Invalid initial_rating in state: %.1f (minimum %.1f)", initial_rating, self._minimum_rating)
             raise InvalidParameterException(
                 f"Initial rating cannot be below the minimum rating of {self._minimum_rating}"
             )
@@ -165,8 +179,10 @@ class Glicko2Competitor(BaseCompetitor):
             InvalidParameterException: If any state variable is invalid.
         """
         # Validate and set rating
+        logger.debug("Importing current state for Glicko2Competitor: %s", state)
         rating = state.get("rating", self._initial_rating)
         if rating < self._minimum_rating:
+            logger.error("Invalid rating in state: %.1f (minimum %.1f)", rating, self._minimum_rating)
             raise InvalidParameterException(f"Rating cannot be below the minimum rating of {self._minimum_rating}")
         self._rating = rating
 
@@ -191,6 +207,9 @@ class Glicko2Competitor(BaseCompetitor):
             self._last_activity = datetime.fromisoformat(state["last_activity"])
         else:
             self._last_activity = datetime.now()
+            logger.warning(
+                "Last activity time missing from state, using current time: %s", self._last_activity.isoformat()
+            )
 
     @classmethod
     def _create_from_parameters(cls: Type[T], parameters: Dict[str, Any]) -> T:
@@ -235,10 +254,13 @@ class Glicko2Competitor(BaseCompetitor):
         Raises:
             InvalidParameterException: If any parameter in the state is invalid.
         """
+        logger.debug("Creating Glicko2Competitor from state: %s", state)
         # Handle legacy state format
         if "type" not in state:
+            logger.warning("Using legacy state format for Glicko2Competitor.from_state")
             # Configure class variables if provided
             if "class_vars" in state:
+                logger.debug("Applying legacy class variables: %s", state["class_vars"])
                 class_vars = state["class_vars"]
                 if "tau" in class_vars:
                     cls._tau = class_vars["tau"]
@@ -278,6 +300,12 @@ class Glicko2Competitor(BaseCompetitor):
 
         This method resets the competitor's rating, RD, and volatility to their initial values.
         """
+        logger.info(
+            "Resetting Glicko2Competitor to initial state (rating=%.1f, rd=%.1f, sigma=%.3f)",
+            self._initial_rating,
+            self._initial_rd,
+            self._initial_volatility,
+        )
         self._rating = self._initial_rating
         self._rd = self._initial_rd
         self._sigma = self._initial_volatility
@@ -305,7 +333,9 @@ class Glicko2Competitor(BaseCompetitor):
         Raises:
             InvalidRatingValueException: If the rating value is below the minimum rating.
         """
+        logger.debug("Setting rating for Glicko2Competitor to %.1f", value)
         if value < self._minimum_rating:
+            logger.warning("Attempted to set rating %.1f below minimum %.1f", value, self._minimum_rating)
             raise InvalidRatingValueException(f"Rating cannot be below the minimum rating of {self._minimum_rating}")
         self._rating = value
         self._mu = self._rating_to_mu(value)
@@ -329,7 +359,9 @@ class Glicko2Competitor(BaseCompetitor):
         Raises:
             InvalidParameterException: If the rating deviation is not positive.
         """
+        logger.debug("Setting RD for Glicko2Competitor to %.1f", value)
         if value <= 0:
+            logger.error("Attempted to set non-positive RD: %.1f", value)
             raise InvalidParameterException("RD must be positive")
         self._rd = value
         self._phi = self._rd_to_phi(value)
@@ -353,7 +385,9 @@ class Glicko2Competitor(BaseCompetitor):
         Raises:
             InvalidParameterException: If the volatility is not positive.
         """
+        logger.debug("Setting volatility for Glicko2Competitor to %.3f", value)
         if value <= 0:
+            logger.error("Attempted to set non-positive volatility: %.3f", value)
             raise InvalidParameterException("Volatility must be positive")
         self._sigma = value
 
@@ -439,6 +473,7 @@ class Glicko2Competitor(BaseCompetitor):
         """
         self.verify_competitor_types(competitor)
         competitor_glicko2 = cast(Glicko2Competitor, competitor)
+        logger.debug("Calculating expected score between %s and %s", self, competitor_glicko2)
         self._phi_j = self._rd_to_phi(competitor.rd)
         return self._E(self._mu, competitor_glicko2._mu, self._phi_j)
 
@@ -466,11 +501,20 @@ class Glicko2Competitor(BaseCompetitor):
             # over the inactive period
             self._phi = math.sqrt(self._phi**2 + rating_periods * self._sigma**2)
             # Convert back to original scale RD
+            old_rd = self._rd
             self._rd = self._phi_to_rd(self._phi)
             # Cap RD at 350 in the original scale
             if self._rd > 350:
+                logger.debug("RD capped at 350 (was %.1f)", self._rd)
                 self._rd = 350
                 self._phi = self._rd_to_phi(350)
+            logger.debug(
+                "Updated RD for %s due to inactivity (%.1f periods): %.1f -> %.1f",
+                self,
+                rating_periods,
+                old_rd,
+                self._rd,
+            )
 
     def update_ratings(self) -> None:
         """Update ratings based on recorded match results.
@@ -481,6 +525,7 @@ class Glicko2Competitor(BaseCompetitor):
         After updating, the match results are cleared.
         """
         if not self._match_results:
+            logger.debug("No matches for %s, updating RD for inactivity.", self)
             # Update RD for inactivity up to current time
             self.update_rd_for_inactivity()
             return
@@ -489,6 +534,7 @@ class Glicko2Competitor(BaseCompetitor):
         current_time = max(match_time for _, _, match_time in self._match_results)
 
         # Update RD for inactivity before processing matches
+        logger.debug("Updating RD for %s before processing %d matches.", self, len(self._match_results))
         self.update_rd_for_inactivity(current_time)
 
         if not self._match_results:
@@ -498,6 +544,7 @@ class Glicko2Competitor(BaseCompetitor):
         mu = self._mu
         phi = self._phi
         sigma = self._sigma
+        logger.debug("Starting rating update for %s: mu=%.3f, phi=%.3f, sigma=%.3f", self, mu, phi, sigma)
 
         # Step 2: For each opponent j, compute g(phi_j) and E(mu, mu_j, phi_j)
         v_inv = 0.0
@@ -514,6 +561,7 @@ class Glicko2Competitor(BaseCompetitor):
         # Step 3: Compute v and delta
         v = 1 / v_inv
         delta = v * delta_sum
+        logger.debug("Calculated v=%.3e and delta=%.3f", v, delta)
 
         # Step 4: Determine new volatility sigma'
         def f(x: float) -> float:
@@ -537,8 +585,10 @@ class Glicko2Competitor(BaseCompetitor):
         fa = f(A)
         fb = f(B)
 
+        iter_count = 0
         # Iterate until convergence
         while abs(B - A) > self._epsilon:
+            iter_count += 1
             C = A + (A - B) * fa / (fb - fa)
             fc = f(C)
             if fc * fb < 0:
@@ -552,6 +602,7 @@ class Glicko2Competitor(BaseCompetitor):
         sigma_prime = math.exp(A / 2)
 
         # Step 5: Update phi* and phi
+        logger.debug("Volatility iteration converged after %d steps. New sigma_prime=%.5f", iter_count, sigma_prime)
         phi_star = math.sqrt(phi**2 + sigma_prime**2)
         phi_prime = 1 / math.sqrt(1 / phi_star**2 + 1 / v)
 
@@ -564,12 +615,17 @@ class Glicko2Competitor(BaseCompetitor):
         self._sigma = sigma_prime
 
         # Ensure rating doesn't go below minimum
+        old_rating = self._rating
         self._rating = max(self._minimum_rating, self._rating)
+        if self._rating != old_rating:
+            logger.warning("Rating for %s adjusted to minimum %.1f (was %.1f)", self, self._minimum_rating, old_rating)
 
         # Cap RD at 350
+        old_rd = self._rd
         if self._rd > 350:
             self._rd = 350
             self._phi = self._rd_to_phi(350)
+            logger.debug("RD for %s capped at 350 (was %.1f)", self, old_rd)
 
         # Update internal values
         self._mu = mu_prime
@@ -578,8 +634,14 @@ class Glicko2Competitor(BaseCompetitor):
         # Update last activity time and clear match results
         self._last_activity = current_time
         self._match_results = []
+        logger.info(
+            "Rating update complete for %s: new_rating=%.1f, new_rd=%.1f, new_sigma=%.5f",
+            self,
+            self._rating,
+            self._rd,
+            self._sigma,
+        )
 
-        
     def beat(self, competitor: BaseCompetitor, match_time: Optional[datetime] = None) -> None:
         """Update ratings after this competitor has won against the given competitor.
 
@@ -595,6 +657,7 @@ class Glicko2Competitor(BaseCompetitor):
             InvalidParameterException: If the match time is before either competitor's last activity.
         """
         self.verify_competitor_types(competitor)
+        logger.debug("%s beat %s (time=%s). Recording result.", self, competitor, match_time)
         competitor_glicko2 = cast(Glicko2Competitor, competitor)
 
         # Get the match time
@@ -602,8 +665,12 @@ class Glicko2Competitor(BaseCompetitor):
 
         # Validate match time is not before last activity
         if current_time < self._last_activity:
+            logger.error("Match time %s is before self last activity %s", current_time, self._last_activity)
             raise InvalidParameterException("Match time cannot be before competitor's last activity time")
         if current_time < competitor_glicko2._last_activity:
+            logger.error(
+                "Match time %s is before opponent last activity %s", current_time, competitor_glicko2._last_activity
+            )
             raise InvalidParameterException("Match time cannot be before opponent's last activity time")
 
         # Update RDs for both competitors based on inactivity before recording match
@@ -615,8 +682,12 @@ class Glicko2Competitor(BaseCompetitor):
 
         # Validate match time is not before last activity
         if current_time < self._last_activity:
+            logger.error("Match time %s is before self last activity %s", current_time, self._last_activity)
             raise InvalidParameterException("Match time cannot be before competitor's last activity time")
         if current_time < competitor_glicko2._last_activity:
+            logger.error(
+                "Match time %s is before opponent last activity %s", current_time, competitor_glicko2._last_activity
+            )
             raise InvalidParameterException("Match time cannot be before opponent's last activity time")
 
         # Update RDs for both competitors based on inactivity before recording match
@@ -648,6 +719,7 @@ class Glicko2Competitor(BaseCompetitor):
             InvalidParameterException: If the match time is before either competitor's last activity.
         """
         self.verify_competitor_types(competitor)
+        logger.debug("%s tied with %s (time=%s). Recording result.", self, competitor, match_time)
         competitor_glicko2 = cast(Glicko2Competitor, competitor)
 
         # Get the match time
@@ -655,8 +727,12 @@ class Glicko2Competitor(BaseCompetitor):
 
         # Validate match time is not before last activity
         if current_time < self._last_activity:
+            logger.error("Match time %s is before self last activity %s", current_time, self._last_activity)
             raise InvalidParameterException("Match time cannot be before competitor's last activity time")
         if current_time < competitor_glicko2._last_activity:
+            logger.error(
+                "Match time %s is before opponent last activity %s", current_time, competitor_glicko2._last_activity
+            )
             raise InvalidParameterException("Match time cannot be before opponent's last activity time")
 
         # Update RDs for both competitors based on inactivity before recording match
@@ -668,8 +744,12 @@ class Glicko2Competitor(BaseCompetitor):
 
         # Validate match time is not before last activity
         if current_time < self._last_activity:
+            logger.error("Match time %s is before self last activity %s", current_time, self._last_activity)
             raise InvalidParameterException("Match time cannot be before competitor's last activity time")
         if current_time < competitor_glicko2._last_activity:
+            logger.error(
+                "Match time %s is before opponent last activity %s", current_time, competitor_glicko2._last_activity
+            )
             raise InvalidParameterException("Match time cannot be before opponent's last activity time")
 
         # Update RDs for both competitors based on inactivity before recording match

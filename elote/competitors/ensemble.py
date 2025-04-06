@@ -10,6 +10,7 @@ from elote import (
     TrueSkillCompetitor,
     ColleyMatrixCompetitor,
 )
+from elote.logging import logger  # Import directly from the logging submodule
 
 T = TypeVar("T", bound="BlendedCompetitor")
 
@@ -54,7 +55,9 @@ class BlendedCompetitor(BaseCompetitor):
             InvalidParameterException: If the blend_mode is not supported or if any
                                       competitor specification is invalid.
         """
+        super().__init__()  # Call base class constructor
         if blend_mode not in ["mean"]:
+            logger.error("Unsupported blend mode specified: %s", blend_mode)
             raise InvalidParameterException(f"Blend mode {blend_mode} not supported")
 
         self.sub_competitors: List[BaseCompetitor] = []
@@ -62,7 +65,10 @@ class BlendedCompetitor(BaseCompetitor):
         self.blend_mode = blend_mode
 
         # Create the sub-competitors
-        for comp_spec in competitors:
+        logger.debug(
+            "Initializing BlendedCompetitor with mode '%s' and %d sub-competitors", blend_mode, len(competitors)
+        )
+        for i, comp_spec in enumerate(competitors):
             comp_type_name = comp_spec.get("type", "EloCompetitor")
             comp_kwargs = comp_spec.get("competitor_kwargs", {})
 
@@ -70,7 +76,13 @@ class BlendedCompetitor(BaseCompetitor):
             comp_class = BaseCompetitor.get_competitor_class(comp_type_name)
 
             # Create the competitor
-            self.sub_competitors.append(comp_class(**comp_kwargs))
+            logger.debug("Creating sub-competitor %d: type=%s, kwargs=%s", i + 1, comp_type_name, comp_kwargs)
+            try:
+                sub_comp = comp_class(**comp_kwargs)
+                self.sub_competitors.append(sub_comp)
+            except Exception as e:
+                logger.error("Failed to create sub-competitor %d ('%s'): %s", i + 1, comp_type_name, e)
+                raise InvalidParameterException(f"Failed to initialize sub-competitor {comp_type_name}: {e}") from e
 
     def __repr__(self) -> str:
         """Return a string representation of this competitor.
@@ -114,6 +126,7 @@ class BlendedCompetitor(BaseCompetitor):
         Raises:
             NotImplementedError: Always, as setting the rating directly is not supported.
         """
+        logger.warning("Attempted to set rating directly on BlendedCompetitor, which is not supported.")
         raise NotImplementedError("Cannot directly set the rating of a BlendedCompetitor")
 
     def _export_parameters(self) -> Dict[str, Any]:
@@ -147,8 +160,10 @@ class BlendedCompetitor(BaseCompetitor):
             InvalidParameterException: If any parameter is invalid.
         """
         # Validate and set blend_mode
+        logger.debug("Importing parameters for BlendedCompetitor: %s", parameters)
         blend_mode = parameters.get("blend_mode", "mean")
         if blend_mode not in ["mean"]:
+            logger.error("Invalid blend_mode in state: %s", blend_mode)
             raise InvalidParameterException(f"Blend mode {blend_mode} not supported")
         self.blend_mode = blend_mode
 
@@ -165,19 +180,29 @@ class BlendedCompetitor(BaseCompetitor):
             InvalidStateException: If any state variable is invalid.
         """
         # Get the sub-competitors state
+        logger.debug(
+            "Importing current state for BlendedCompetitor (%d sub-competitors)", len(state.get("sub_competitors", []))
+        )
         sub_competitors_state = state.get("sub_competitors", [])
 
         # Create new sub-competitors from their state
         self.sub_competitors = []
-        for comp_state in sub_competitors_state:
+        for _i, comp_state in enumerate(sub_competitors_state):
             # Get the competitor type
             comp_type_name = comp_state.get("type")
             if not comp_type_name:
+                logger.error("Missing competitor type in sub-competitor state during import.")
                 raise InvalidStateException("Missing competitor type in sub-competitor state")
 
             # Create the competitor from its state
             comp_class = BaseCompetitor.get_competitor_class(comp_type_name)
-            self.sub_competitors.append(comp_class.from_state(comp_state))
+            try:
+                comp = comp_class.from_state(comp_state)
+                self.sub_competitors.append(comp)
+                logger.debug("Successfully imported state for sub-competitor: %s", comp)
+            except Exception as e:
+                logger.error("Failed to import state for sub-competitor '%s': %s", comp_type_name, e)
+                raise InvalidStateException(f"Failed to import state for sub-competitor {comp_type_name}: {e}") from e
 
     @classmethod
     def _create_from_parameters(cls: Type[T], parameters: Dict[str, Any]) -> T:
@@ -192,6 +217,7 @@ class BlendedCompetitor(BaseCompetitor):
         Raises:
             InvalidParameterException: If any parameter is invalid.
         """
+        logger.debug("Creating BlendedCompetitor instance from parameters: %s", parameters)
         return cls(
             competitors=parameters.get("competitors", []),
             blend_mode=parameters.get("blend_mode", "mean"),
@@ -223,7 +249,9 @@ class BlendedCompetitor(BaseCompetitor):
             InvalidParameterException: If any competitor specification is invalid.
         """
         # Handle legacy state format
+        logger.debug("Creating BlendedCompetitor from state: %s", state)
         if "type" not in state:
+            logger.warning("Using legacy state format for BlendedCompetitor.from_state")
             blend_mode = state.get("blend_mode", "mean")
             competitors_state = state.get("competitors", [])
 
@@ -234,6 +262,7 @@ class BlendedCompetitor(BaseCompetitor):
                 comp_type = competitor_types.get(comp_type_name)
 
                 if comp_type is None:
+                    logger.error("Unknown competitor type found in legacy state: %s", comp_type_name)
                     raise InvalidParameterException(f"Unknown competitor type: {comp_type_name}")
 
                 comp_kwargs = comp_state.get("competitor_kwargs", {})
@@ -256,7 +285,14 @@ class BlendedCompetitor(BaseCompetitor):
                 comp_kwargs = comp_state.get("competitor_kwargs", {})
 
                 # Replace the sub-competitor with one created from the full state
-                blended.sub_competitors[i] = comp_type.from_state(comp_kwargs)
+                try:
+                    blended.sub_competitors[i] = comp_type.from_state(comp_kwargs)
+                    logger.debug("Updated sub-competitor %d from legacy state: %s", i, blended.sub_competitors[i])
+                except Exception as e:
+                    logger.error("Failed to update sub-competitor %d from legacy state '%s': %s", i, comp_type_name, e)
+                    raise InvalidStateException(
+                        f"Failed to update sub-competitor {comp_type_name} from legacy state: {e}"
+                    ) from e
 
             return blended
 
@@ -268,8 +304,10 @@ class BlendedCompetitor(BaseCompetitor):
 
         This method resets all sub-competitors to their initial states.
         """
+        logger.info("Resetting BlendedCompetitor to initial state.")
         # Reset all sub-competitors
         for competitor in self.sub_competitors:
+            logger.debug("Resetting sub-competitor: %s", competitor)
             competitor.reset()
 
     def expected_score(self, competitor: BaseCompetitor) -> float:
@@ -289,13 +327,19 @@ class BlendedCompetitor(BaseCompetitor):
             NotImplementedError: If the blend_mode is not supported.
         """
         self.verify_competitor_types(competitor)
+        logger.debug(
+            "Calculating blended expected score (mode='%s') between %s and %s", self.blend_mode, self, competitor
+        )
 
         if self.blend_mode == "mean":
             es = []
             for c, other_c in zip(self.sub_competitors, competitor.sub_competitors):
                 es.append(c.expected_score(other_c))
-            return sum(es) / len(es)
+            result = sum(es) / len(es)
+            logger.debug("Mean expected score: %.4f", result)
+            return result
         else:
+            logger.error("Unsupported blend mode used in expected_score: %s", self.blend_mode)
             raise NotImplementedError(f"Blend mode {self.blend_mode} not supported")
 
     def beat(self, competitor: BaseCompetitor) -> None:
@@ -310,8 +354,10 @@ class BlendedCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        logger.debug("%s beat %s. Updating %d sub-competitors.", self, competitor, len(self.sub_competitors))
 
         for c, other_c in zip(self.sub_competitors, competitor.sub_competitors):
+            logger.debug("Updating sub-competitors via beat: %s vs %s", c, other_c)
             c.beat(other_c)
 
     def tied(self, competitor: BaseCompetitor) -> None:
@@ -326,6 +372,8 @@ class BlendedCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        logger.debug("%s tied with %s. Updating %d sub-competitors.", self, competitor, len(self.sub_competitors))
 
         for c, other_c in zip(self.sub_competitors, competitor.sub_competitors):
+            logger.debug("Updating sub-competitors via tied: %s vs %s", c, other_c)
             c.tied(other_c)  # Fixed: was using beat() instead of tied()
