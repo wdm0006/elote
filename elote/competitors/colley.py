@@ -102,30 +102,18 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         """
         return self._wins + self._losses + self._ties
 
-    def expected_score(self, competitor: BaseCompetitor) -> float:
-        """Calculate the expected score (probability of winning) against another competitor.
-
-        In the Colley system, a higher rating indicates a stronger competitor.
-        This method converts these ratings to a win probability.
+    def expected_score(self, competitor: "BaseCompetitor") -> float:
+        """Calculate the expected score against another competitor.
 
         Args:
-            competitor (BaseCompetitor): The opponent competitor to compare against.
+            competitor (BaseCompetitor): The competitor to compare against.
 
         Returns:
-            float: The probability of winning (between 0 and 1).
-
-        Raises:
-            MissMatchedCompetitorTypesException: If the competitor types don't match.
+            float: The expected score (probability of winning).
         """
-        logger.debug("Calculating expected score between %s and %s", self, competitor)
         self.verify_competitor_types(competitor)
-        competitor_colley = cast(ColleyMatrixCompetitor, competitor)
-
-        # To convert Colley ratings (which are between 0 and 1) to win probabilities,
-        # we need to map them to a reasonable probability scale
-        # A simple approach is to use a logistic function based on rating difference
-        rating_diff = self._rating - competitor_colley.rating
-        return 1 / (1 + np.exp(-4 * rating_diff))
+        rating_diff = self.rating - competitor.rating
+        return float(1 / (1 + np.exp(-4 * rating_diff)))
 
     def beat(self, competitor: BaseCompetitor) -> None:
         """Update ratings after this competitor has won against the given competitor.

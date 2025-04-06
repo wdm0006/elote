@@ -7,7 +7,7 @@ including comparison charts and accuracy analysis.
 
 import matplotlib.pyplot as plt
 import numpy as np
-from typing import Dict, List, Tuple, Optional, Any, Union, cast
+from typing import Dict, List, Tuple, Optional, Any, cast
 
 
 def plot_rating_system_comparison(

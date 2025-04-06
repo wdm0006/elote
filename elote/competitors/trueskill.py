@@ -423,9 +423,11 @@ class TrueSkillCompetitor(BaseCompetitor):
             draw_probability: The probability of a draw
 
         Returns:
-            The draw margin
+            float: The draw margin
         """
-        return math.sqrt(2) * beta * special.erfinv(1 - 2 * draw_probability)
+        if not 0 <= draw_probability < 1:
+            raise InvalidParameterException("Draw probability must be between 0 and 1")
+        return float(math.sqrt(2) * beta * special.erfinv(1 - 2 * draw_probability))
 
     def expected_score(self, competitor: BaseCompetitor) -> float:
         """Calculate the expected score (probability of winning) against another competitor.
