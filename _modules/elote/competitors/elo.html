@@ -330,14 +330,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">transformed_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the transformed rating of this competitor.</span>
-
-<span class="sd">        The transformed rating is used in the expected score calculation.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the transformed rating for this competitor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            float: The transformed rating.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_rating</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">/</span> <span class="mi">400</span><span class="p">))</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -364,25 +362,17 @@
             <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">value</span>
 
-<div class="viewcode-block" id="EloCompetitor.expected_score"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.elo.EloCompetitor.expected_score">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the expected score (probability of winning) against another competitor.</span>
-
-<span class="sd">        In Elo rating, a player&#39;s expected score is their probability of winning plus half their probability of drawing.</span>
-<span class="sd">        This is because in Elo rating a draw is not explicitly accounted for, but rather counted as half of a win and</span>
-<span class="sd">        half of a loss. It can make the expected score a bit difficult to reason about, so be careful.</span>
+<div class="viewcode-block" id="EloCompetitor.expected_score"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.elo.EloCompetitor.expected_score">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;BaseCompetitor&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the expected score against another competitor.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            competitor (BaseCompetitor): The opponent competitor to compare against.</span>
+<span class="sd">            competitor (BaseCompetitor): The competitor to compare against.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            float: The probability of winning (between 0 and 1).</span>
-
-<span class="sd">        Raises:</span>
-<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
+<span class="sd">            float: The expected score (probability of winning).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Calculating expected score between </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformed_rating</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transformed_rating</span> <span class="o">+</span> <span class="n">competitor</span><span class="o">.</span><span class="n">transformed_rating</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transformed_rating</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transformed_rating</span> <span class="o">+</span> <span class="n">competitor</span><span class="o">.</span><span class="n">transformed_rating</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="EloCompetitor.beat"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.elo.EloCompetitor.beat">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has won against the given competitor.</span>

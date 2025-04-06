@@ -339,19 +339,13 @@ InvalidParameterException: If any parameter in the state is invalid.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.base.BaseCompetitor.from_state">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="reference internal" href="../_modules/elote/competitors/base.html#BaseCompetitor.from_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.base.BaseCompetitor.from_state" title="Permalink to this definition"></a></dt>
-<dd><p>Create a new competitor from a previously exported state.</p>
-<p>This method creates a new competitor instance from a previously exported
-state dictionary.</p>
+<dd><p>Create a new competitor from a state dictionary.</p>
 <dl class="simple">
-<dt>Args:</dt><dd><dl class="simple">
-<dt>state (dict): A dictionary containing the state of a competitor,</dt><dd><p>as returned by export_state().</p>
+<dt>Args:</dt><dd><p>state: A dictionary containing the state of a competitor, including its type and parameters.</p>
 </dd>
-</dl>
+<dt>Returns:</dt><dd><p>A new competitor of the same type as the exported one.</p>
 </dd>
-<dt>Returns:</dt><dd><p>BaseCompetitor: A new competitor with the same state as the exported one.</p>
-</dd>
-<dt>Raises:</dt><dd><p>InvalidStateException: If the state dictionary is invalid or incompatible.
-InvalidParameterException: If any parameter in the state is invalid.</p>
+<dt>Raises:</dt><dd><p>InvalidStateException: If the state format is invalid or missing required fields.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -566,16 +560,11 @@ based on the match outcome where this competitor won.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.elo.EloCompetitor.expected_score">
 <span class="sig-name descname"><span class="pre">expected_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/elote/competitors/elo.html#EloCompetitor.expected_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.elo.EloCompetitor.expected_score" title="Permalink to this definition"></a></dt>
-<dd><p>Calculate the expected score (probability of winning) against another competitor.</p>
-<p>In Elo rating, a player’s expected score is their probability of winning plus half their probability of drawing.
-This is because in Elo rating a draw is not explicitly accounted for, but rather counted as half of a win and
-half of a loss. It can make the expected score a bit difficult to reason about, so be careful.</p>
+<dd><p>Calculate the expected score against another competitor.</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor to compare against.</p>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The competitor to compare against.</p>
 </dd>
-<dt>Returns:</dt><dd><p>float: The probability of winning (between 0 and 1).</p>
-</dd>
-<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+<dt>Returns:</dt><dd><p>float: The expected score (probability of winning).</p>
 </dd>
 </dl>
 </dd></dl>
@@ -644,8 +633,7 @@ based on a drawn match outcome.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="elote.competitors.elo.EloCompetitor.transformed_rating">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transformed_rating</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#elote.competitors.elo.EloCompetitor.transformed_rating" title="Permalink to this definition"></a></dt>
-<dd><p>Get the transformed rating of this competitor.</p>
-<p>The transformed rating is used in the expected score calculation.</p>
+<dd><p>Get the transformed rating for this competitor.</p>
 <dl class="simple">
 <dt>Returns:</dt><dd><p>float: The transformed rating.</p>
 </dd>

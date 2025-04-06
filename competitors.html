@@ -226,16 +226,11 @@ based on the match outcome where this competitor won.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.elo.EloCompetitor.expected_score">
 <span class="sig-name descname"><span class="pre">expected_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/elote/competitors/elo.html#EloCompetitor.expected_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.elo.EloCompetitor.expected_score" title="Permalink to this definition"></a></dt>
-<dd><p>Calculate the expected score (probability of winning) against another competitor.</p>
-<p>In Elo rating, a player’s expected score is their probability of winning plus half their probability of drawing.
-This is because in Elo rating a draw is not explicitly accounted for, but rather counted as half of a win and
-half of a loss. It can make the expected score a bit difficult to reason about, so be careful.</p>
+<dd><p>Calculate the expected score against another competitor.</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor to compare against.</p>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The competitor to compare against.</p>
 </dd>
-<dt>Returns:</dt><dd><p>float: The probability of winning (between 0 and 1).</p>
-</dd>
-<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+<dt>Returns:</dt><dd><p>float: The expected score (probability of winning).</p>
 </dd>
 </dl>
 </dd></dl>
