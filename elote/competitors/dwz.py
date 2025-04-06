@@ -1,5 +1,5 @@
 import math
-from typing import Dict, Any, ClassVar, Optional, Type, TypeVar
+from typing import Dict, Any, ClassVar, Optional, Type, TypeVar, cast
 
 from elote.competitors.base import BaseCompetitor, InvalidRatingValueException, InvalidParameterException
 
@@ -10,7 +10,8 @@ class DWZCompetitor(BaseCompetitor):
     """Deutsche Wertungszahl (DWZ) rating system competitor.
 
     The DWZ is the German chess rating system, similar to Elo but with some
-    differences in how ratings are updated after matches.
+    differences in how ratings are updated after matches, including factors
+    based on player age and performance.
 
     Class Attributes:
         _J (int): Development coefficient. Default: 10.
@@ -36,9 +37,6 @@ class DWZCompetitor(BaseCompetitor):
         self._count = 0
         self._initial_count = 0
         self._rating = initial_rating
-        self._cached_E: Optional[float] = None
-        self._cached_rating_for_E: Optional[float] = None
-        self._cached_count_for_E: Optional[int] = None
 
     def __repr__(self) -> str:
         """Return a string representation of this competitor.
@@ -79,9 +77,6 @@ class DWZCompetitor(BaseCompetitor):
             raise InvalidRatingValueException(f"Rating cannot be below the minimum rating of {self._minimum_rating}")
 
         self._rating = value
-        # Invalidate cache when rating changes
-        self._cached_E = None
-        self._cached_rating_for_E = None
 
     def export_state(self) -> Dict[str, Any]:
         """Export the current state of this competitor for serialization.
@@ -151,11 +146,6 @@ class DWZCompetitor(BaseCompetitor):
         self._count = state.get("count", 0)
         self._initial_count = state.get("initial_count", 0)
 
-        # Invalidate cache
-        self._cached_E = None
-        self._cached_rating_for_E = None
-        self._cached_count_for_E = None
-
     @classmethod
     def _create_from_parameters(cls: Type[T], parameters: Dict[str, Any]) -> T:
         """Create a new competitor instance from parameters.
@@ -189,12 +179,6 @@ class DWZCompetitor(BaseCompetitor):
         """
         # Handle legacy state format
         if "type" not in state:
-            # Configure class variables if provided
-            if "class_vars" in state:
-                class_vars = state["class_vars"]
-                if "J" in class_vars:
-                    cls._J = class_vars["J"]
-
             # Create a new competitor with the initial rating
             competitor = cls(initial_rating=state.get("initial_rating", 400))
 
@@ -220,9 +204,6 @@ class DWZCompetitor(BaseCompetitor):
         """
         self._rating = self._initial_rating
         self._count = self._initial_count
-        self._cached_E = None
-        self._cached_rating_for_E = None
-        self._cached_count_for_E = None
 
     def expected_score(self, competitor: BaseCompetitor) -> float:
         """Calculate the expected score (probability of winning) against another competitor.
@@ -237,114 +218,129 @@ class DWZCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        competitor_dwz = cast(DWZCompetitor, competitor)
 
         # Direct calculation to avoid property access overhead
-        competitor_rating = competitor._rating
-        return 1 / (1 + 10 ** ((competitor_rating - self._rating) / 400))
+        competitor_rating = competitor_dwz._rating
+        return 1.0 / (1.0 + 10 ** ((competitor_rating - self._rating) / 400.0))
 
-    @property
-    def _E(self) -> int:
-        """Calculate the development coefficient E.
-
-        The development coefficient determines how much a player's rating changes
-        after a match, based on their current rating and number of games played.
-
-        Returns:
-            int: The development coefficient.
-        """
-        # Check if we can use cached value
-        if (
-            self._cached_E is not None
-            and self._cached_rating_for_E == self._rating
-            and self._cached_count_for_E == self._count
-        ):
-            return self._cached_E
-
-        # Calculate E
-        E0 = (self._rating / 1000) ** 4 + self._J
-        a = max([0.5, min([self._rating / 2000, 1])])
-
-        if self._rating < 1300:
-            B = math.exp((1300 - self._rating) / 150) - 1
-        else:
-            B = 0
-
-        E = int(a * E0 + B)
-        if B == 0:
-            result = max([5, min([E, min([30, 5 * self._count])])])
-        else:
-            result = max([5, min([E, 150])])
-
-        # Cache the result
-        self._cached_E = result
-        self._cached_rating_for_E = self._rating
-        self._cached_count_for_E = self._count
-
-        return result
-
-    def _new_rating(self, competitor: "DWZCompetitor", W_a: float) -> float:
-        """Calculate the new rating after a match.
+    def _calculate_E(self, age: Optional[int], W_a: float, W_e: float) -> float:
+        """Calculate the development coefficient E for a specific match context.
 
         Args:
-            competitor (DWZCompetitor): The opponent competitor.
-            W_a (float): The actual outcome of the match (1 for win, 0.5 for draw, 0 for loss).
+            age (Optional[int]): The age of the player at the time of the match. Defaults to 26 if None.
+            W_a (float): Achieved points in the match (1.0 for win, 0.5 for draw, 0.0 for loss).
+            W_e (float): Expected points in the match.
+
+        Returns:
+            float: The calculated development coefficient E.
+        """
+        # Determine J based on age (default to adult > 25 if None)
+        current_age = age if age is not None else 26
+        if current_age <= 20:
+            J = 5
+        elif 21 <= current_age <= 25:
+            J = 10
+        else:  # age > 25 or default
+            J = 15
+
+        # Calculate E0
+        Z_A = self._rating
+        E0 = (Z_A / 1000.0) ** 4 + J
+
+        # Calculate acceleration factor 'a'
+        a = 1.0
+        if current_age <= 20 and W_a > W_e:
+            a = Z_A / 2000.0
+            a = max(0.5, min(1.0, a))  # Clamp a between 0.5 and 1.0
+
+        # Calculate braking value 'B'
+        B = 0.0
+        if Z_A < 1300 and W_a <= W_e:
+            try:
+                B = math.exp((1300.0 - Z_A) / 150.0) - 1.0
+            except OverflowError:
+                B = float("inf")  # Handle potential overflow for very low ratings
+
+        # Calculate E
+        E = a * E0 + B
+
+        # Apply bounds based on tournament index 'i' (using game count + 1)
+        i = self._count + 1  # Game count before this match + 1
+        if B == 0.0:
+            E_upper_bound = min(30.0, 5.0 * i)
+        else:
+            E_upper_bound = 150.0
+
+        E = max(5.0, min(E, E_upper_bound))  # Clamp E: 5 <= E <= E_upper_bound
+
+        return E
+
+    def _new_rating(self, competitor: "DWZCompetitor", W_a: float, age: Optional[int] = None) -> float:
+        """Calculate the new DWZ rating after a match.
+
+        Args:
+            competitor (DWZCompetitor): The opponent.
+            W_a (float): The actual score achieved against the opponent (1.0, 0.5, or 0.0).
+            age (Optional[int]): The age of this competitor at the time of the match. Defaults to 26.
 
         Returns:
             float: The new rating.
         """
-        # Calculate expected score directly to avoid multiple property accesses
-        expected = self.expected_score(competitor)
-        E_value = self._E  # Get E value once
-        return self._rating + (800 / (E_value + self._count)) * (W_a - expected)
+        W_e = self.expected_score(competitor)
+        E = self._calculate_E(age=age, W_a=W_a, W_e=W_e)
 
-    def beat(self, competitor: BaseCompetitor) -> None:
-        """Update ratings after this competitor has won against the given competitor.
+        # Formula uses n = number of games in evaluation period. Assuming game-by-game update, n=1.
+        n = 1
+        new_rating = self._rating + (800.0 / (E + n)) * (W_a - W_e)
 
-        This method updates the ratings of both this competitor and the opponent
-        based on the match outcome where this competitor won.
+        # Ensure rating doesn't fall below minimum
+        return max(self._minimum_rating, new_rating)
+
+    def beat(self, competitor: BaseCompetitor, age: Optional[int] = None) -> None:
+        """Update ratings after this competitor wins against another.
 
         Args:
-            competitor (BaseCompetitor): The opponent competitor that lost.
+            competitor (BaseCompetitor): The opponent competitor.
+            age (Optional[int]): The age of this competitor at the time of the match.
+                                 Used for DWZ calculation. Defaults to 26 (adult).
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        competitor_dwz = cast(DWZCompetitor, competitor)
 
-        # Calculate new ratings
-        self_rating = self._new_rating(competitor, 1)
-        competitor_rating = competitor._new_rating(self, 0)
+        # Calculate new ratings using the age parameter
+        my_new_rating = self._new_rating(competitor_dwz, 1.0, age=age)
+        opponent_new_rating = competitor_dwz._new_rating(self, 0.0, age=None)  # Opponent age not needed here
 
-        # Update ratings and counts in one go
-        self._rating = self_rating
+        # Update ratings and counts simultaneously
+        self.rating = my_new_rating
+        competitor_dwz.rating = opponent_new_rating
         self._count += 1
-        self._cached_E = None  # Invalidate cache
+        competitor_dwz._count += 1
 
-        competitor.rating = competitor_rating
-        competitor._count += 1
-
-    def tied(self, competitor: BaseCompetitor) -> None:
-        """Update ratings after this competitor has tied with the given competitor.
-
-        This method updates the ratings of both this competitor and the opponent
-        based on a drawn match outcome.
+    def tied(self, competitor: BaseCompetitor, age: Optional[int] = None) -> None:
+        """Update ratings after this competitor ties with another.
 
         Args:
-            competitor (BaseCompetitor): The opponent competitor that tied.
+            competitor (BaseCompetitor): The opponent competitor.
+            age (Optional[int]): The age of this competitor at the time of the match.
+                                 Used for DWZ calculation. Defaults to 26 (adult).
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        competitor_dwz = cast(DWZCompetitor, competitor)
 
-        # Calculate new ratings
-        self_rating = self._new_rating(competitor, 0.5)
-        competitor_rating = competitor._new_rating(self, 0.5)
+        # Calculate new ratings using the age parameter
+        my_new_rating = self._new_rating(competitor_dwz, 0.5, age=age)
+        opponent_new_rating = competitor_dwz._new_rating(self, 0.5, age=None)  # Opponent age not needed here
 
-        # Update ratings and counts in one go
-        self._rating = self_rating
+        # Update ratings and counts simultaneously
+        self.rating = my_new_rating
+        competitor_dwz.rating = opponent_new_rating
         self._count += 1
-        self._cached_E = None  # Invalidate cache
-
-        competitor.rating = competitor_rating
-        competitor._count += 1
+        competitor_dwz._count += 1

@@ -12,6 +12,7 @@ This example demonstrates:
 4. Visualizing the rating changes over time
 """
 
+import os
 import matplotlib.pyplot as plt
 from elote import ColleyMatrixCompetitor
 
@@ -111,7 +112,7 @@ def main():
     plt.xticks(rounds)
 
     # Save the plot
-    plt.savefig("colley_matrix_ratings.png")
+    plt.savefig(os.path.join("images", "colley_matrix_ratings.png"))
     print("\nRating history plot saved as 'colley_matrix_ratings.png'")
 
     # Show the plot if running interactively

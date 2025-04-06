@@ -1,6 +1,6 @@
 import abc
 import random
-from typing import Dict
+from typing import Dict, Any, List, Tuple, Optional
 
 
 class BaseArena:
@@ -12,7 +12,7 @@ class BaseArena:
     """
 
     @abc.abstractmethod
-    def set_competitor_class_var(self, name, value):
+    def set_competitor_class_var(self, name: str, value: Any) -> None:
         """Set a class variable on all competitors in this arena.
 
         This method allows for global configuration of all competitors
@@ -25,7 +25,7 @@ class BaseArena:
         pass
 
     @abc.abstractmethod
-    def tournament(self, matchups):
+    def tournament(self, matchups: List[Tuple[Any, Any]]) -> None:
         """Run a tournament with the given matchups.
 
         A tournament consists of multiple matchups between competitors.
@@ -36,7 +36,7 @@ class BaseArena:
         pass
 
     @abc.abstractmethod
-    def matchup(self, a, b):
+    def matchup(self, a: Any, b: Any) -> Any:
         """Process a single matchup between two competitors.
 
         Args:
@@ -49,7 +49,7 @@ class BaseArena:
         pass
 
     @abc.abstractmethod
-    def leaderboard(self):
+    def leaderboard(self) -> List[Tuple[Any, float]]:
         """Generate a leaderboard of all competitors.
 
         Returns:
@@ -58,7 +58,7 @@ class BaseArena:
         pass
 
     @abc.abstractmethod
-    def export_state(self):
+    def export_state(self) -> Dict[str, Any]:
         """Export the current state of this arena for serialization.
 
         Returns:
@@ -75,11 +75,11 @@ class History:
     the performance of the rating system.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize an empty history of bouts."""
         self.bouts = []
 
-    def add_bout(self, bout):
+    def add_bout(self, bout: "Bout") -> None:
         """Add a bout to the history.
 
         Args:
@@ -87,7 +87,7 @@ class History:
         """
         self.bouts.append(bout)
 
-    def report_results(self, lower_threshold=0.5, upper_threshold=0.5):
+    def report_results(self, lower_threshold: float = 0.5, upper_threshold: float = 0.5) -> List[Dict[str, Any]]:
         """Generate a report of the results in this history.
 
         Args:
@@ -203,7 +203,7 @@ class History:
             "fn": false_negatives
         }
 
-    def random_search(self, trials=1000):
+    def random_search(self, trials: int = 1000) -> Tuple[float, List[float]]:
         """Search for optimal prediction thresholds using random sampling.
 
         This method performs a random search to find the best lower and upper
@@ -242,7 +242,9 @@ class History:
 
         return best_accuracy, best_thresholds
 
-    def optimize_thresholds(self, method="L-BFGS-B", initial_thresholds=(0.5, 0.5)):
+    def optimize_thresholds(
+        self, method: str = "L-BFGS-B", initial_thresholds: Tuple[float, float] = (0.5, 0.5)
+    ) -> Tuple[float, List[float]]:
         """Search for optimal prediction thresholds using scipy optimization.
 
         This method uses scipy's optimize module to find the best lower and upper
@@ -263,7 +265,7 @@ class History:
         max_outcome = max(predicted_outcomes) if predicted_outcomes else 1
 
         # Define the objective function to minimize (negative accuracy)
-        def objective(thresholds):
+        def objective(thresholds: List[float]) -> float:
             # Ensure thresholds are sorted
             sorted_thresholds = sorted(thresholds)
             metrics = self.calculate_metrics(*sorted_thresholds)
@@ -378,7 +380,9 @@ class History:
         # Return all metrics
         return {"accuracy": accuracy, "precision": precision, "recall": recall, "f1": f1, "confusion_matrix": cm}
 
-    def calculate_metrics_with_draws(self, lower_threshold=0.33, upper_threshold=0.66):
+    def calculate_metrics_with_draws(
+        self, lower_threshold: float = 0.33, upper_threshold: float = 0.66
+    ) -> Dict[str, Any]:
         """Calculate evaluation metrics for the bout history, treating predictions
         between thresholds as explicit draw predictions.
 
@@ -457,7 +461,9 @@ class History:
             "confusion_matrix": cm,
         }
 
-    def accuracy_by_prior_bouts(self, arena, thresholds=None, bin_size=5):
+    def accuracy_by_prior_bouts(
+        self, arena: "BaseArena", thresholds: Optional[Tuple[float, float]] = None, bin_size: int = 5
+    ) -> Dict[int, Dict[str, Any]]:
         """Calculate accuracy based on the number of prior bouts for each competitor.
 
         This method analyzes how accuracy changes as competitors participate in more bouts,
@@ -552,7 +558,7 @@ class History:
         # Return only the binned data in the expected format
         return {"binned": binned_data}
 
-    def get_calibration_data(self, n_bins=10):
+    def get_calibration_data(self, n_bins: int = 10) -> Dict[str, List[float]]:
         """Compute calibration data from the bout history.
 
         This method extracts predicted probabilities and actual outcomes from the bout history
@@ -581,7 +587,14 @@ class History:
 class Bout:
     """A single bout between two competitors."""
 
-    def __init__(self, a, b, predicted_outcome, outcome, attributes=None):
+    def __init__(
+        self,
+        a: Any,
+        b: Any,
+        predicted_outcome: Optional[float],
+        outcome: Any,
+        attributes: Optional[Dict[str, Any]] = None,
+    ) -> None:
         """
         Initialize a bout.
 
@@ -598,7 +611,7 @@ class Bout:
         self.outcome = outcome
         self.attributes = attributes or {}
 
-    def actual_winner(self):
+    def actual_winner(self) -> Optional[str]:
         """
         Return the actual winner of the bout based on the outcome.
 
@@ -623,7 +636,7 @@ class Bout:
 
         return None
 
-    def true_positive(self, threshold=0.5):
+    def true_positive(self, threshold: float = 0.5) -> bool:
         """Check if this bout is a true positive prediction.
 
         A true positive occurs when the model correctly predicts a win.
@@ -641,7 +654,7 @@ class Bout:
                 return self.outcome == 1.0
         return False
 
-    def false_positive(self, threshold=0.5):
+    def false_positive(self, threshold: float = 0.5) -> bool:
         """Check if this bout is a false positive prediction.
 
         A false positive occurs when the model incorrectly predicts a win.
@@ -659,7 +672,7 @@ class Bout:
                 return self.outcome != 1.0
         return False
 
-    def true_negative(self, threshold=0.5):
+    def true_negative(self, threshold: float = 0.5) -> bool:
         """Check if this bout is a true negative prediction.
 
         A true negative occurs when the model correctly predicts a non-win.
@@ -677,7 +690,7 @@ class Bout:
                 return self.outcome == 0.0
         return False
 
-    def false_negative(self, threshold=0.5):
+    def false_negative(self, threshold: float = 0.5) -> bool:
         """Check if this bout is a false negative prediction.
 
         A false negative occurs when the model incorrectly predicts a non-win.
@@ -695,7 +708,7 @@ class Bout:
                 return self.outcome != 0.0
         return False
 
-    def predicted_winner(self, lower_threshold=0.5, upper_threshold=0.5):
+    def predicted_winner(self, lower_threshold: float = 0.5, upper_threshold: float = 0.5) -> Optional[str]:
         """Determine the predicted winner of this bout.
 
         Args:
@@ -712,7 +725,7 @@ class Bout:
         else:
             return None
 
-    def predicted_loser(self, lower_threshold=0.5, upper_threshold=0.5):
+    def predicted_loser(self, lower_threshold: float = 0.5, upper_threshold: float = 0.5) -> Optional[str]:
         """Determine the predicted loser of this bout.
 
         Args:

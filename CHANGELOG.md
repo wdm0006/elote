@@ -1,3 +1,9 @@
+v1.2.0
+======
+
+ * Began adding type hints
+ * Fixed DWZ to correctly calculate development coefficient based on the competitors age at time of match.
+ 
 v1.1.0
 ======
 
