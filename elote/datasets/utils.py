@@ -165,7 +165,7 @@ def train_and_evaluate_arena(
     # Train the arena
     if progress_callback:
 
-        def train_progress(current, total):
+        def train_progress(current: int, total: int) -> None:
             return progress_callback("train", current, total)
     else:
         train_progress = None
@@ -177,7 +177,7 @@ def train_and_evaluate_arena(
     # Evaluate the arena
     if progress_callback:
 
-        def eval_progress(current, total):
+        def eval_progress(current: int, total: int) -> None:
             return progress_callback("eval", current, total)
     else:
         eval_progress = None
