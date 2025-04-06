@@ -579,6 +579,7 @@ class Glicko2Competitor(BaseCompetitor):
         self._last_activity = current_time
         self._match_results = []
 
+        
     def beat(self, competitor: BaseCompetitor, match_time: Optional[datetime] = None) -> None:
         """Update ratings after this competitor has won against the given competitor.
 
@@ -595,6 +596,19 @@ class Glicko2Competitor(BaseCompetitor):
         """
         self.verify_competitor_types(competitor)
         competitor_glicko2 = cast(Glicko2Competitor, competitor)
+
+        # Get the match time
+        current_time = match_time if match_time is not None else datetime.now()
+
+        # Validate match time is not before last activity
+        if current_time < self._last_activity:
+            raise InvalidParameterException("Match time cannot be before competitor's last activity time")
+        if current_time < competitor_glicko2._last_activity:
+            raise InvalidParameterException("Match time cannot be before opponent's last activity time")
+
+        # Update RDs for both competitors based on inactivity before recording match
+        self.update_rd_for_inactivity(current_time)
+        competitor_glicko2.update_rd_for_inactivity(current_time)
 
         # Get the match time
         current_time = match_time if match_time is not None else datetime.now()
@@ -635,6 +649,19 @@ class Glicko2Competitor(BaseCompetitor):
         """
         self.verify_competitor_types(competitor)
         competitor_glicko2 = cast(Glicko2Competitor, competitor)
+
+        # Get the match time
+        current_time = match_time if match_time is not None else datetime.now()
+
+        # Validate match time is not before last activity
+        if current_time < self._last_activity:
+            raise InvalidParameterException("Match time cannot be before competitor's last activity time")
+        if current_time < competitor_glicko2._last_activity:
+            raise InvalidParameterException("Match time cannot be before opponent's last activity time")
+
+        # Update RDs for both competitors based on inactivity before recording match
+        self.update_rd_for_inactivity(current_time)
+        competitor_glicko2.update_rd_for_inactivity(current_time)
 
         # Get the match time
         current_time = match_time if match_time is not None else datetime.now()
