@@ -125,6 +125,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">statistics</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote.competitors.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="n">InvalidRatingValueException</span><span class="p">,</span> <span class="n">InvalidParameterException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>  <span class="c1"># Import directly from the logging submodule</span>
 
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;ECFCompetitor&quot;</span><span class="p">)</span>
 
@@ -152,6 +153,7 @@
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidRatingValueException: If the initial rating is below the minimum rating.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>  <span class="c1"># Call base class constructor</span>
         <span class="k">if</span> <span class="n">initial_rating</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Initial rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -163,7 +165,13 @@
 
         <span class="c1"># Cache for transformed rating calculation</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cached_transformed_elo_rating</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_elo_conversion_for_transform</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_elo_conversion_for_transform</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;Initialized ECFCompetitor with initial rating </span><span class="si">%.1f</span><span class="s2">, delta=</span><span class="si">%.1f</span><span class="s2">, n_periods=</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">initial_rating</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_n_periods</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of this competitor.</span>
@@ -184,6 +192,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">__initialize_ratings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the ratings deque with the initial rating.&quot;&quot;&quot;</span>
         <span class="c1"># Initialize with a single value instead of a full deque of None values</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Initializing scores deque with initial rating </span><span class="si">%.1f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__initial_rating</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="n">deque</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">__initial_rating</span><span class="p">],</span> <span class="n">maxlen</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_periods</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__cached_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__initial_rating</span>  <span class="c1"># Initialize the cache</span>
 
@@ -207,6 +216,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__initialize_ratings</span><span class="p">()</span>
+            <span class="c1"># The assertion below handles the Optional type, no need for another check</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cached_rating</span>
 
         <span class="c1"># Return cached value if available</span>
@@ -216,8 +227,11 @@
         <span class="c1"># Calculate and cache the mean</span>
         <span class="n">valid_scores</span> <span class="o">=</span> <span class="p">[</span><span class="n">_</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="k">if</span> <span class="n">_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">valid_scores</span><span class="p">:</span>
+            <span class="n">mean_rating</span> <span class="o">=</span> <span class="n">statistics</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">valid_scores</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__cached_rating</span> <span class="o">=</span> <span class="n">statistics</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">valid_scores</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Calculated rating from </span><span class="si">%d</span><span class="s2"> scores: </span><span class="si">%.1f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_scores</span><span class="p">),</span> <span class="n">mean_rating</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;No valid scores in deque, using initial rating </span><span class="si">%.1f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__initial_rating</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__cached_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__initial_rating</span>
 
         <span class="c1"># Assert that cache is now float before returning</span>
@@ -238,7 +252,9 @@
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidRatingValueException: If the rating value is below the minimum rating.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Setting rating for ECFCompetitor via score update: </span><span class="si">%.1f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Attempted to set rating </span><span class="si">%.1f</span><span class="s2"> below minimum </span><span class="si">%.1f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
@@ -249,6 +265,7 @@
 <span class="sd">        Args:</span>
 <span class="sd">            rating (float): The new rating to add to the scores deque.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding rating </span><span class="si">%.1f</span><span class="s2"> to scores deque&quot;</span><span class="p">,</span> <span class="n">rating</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__initialize_ratings</span><span class="p">()</span>
             <span class="c1"># Assert scores is now initialized</span>
@@ -303,8 +320,10 @@
 <span class="sd">            InvalidParameterException: If any parameter is invalid.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Validate and set initial_rating</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Importing parameters for ECFCompetitor: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
         <span class="n">initial_rating</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">initial_rating</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid initial_rating in state: </span><span class="si">%.1f</span><span class="s2"> (minimum </span><span class="si">%.1f</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">initial_rating</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Initial rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
@@ -320,11 +339,14 @@
 <span class="sd">            InvalidStateException: If any state variable is invalid.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Restore the scores if provided</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Importing current state for ECFCompetitor: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
         <span class="n">scores</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scores&quot;</span><span class="p">,</span> <span class="p">[])</span>
         <span class="k">if</span> <span class="n">scores</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">maxlen</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_periods</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Restored </span><span class="si">%d</span><span class="s2"> scores from state&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">scores</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__cached_rating</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Force recalculation</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;No scores found in state, initializing scores deque.&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__initialize_ratings</span><span class="p">()</span>
 
     <span class="nd">@classmethod</span>
@@ -360,8 +382,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Handle legacy state format</span>
         <span class="k">if</span> <span class="s2">&quot;type&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Using legacy state format for ECFCompetitor.from_state&quot;</span><span class="p">)</span>
             <span class="c1"># Configure class variables if provided</span>
             <span class="k">if</span> <span class="s2">&quot;class_vars&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Applying legacy class variables: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;class_vars&quot;</span><span class="p">])</span>
                 <span class="n">class_vars</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;class_vars&quot;</span><span class="p">]</span>
                 <span class="k">if</span> <span class="s2">&quot;delta&quot;</span> <span class="ow">in</span> <span class="n">class_vars</span><span class="p">:</span>
                     <span class="bp">cls</span><span class="o">.</span><span class="n">_delta</span> <span class="o">=</span> <span class="n">class_vars</span><span class="p">[</span><span class="s2">&quot;delta&quot;</span><span class="p">]</span>
@@ -386,6 +410,7 @@
 
 <span class="sd">        This method resets the competitor&#39;s scores deque to contain only the initial rating.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Resetting ECFCompetitor to initial state (rating=</span><span class="si">%.1f</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__initial_rating</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_periods</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__initial_rating</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__cached_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__initial_rating</span>
@@ -425,6 +450,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="n">competitor_ecf</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">ECFCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Calculating expected score between </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor_ecf</span><span class="p">)</span>
 
         <span class="c1"># Use transformed Elo ratings for comparison</span>
         <span class="n">my_transformed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformed_elo_rating</span>
@@ -445,6 +471,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="n">competitor_ecf</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">ECFCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> beat </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor_ecf</span><span class="p">)</span>
 
         <span class="c1"># Revert to original logic, using casted opponent</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -480,6 +507,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="n">competitor_ecf</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">ECFCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> tied with </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor_ecf</span><span class="p">)</span>
 
         <span class="c1"># Revert to original logic, using casted opponent</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

@@ -124,6 +124,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote.competitors.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="n">InvalidRatingValueException</span><span class="p">,</span> <span class="n">InvalidParameterException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>  <span class="c1"># Import directly from the logging submodule</span>
 
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;DWZCompetitor&quot;</span><span class="p">)</span>
 
@@ -150,6 +151,7 @@
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidRatingValueException: If the initial rating is below the minimum rating.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>  <span class="c1"># Call base class constructor</span>
         <span class="k">if</span> <span class="n">initial_rating</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Initial rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -158,7 +160,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_count</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">initial_rating</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Initialized DWZCompetitor with initial rating </span><span class="si">%.1f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">initial_rating</span><span class="p">)</span></div>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of this competitor.</span>
@@ -195,7 +198,9 @@
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidRatingValueException: If the rating value is below the minimum rating.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Setting rating for DWZCompetitor to </span><span class="si">%.1f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Attempted to set rating </span><span class="si">%.1f</span><span class="s2"> below minimum </span><span class="si">%.1f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">value</span>
@@ -242,8 +247,10 @@
 <span class="sd">            InvalidParameterException: If any parameter is invalid.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Validate and set initial_rating</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Importing parameters for DWZCompetitor: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
         <span class="n">initial_rating</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">initial_rating</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid initial_rating in state: </span><span class="si">%.1f</span><span class="s2"> (minimum </span><span class="si">%.1f</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">initial_rating</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Initial rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
@@ -259,8 +266,10 @@
 <span class="sd">            InvalidStateException: If any state variable is invalid.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Validate and set rating</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Importing current state for DWZCompetitor: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
         <span class="n">rating</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rating&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">rating</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid rating in state: </span><span class="si">%.1f</span><span class="s2"> (minimum </span><span class="si">%.1f</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">rating</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">rating</span>
 
@@ -299,8 +308,10 @@
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidParameterException: If any parameter in the state is invalid.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating DWZCompetitor from state: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
         <span class="c1"># Handle legacy state format</span>
         <span class="k">if</span> <span class="s2">&quot;type&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Using legacy state format for DWZCompetitor.from_state&quot;</span><span class="p">)</span>
             <span class="c1"># Create a new competitor with the initial rating</span>
             <span class="n">competitor</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="mi">400</span><span class="p">))</span>
 
@@ -324,6 +335,11 @@
 
 <span class="sd">        This method resets the competitor&#39;s rating and count to their initial values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Resetting DWZCompetitor to initial state (rating=</span><span class="si">%.1f</span><span class="s2">, count=</span><span class="si">%d</span><span class="s2">)&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initial_count</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_count</span></div>
 
@@ -341,6 +357,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="n">competitor_dwz</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">DWZCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Calculating expected score between </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor_dwz</span><span class="p">)</span>
 
         <span class="c1"># Direct calculation to avoid property access overhead</span>
         <span class="n">competitor_rating</span> <span class="o">=</span> <span class="n">competitor_dwz</span><span class="o">.</span><span class="n">_rating</span>
@@ -358,7 +375,11 @@
 <span class="sd">            float: The calculated development coefficient E.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Determine J based on age (default to adult &gt; 25 if None)</span>
-        <span class="n">current_age</span> <span class="o">=</span> <span class="n">age</span> <span class="k">if</span> <span class="n">age</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">26</span>
+        <span class="n">current_age</span> <span class="o">=</span> <span class="n">age</span> <span class="k">if</span> <span class="n">age</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">26</span>  <span class="c1"># Use a default age if None</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;Calculating E coefficient: age=</span><span class="si">%d</span><span class="s2">, Wa=</span><span class="si">%.1f</span><span class="s2">, We=</span><span class="si">%.3f</span><span class="s2">, rating=</span><span class="si">%.1f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">current_age</span><span class="p">,</span> <span class="n">W_a</span><span class="p">,</span> <span class="n">W_e</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span>
+        <span class="p">)</span>
+        <span class="c1"># Determine J based on age</span>
         <span class="k">if</span> <span class="n">current_age</span> <span class="o">&lt;=</span> <span class="mi">20</span><span class="p">:</span>
             <span class="n">J</span> <span class="o">=</span> <span class="mi">5</span>
         <span class="k">elif</span> <span class="mi">21</span> <span class="o">&lt;=</span> <span class="n">current_age</span> <span class="o">&lt;=</span> <span class="mi">25</span><span class="p">:</span>
@@ -388,6 +409,7 @@
         <span class="n">E</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">E0</span> <span class="o">+</span> <span class="n">B</span>
 
         <span class="c1"># Apply bounds based on tournament index &#39;i&#39; (using game count + 1)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Calculated E components: J=</span><span class="si">%d</span><span class="s2">, E0=</span><span class="si">%.2f</span><span class="s2">, a=</span><span class="si">%.2f</span><span class="s2">, B=</span><span class="si">%.2f</span><span class="s2">, Unbounded E=</span><span class="si">%.2f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">E0</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">E</span><span class="p">)</span>
         <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count</span> <span class="o">+</span> <span class="mi">1</span>  <span class="c1"># Game count before this match + 1</span>
         <span class="k">if</span> <span class="n">B</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
             <span class="n">E_upper_bound</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">30.0</span><span class="p">,</span> <span class="mf">5.0</span> <span class="o">*</span> <span class="n">i</span><span class="p">)</span>
@@ -396,6 +418,7 @@
 
         <span class="n">E</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">E_upper_bound</span><span class="p">))</span>  <span class="c1"># Clamp E: 5 &lt;= E &lt;= E_upper_bound</span>
 
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Final E coefficient clamped between 5.0 and </span><span class="si">%.2f</span><span class="s2">: E = </span><span class="si">%.2f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">E_upper_bound</span><span class="p">,</span> <span class="n">E</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">E</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_new_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;DWZCompetitor&quot;</span><span class="p">,</span> <span class="n">W_a</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">age</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -409,6 +432,9 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            float: The new rating.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;Calculating new rating for </span><span class="si">%s</span><span class="s2"> after match against </span><span class="si">%s</span><span class="s2"> (Score=</span><span class="si">%.1f</span><span class="s2">, Age=</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">,</span> <span class="n">W_a</span><span class="p">,</span> <span class="n">age</span>
+        <span class="p">)</span>
         <span class="n">W_e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="n">E</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_E</span><span class="p">(</span><span class="n">age</span><span class="o">=</span><span class="n">age</span><span class="p">,</span> <span class="n">W_a</span><span class="o">=</span><span class="n">W_a</span><span class="p">,</span> <span class="n">W_e</span><span class="o">=</span><span class="n">W_e</span><span class="p">)</span>
 
@@ -417,7 +443,9 @@
         <span class="n">new_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">+</span> <span class="p">(</span><span class="mf">800.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">E</span> <span class="o">+</span> <span class="n">n</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">W_a</span> <span class="o">-</span> <span class="n">W_e</span><span class="p">)</span>
 
         <span class="c1"># Ensure rating doesn&#39;t fall below minimum</span>
-        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">,</span> <span class="n">new_rating</span><span class="p">)</span>
+        <span class="n">new_rating_clamped</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">,</span> <span class="n">new_rating</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;New rating calculated: </span><span class="si">%.1f</span><span class="s2"> (Clamped: </span><span class="si">%.1f</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">new_rating</span><span class="p">,</span> <span class="n">new_rating_clamped</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_rating_clamped</span>
 
 <div class="viewcode-block" id="DWZCompetitor.beat"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.dwz.DWZCompetitor.beat">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="n">age</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor wins against another.</span>
@@ -432,6 +460,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="n">competitor_dwz</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">DWZCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> beat </span><span class="si">%s</span><span class="s2"> (age=</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor_dwz</span><span class="p">,</span> <span class="n">age</span><span class="p">)</span>
 
         <span class="c1"># Calculate new ratings using the age parameter</span>
         <span class="n">my_new_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_rating</span><span class="p">(</span><span class="n">competitor_dwz</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="n">age</span><span class="p">)</span>
@@ -456,6 +485,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="n">competitor_dwz</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">DWZCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> tied with </span><span class="si">%s</span><span class="s2"> (age=</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor_dwz</span><span class="p">,</span> <span class="n">age</span><span class="p">)</span>
 
         <span class="c1"># Calculate new ratings using the age parameter</span>
         <span class="n">my_new_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_rating</span><span class="p">(</span><span class="n">competitor_dwz</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="n">age</span><span class="p">)</span>

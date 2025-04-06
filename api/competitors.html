@@ -89,6 +89,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Competitors API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#base-competitor">Base Competitor</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor"><code class="docutils literal notranslate"><span class="pre">BaseCompetitor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor.__init__"><code class="docutils literal notranslate"><span class="pre">BaseCompetitor.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor.beat"><code class="docutils literal notranslate"><span class="pre">BaseCompetitor.beat()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor.configure"><code class="docutils literal notranslate"><span class="pre">BaseCompetitor.configure()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor.configure_class"><code class="docutils literal notranslate"><span class="pre">BaseCompetitor.configure_class()</span></code></a></li>
@@ -220,7 +221,7 @@
 <h2>Base Competitor<a class="headerlink" href="#base-competitor" title="Permalink to this heading"></a></h2>
 <span class="target" id="module-elote.competitors.base"></span><dl class="py class">
 <dt class="sig sig-object py" id="elote.competitors.base.BaseCompetitor">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">elote.competitors.base.</span></span><span class="sig-name descname"><span class="pre">BaseCompetitor</span></span><a class="reference internal" href="../_modules/elote/competitors/base.html#BaseCompetitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.base.BaseCompetitor" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">elote.competitors.base.</span></span><span class="sig-name descname"><span class="pre">BaseCompetitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/competitors/base.html#BaseCompetitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.base.BaseCompetitor" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
 <p>Base abstract class for all rating system competitors.</p>
 <p>This class defines the interface that all rating system implementations must follow.
@@ -236,6 +237,13 @@ unreasonably low.</p>
 </dl>
 </dd>
 </dl>
+<p>Initialize base competitor state.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.base.BaseCompetitor.__init__">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/base.html#BaseCompetitor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.base.BaseCompetitor.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize base competitor state.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.base.BaseCompetitor.beat">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/base.html#BaseCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.base.BaseCompetitor.beat" title="Permalink to this definition"></a></dt>

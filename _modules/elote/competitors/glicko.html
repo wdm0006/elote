@@ -125,6 +125,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote.competitors.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="n">InvalidRatingValueException</span><span class="p">,</span> <span class="n">InvalidParameterException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>  <span class="c1"># Import directly from the logging submodule</span>
 
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;GlickoCompetitor&quot;</span><span class="p">)</span>
 
@@ -164,6 +165,7 @@
 <span class="sd">            InvalidRatingValueException: If the initial rating is below the minimum rating.</span>
 <span class="sd">            InvalidParameterException: If the initial RD is not positive.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>  <span class="c1"># Call base class constructor</span>
         <span class="k">if</span> <span class="n">initial_rating</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Initial rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -176,7 +178,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rd</span> <span class="o">=</span> <span class="n">initial_rd</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="n">initial_rd</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="n">initial_time</span> <span class="k">if</span> <span class="n">initial_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="n">initial_time</span> <span class="k">if</span> <span class="n">initial_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;Initialized GlickoCompetitor with rating=</span><span class="si">%.1f</span><span class="s2">, rd=</span><span class="si">%.1f</span><span class="s2">, time=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rd</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+        <span class="p">)</span></div>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of this competitor.</span>
@@ -227,8 +235,10 @@
 <span class="sd">            InvalidParameterException: If any parameter is invalid.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Validate and set initial_rating</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Importing parameters for GlickoCompetitor: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
         <span class="n">initial_rating</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="mi">1500</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">initial_rating</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid initial_rating in state: </span><span class="si">%.1f</span><span class="s2"> (minimum </span><span class="si">%.1f</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">initial_rating</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Initial rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
@@ -250,8 +260,10 @@
 <span class="sd">            InvalidParameterException: If any state variable is invalid.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Validate and set rating</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Importing current state for GlickoCompetitor: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
         <span class="n">rating</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rating&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">rating</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid rating in state: </span><span class="si">%.1f</span><span class="s2"> (minimum </span><span class="si">%.1f</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">rating</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">rating</span>
 
@@ -266,6 +278,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s2">&quot;last_activity&quot;</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Last activity time missing from state, using current time: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+            <span class="p">)</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_from_parameters</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
@@ -311,8 +326,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Handle legacy state format</span>
         <span class="k">if</span> <span class="s2">&quot;type&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Using legacy state format for GlickoCompetitor.from_state&quot;</span><span class="p">)</span>
             <span class="c1"># Configure class variables if provided</span>
             <span class="k">if</span> <span class="s2">&quot;class_vars&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Applying legacy class variables: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;class_vars&quot;</span><span class="p">])</span>
                 <span class="n">class_vars</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;class_vars&quot;</span><span class="p">]</span>
                 <span class="k">if</span> <span class="s2">&quot;c&quot;</span> <span class="ow">in</span> <span class="n">class_vars</span><span class="p">:</span>
                     <span class="bp">cls</span><span class="o">.</span><span class="n">_c</span> <span class="o">=</span> <span class="n">class_vars</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">]</span>
@@ -338,8 +355,12 @@
 
 <span class="sd">        This method resets the competitor&#39;s rating and RD to their initial values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Resetting GlickoCompetitor to initial state (rating=</span><span class="si">%.1f</span><span class="s2">, rd=</span><span class="si">%.1f</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rd</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rd</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -360,7 +381,9 @@
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidRatingValueException: If the rating value is below the minimum rating.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Setting rating for GlickoCompetitor to </span><span class="si">%.1f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Attempted to set rating </span><span class="si">%.1f</span><span class="s2"> below minimum </span><span class="si">%.1f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">value</span>
 
@@ -400,6 +423,7 @@
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Calculating expected score between </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
 
         <span class="n">g_term</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rd</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
         <span class="n">E</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">((</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">g_term</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">-</span> <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span><span class="p">))</span> <span class="o">/</span> <span class="mi">400</span><span class="p">))</span>
@@ -419,6 +443,7 @@
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> beat </span><span class="si">%s</span><span class="s2"> (time=</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">,</span> <span class="n">match_time</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_compute_match_result</span><span class="p">(</span><span class="n">competitor</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">match_time</span><span class="o">=</span><span class="n">match_time</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GlickoCompetitor.tied"><a class="viewcode-back" href="../../../competitors.html#elote.competitors.glicko.GlickoCompetitor.tied">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;GlickoCompetitor&quot;</span><span class="p">,</span> <span class="n">match_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -435,6 +460,7 @@
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> tied with </span><span class="si">%s</span><span class="s2"> (time=</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">,</span> <span class="n">match_time</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_compute_match_result</span><span class="p">(</span><span class="n">competitor</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">match_time</span><span class="o">=</span><span class="n">match_time</span><span class="p">)</span></div>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_compute_match_result</span><span class="p">(</span>
@@ -454,10 +480,13 @@
         <span class="c1"># Get the match time</span>
         <span class="n">current_time</span> <span class="o">=</span> <span class="n">match_time</span> <span class="k">if</span> <span class="n">match_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
 
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Computing match result for </span><span class="si">%s</span><span class="s2"> vs </span><span class="si">%s</span><span class="s2"> (score=</span><span class="si">%.1f</span><span class="s2">, time=</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">current_time</span><span class="p">)</span>
         <span class="c1"># Validate match time is not before last activity</span>
         <span class="k">if</span> <span class="n">current_time</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Match time </span><span class="si">%s</span><span class="s2"> is before self last activity </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">current_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Match time cannot be before competitor&#39;s last activity time&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">current_time</span> <span class="o">&lt;</span> <span class="n">competitor</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Match time </span><span class="si">%s</span><span class="s2"> is before opponent last activity </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">current_time</span><span class="p">,</span> <span class="n">competitor</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Match time cannot be before opponent&#39;s last activity time&quot;</span><span class="p">)</span>
 
         <span class="c1"># Update RDs for both competitors based on inactivity</span>
@@ -471,6 +500,7 @@
         <span class="c1"># then the competitor</span>
         <span class="n">s</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">s</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">c_new_r</span><span class="p">,</span> <span class="n">c_new_rd</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">update_competitor_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Opponent (</span><span class="si">%s</span><span class="s2">) new rating=</span><span class="si">%.1f</span><span class="s2">, new RD=</span><span class="si">%.1f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">competitor</span><span class="p">,</span> <span class="n">c_new_r</span><span class="p">,</span> <span class="n">c_new_rd</span><span class="p">)</span>
 
         <span class="c1"># assign everything</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">s_new_r</span>
@@ -494,6 +524,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">E_term</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span><span class="p">(</span><span class="n">competitor</span><span class="o">.</span><span class="n">rd</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Calculating rating update for </span><span class="si">%s</span><span class="s2">: E=</span><span class="si">%.4f</span><span class="s2">, g=</span><span class="si">%.4f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E_term</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
         <span class="n">d_squared</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_q</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">g</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">E_term</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">E_term</span><span class="p">)))</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span>
 
         <span class="c1"># The rating change is proportional to 1/RD^2, so a higher RD means a larger change</span>
@@ -503,8 +534,16 @@
         <span class="c1"># Ensure the new rating doesn&#39;t go below the minimum rating</span>
         <span class="n">s_new_r</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">,</span> <span class="n">s_new_r</span><span class="p">)</span>
 
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;Calculated update for </span><span class="si">%s</span><span class="s2">: rating_change=</span><span class="si">%.4f</span><span class="s2">, new_rating=</span><span class="si">%.1f</span><span class="s2">, d_squared=</span><span class="si">%.4f</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">rating_change</span><span class="p">,</span>
+            <span class="n">s_new_r</span><span class="p">,</span>
+            <span class="n">d_squared</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="c1"># The new RD is smaller (more certain) after a match</span>
         <span class="n">s_new_rd</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">rd</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">d_squared</span><span class="p">)</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Calculated new RD for </span><span class="si">%s</span><span class="s2">: </span><span class="si">%.1f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">s_new_rd</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">s_new_r</span><span class="p">,</span> <span class="n">s_new_rd</span></div>
 
 <div class="viewcode-block" id="GlickoCompetitor.update_rd_for_inactivity"><a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.glicko.GlickoCompetitor.update_rd_for_inactivity">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_rd_for_inactivity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_time</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -527,8 +566,12 @@
 
         <span class="k">if</span> <span class="n">rating_periods</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="c1"># Use Glickman&#39;s formula for RD increase over time</span>
+            <span class="n">old_rd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rd</span>
             <span class="n">new_rd</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="mi">350</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rd</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_c</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">rating_periods</span><span class="p">))])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="n">new_rd</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="n">new_rd</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="s2">&quot;Updated RD for </span><span class="si">%s</span><span class="s2"> due to inactivity (</span><span class="si">%.1f</span><span class="s2"> periods): </span><span class="si">%.1f</span><span class="s2"> -&gt; </span><span class="si">%.1f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">rating_periods</span><span class="p">,</span> <span class="n">old_rd</span><span class="p">,</span> <span class="n">new_rd</span>
+            <span class="p">)</span></div></div>
 </pre></div>
 
            </div>
