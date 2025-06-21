@@ -31,6 +31,8 @@ class SyntheticDataset(BaseDataset):
         draw_probability: float = 0.1,
         time_span_days: int = 365,
         seed: Optional[int] = None,
+        cache_dir: Optional[str] = None,
+        max_memory_mb: int = 1024,
     ):
         """
         Initialize a synthetic dataset generator.
@@ -45,8 +47,10 @@ class SyntheticDataset(BaseDataset):
             draw_probability: Probability of a draw when competitors are closely matched
             time_span_days: Number of days to spread the matchups over
             seed: Random seed for reproducibility
+            cache_dir: Directory to cache data (not used for synthetic data)
+            max_memory_mb: Maximum memory usage in MB for dataset operations
         """
-        super().__init__(cache_dir=None)
+        super().__init__(cache_dir=cache_dir, max_memory_mb=max_memory_mb)
         self.num_competitors = num_competitors
         self.num_matchups = num_matchups
         self.skill_distribution = skill_distribution

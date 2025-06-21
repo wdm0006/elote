@@ -65,7 +65,7 @@ class TestCalibration(unittest.TestCase):
         )  # Push toward 0
 
         # For each probability p, generate outcome 1 with probability p
-        for i, (p, overconfident_p) in enumerate(zip(probabilities, overconfident_probs)):
+        for i, (p, overconfident_p) in enumerate(zip(probabilities, overconfident_probs, strict=False)):
             outcome = 1.0 if np.random.random() < p else 0.0
             bout = Bout(f"A{i}", f"B{i}", overconfident_p, outcome)
             history.add_bout(bout)
@@ -84,7 +84,7 @@ class TestCalibration(unittest.TestCase):
         underconfident_probs = 0.5 + (probabilities - 0.5) * 0.5  # Shrink toward 0.5
 
         # For each probability p, generate outcome 1 with probability p
-        for i, (p, underconfident_p) in enumerate(zip(probabilities, underconfident_probs)):
+        for i, (p, underconfident_p) in enumerate(zip(probabilities, underconfident_probs, strict=False)):
             outcome = 1.0 if np.random.random() < p else 0.0
             bout = Bout(f"A{i}", f"B{i}", underconfident_p, outcome)
             history.add_bout(bout)

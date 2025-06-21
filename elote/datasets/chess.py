@@ -8,9 +8,26 @@ import os
 import datetime
 import tempfile
 import requests
-import chess.pgn
-import pyzstd
-from typing import List, Tuple, Dict, Any, Optional
+from typing import List, Tuple, Dict, Any, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import chess.pgn
+else:
+    try:
+        import chess.pgn
+    except ImportError as e:
+        raise ImportError(
+            "python-chess is required for ChessDataset. "
+            "Install it with: pip install python-chess"
+        ) from e
+
+try:
+    import pyzstd
+except ImportError as e:
+    raise ImportError(
+        "pyzstd is required for ChessDataset. "
+        "Install it with: pip install pyzstd"
+    ) from e
 
 from elote.datasets.base import BaseDataset
 
@@ -22,7 +39,7 @@ class ChessDataset(BaseDataset):
     This dataset contains chess games from the Lichess database.
     """
 
-    def __init__(self, cache_dir: Optional[str] = None, max_games: int = 10000, year: int = 2013, month: int = 1):
+    def __init__(self, cache_dir: Optional[str] = None, max_games: int = 10000, year: int = 2013, month: int = 1, max_memory_mb: int = 1024):
         """
         Initialize a chess dataset.
 
@@ -31,8 +48,9 @@ class ChessDataset(BaseDataset):
             max_games: Maximum number of games to load (to limit memory usage)
             year: Year of the Lichess database to use (2013-present)
             month: Month of the Lichess database to use (1-12)
+            max_memory_mb: Maximum memory usage in MB for dataset operations
         """
-        super().__init__(cache_dir=cache_dir)
+        super().__init__(cache_dir=cache_dir, max_memory_mb=max_memory_mb)
         self.max_games = max_games
         self.year = year
         self.month = month
@@ -63,15 +81,27 @@ class ChessDataset(BaseDataset):
         if not os.path.exists(self.compressed_file):
             print(f"Downloading chess dataset from {self.data_url}...")
 
-            # Download the data
-            response = requests.get(self.data_url, stream=True)
-            response.raise_for_status()
+            try:
+                # Download the data with timeout and retry logic
+                response = requests.get(self.data_url, stream=True, timeout=30)
+                response.raise_for_status()
 
-            with open(self.compressed_file, "wb") as f:
-                for chunk in response.iter_content(chunk_size=8192):
-                    f.write(chunk)
+                with open(self.compressed_file, "wb") as f:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        if chunk:  # filter out keep-alive chunks
+                            f.write(chunk)
 
-            print(f"Download complete: {self.compressed_file}")
+                print(f"Download complete: {self.compressed_file}")
+            except requests.exceptions.RequestException as e:
+                # Clean up partial download
+                if os.path.exists(self.compressed_file):
+                    os.remove(self.compressed_file)
+                raise RuntimeError(f"Failed to download chess dataset: {e}") from e
+            except IOError as e:
+                # Clean up partial file
+                if os.path.exists(self.compressed_file):
+                    os.remove(self.compressed_file)
+                raise RuntimeError(f"Failed to write chess dataset file: {e}") from e
         else:
             print(f"Using existing compressed file: {self.compressed_file}")
 
@@ -80,14 +110,23 @@ class ChessDataset(BaseDataset):
 
         try:
             with open(self.compressed_file, "rb") as compressed:
+                compressed_data = compressed.read()
+                if not compressed_data:
+                    raise RuntimeError("Compressed file is empty")
+                
+                decompressed_data = pyzstd.decompress(compressed_data)
+                
                 with open(self.decompressed_file, "wb") as decompressed:
-                    decompressed.write(pyzstd.decompress(compressed.read()))
+                    decompressed.write(decompressed_data)
             print(f"Decompression complete: {self.decompressed_file}")
-        except Exception as e:
+        except (pyzstd.ZstdError, IOError, RuntimeError) as e:
+            # Clean up partial decompressed file
+            if os.path.exists(self.decompressed_file):
+                os.remove(self.decompressed_file)
             raise RuntimeError(f"Error decompressing the zstd file: {e}") from e
 
     def _parse_pgn_game(
-        self, game: chess.pgn.Game
+        self, game: "chess.pgn.Game"
     ) -> Optional[Tuple[str, str, float, datetime.datetime, Dict[str, Any]]]:
         """
         Parse a PGN game into a matchup tuple.

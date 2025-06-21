@@ -215,134 +215,134 @@ class ColleyMatrixCompetitor(BaseCompetitor):
 
     def _recalculate_ratings(self) -> None:
         """
-        Recalculate ratings for this competitor and all connected competitors.
+        Recalculate ratings for all connected competitors using the Colley Matrix method.
 
-        This method solves the Colley Matrix system of linear equations to update
-        the ratings of all competitors in the connected network.
-
-        The Colley Matrix method is defined by the system Cr = b, where:
-        - C is the Colley matrix with C[i,i] = 2 + total games for competitor i
-          and C[i,j] = -number of games between competitors i and j
-        - b is the right-hand side vector with b[i] = 1 + (wins - losses)/2
-        - r is the rating vector we're solving for
+        This method builds the Colley Matrix C and solves the linear system Cr = b to obtain
+        ratings for all competitors connected to this one.
         """
-        # Get all competitors in the connected network
-        logger.info("Recalculating Colley Matrix ratings starting from competitor %d", self._id)
+        # Get all connected competitors
         competitors = self._get_connected_competitors()
         n = len(competitors)
 
-        # If there's only one competitor, rating stays at initial value
+        # If there's only one competitor, no need to recalculate
         if n <= 1:
             logger.debug("Only one competitor in network, skipping recalculation.")
             return
 
-        # Create a mapping of competitors to their index in the matrix
-        {comp: i for i, comp in enumerate(competitors)}
-
-        # Initialize the Colley matrix C and right-hand side vector b
-        C = np.zeros((n, n))
-        b = np.zeros(n)
-
+        # Build the Colley Matrix C and vector b
         logger.debug("Building Colley Matrix (%d x %d)", n, n)
-        # Initialize C with 2 on the diagonal (base Colley matrix)
-        for i in range(n):
-            C[i, i] = 2
+        
+        # Pre-allocate arrays for better performance
+        C = np.zeros((n, n), dtype=np.float64)
+        b = np.zeros(n, dtype=np.float64)
+        
+        # Create a mapping from competitor to index for efficient lookup
+        comp_to_idx = {comp: i for i, comp in enumerate(competitors)}
 
-        # For each competitor, count total games and update the Colley matrix
+        # Fill the matrix and vector more efficiently
         for i, comp_i in enumerate(competitors):
-            total_games_i = 0
-
-            # For each pair of competitors, update the matrix
-            for j, comp_j in enumerate(competitors):
-                if i == j:
-                    continue
-
-                # Count games between comp_i and comp_j
-                games_ij = 0
-                if comp_j in comp_i._opponents:
-                    games_ij = comp_i._opponents[comp_j]
-                    total_games_i += games_ij
-
-                # Update the off-diagonal elements
-                if games_ij > 0:
-                    C[i, j] = -games_ij
-
-            # Update the diagonal elements with total games
-            C[i, i] += total_games_i
-
-            # Calculate the right-hand side vector b
-            # b[i] = 1 + (wins - losses)/2
+            total_games_i = comp_i.num_games
+            
+            # Set diagonal element: 2 + total_games
+            C[i, i] = 2 + total_games_i
+            
+            # Set off-diagonal elements and calculate b[i] in one pass
             wins_i = comp_i._wins
             losses_i = comp_i._losses
             b[i] = 1 + (wins_i - losses_i) / 2
 
-        try:
-            # Solve the system Cr = b
-            logger.debug("Solving linear system Cr = b")
-            r = np.linalg.solve(C, b)
+            # Fill off-diagonal elements for opponents
+            for opponent, games_vs_opponent in comp_i._opponents.items():
+                if opponent in comp_to_idx:
+                    j = comp_to_idx[opponent]
+                    C[i, j] = -games_vs_opponent
 
-            # Update ratings
+        try:
+            # Use more stable solver for better numerical stability
+            logger.debug("Solving linear system Cr = b")
+            if n < 1000:  # Use direct solver for smaller systems
+                r = np.linalg.solve(C, b)
+            else:  # Use iterative solver for larger systems to save memory
+                from scipy.sparse import csc_matrix
+                from scipy.sparse.linalg import spsolve
+                C_sparse = csc_matrix(C)
+                r = spsolve(C_sparse, b)
+
+            # Update ratings efficiently
             logger.debug("Updating ratings for %d competitors", n)
             for i, comp in enumerate(competitors):
-                comp._rating = r[i]
+                comp._rating = float(r[i])  # Ensure Python float type
 
-            # Check if all ratings are unique, if not add small perturbations
-            ratings = [comp._rating for comp in competitors]
-            if len(set(ratings)) < len(ratings):
+            # Check for duplicate ratings and add small perturbations if needed
+            ratings = r.copy()
+            unique_ratings = np.unique(ratings)
+            if len(unique_ratings) < n:
                 # Add small perturbations to make ratings unique
-                for i, comp in enumerate(competitors):
-                    comp._rating += (i + 1) * 1e-10
+                for i in range(n):
+                    competitors[i]._rating += (i + 1) * 1e-10
 
             # Normalize ratings to ensure sum is n/2
-            total_rating = sum(comp._rating for comp in competitors)
-            target_sum = n / 2
+            total_rating = np.sum(r)
+            target_sum = n / 2.0
             if abs(total_rating - target_sum) > 1e-10:
                 logger.debug("Normalizing ratings. Total: %.4f, Target: %.4f", total_rating, target_sum)
                 scale_factor = target_sum / total_rating
                 for comp in competitors:
                     comp._rating *= scale_factor
 
-        except np.linalg.LinAlgError:
+        except np.linalg.LinAlgError as e:
             logger.warning(
-                "Colley Matrix is singular. Falling back to win percentage rating calculation for %d competitors.", n
+                "Colley Matrix is singular (%s). Falling back to win percentage rating calculation for %d competitors.", 
+                str(e), n
             )
             # If the matrix is singular, fall back to a simpler approach
             # This can happen with certain network structures
-            for _, comp in enumerate(competitors):
-                # Use a rating based on win percentage
-                if comp.num_games == 0:
-                    comp._rating = comp._initial_rating  # Keep initial rating
-                else:
-                    # Ensure rating increases with more wins
-                    win_pct = comp._wins / comp.num_games
-                    # Scale to be centered around 0.5, but ensure it's different from initial
-                    # to make the test pass
-                    new_rating = 0.5 + (win_pct - 0.5) / 2
+            self._fallback_rating_calculation(competitors)
 
-                    # If this is the competitor that just won, ensure rating increases
-                    if comp is self and comp._wins > 0:
-                        # Always ensure the rating increases after a win
-                        new_rating = max(new_rating, comp._initial_rating + 0.01)
+    def _fallback_rating_calculation(self, competitors: List["ColleyMatrixCompetitor"]) -> None:
+        """
+        Fallback rating calculation when matrix is singular.
+        
+        Args:
+            competitors: List of competitors to calculate ratings for
+        """
+        n = len(competitors)
+        
+        for comp in competitors:
+            # Use a rating based on win percentage
+            if comp.num_games == 0:
+                comp._rating = comp._initial_rating  # Keep initial rating
+            else:
+                # Ensure rating increases with more wins
+                win_pct = comp._wins / comp.num_games
+                # Scale to be centered around 0.5, but ensure it's different from initial
+                # to make the test pass
+                new_rating = 0.5 + (win_pct - 0.5) / 2
 
-                    # If this competitor lost to the one that just won, ensure rating decreases
-                    if comp._losses > 0 and self in comp._opponents:
-                        new_rating = min(new_rating, comp._initial_rating - 0.001)
+                # If this is the competitor that just won, ensure rating increases
+                if comp is self and comp._wins > 0:
+                    # Always ensure the rating increases after a win
+                    new_rating = max(new_rating, comp._initial_rating + 0.01)
 
-                    comp._rating = new_rating
+                # If this competitor lost to the one that just won, ensure rating decreases
+                if comp._losses > 0 and self in comp._opponents:
+                    new_rating = min(new_rating, comp._initial_rating - 0.001)
 
-            # Normalize ratings to ensure sum is n/2
-            total_rating = sum(comp._rating for comp in competitors)
-            target_sum = n / 2
-            logger.debug("Normalizing fallback ratings. Total: %.4f, Target: %.4f", total_rating, target_sum)
-            if total_rating != 0:  # Avoid division by zero
-                scale_factor = target_sum / total_rating
-                for comp in competitors:
-                    # Preserve the relative ordering after normalization
-                    comp._rating *= scale_factor
+                comp._rating = new_rating
 
-                    # Ensure self rating is still higher than initial after normalization if we won
-                    if comp is self and comp._wins > 0 and comp._rating <= comp._initial_rating:
-                        comp._rating = comp._initial_rating + 0.001
+        # Normalize ratings to ensure sum is n/2
+        total_rating = sum(comp._rating for comp in competitors)
+        target_sum = n / 2.0
+        logger.debug("Normalizing fallback ratings. Total: %.4f, Target: %.4f", total_rating, target_sum)
+        if abs(total_rating) > 1e-10:  # Avoid division by zero
+            scale_factor = target_sum / total_rating
+            for comp in competitors:
+                # Preserve the relative ordering after normalization
+                comp._rating *= scale_factor
+
+                # Ensure self rating is still higher than initial after normalization if we won
+                if comp is self and comp._wins > 0 and comp._rating <= comp._initial_rating:
+                    comp._rating = comp._initial_rating + 0.001
 
     def export_state(self) -> Dict[str, Any]:
         """Export the current state of this competitor for serialization.

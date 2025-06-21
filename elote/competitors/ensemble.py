@@ -333,7 +333,7 @@ class BlendedCompetitor(BaseCompetitor):
 
         if self.blend_mode == "mean":
             es = []
-            for c, other_c in zip(self.sub_competitors, competitor.sub_competitors):
+            for c, other_c in zip(self.sub_competitors, competitor.sub_competitors, strict=False):
                 es.append(c.expected_score(other_c))
             result = sum(es) / len(es)
             logger.debug("Mean expected score: %.4f", result)
@@ -356,7 +356,7 @@ class BlendedCompetitor(BaseCompetitor):
         self.verify_competitor_types(competitor)
         logger.debug("%s beat %s. Updating %d sub-competitors.", self, competitor, len(self.sub_competitors))
 
-        for c, other_c in zip(self.sub_competitors, competitor.sub_competitors):
+        for c, other_c in zip(self.sub_competitors, competitor.sub_competitors, strict=False):
             logger.debug("Updating sub-competitors via beat: %s vs %s", c, other_c)
             c.beat(other_c)
 
@@ -374,6 +374,6 @@ class BlendedCompetitor(BaseCompetitor):
         self.verify_competitor_types(competitor)
         logger.debug("%s tied with %s. Updating %d sub-competitors.", self, competitor, len(self.sub_competitors))
 
-        for c, other_c in zip(self.sub_competitors, competitor.sub_competitors):
+        for c, other_c in zip(self.sub_competitors, competitor.sub_competitors, strict=False):
             logger.debug("Updating sub-competitors via tied: %s vs %s", c, other_c)
             c.tied(other_c)  # Fixed: was using beat() instead of tied()

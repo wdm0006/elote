@@ -20,7 +20,7 @@ class CollegeFootballDataset(BaseDataset):
     This dataset contains college football games from the College Football Data API using sportsdataverse.
     """
 
-    def __init__(self, cache_dir: Optional[str] = None, start_year: int = 2015, end_year: int = 2022):
+    def __init__(self, cache_dir: Optional[str] = None, start_year: int = 2015, end_year: int = 2022, max_memory_mb: int = 1024):
         """
         Initialize a college football dataset.
 
@@ -28,8 +28,9 @@ class CollegeFootballDataset(BaseDataset):
             cache_dir: Directory to cache downloaded data. If None, a temporary directory will be used.
             start_year: First year to include in the dataset
             end_year: Last year to include in the dataset
+            max_memory_mb: Maximum memory usage in MB for dataset operations
         """
-        super().__init__(cache_dir=cache_dir)
+        super().__init__(cache_dir=cache_dir, max_memory_mb=max_memory_mb)
         self.start_year = start_year
         self.end_year = end_year
 
