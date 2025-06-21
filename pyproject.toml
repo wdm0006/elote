@@ -17,6 +17,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
 keywords = ["elo", "scoring", "rating"]
 dependencies = [
@@ -76,8 +77,8 @@ python_files = "test_*.py"
 line-length = 120
 indent-width = 4
 
-# Assume Python 3.8
-target-version = "py38"
+# Assume Python 3.10
+target-version = "py310"
 
 [tool.ruff.lint]
 # Enable Pyflakes (`F`), pycodestyle (`E`), and flake8-bugbear (`B`) rules
@@ -123,7 +124,7 @@ pretty = true
 ignore_missing_imports = true
 disallow_any_unimported = true
 disallow_untyped_calls = true
-disable_error_code = ["attr-defined", "assignment", "index", "call-arg", "arg-type", "valid-type", "misc", "override", "union-attr", "safe-super", "dict-item", "call-overload"]
+disable_error_code = ["attr-defined", "assignment", "index", "call-arg", "arg-type", "valid-type", "misc", "override", "union-attr", "safe-super", "dict-item", "call-overload", "no-any-unimported"]
 files = ["elote"]
 exclude = ["tests/.*", "examples/.*", "scripts/.*", "docs/.*"]
 

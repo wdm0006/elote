@@ -9,18 +9,39 @@ import tempfile
 import pandas as pd
 from unittest.mock import patch, MagicMock
 import shutil
+import pytest
 
 from elote import (
     DataSplit,
     SyntheticDataset,
-    ChessDataset,
-    CollegeFootballDataset,
     LambdaArena,
     EloCompetitor,
     train_arena_with_dataset,
     evaluate_arena_with_dataset,
     train_and_evaluate_arena,
+    list_available_datasets,
 )
+
+# Conditionally import optional datasets
+try:
+    from elote import ChessDataset
+    HAS_CHESS = True
+except ImportError:
+    HAS_CHESS = False
+    ChessDataset = None
+
+try:
+    from elote import CollegeFootballDataset
+    # Test if sportsdataverse is actually available
+    import importlib.util
+    if importlib.util.find_spec("sportsdataverse.cfb") is not None:
+        HAS_FOOTBALL = True
+    else:
+        HAS_FOOTBALL = False
+        CollegeFootballDataset = None
+except ImportError:
+    HAS_FOOTBALL = False
+    CollegeFootballDataset = None
 
 
 class TestDataSplit(unittest.TestCase):
@@ -125,7 +146,64 @@ class TestSyntheticDataset(unittest.TestCase):
         self.assertGreater(len(competitor_split.train), 0)
         self.assertGreater(len(competitor_split.test), 0)
 
+    def test_memory_management_features(self):
+        """Test memory management features in datasets."""
+        dataset = SyntheticDataset(
+            num_competitors=10,
+            num_matchups=100,
+            seed=42,
+            max_memory_mb=512  # Set low memory limit
+        )
 
+        # Test memory usage estimation
+        initial_memory = dataset.get_memory_usage_mb()
+        self.assertEqual(initial_memory, 0.0)  # No data loaded yet
+
+        # Load data and check memory usage
+        dataset.get_data()
+        loaded_memory = dataset.get_memory_usage_mb()
+        self.assertGreater(loaded_memory, 0.0)
+
+        # Test data iterator
+        batch_count = 0
+        total_items = 0
+        for batch in dataset.get_data_iterator(batch_size=25):
+            batch_count += 1
+            total_items += len(batch)
+            self.assertLessEqual(len(batch), 25)
+
+        self.assertEqual(total_items, 100)
+        self.assertEqual(batch_count, 4)
+
+        # Test cache clearing
+        dataset.clear_cache()
+        cleared_memory = dataset.get_memory_usage_mb()
+        self.assertEqual(cleared_memory, 0.0)
+
+    def test_memory_efficient_mode(self):
+        """Test memory-efficient mode activation."""
+        # Test with low memory limit (should activate memory-efficient mode)
+        dataset_low = SyntheticDataset(num_competitors=5, num_matchups=10, max_memory_mb=1024)
+        self.assertTrue(dataset_low._memory_efficient)
+
+        # Test with high memory limit (should not activate memory-efficient mode)
+        dataset_high = SyntheticDataset(num_competitors=5, num_matchups=10, max_memory_mb=4096)
+        self.assertFalse(dataset_high._memory_efficient)
+
+
+class TestAvailableDatasets(unittest.TestCase):
+    """Tests for dataset availability functions."""
+
+    def test_list_available_datasets(self):
+        """Test that list_available_datasets works correctly."""
+        available = list_available_datasets()
+        self.assertIn("SyntheticDataset", available)
+        self.assertIsInstance(available, list)
+        for dataset_name in available:
+            self.assertIsInstance(dataset_name, str)
+
+
+@pytest.mark.skipif(not HAS_CHESS, reason="ChessDataset requires python-chess and pyzstd")
 class TestChessDataset(unittest.TestCase):
     """Tests for the ChessDataset class."""
 
@@ -303,6 +381,7 @@ class TestChessDataset(unittest.TestCase):
         self.assertEqual(matchups[2][2], 0.5)  # Draw
 
 
+@pytest.mark.skipif(not HAS_FOOTBALL, reason="CollegeFootballDataset requires sportsdataverse")
 class TestCollegeFootballDataset(unittest.TestCase):
     """Tests for the CollegeFootballDataset class."""
 
@@ -474,8 +553,8 @@ class TestDatasetUtils(unittest.TestCase):
             seed=42,
         )
 
-        # Split the dataset
-        data_split = dataset.time_split(test_ratio=0.2)
+        # Split the data
+        data_split = dataset.time_split(test_ratio=0.3)
 
         # Create an arena
         arena = LambdaArena(
@@ -484,13 +563,13 @@ class TestDatasetUtils(unittest.TestCase):
         )
 
         # Train and evaluate the arena
-        trained_arena, history = train_and_evaluate_arena(arena, data_split)
+        trained_arena, evaluation_history = train_and_evaluate_arena(arena, data_split)
 
         # Check that competitors were created
         self.assertGreater(len(trained_arena.competitors), 0)
 
-        # Check that bouts were recorded
-        self.assertGreater(len(history.bouts), 0)
+        # Check that evaluation history was recorded
+        self.assertGreater(len(evaluation_history.bouts), 0)
 
 
 if __name__ == "__main__":

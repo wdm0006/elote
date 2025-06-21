@@ -7,10 +7,11 @@ for evaluating different rating algorithms.
 
 import abc
 from dataclasses import dataclass
-from typing import List, Tuple, Dict, Any, Optional, Sequence, Set
+from typing import List, Tuple, Dict, Any, Optional, Sequence, Set, Iterator
 import datetime
 import pandas as pd
 import numpy as np
+import gc
 
 
 @dataclass
@@ -55,15 +56,18 @@ class BaseDataset(abc.ABC):
     for evaluating different rating algorithms.
     """
 
-    def __init__(self, cache_dir: Optional[str] = None):
+    def __init__(self, cache_dir: Optional[str] = None, max_memory_mb: int = 1024):
         """
         Initialize a dataset.
 
         Args:
             cache_dir: Directory to cache downloaded data. If None, a temporary directory will be used.
+            max_memory_mb: Maximum memory usage in MB for dataset operations.
         """
         self.cache_dir = cache_dir
+        self.max_memory_mb = max_memory_mb
         self._data: Optional[List[Tuple[Any, Any, float, Optional[datetime.datetime], Optional[Dict[str, Any]]]]] = None
+        self._memory_efficient = max_memory_mb < 2048  # Use memory-efficient mode for < 2GB
 
     @abc.abstractmethod
     def download(self) -> None:
@@ -96,7 +100,44 @@ class BaseDataset(abc.ABC):
         if self._data is None:
             self.download()
             self._data = self.load()
+            
+            # Force garbage collection after loading large datasets
+            if self._memory_efficient:
+                gc.collect()
+                
         return self._data
+
+    def get_data_iterator(self, batch_size: int = 1000) -> Iterator[List[Tuple[Any, Any, float, Optional[datetime.datetime], Optional[Dict[str, Any]]]]]:
+        """
+        Get an iterator over the dataset in batches for memory-efficient processing.
+        
+        Args:
+            batch_size: Number of matchups per batch.
+            
+        Yields:
+            Batches of matchup tuples.
+        """
+        data = self.get_data()
+        for i in range(0, len(data), batch_size):
+            yield data[i:i + batch_size]
+
+    def clear_cache(self) -> None:
+        """Clear the in-memory cache to free up memory."""
+        self._data = None
+        gc.collect()
+
+    def get_memory_usage_mb(self) -> float:
+        """
+        Estimate the memory usage of the loaded dataset in MB.
+        
+        Returns:
+            Estimated memory usage in MB.
+        """
+        if self._data is None:
+            return 0.0
+        
+        # Rough estimate: each tuple takes ~200 bytes on average
+        return len(self._data) * 200 / (1024 * 1024)
 
     def time_split(self, test_ratio: float = 0.2) -> DataSplit:
         """

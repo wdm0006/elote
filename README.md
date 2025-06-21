@@ -47,8 +47,31 @@ Currently implemented rating systems:
 ### For Users
 
 ```bash
+# Basic installation (core rating systems)
 pip install elote
+
+# With optional dataset support
+pip install "elote[datasets]"
 ```
+
+### Optional Dependencies
+
+Elote has optional dependencies for specific datasets:
+
+- **Chess Dataset**: Requires `python-chess` and `pyzstd`
+  ```bash
+  pip install python-chess pyzstd
+  ```
+
+- **College Football Dataset**: Requires `sportsdataverse`
+  ```bash
+  pip install "sportsdataverse[all]"
+  ```
+
+- **All Datasets**: Install all optional dependencies
+  ```bash
+  pip install "elote[datasets]"
+  ```
 
 ### For Developers
 
@@ -67,7 +90,7 @@ uv pip install -e ".[dev]"
 
 ### Requirements
 
-- Python 3.8 or higher
+- Python 3.10 or higher
 
 ## Quick Start
 
@@ -87,6 +110,21 @@ player1.beat(player2)  # Player 1 won!
 # Ratings are automatically updated
 print(f"Player 1 new rating: {player1.rating}")
 print(f"Player 2 new rating: {player2.rating}")
+```
+
+### Check Available Features
+
+```python
+from elote import list_available_datasets, list_missing_datasets
+
+# See which datasets are available
+print("Available datasets:", list_available_datasets())
+
+# See which datasets require additional dependencies
+missing = list_missing_datasets()
+for dataset in missing:
+    print(f"Missing: {dataset['name']}")
+    print(f"Install with: {dataset['error']}")
 ```
 
 ## Usage Examples
