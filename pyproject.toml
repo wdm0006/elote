@@ -67,9 +67,9 @@ package-data = {"elote" = ["py.typed"]}
 [tool.setuptools.exclude-package-data]
 "*" = ["*.pyc", "*.pyo", "*.pyd", "*.so", "*.dylib", "*~"]
 
-[tool.pytest]
+[tool.pytest.ini_options]
 testpaths = ["tests"]
-python_files = "test_*.py"
+python_files = ["test_*.py"]
 
 [tool.ruff]
 # Same as Black.
