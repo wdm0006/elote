@@ -47,7 +47,6 @@ except ImportError:
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
-    "sphinx_rtd_dark_mode",
     "sphinxcontrib.googleanalytics",
 ]
 
@@ -58,25 +57,52 @@ templates_path = ["_templates"]
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
-html_extra_path = ["CNAME"]
 
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_rtd_theme"
+html_theme = "wabi_sphinx_theme"
 
-# Default to dark theme
-default_dark_mode = True
+# The name of the Pygments (syntax highlighting) style to use.
+pygments_style = "wabi_sphinx_theme.pygments_style.WabiStyle"
 
 # Google Analytics configuration
 googleanalytics_id = "G-Z43R9PWW0B"
 googleanalytics_enabled = True
 
+# Theme options
+html_theme_options = {
+    "site_title": "McGinnis, Will",
+    "site_url": "https://mcginniscommawill.com",
+    "docs_base_url": "https://elote.mcginniscommawill.com",
+    "nav_links": [
+        {"label": "Guides", "url": "https://mcginniscommawill.com/guides/"},
+        {"label": "Topics", "url": "https://mcginniscommawill.com/topics/"},
+        {"label": "Blog", "url": "https://mcginniscommawill.com/posts/"},
+        {"label": "About", "url": "https://mcginniscommawill.com/about/"},
+        {"label": "Free Coffee", "url": "https://mcginniscommawill.com/coffee/"},
+        {"label": "OSS", "url": "https://mcginniscommawill.com/oss/"},
+    ],
+    "nav_show_docs_link": True,
+    "nav_docs_label": "Docs",
+    "show_breadcrumbs": True,
+    "show_home_breadcrumb": True,
+    "twitter_site": "@willmcginniser",
+}
+
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
+
+# These paths are either relative to html_static_path
+# or fully qualified paths (eg. https://...)
+html_css_files = [
+    "custom.css",
+]
+
+html_extra_path = ["CNAME"]
 
 autoclass_content = "both"

@@ -1,5 +1,4 @@
 sphinx>=6.1.3
 docutils>=0.19
-sphinx_rtd_theme
-sphinx-rtd-dark-mode
+wabi-sphinx-theme @ git+https://github.com/wdm0006/mcw-sphinx-theme.git
 sphinxcontrib-googleanalytics
