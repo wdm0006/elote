@@ -1,0 +1,669 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z43R9PWW0B"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-Z43R9PWW0B');
+    </script>
+    
+    <title>elote.arenas.lambda_arena &#8212; elote 1.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=30d13653" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/wabi.css?v=501c8ac3" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=71d92741" />
+    <script src="../../../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+
+
+
+<meta name="description" content="elote.arenas.lambda_arena - elote documentation">
+
+
+
+
+
+<meta property="og:title" content="elote.arenas.lambda_arena">
+<meta property="og:description" content="elote.arenas.lambda_arena - elote documentation">
+<meta property="og:type" content="website">
+
+<meta property="og:url" content="https://elote.mcginniscommawill.com/_modules/elote/arenas/lambda_arena.html">
+
+
+<meta property="og:site_name" content="elote">
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="elote.arenas.lambda_arena">
+<meta name="twitter:description" content="elote.arenas.lambda_arena - elote documentation">
+
+<meta name="twitter:site" content="@willmcginniser">
+
+
+
+
+
+<link rel="canonical" href="https://elote.mcginniscommawill.com/_modules/elote/arenas/lambda_arena.html">
+
+
+ 
+
+  </head><body>
+<header class="header">
+  <div class="header__inner">
+    
+    <a href="https://mcginniscommawill.com" class="header__logo">
+      McGinnis, Will
+    </a>
+
+    
+    <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+      </svg>
+    </button>
+
+    
+    <nav class="nav" role="navigation">
+      
+      
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/guides/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Guides
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/topics/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Topics
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/posts/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Blog
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/about/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            About
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/coffee/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Free Coffee
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/oss/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            OSS
+          </a>
+        
+      
+
+      
+      
+      <a href="../../../index.html" class="nav__link nav__link--active">
+        Docs
+      </a>
+      
+    </nav>
+  </div>
+</header>
+
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <div class="breadcrumbs__inner">
+    
+    <a href="https://mcginniscommawill.com">Home</a>
+    <span class="breadcrumbs__separator">/</span>
+    
+    <a href="../../../index.html">Docs</a>
+    
+      
+      <span class="breadcrumbs__separator">/</span>
+      <a href="../../index.html">Module code</a>
+      
+    
+    
+    <span class="breadcrumbs__separator">/</span>
+    <span>elote.arenas.lambda_arena</span>
+    
+  </div>
+</nav>
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for elote.arenas.lambda_arena</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote.arenas.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseArena</span><span class="p">,</span> <span class="n">Bout</span><span class="p">,</span> <span class="n">History</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote.competitors.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCompetitor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+
+
+<div class="viewcode-block" id="LambdaArena">
+<a class="viewcode-back" href="../../../arenas.html#elote.arenas.lambda_arena.LambdaArena">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LambdaArena</span><span class="p">(</span><span class="n">BaseArena</span><span class="p">):</span>
+<div class="viewcode-block" id="LambdaArena.__init__">
+<a class="viewcode-back" href="../../../api/arenas.html#elote.arenas.lambda_arena.LambdaArena.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]],</span>
+        <span class="n">base_competitor</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BaseCompetitor</span><span class="p">]</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">,</span>
+        <span class="n">base_competitor_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">initial_state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a LambdaArena with a comparison function.</span>
+
+<span class="sd">        The LambdaArena uses a provided function to determine the outcome of matchups</span>
+<span class="sd">        between competitors. This is particularly useful for comparing objects that</span>
+<span class="sd">        aren&#39;t competitors themselves.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            func (callable): A function that takes two arguments (a, b) and returns</span>
+<span class="sd">                True if a beats b, False if b beats a, and None for a draw.</span>
+<span class="sd">            base_competitor (class): The competitor class to use for ratings.</span>
+<span class="sd">                Defaults to EloCompetitor.</span>
+<span class="sd">            base_competitor_kwargs (dict, optional): Keyword arguments to pass to</span>
+<span class="sd">                the base_competitor constructor.</span>
+<span class="sd">            initial_state (dict, optional): Initial state for competitors, mapping</span>
+<span class="sd">                competitor IDs to their initial parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Initializing LambdaArena with competitor type: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="n">func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">BaseCompetitor</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_competitor</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BaseCompetitor</span><span class="p">]</span> <span class="o">=</span> <span class="n">base_competitor</span>
+        <span class="c1"># Define type hint once for the instance variable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_competitor_kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">base_competitor_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">base_competitor_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">base_competitor_kwargs</span> <span class="o">=</span> <span class="n">base_competitor_kwargs</span>
+
+        <span class="c1"># if some initial state is passed in, we can seed the population</span>
+        <span class="k">if</span> <span class="n">initial_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">initial_state</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_competitor</span><span class="p">(</span><span class="o">**</span><span class="n">v</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="p">:</span> <span class="n">History</span> <span class="o">=</span> <span class="n">History</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval_history</span> <span class="o">=</span> <span class="n">History</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validation_history</span> <span class="o">=</span> <span class="n">History</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="LambdaArena.clear_history">
+<a class="viewcode-back" href="../../../arenas.html#elote.arenas.lambda_arena.LambdaArena.clear_history">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_history</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clear the history of bouts in this arena.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="n">History</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="LambdaArena.set_competitor_class_var">
+<a class="viewcode-back" href="../../../arenas.html#elote.arenas.lambda_arena.LambdaArena.set_competitor_class_var">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_competitor_class_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set a class variable on the base competitor class.</span>
+
+<span class="sd">        This method allows for global configuration of all competitors</span>
+<span class="sd">        managed by this arena.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): The name of the class variable to set.</span>
+<span class="sd">            value: The value to set for the class variable.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_competitor</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LambdaArena.tournament">
+<a class="viewcode-back" href="../../../arenas.html#elote.arenas.lambda_arena.LambdaArena.tournament">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tournament</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matchups</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a tournament with the given matchups.</span>
+
+<span class="sd">        Process multiple matchups between competitors, updating ratings</span>
+<span class="sd">        after each matchup.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            matchups (list): A list of (competitor_a, competitor_b) tuples.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">matchups</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">matchup</span><span class="p">(</span><span class="o">*</span><span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LambdaArena.matchup">
+<a class="viewcode-back" href="../../../arenas.html#elote.arenas.lambda_arena.LambdaArena.matchup">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matchup</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">a</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">b</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">attributes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">match_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process a single matchup between two competitors.</span>
+
+<span class="sd">        This method handles a matchup between two competitors, creating them</span>
+<span class="sd">        if they don&#39;t already exist in the arena. It uses the comparison function</span>
+<span class="sd">        to determine the outcome and updates the ratings accordingly.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            a: The first competitor or competitor identifier.</span>
+<span class="sd">            b: The second competitor or competitor identifier.</span>
+<span class="sd">            attributes (dict, optional): Additional attributes to record with this bout.</span>
+<span class="sd">            match_time (datetime, optional): The time when the match occurred.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">a</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_competitor</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">base_competitor_kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">b</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_competitor</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">base_competitor_kwargs</span><span class="p">)</span>
+
+        <span class="n">predicted_outcome</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">attributes</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="n">attributes</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+        <span class="c1"># Check if the competitor supports time-based ratings</span>
+        <span class="n">supports_time</span> <span class="o">=</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">],</span> <span class="s2">&quot;_last_activity&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">res</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">supports_time</span><span class="p">:</span>
+                <span class="c1"># type: ignore[call-arg]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">.</span><span class="n">tied</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">],</span> <span class="n">match_time</span><span class="o">=</span><span class="n">match_time</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">.</span><span class="n">tied</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">add_bout</span><span class="p">(</span><span class="n">Bout</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">predicted_outcome</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="s2">&quot;tie&quot;</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="n">attributes</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">res</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">supports_time</span><span class="p">:</span>
+                <span class="c1"># type: ignore[call-arg]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">],</span> <span class="n">match_time</span><span class="o">=</span><span class="n">match_time</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">add_bout</span><span class="p">(</span><span class="n">Bout</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">predicted_outcome</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="s2">&quot;win&quot;</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="n">attributes</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">supports_time</span><span class="p">:</span>
+                <span class="c1"># type: ignore[call-arg]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">],</span> <span class="n">match_time</span><span class="o">=</span><span class="n">match_time</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">add_bout</span><span class="p">(</span><span class="n">Bout</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">predicted_outcome</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="n">attributes</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="LambdaArena.expected_score">
+<a class="viewcode-back" href="../../../arenas.html#elote.arenas.lambda_arena.LambdaArena.expected_score">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the expected score for a matchup between two competitors.</span>
+
+<span class="sd">        This method returns the probability that competitor a will beat competitor b.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            a: The first competitor or competitor identifier.</span>
+<span class="sd">            b: The second competitor or competitor identifier.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The probability that a will beat b (between 0 and 1).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">a</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_competitor</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">base_competitor_kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">b</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_competitor</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">base_competitor_kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="LambdaArena.export_state">
+<a class="viewcode-back" href="../../../arenas.html#elote.arenas.lambda_arena.LambdaArena.export_state">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">export_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the current state of this arena for serialization.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: A dictionary containing the state of all competitors in this arena.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">state</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">export_state</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">state</span></div>
+
+
+    <span class="c1"># type: ignore[override]</span>
+<div class="viewcode-block" id="LambdaArena.leaderboard">
+<a class="viewcode-back" href="../../../arenas.html#elote.arenas.lambda_arena.LambdaArena.leaderboard">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">leaderboard</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a leaderboard of all competitors.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: A list of dictionaries containing competitor IDs and their ratings,</span>
+<span class="sd">                 sorted by rating in descending order.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Restore original implementation returning list of dicts</span>
+        <span class="n">lb</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span> <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">rating</span><span class="p">}</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+
+        <span class="c1"># Restore original sorting key and add ignores for mypy errors</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">lb</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rating&quot;</span><span class="p">))</span>  <span class="c1"># type: ignore[arg-type, return-value]</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_or_create_competitor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_val</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BaseCompetitor</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">id_val</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">:</span>
+            <span class="n">comp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_competitor</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">base_competitor_kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">id_val</span><span class="p">]</span> <span class="o">=</span> <span class="n">comp</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Created new competitor &#39;</span><span class="si">%s</span><span class="s2">&#39; of type </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">id_val</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_competitor</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">id_val</span><span class="p">]</span>
+
+<div class="viewcode-block" id="LambdaArena.process_history">
+<a class="viewcode-back" href="../../../api/arenas.html#elote.arenas.lambda_arena.LambdaArena.process_history">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">process_history</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bouts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]]],</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">iterator</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">bouts</span><span class="p">)</span> <span class="k">if</span> <span class="n">progress_bar</span> <span class="k">else</span> <span class="n">bouts</span>
+        <span class="n">total_bouts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">bouts</span><span class="p">)</span>
+        <span class="n">skipped_bouts</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Processing </span><span class="si">%d</span><span class="s2"> bouts for training history&quot;</span><span class="p">,</span> <span class="n">total_bouts</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">outcome</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">iterator</span><span class="p">):</span>
+            <span class="c1"># Get or create competitors</span>
+            <span class="n">c_a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_competitor</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+            <span class="n">c_b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_competitor</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">outcome</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">predicted_outcome</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">c_a</span><span class="p">,</span> <span class="n">c_b</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">c_a</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">c_b</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">c_b</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">c_a</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">c_a</span><span class="o">.</span><span class="n">tied</span><span class="p">(</span><span class="n">c_b</span><span class="p">)</span>
+                <span class="n">new_bout</span> <span class="o">=</span> <span class="n">Bout</span><span class="p">(</span>
+                    <span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="n">outcome</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span> <span class="n">predicted_outcome</span><span class="o">=</span><span class="n">predicted_outcome</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">add_bout</span><span class="p">(</span><span class="n">bout</span><span class="o">=</span><span class="n">new_bout</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">skipped_bouts</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Skipping bout </span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">: outcome value is None&quot;</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">total_bouts</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">skipped_bouts</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;Skipped </span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2"> bouts during training history processing due to None outcome&quot;</span><span class="p">,</span> <span class="n">skipped_bouts</span><span class="p">,</span> <span class="n">total_bouts</span>
+            <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished processing training history. </span><span class="si">%d</span><span class="s2"> competitors tracked.&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="LambdaArena.evaluate_performance">
+<a class="viewcode-back" href="../../../arenas.html#elote.arenas.lambda_arena.LambdaArena.evaluate_performance">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate_performance</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">eval_bouts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]]],</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate the performance of the competitors based on a list of evaluation bouts.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            eval_bouts (list): A list of (competitor_a, competitor_b, outcome) tuples.</span>
+<span class="sd">            progress_bar (bool, optional): Whether to display a progress bar.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">iterator</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">eval_bouts</span><span class="p">)</span> <span class="k">if</span> <span class="n">progress_bar</span> <span class="k">else</span> <span class="n">eval_bouts</span>
+        <span class="n">total_bouts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">eval_bouts</span><span class="p">)</span>
+        <span class="n">skipped_bouts</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Evaluating performance using </span><span class="si">%d</span><span class="s2"> bouts&quot;</span><span class="p">,</span> <span class="n">total_bouts</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">outcome</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">iterator</span><span class="p">):</span>
+            <span class="c1"># Get or create competitors</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">c_a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_competitor</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+                <span class="n">c_b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_competitor</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># If a competitor is not found, skip this bout</span>
+                <span class="n">skipped_bouts</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;Skipping evaluation bout </span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">: Competitor &#39;</span><span class="si">%s</span><span class="s2">&#39; not found in training history.&quot;</span><span class="p">,</span>
+                    <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="n">total_bouts</span><span class="p">,</span>
+                    <span class="n">e</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># Skip bouts where the actual outcome is None</span>
+            <span class="k">if</span> <span class="n">outcome</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">skipped_bouts</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># Calculate the expected outcome</span>
+            <span class="n">predicted_outcome</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">c_a</span><span class="p">,</span> <span class="n">c_b</span><span class="p">)</span>
+            <span class="n">new_bout</span> <span class="o">=</span> <span class="n">Bout</span><span class="p">(</span>
+                <span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="n">outcome</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span> <span class="n">predicted_outcome</span><span class="o">=</span><span class="n">predicted_outcome</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">eval_history</span><span class="o">.</span><span class="n">add_bout</span><span class="p">(</span><span class="n">bout</span><span class="o">=</span><span class="n">new_bout</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">skipped_bouts</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;Skipped </span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2"> bouts during evaluation due to missing competitors or None outcome.&quot;</span><span class="p">,</span>
+                <span class="n">skipped_bouts</span><span class="p">,</span>
+                <span class="n">total_bouts</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished performance evaluation.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LambdaArena.validate">
+<a class="viewcode-back" href="../../../arenas.html#elote.arenas.lambda_arena.LambdaArena.validate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validation_bouts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]]],</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a validation set through the arena without updating ratings, only recording predictions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            validation_bouts (list): A list of (competitor_a, competitor_b, outcome) tuples.</span>
+<span class="sd">            progress_bar (bool, optional): Whether to display a progress bar.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">iterator</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">validation_bouts</span><span class="p">)</span> <span class="k">if</span> <span class="n">progress_bar</span> <span class="k">else</span> <span class="n">validation_bouts</span>
+        <span class="n">total_bouts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">validation_bouts</span><span class="p">)</span>
+        <span class="n">skipped_bouts</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Validating model using </span><span class="si">%d</span><span class="s2"> bouts&quot;</span><span class="p">,</span> <span class="n">total_bouts</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">outcome</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">iterator</span><span class="p">):</span>
+            <span class="c1"># Get or create competitors</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">c_a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_competitor</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+                <span class="n">c_b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_competitor</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># If a competitor is not found, skip this bout</span>
+                <span class="n">skipped_bouts</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;Skipping validation bout </span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">: Competitor &#39;</span><span class="si">%s</span><span class="s2">&#39; not found in training history.&quot;</span><span class="p">,</span>
+                    <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="n">total_bouts</span><span class="p">,</span>
+                    <span class="n">e</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># Skip bouts where the actual outcome is None</span>
+            <span class="k">if</span> <span class="n">outcome</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">skipped_bouts</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># Calculate the expected outcome</span>
+            <span class="n">predicted_outcome</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">c_a</span><span class="p">,</span> <span class="n">c_b</span><span class="p">)</span>
+            <span class="n">new_bout</span> <span class="o">=</span> <span class="n">Bout</span><span class="p">(</span>
+                <span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="n">outcome</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span> <span class="n">predicted_outcome</span><span class="o">=</span><span class="n">predicted_outcome</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validation_history</span><span class="o">.</span><span class="n">add_bout</span><span class="p">(</span><span class="n">bout</span><span class="o">=</span><span class="n">new_bout</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">skipped_bouts</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;Skipped </span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2"> bouts during validation due to missing competitors or None outcome.&quot;</span><span class="p">,</span>
+                <span class="n">skipped_bouts</span><span class="p">,</span>
+                <span class="n">total_bouts</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished model validation.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LambdaArena.get_competitor_by_id">
+<a class="viewcode-back" href="../../../arenas.html#elote.arenas.lambda_arena.LambdaArena.get_competitor_by_id">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_competitor_by_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_val</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BaseCompetitor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieve a competitor by their ID.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            id_val (str): The ID of the competitor to retrieve.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Optional[BaseCompetitor]: The retrieved competitor, or None if not found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">comp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">id_val</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">comp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Competitor with ID &#39;</span><span class="si">%s</span><span class="s2">&#39; not found.&quot;</span><span class="p">,</span> <span class="n">id_val</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Retrieved competitor &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">id_val</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">comp</span></div>
+
+
+<div class="viewcode-block" id="LambdaArena.get_all_competitors">
+<a class="viewcode-back" href="../../../arenas.html#elote.arenas.lambda_arena.LambdaArena.get_all_competitors">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_all_competitors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">BaseCompetitor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieve a list of all competitors in the arena.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: A list of all competitors.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Retrieving all </span><span class="si">%d</span><span class="s2"> competitors.&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../competitors.html">Competitors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../arenas.html">Arenas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../serialization.html">Serialization</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/elo.html">Elo Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/ecf.html">ECF Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/dwz.html">DWZ Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/ensemble.html">Ensemble Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/comparison.html">Comparing Rating Systems</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advance_example.html">Advanced Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../use_cases/product_ranking.html">Product Ranking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../use_cases/matchmaking.html">Matchmaking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../use_cases/feature_prioritization.html">Feature Prioritization with Elote</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/competitors.html">Competitors API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/arenas.html">Arenas API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../blog_posts.html">Blog Posts</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to Elote</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <div class="footer__inner">
+    
+    
+    <div class="footer__links">
+      
+        <a href="https://github.com/wdm0006" class="footer__link" target="_blank" rel="noopener noreferrer">
+          GitHub
+        </a>
+      
+        <a href="https://www.linkedin.com/in/wmcginnis/" class="footer__link" target="_blank" rel="noopener noreferrer">
+          LinkedIn
+        </a>
+      
+        <a href="https://x.com/willmcginniser" class="footer__link" target="_blank" rel="noopener noreferrer">
+          Twitter
+        </a>
+      
+    </div>
+    
+
+    
+    <p class="footer__copy">
+      
+        &copy; 2020, Will McGinnis
+      
+    </p>
+  </div>
+</footer>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggle = document.querySelector('.nav-toggle');
+    const nav = document.querySelector('.nav');
+    if (toggle && nav) {
+      toggle.addEventListener('click', function() {
+        nav.classList.toggle('is-open');
+        const isOpen = nav.classList.contains('is-open');
+        toggle.setAttribute('aria-expanded', isOpen);
+      });
+    }
+  });
+</script>
+
+  </body>
+</html>
