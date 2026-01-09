@@ -38,6 +38,7 @@ try:
     HAS_FOOTBALL = True
 except Exception:
     # Catch any exception (including xgboost.core.XGBoostError for deprecated model formats)
+    # Test if sportsdataverse is actually available
     HAS_FOOTBALL = False
     CollegeFootballDataset = None
 
