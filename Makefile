@@ -89,6 +89,7 @@ build: clean
 
 # Build documentation
 docs:
+	uv pip install -r docs/requirements.txt
 	cd docs && uv run $(MAKE) html SPHINXBUILD="python -m sphinx" 
 	@echo "Opening documentation in Google Chrome..."
 	@if [ "$(shell uname)" = "Darwin" ]; then \

@@ -32,14 +32,13 @@ except ImportError:
 
 try:
     from elote import CollegeFootballDataset
+    # Test if sportsdataverse.cfb is actually available and working
+    # Note: sportsdataverse may fail to import due to xgboost model compatibility issues
+    import sportsdataverse.cfb  # noqa: F401
+    HAS_FOOTBALL = True
+except Exception:
+    # Catch any exception (including xgboost.core.XGBoostError for deprecated model formats)
     # Test if sportsdataverse is actually available
-    import importlib.util
-    if importlib.util.find_spec("sportsdataverse.cfb") is not None:
-        HAS_FOOTBALL = True
-    else:
-        HAS_FOOTBALL = False
-        CollegeFootballDataset = None
-except ImportError:
     HAS_FOOTBALL = False
     CollegeFootballDataset = None
 
