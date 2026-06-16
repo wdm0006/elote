@@ -1,5 +1,5 @@
 import unittest
-from elote import LambdaArena, EloCompetitor
+from elote import LambdaArena, EloCompetitor, GlickoCompetitor
 
 
 class TestArenas(unittest.TestCase):
@@ -164,3 +164,67 @@ class TestArenas(unittest.TestCase):
 
         # Reset the class variable for other tests
         arena.set_competitor_class_var("_k_factor", 32)
+
+    def _assert_history_recorded(self, history, expected_len):
+        """Assert that a history has the expected number of bouts with sane predictions."""
+        self.assertEqual(len(history.bouts), expected_len)
+        for bout in history.bouts:
+            self.assertIsNotNone(bout.predicted_outcome)
+            self.assertGreaterEqual(bout.predicted_outcome, 0.0)
+            self.assertLessEqual(bout.predicted_outcome, 1.0)
+
+    def test_process_history_non_colley_competitors(self):
+        """process_history should run end-to-end for non-Colley competitors.
+
+        Regression test for a TypeError ('unhashable type') that occurred because
+        the method passed competitor *objects* to expected_score, which expects IDs.
+        """
+        for competitor_cls in (EloCompetitor, GlickoCompetitor):
+            with self.subTest(competitor=competitor_cls.__name__):
+                arena = LambdaArena(func=lambda x, y: True, base_competitor=competitor_cls)
+                bouts = [("x", "y", 1), ("y", "z", 0), ("x", "z", 0.5)]
+                arena.process_history(bouts, progress_bar=False)
+
+                # All bouts have non-None outcomes, so all should be recorded.
+                self._assert_history_recorded(arena.history, len(bouts))
+                for cid in ("x", "y", "z"):
+                    self.assertIn(cid, arena.competitors)
+
+    def test_process_history_skips_none_outcome(self):
+        """Bouts with a None outcome should be skipped, not recorded."""
+        arena = LambdaArena(func=lambda x, y: True)
+        bouts = [("x", "y", 1), ("y", "z", None)]
+        arena.process_history(bouts, progress_bar=False)
+        self.assertEqual(len(arena.history.bouts), 1)
+
+    def test_evaluate_performance_non_colley_competitors(self):
+        """evaluate_performance should run end-to-end for non-Colley competitors."""
+        for competitor_cls in (EloCompetitor, GlickoCompetitor):
+            with self.subTest(competitor=competitor_cls.__name__):
+                arena = LambdaArena(func=lambda x, y: True, base_competitor=competitor_cls)
+                arena.process_history([("x", "y", 1), ("y", "z", 0)], progress_bar=False)
+
+                eval_bouts = [("x", "y", 1), ("y", "z", 0)]
+                arena.evaluate_performance(eval_bouts, progress_bar=False)
+
+                # evaluate_performance must not modify the training history.
+                self.assertEqual(len(arena.history.bouts), 2)
+                self._assert_history_recorded(arena.eval_history, len(eval_bouts))
+
+    def test_validate_non_colley_competitors(self):
+        """validate should run end-to-end for non-Colley competitors without updating ratings."""
+        for competitor_cls in (EloCompetitor, GlickoCompetitor):
+            with self.subTest(competitor=competitor_cls.__name__):
+                arena = LambdaArena(func=lambda x, y: True, base_competitor=competitor_cls)
+                arena.process_history([("x", "y", 1), ("y", "z", 0)], progress_bar=False)
+
+                ratings_before = {cid: c.rating for cid, c in arena.competitors.items()}
+
+                validation_bouts = [("x", "y", 1), ("y", "z", 0)]
+                arena.validate(validation_bouts, progress_bar=False)
+
+                self._assert_history_recorded(arena.validation_history, len(validation_bouts))
+
+                # validate only records predictions; it must not update ratings.
+                ratings_after = {cid: c.rating for cid, c in arena.competitors.items()}
+                self.assertEqual(ratings_before, ratings_after)
