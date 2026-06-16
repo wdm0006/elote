@@ -129,11 +129,11 @@ class TestArenas(unittest.TestCase):
         # Get the leaderboard
         leaderboard = arena.leaderboard()
 
-        # Check that the leaderboard is sorted by rating (ascending)
+        # Check that the leaderboard is sorted by rating (descending, best-first)
         self.assertEqual(len(leaderboard), 3)
-        self.assertEqual(leaderboard[0]["competitor"], "C")
+        self.assertEqual(leaderboard[0]["competitor"], "A")
         self.assertEqual(leaderboard[1]["competitor"], "B")
-        self.assertEqual(leaderboard[2]["competitor"], "A")
+        self.assertEqual(leaderboard[2]["competitor"], "C")
 
     def test_lambda_arena_clear_history(self):
         """Test that the history can be cleared."""
