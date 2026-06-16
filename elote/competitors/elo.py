@@ -213,7 +213,7 @@ class EloCompetitor(BaseCompetitor):
         Returns:
             float: The transformed rating.
         """
-        return float(10 ** (self.rating / 400))
+        return float(10 ** (self.rating / self._base_rating))
 
     @property
     def rating(self) -> float:
