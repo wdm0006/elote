@@ -6,6 +6,7 @@ from elote import (
     DWZCompetitor,
     BlendedCompetitor,
     ColleyMatrixCompetitor,
+    BradleyTerryCompetitor,
 )
 from elote.competitors.base import (
     MissMatchedCompetitorTypesException,
@@ -301,6 +302,51 @@ class TestUnifiedInterface(unittest.TestCase):
         with self.assertRaises(InvalidRatingValueException):
             ColleyMatrixCompetitor(initial_rating=-0.1)
 
+        with self.assertRaises(MissMatchedCompetitorTypesException):
+            competitor1.expected_score(EloCompetitor())
+
+    def test_base_methods_bradley_terry(self):
+        """Test that the Bradley-Terry competitor implements all required methods."""
+        competitor = BradleyTerryCompetitor(initial_rating=1500)
+        self.assertAlmostEqual(competitor.rating, 1500)
+
+        # Test export/import
+        state = competitor.export_state()
+        self.assertIn("initial_rating", state)
+
+        new_competitor = BradleyTerryCompetitor.from_state(state)
+        self.assertAlmostEqual(new_competitor.rating, 1500)
+
+        # Test reset
+        competitor.rating = 1600
+        self.assertAlmostEqual(competitor.rating, 1600)
+        competitor.reset()
+        self.assertAlmostEqual(competitor.rating, 1500)
+
+        # Test comparison operators
+        competitor1 = BradleyTerryCompetitor(initial_rating=1400)
+        competitor2 = BradleyTerryCompetitor(initial_rating=1600)
+        self.assertTrue(competitor1 < competitor2)
+        self.assertTrue(competitor2 > competitor1)
+        self.assertFalse(competitor1 == competitor2)
+
+        # Test expected score
+        score = competitor1.expected_score(competitor2)
+        self.assertTrue(0 < score < 1)
+
+        # Test match outcomes. Bradley-Terry re-fits the whole component on each result,
+        # so we assert that ratings changed (as with Colley) rather than a fixed magnitude.
+        comp_a = BradleyTerryCompetitor()
+        comp_b = BradleyTerryCompetitor()
+        old_rating_a = comp_a.rating
+        old_rating_b = comp_b.rating
+        for _ in range(3):
+            comp_a.beat(comp_b)
+        self.assertNotEqual(comp_a.rating, old_rating_a)
+        self.assertNotEqual(comp_b.rating, old_rating_b)
+        self.assertGreater(comp_a.rating, comp_b.rating)
+
+        # Test type mismatch
         with self.assertRaises(MissMatchedCompetitorTypesException):
             competitor1.expected_score(EloCompetitor())
 
