@@ -15,7 +15,7 @@
         gtag('config', 'G-Z43R9PWW0B');
     </script>
     
-    <title>Glicko Rating System &#8212; elote 1.1.0 documentation</title>
+    <title>Bradley-Terry Model &#8212; elote 1.1.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=30d13653" />
     <link rel="stylesheet" type="text/css" href="../_static/css/wabi.css?v=501c8ac3" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=71d92741" />
@@ -25,8 +25,8 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="ECF Rating System" href="ecf.html" />
-    <link rel="prev" title="Elo Rating System" href="elo.html" />
+    <link rel="next" title="Ensemble Rating System" href="ensemble.html" />
+    <link rel="prev" title="DWZ Rating System" href="dwz.html" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,25 +34,25 @@
 
 
 
-<meta name="description" content="Glicko Rating System - elote documentation">
+<meta name="description" content="Bradley-Terry Model - elote documentation">
 
 
 
 
 
-<meta property="og:title" content="Glicko Rating System">
-<meta property="og:description" content="Glicko Rating System - elote documentation">
+<meta property="og:title" content="Bradley-Terry Model">
+<meta property="og:description" content="Bradley-Terry Model - elote documentation">
 <meta property="og:type" content="website">
 
-<meta property="og:url" content="https://elote.mcginniscommawill.com/rating_systems/glicko.html">
+<meta property="og:url" content="https://elote.mcginniscommawill.com/rating_systems/bradley_terry.html">
 
 
 <meta property="og:site_name" content="elote">
 
 
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Glicko Rating System">
-<meta name="twitter:description" content="Glicko Rating System - elote documentation">
+<meta name="twitter:title" content="Bradley-Terry Model">
+<meta name="twitter:description" content="Bradley-Terry Model - elote documentation">
 
 <meta name="twitter:site" content="@willmcginniser">
 
@@ -60,7 +60,7 @@
 
 
 
-<link rel="canonical" href="https://elote.mcginniscommawill.com/rating_systems/glicko.html">
+<link rel="canonical" href="https://elote.mcginniscommawill.com/rating_systems/bradley_terry.html">
 
 
  
@@ -156,7 +156,7 @@
     
     
     <span class="breadcrumbs__separator">/</span>
-    <span>Glicko Rating System</span>
+    <span>Bradley-Terry Model</span>
     
   </div>
 </nav>
@@ -168,123 +168,115 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="glicko-rating-system">
-<h1>Glicko Rating System<a class="headerlink" href="#glicko-rating-system" title="Link to this heading">¶</a></h1>
+  <section id="bradley-terry-model">
+<h1>Bradley-Terry Model<a class="headerlink" href="#bradley-terry-model" title="Link to this heading">¶</a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
-<p>The Glicko rating system was developed by Mark Glickman in 1995 as an improvement over the Elo rating system. The key innovation of Glicko is the introduction of a “rating deviation” (RD) parameter that measures the uncertainty in a player’s rating. This addresses one of the main limitations of the Elo system, which doesn’t account for rating reliability.</p>
-<p>The name “Glicko” is derived from the creator’s surname, Glickman. The system has since been further refined into Glicko-2, though Elote currently implements the original Glicko-1 system.</p>
+<p>The Bradley-Terry model is a probabilistic model for paired comparisons, introduced by
+Ralph Bradley and Milton Terry in 1952. Each competitor is assigned a single latent
+<em>strength</em>, and the outcome of any head-to-head matchup is modeled as a function of the two
+competitors’ strengths. It is one of the most widely used models for analyzing paired
+comparison data across sports analytics, ranking systems, and preference learning.</p>
+<p>Unlike Elo, which nudges ratings incrementally after every game, Bradley-Terry estimates the
+strengths by <strong>maximum likelihood</strong> over the full set of observed comparisons. In Elote this
+is done the same way as the Colley Matrix method: results are recorded as they happen, and the
+strengths of the entire connected group of competitors are re-fit after each result.</p>
 </section>
 <section id="how-it-works">
 <h2>How It Works<a class="headerlink" href="#how-it-works" title="Link to this heading">¶</a></h2>
-<p>The Glicko system uses three key parameters:</p>
-<ol class="arabic simple">
-<li><p><strong>Rating (r)</strong>: Represents the player’s skill level, similar to Elo</p></li>
-<li><p><strong>Rating Deviation (RD)</strong>: Represents the uncertainty in the rating (higher RD = more uncertainty)</p></li>
-<li><p><strong>Time Factor (c)</strong>: Controls how much the RD increases over time without playing</p></li>
-</ol>
-<p>The expected outcome calculation is similar to Elo but incorporates the rating deviations:</p>
+<p>Each competitor <code class="docutils literal notranslate"><span class="pre">i</span></code> has a positive strength <code class="docutils literal notranslate"><span class="pre">p_i</span></code>. The probability that <code class="docutils literal notranslate"><span class="pre">i</span></code> beats <code class="docutils literal notranslate"><span class="pre">j</span></code> is</p>
 <div class="math notranslate nohighlight">
-\[E(A, B) = \frac{1}{1 + 10^{-g(RD_B) \times (r_A - r_B) / 400}}\]</div>
-<p>Where:
-- <span class="math notranslate nohighlight">\(g(RD) = \frac{1}{\sqrt{1 + 3 \times RD^2 / \pi^2}}\)</span>
-- <span class="math notranslate nohighlight">\(r_A\)</span> and <span class="math notranslate nohighlight">\(r_B\)</span> are the ratings of players A and B
-- <span class="math notranslate nohighlight">\(RD_A\)</span> and <span class="math notranslate nohighlight">\(RD_B\)</span> are their rating deviations</p>
-<p>After a match, both the rating and rating deviation are updated:</p>
+\[\begin{split}P(i \\text{ beats } j) = \\frac{p_i}{p_i + p_j}\end{split}\]</div>
+<p>Writing the strengths in the log domain as <code class="docutils literal notranslate"><span class="pre">p_i</span> <span class="pre">=</span> <span class="pre">e^{\\beta_i}</span></code> turns this into the logistic
+function</p>
 <div class="math notranslate nohighlight">
-\[r'_A = r_A + \frac{q}{1/RD_A^2 + 1/d^2} \times g(RD_B) \times (S_A - E(A, B))\]</div>
+\[\begin{split}P(i \\text{ beats } j) = \\frac{1}{1 + e^{-(\\beta_i - \\beta_j)}}\end{split}\]</div>
+<p>which is exactly the functional form of the Elo expected score. Elote reports Bradley-Terry
+ratings on an Elo-like scale, <code class="docutils literal notranslate"><span class="pre">rating</span> <span class="pre">=</span> <span class="pre">1500</span> <span class="pre">+</span> <span class="pre">s</span> <span class="pre">\\cdot</span> <span class="pre">\\beta</span></code> with <code class="docutils literal notranslate"><span class="pre">s</span> <span class="pre">=</span> <span class="pre">400</span> <span class="pre">/</span> <span class="pre">\\ln(10)</span></code>,
+so that the expected score is numerically identical to Elo’s and the ratings are directly
+comparable to Elo ratings.</p>
+<p>The strengths are fit with the iterative MM update of Newman (2023). Given win counts
+<code class="docutils literal notranslate"><span class="pre">w_{ij}</span></code> (the number of times <code class="docutils literal notranslate"><span class="pre">i</span></code> beat <code class="docutils literal notranslate"><span class="pre">j</span></code>), each iteration applies</p>
 <div class="math notranslate nohighlight">
-\[RD'_A = \sqrt{\frac{1}{1/RD_A^2 + 1/d^2}}\]</div>
-<p>Where:
-- <span class="math notranslate nohighlight">\(q = \ln(10) / 400\)</span>
-- <span class="math notranslate nohighlight">\(d^2 = 1 / (q^2 \times g(RD_B)^2 \times E(A, B) \times (1 - E(A, B)))\)</span>
-- <span class="math notranslate nohighlight">\(S_A\)</span> is the actual score (1 for win, 0.5 for draw, 0 for loss)</p>
-<p>When a player doesn’t compete for a period, their RD increases:</p>
-<div class="math notranslate nohighlight">
-\[RD'_A = \min(\sqrt{RD_A^2 + c^2 \times t}, RD_{max})\]</div>
-<p>Where:
-- <span class="math notranslate nohighlight">\(t\)</span> is the time since last competition
-- <span class="math notranslate nohighlight">\(c\)</span> is the volatility constant
-- <span class="math notranslate nohighlight">\(RD_{max}\)</span> is the maximum allowed rating deviation</p>
+\[\begin{split}p_i' = \\frac{\\sum_j w_{ij}\\, p_j / (p_i + p_j)}{\\sum_j w_{ji} / (p_i + p_j)}\end{split}\]</div>
+<p>followed by normalization by the geometric mean of the strengths. Because the strengths are
+only identified up to an overall scale, Elote re-centers them so that the mean log-strength of
+a connected group is zero.</p>
+<p>A small amount of <strong>regularization</strong> (a virtual win and loss against an average phantom
+opponent) is added so that a unique, finite maximum-likelihood estimate exists even when a
+competitor is undefeated or winless within its group – a case where the unregularized estimate
+would diverge to infinity.</p>
+<p>Ties are counted as half a win for each side.</p>
 </section>
 <section id="advantages">
 <h2>Advantages<a class="headerlink" href="#advantages" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>Uncertainty Measurement</strong>: Accounts for the reliability of a player’s rating</p></li>
-<li><p><strong>Inactivity Handling</strong>: Automatically increases uncertainty for inactive players</p></li>
-<li><p><strong>More Accurate Matchmaking</strong>: Can match players with similar ratings but different uncertainties</p></li>
-<li><p><strong>Faster Convergence</strong>: New players can reach their true skill level faster</p></li>
-<li><p><strong>Better for Sparse Data</strong>: Works well when players don’t compete frequently</p></li>
+<li><p><strong>Order independent</strong>: the fit depends only on the set of results, not the order they were
+played.</p></li>
+<li><p><strong>Statistically principled</strong>: produces the maximum-likelihood strengths given the data.</p></li>
+<li><p><strong>Elo-compatible scale</strong>: expected scores match Elo, so ratings are easy to interpret.</p></li>
 </ul>
 </section>
 <section id="limitations">
 <h2>Limitations<a class="headerlink" href="#limitations" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>Complexity</strong>: More complex to understand and implement than Elo</p></li>
-<li><p><strong>Parameter Sensitivity</strong>: Results depend on proper tuning of multiple parameters</p></li>
-<li><p><strong>Computational Overhead</strong>: Requires more calculations than Elo</p></li>
-<li><p><strong>No Volatility Tracking</strong>: Unlike Glicko-2, doesn’t track how volatile a player’s performance is</p></li>
-<li><p><strong>Batch Updates</strong>: Originally designed for updating ratings in batches rather than after each game</p></li>
+<li><p><strong>Recomputes globally</strong>: like Colley, every result re-fits the whole connected group, which
+is more expensive than Elo’s constant-time update for very large populations.</p></li>
+<li><p><strong>No margin of victory</strong>: only win/loss/tie outcomes are used.</p></li>
+<li><p><strong>Serialization</strong>: the match graph (opponent references) cannot be serialized, so a
+competitor restored from state keeps its rating and aggregate win/loss/tie counts but not the
+live links to its opponents.</p></li>
 </ul>
 </section>
 <section id="implementation-in-elote">
 <h2>Implementation in Elote<a class="headerlink" href="#implementation-in-elote" title="Link to this heading">¶</a></h2>
-<p>Elote provides an implementation of the Glicko-1 rating system through the <code class="docutils literal notranslate"><span class="pre">GlickoCompetitor</span></code> class:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">GlickoCompetitor</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">BradleyTerryCompetitor</span>
 
-<span class="c1"># Create two competitors with different initial ratings and RDs</span>
-<span class="n">player1</span> <span class="o">=</span> <span class="n">GlickoCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">initial_rd</span><span class="o">=</span><span class="mi">350</span><span class="p">)</span>
-<span class="n">player2</span> <span class="o">=</span> <span class="n">GlickoCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1700</span><span class="p">,</span> <span class="n">initial_rd</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">player_a</span> <span class="o">=</span> <span class="n">BradleyTerryCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
+<span class="n">player_b</span> <span class="o">=</span> <span class="n">BradleyTerryCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
 
-<span class="c1"># Get win probability</span>
-<span class="n">win_probability</span> <span class="o">=</span> <span class="n">player2</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player1</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 win probability: </span><span class="si">{</span><span class="n">win_probability</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># Record results; strengths are re-fit after each one.</span>
+<span class="n">player_a</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">player_b</span><span class="p">)</span>
+<span class="n">player_a</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">player_b</span><span class="p">)</span>
+<span class="n">player_b</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">player_a</span><span class="p">)</span>
 
-<span class="c1"># Record a match result</span>
-<span class="n">player1</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">player2</span><span class="p">)</span>  <span class="c1"># Player 1 won!</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">player_a</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">player_b</span><span class="o">.</span><span class="n">rating</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">player_a</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player_b</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>It also plugs directly into an arena:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">LambdaArena</span><span class="p">,</span> <span class="n">BradleyTerryCompetitor</span>
 
-<span class="c1"># Ratings and RDs are automatically updated</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 1 new rating: </span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">, RD: </span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">rd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 new rating: </span><span class="si">{</span><span class="n">player2</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">, RD: </span><span class="si">{</span><span class="n">player2</span><span class="o">.</span><span class="n">rd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">comparison_func</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">BradleyTerryCompetitor</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="customization">
 <h2>Customization<a class="headerlink" href="#customization" title="Link to this heading">¶</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">GlickoCompetitor</span></code> class allows for customization of several parameters:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a competitor with custom parameters</span>
-<span class="n">player</span> <span class="o">=</span> <span class="n">GlickoCompetitor</span><span class="p">(</span>
-    <span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span>
-    <span class="n">initial_rd</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span>
-    <span class="n">volatility</span><span class="o">=</span><span class="mf">0.06</span><span class="p">,</span>
-    <span class="n">tau</span><span class="o">=</span><span class="mf">0.5</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-<p>Key parameters:
-- <strong>initial_rating</strong>: Starting rating value (default: 1500)
-- <strong>initial_rd</strong>: Starting rating deviation (default: 350)
-- <strong>volatility</strong>: How much RD increases over time (default: 0.06)
-- <strong>tau</strong>: System constant affecting rating changes (default: 0.5)</p>
+<p>Class-level parameters can be tuned with <code class="docutils literal notranslate"><span class="pre">configure_class</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">anchor_rating</span></code> – the rating assigned to the mean log-strength (default <code class="docutils literal notranslate"><span class="pre">1500</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">scale</span></code> – points per unit of log-strength (default <code class="docutils literal notranslate"><span class="pre">400</span> <span class="pre">/</span> <span class="pre">ln(10)</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reg</span></code> – regularization strength (default <code class="docutils literal notranslate"><span class="pre">0.01</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max_iter</span></code> / <code class="docutils literal notranslate"><span class="pre">tol</span></code> – iteration budget and convergence tolerance for the fit.</p></li>
+</ul>
 </section>
 <section id="real-world-applications">
 <h2>Real-World Applications<a class="headerlink" href="#real-world-applications" title="Link to this heading">¶</a></h2>
-<p>The Glicko rating system is used in various competitive domains:</p>
 <ul class="simple">
-<li><p><strong>Chess</strong>: Used by the Australian Chess Federation and Free Internet Chess Server</p></li>
-<li><p><strong>Video Games</strong>: Used in modified form by many competitive games</p></li>
-<li><p><strong>Online Platforms</strong>: Used by lichess.org and other competitive platforms</p></li>
-<li><p><strong>Sports Analytics</strong>: Used for player performance analysis in various sports</p></li>
+<li><p>Ranking sports teams or players from head-to-head results.</p></li>
+<li><p>Aggregating pairwise human preferences (e.g. A/B choices) into a single ranking.</p></li>
+<li><p>Any setting where you want a maximum-likelihood ranking rather than an online estimate.</p></li>
 </ul>
 </section>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
-<ol class="arabic simple">
-<li><p>Glickman, Mark E. (1995). “A Comprehensive Guide to Chess Ratings”. American Chess Journal, 3, 59-102.</p></li>
-<li><p>Glickman, Mark E. (1999). “Parameter estimation in large dynamic paired comparison experiments”. Applied Statistics, 48, 377-394.</p></li>
-<li><p>Glickman, Mark E. (2001). “Dynamic paired comparison models with stochastic variances”. Journal of Applied Statistics, 28, 673-689.</p></li>
-<li><p>[The Glicko System](<a class="reference external" href="http://www.glicko.net/glicko/glicko.pdf">http://www.glicko.net/glicko/glicko.pdf</a>) - Original paper by Mark Glickman</p></li>
-</ol>
+<ul class="simple">
+<li><p>Bradley, R. A., &amp; Terry, M. E. (1952). Rank Analysis of Incomplete Block Designs: I. The
+Method of Paired Comparisons. <em>Biometrika</em>, 39(3/4), 324-345.</p></li>
+<li><p>Newman, M. E. J. (2023). Efficient computation of rankings from pairwise comparisons.
+<em>Journal of Machine Learning Research</em>, 24(238), 1-25.</p></li>
+</ul>
 </section>
 </section>
 
@@ -311,10 +303,10 @@
 <p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="elo.html">Elo Rating System</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glicko.html">Glicko Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ecf.html">ECF Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dwz.html">DWZ Rating System</a></li>
-<li class="toctree-l1"><a class="reference internal" href="bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Bradley-Terry Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="comparison.html">Comparing Rating Systems</a></li>
 </ul>
