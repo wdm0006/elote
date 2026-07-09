@@ -178,8 +178,8 @@ class LambdaArena(BaseArena):
         # Restore original implementation returning list of dicts
         lb: List[Dict[str, Any]] = [{"competitor": k, "rating": v.rating} for k, v in self.competitors.items()]
 
-        # Restore original sorting key and add ignores for mypy errors
-        return sorted(lb, key=lambda x: x.get("rating"))  # type: ignore[arg-type, return-value]
+        # Sort best-first (descending by rating) to match the docstring and method name
+        return sorted(lb, key=lambda x: x.get("rating"), reverse=True)  # type: ignore[arg-type, return-value]
 
     def _get_or_create_competitor(self, id_val: str) -> BaseCompetitor:
         if id_val not in self.competitors:

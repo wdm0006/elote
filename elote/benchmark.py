@@ -110,8 +110,8 @@ def evaluate_competitor(
     metrics["train_time"] = train_time
     metrics["eval_time"] = eval_time
 
-    # Get top teams
-    top_teams = sorted(arena.leaderboard(), reverse=True, key=lambda x: x.get("rating"))[:5]
+    # Get top teams (leaderboard is already sorted best-first)
+    top_teams = arena.leaderboard()[:5]
     metrics["top_teams"] = top_teams
 
     # Add history and arena to metrics
