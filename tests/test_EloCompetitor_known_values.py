@@ -136,6 +136,29 @@ class TestEloKnownValues(unittest.TestCase):
         self.assertAlmostEqual(player1.rating, p1_new_rating)
         self.assertAlmostEqual(player2.rating, p2_new_rating)
 
+    def test_base_rating_affects_transformed_rating(self):
+        """Test that a non-default _base_rating divisor is honored in the rating math."""
+        original_base_rating = EloCompetitor._base_rating
+        try:
+            EloCompetitor.configure_class(base_rating=200)
+
+            player = EloCompetitor(initial_rating=400)
+            # 10 ** (400 / 200) == 10 ** 2 == 100, not the default 10 ** (400 / 400) == 10
+            self.assertEqual(player.transformed_rating, 100.0)
+
+            # expected_score is derived from transformed_rating, so it must change too
+            player1 = EloCompetitor(initial_rating=400)
+            player2 = EloCompetitor(initial_rating=600)
+            p1_transformed = 10 ** (400 / 200)
+            p2_transformed = 10 ** (600 / 200)
+            expected = p1_transformed / (p1_transformed + p2_transformed)
+            self.assertAlmostEqual(player1.expected_score(player2), expected)
+        finally:
+            EloCompetitor.configure_class(base_rating=original_base_rating)
+
+        # Restoring the default divisor restores the original transformed rating
+        self.assertEqual(EloCompetitor(initial_rating=400).transformed_rating, 10.0)
+
     def test_k_factor_effect(self):
         """Test that k_factor affects the rating change magnitude."""
         # With k_factor = 32
