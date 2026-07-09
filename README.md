@@ -41,6 +41,10 @@ Currently implemented rating systems:
 - **TrueSkill** - Microsoft's Bayesian skill rating system for multiplayer games
 - **ECF** - The English Chess Federation rating system
 - **DWZ** - The Deutsche Wertungszahl (German evaluation number) system
+- **Colley Matrix** - A least-squares method that ranks competitors by solving a linear system
+- **Bradley-Terry** - A maximum-likelihood paired-comparison model on an Elo-compatible scale
+
+You can also combine several systems into a single **Ensemble** (blended) competitor.
 
 ## Installation
 

@@ -11,15 +11,16 @@ Unlike Elo, which nudges ratings incrementally after every game, the Bradley-Ter
 are obtained by maximum likelihood estimation over the full set of observed comparisons. This
 implementation follows the same approach as :class:`~elote.competitors.colley.ColleyMatrixCompetitor`:
 each competitor accumulates its match history and, after every result, the strengths of the
-whole connected component are re-fit. The fit uses the iterative MM update of Newman (2023)
-with geometric-mean normalization and a small amount of regularization so that a unique, finite
-solution exists even when a competitor is undefeated or winless within its component.
+whole connected component are re-fit. The fit uses the minorization-maximization (MM) update of
+Hunter (2004) with geometric-mean normalization and a small amount of regularization so that a
+unique, finite solution exists even when a competitor is undefeated or winless within its
+component.
 
 References:
 - Bradley, R. A., & Terry, M. E. (1952). Rank Analysis of Incomplete Block Designs: I. The
   Method of Paired Comparisons. Biometrika, 39(3/4), 324-345.
-- Newman, M. E. J. (2023). Efficient computation of rankings from pairwise comparisons.
-  Journal of Machine Learning Research, 24(238), 1-25.
+- Hunter, D. R. (2004). MM algorithms for generalized Bradley-Terry models. The Annals of
+  Statistics, 32(1), 384-406.
 """
 
 import math
@@ -54,8 +55,8 @@ class BradleyTerryCompetitor(BaseCompetitor):
         _anchor_rating (float): Rating assigned to the mean log-strength. Default: 1500.0.
         _scale (float): Points per unit of log-strength. Default: 400 / ln(10).
         _reg (float): Regularization strength (virtual wins/losses against an average
-            phantom opponent). Default: 0.01.
-        _max_iter (int): Maximum MM iterations per fit. Default: 1000.
+            phantom opponent). Default: 0.1.
+        _max_iter (int): Maximum MM iterations per fit. Default: 10000.
         _tol (float): Convergence tolerance on the max change in log-strength. Default: 1e-8.
     """
 
@@ -63,7 +64,7 @@ class BradleyTerryCompetitor(BaseCompetitor):
     _anchor_rating: ClassVar[float] = 1500.0
     _scale: ClassVar[float] = 400.0 / math.log(10.0)
     _reg: ClassVar[float] = 0.1
-    _max_iter: ClassVar[int] = 1000
+    _max_iter: ClassVar[int] = 10000
     _tol: ClassVar[float] = 1e-8
 
     def __init__(self, initial_rating: Optional[float] = None):
@@ -225,10 +226,10 @@ class BradleyTerryCompetitor(BaseCompetitor):
     def _recalculate_ratings(self) -> None:
         """Re-fit the Bradley-Terry strengths for all connected competitors.
 
-        Uses the iterative MM update of Newman (2023) with geometric-mean normalization and a
-        small regularization term (virtual results against an average phantom opponent) so that
-        the maximum-likelihood estimate exists and is unique even when a competitor is
-        undefeated or winless within its component.
+        Uses the minorization-maximization (MM) update of Hunter (2004) with geometric-mean
+        normalization and a small regularization term (virtual results against an average phantom
+        opponent) so that the maximum-likelihood estimate exists and is unique even when a
+        competitor is undefeated or winless within its component.
         """
         competitors = self._get_connected_competitors()
         n = len(competitors)
@@ -249,27 +250,28 @@ class BradleyTerryCompetitor(BaseCompetitor):
         # Total games between each pair (symmetric).
         games = [[wins[i][j] + wins[j][i] for j in range(n)] for i in range(n)]
 
+        # Total wins per competitor (ties are already counted as half in the win matrix).
+        total_wins = [math.fsum(wins[i]) for i in range(n)]
+
         # Strengths p_i = exp(beta_i). The Bradley-Terry log-likelihood is concave with a
         # unique maximum, so we seed from a flat, well-conditioned starting point rather than
-        # warm-starting from the (possibly extreme) current strengths, which converges reliably.
+        # warm-starting from the (possibly extreme) current strengths.
         p = [1.0] * n
 
         reg = self._reg
         for iteration in range(self._max_iter):
             new_p = [0.0] * n
             for i in range(n):
-                numerator = 0.0
                 denominator = 0.0
                 for j in range(n):
                     if i == j or games[i][j] == 0:
                         continue
-                    denom_ij = p[i] + p[j]
-                    numerator += wins[i][j] * p[j] / denom_ij
-                    denominator += wins[j][i] / denom_ij
+                    denominator += games[i][j] / (p[i] + p[j])
                 # Regularization: a virtual win and loss against a phantom opponent of unit
-                # strength, guaranteeing a finite, unique solution.
-                numerator += reg * 1.0 / (p[i] + 1.0)
-                denominator += reg * 1.0 / (p[i] + 1.0)
+                # strength, guaranteeing a finite, unique solution even for undefeated or
+                # winless competitors.
+                numerator = total_wins[i] + reg
+                denominator += 2.0 * reg / (p[i] + 1.0)
                 new_p[i] = numerator / denominator if denominator > 0 else p[i]
 
             # Normalize by the geometric mean to fix the overall scale.
