@@ -199,16 +199,14 @@ class LambdaArena(BaseArena):
             c_b = self._get_or_create_competitor(b)
 
             if outcome is not None:
-                predicted_outcome = self.expected_score(c_a, c_b)
+                predicted_outcome = c_a.expected_score(c_b)
                 if outcome == 1:
                     c_a.beat(c_b)
                 elif outcome == 0:
                     c_b.beat(c_a)
                 else:
                     c_a.tied(c_b)
-                new_bout = Bout(
-                    a=a, b=b, outcome=outcome, timestamp=datetime.datetime.now(), predicted_outcome=predicted_outcome
-                )
+                new_bout = Bout(a=a, b=b, outcome=outcome, predicted_outcome=predicted_outcome)
                 self.history.add_bout(bout=new_bout)
             else:
                 skipped_bouts += 1
@@ -255,10 +253,8 @@ class LambdaArena(BaseArena):
                 continue
 
             # Calculate the expected outcome
-            predicted_outcome = self.expected_score(c_a, c_b)
-            new_bout = Bout(
-                a=a, b=b, outcome=outcome, timestamp=datetime.datetime.now(), predicted_outcome=predicted_outcome
-            )
+            predicted_outcome = c_a.expected_score(c_b)
+            new_bout = Bout(a=a, b=b, outcome=outcome, predicted_outcome=predicted_outcome)
             self.eval_history.add_bout(bout=new_bout)
 
         if skipped_bouts > 0:
@@ -302,10 +298,8 @@ class LambdaArena(BaseArena):
                 continue
 
             # Calculate the expected outcome
-            predicted_outcome = self.expected_score(c_a, c_b)
-            new_bout = Bout(
-                a=a, b=b, outcome=outcome, timestamp=datetime.datetime.now(), predicted_outcome=predicted_outcome
-            )
+            predicted_outcome = c_a.expected_score(c_b)
+            new_bout = Bout(a=a, b=b, outcome=outcome, predicted_outcome=predicted_outcome)
             self.validation_history.add_bout(bout=new_bout)
 
         if skipped_bouts > 0:
