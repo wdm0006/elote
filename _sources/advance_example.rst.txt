@@ -99,7 +99,7 @@ And while we are here let's also print out what the rankings would have been to 
 
     # then we print out the top 25 as of the end of our training dataset
     print('\n\nTop 25 as of start of validation:')
-    rankings = sorted(arena.leaderboard(), reverse=True, key=lambda x: x.get('rating'))[:25]
+    rankings = arena.leaderboard()[:25]
     for idx, item in enumerate(rankings):
         print('\t%d) %s' % (idx + 1, item.get('competitor')))
 
