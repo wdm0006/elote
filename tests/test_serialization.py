@@ -6,6 +6,7 @@ from elote import (
     GlickoCompetitor,
     BlendedCompetitor,
     ColleyMatrixCompetitor,
+    BradleyTerryCompetitor,
 )
 from elote.competitors.base import BaseCompetitor, InvalidStateException
 
@@ -164,6 +165,42 @@ class TestStandardizedSerialization(unittest.TestCase):
         self.assertEqual(new_competitor._wins, 2)
         self.assertEqual(new_competitor._losses, 1)
         self.assertEqual(new_competitor._ties, 0)
+
+        # Note: We can't verify _opponents because that can't be exported/imported
+
+    def test_bradley_terry_serialization(self):
+        """Test serialization and deserialization of BradleyTerryCompetitor."""
+        competitor = BradleyTerryCompetitor(initial_rating=1550)
+
+        opponent = BradleyTerryCompetitor(initial_rating=1500)
+        competitor.beat(opponent)
+        competitor.beat(opponent)
+        opponent.beat(competitor)
+
+        state = competitor.export_state()
+
+        self.assertIn("type", state)
+        self.assertIn("version", state)
+        self.assertIn("parameters", state)
+        self.assertIn("state", state)
+        self.assertEqual(state["type"], "BradleyTerryCompetitor")
+        self.assertEqual(state["version"], 1)
+
+        self.assertIn("initial_rating", state["parameters"])
+        self.assertEqual(state["parameters"]["initial_rating"], 1550)
+
+        self.assertIn("rating", state["state"])
+        self.assertAlmostEqual(state["state"]["rating"], competitor.rating)
+        self.assertEqual(state["state"]["wins"], 2)
+        self.assertEqual(state["state"]["losses"], 1)
+        self.assertEqual(state["state"]["ties"], 0)
+
+        new_competitor = BaseCompetitor.from_state(state)
+        self.assertIsInstance(new_competitor, BradleyTerryCompetitor)
+        self.assertEqual(new_competitor._initial_rating, 1550)
+        self.assertAlmostEqual(new_competitor.rating, competitor.rating)
+        self.assertEqual(new_competitor._wins, 2)
+        self.assertEqual(new_competitor._losses, 1)
 
         # Note: We can't verify _opponents because that can't be exported/imported
 
