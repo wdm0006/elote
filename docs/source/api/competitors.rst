@@ -30,6 +30,24 @@ Glicko Competitor
    :show-inheritance:
    :special-members: __init__
 
+Glicko-2 Competitor
+------------------
+
+.. automodule:: elote.competitors.glicko2
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :special-members: __init__
+
+TrueSkill Competitor
+-------------------
+
+.. automodule:: elote.competitors.trueskill
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :special-members: __init__
+
 DWZ Competitor
 -------------
 
@@ -43,6 +61,24 @@ ECF Competitor
 -------------
 
 .. automodule:: elote.competitors.ecf
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :special-members: __init__
+
+Colley Matrix Competitor
+-----------------------
+
+.. automodule:: elote.competitors.colley
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :special-members: __init__
+
+Bradley-Terry Competitor
+-----------------------
+
+.. automodule:: elote.competitors.bradley_terry
    :members:
    :undoc-members:
    :show-inheritance:
