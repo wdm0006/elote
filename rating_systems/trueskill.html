@@ -15,18 +15,17 @@
         gtag('config', 'G-Z43R9PWW0B');
     </script>
     
-    <title>Elo Rating System &#8212; elote 1.2.0 documentation</title>
+    <title>TrueSkill Rating System &#8212; elote 1.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=30d13653" />
     <link rel="stylesheet" type="text/css" href="../_static/css/wabi.css?v=501c8ac3" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=71d92741" />
     <script src="../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Glicko Rating System" href="glicko.html" />
-    <link rel="prev" title="Serialization" href="../serialization.html" />
+    <link rel="next" title="ECF Rating System" href="ecf.html" />
+    <link rel="prev" title="Glicko-2 Rating System" href="glicko2.html" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,25 +33,25 @@
 
 
 
-<meta name="description" content="Elo Rating System - elote documentation">
+<meta name="description" content="TrueSkill Rating System - elote documentation">
 
 
 
 
 
-<meta property="og:title" content="Elo Rating System">
-<meta property="og:description" content="Elo Rating System - elote documentation">
+<meta property="og:title" content="TrueSkill Rating System">
+<meta property="og:description" content="TrueSkill Rating System - elote documentation">
 <meta property="og:type" content="website">
 
-<meta property="og:url" content="https://elote.mcginniscommawill.com/rating_systems/elo.html">
+<meta property="og:url" content="https://elote.mcginniscommawill.com/rating_systems/trueskill.html">
 
 
 <meta property="og:site_name" content="elote">
 
 
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Elo Rating System">
-<meta name="twitter:description" content="Elo Rating System - elote documentation">
+<meta name="twitter:title" content="TrueSkill Rating System">
+<meta name="twitter:description" content="TrueSkill Rating System - elote documentation">
 
 <meta name="twitter:site" content="@willmcginniser">
 
@@ -60,7 +59,7 @@
 
 
 
-<link rel="canonical" href="https://elote.mcginniscommawill.com/rating_systems/elo.html">
+<link rel="canonical" href="https://elote.mcginniscommawill.com/rating_systems/trueskill.html">
 
 
  
@@ -156,7 +155,7 @@
     
     
     <span class="breadcrumbs__separator">/</span>
-    <span>Elo Rating System</span>
+    <span>TrueSkill Rating System</span>
     
   </div>
 </nav>
@@ -168,109 +167,104 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="elo-rating-system">
-<h1>Elo Rating System<a class="headerlink" href="#elo-rating-system" title="Link to this heading">¶</a></h1>
+  <section id="trueskill-rating-system">
+<h1>TrueSkill Rating System<a class="headerlink" href="#trueskill-rating-system" title="Link to this heading">¶</a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
-<p>The Elo rating system is one of the most widely used rating systems in the world. Developed by Hungarian-American physics professor Arpad Elo, it was originally designed for chess but has since been adapted for many other competitive domains including video games, basketball, football, and baseball.</p>
-<p>The Elo system is named after its creator and was first introduced as the official rating system for the United States Chess Federation in 1960, and later adopted by the World Chess Federation (FIDE) in 1970.</p>
+<p>TrueSkill is a Bayesian skill-rating system developed by Microsoft Research. It generalizes Elo and
+Glicko to team-based and multiplayer games, and is best known for powering matchmaking on Xbox Live.
+Each player’s skill is modeled as a Gaussian (normal) distribution with a mean and a standard
+deviation, and match results shift both quantities.</p>
 </section>
 <section id="how-it-works">
 <h2>How It Works<a class="headerlink" href="#how-it-works" title="Link to this heading">¶</a></h2>
-<p>The Elo rating system is based on the following principles:</p>
+<p>Each competitor’s skill is described by two quantities:</p>
 <ol class="arabic simple">
-<li><p>Each player has a rating that represents their skill level</p></li>
-<li><p>The difference between ratings determines the expected outcome of a match</p></li>
-<li><p>After each match, ratings are adjusted based on the actual outcome compared to the expected outcome</p></li>
+<li><p><strong>Mu (μ)</strong>: the estimated skill level (the mean of the belief distribution).</p></li>
+<li><p><strong>Sigma (σ)</strong>: the uncertainty in that estimate (the standard deviation).</p></li>
 </ol>
-<p>The core formula for calculating the expected score (probability of winning) is:</p>
-<div class="math notranslate nohighlight">
-\[E_A = \frac{1}{1 + 10^{(R_B - R_A) / 400}}\]</div>
-<p>Where:
-- <span class="math notranslate nohighlight">\(E_A\)</span> is the expected score for player A
-- <span class="math notranslate nohighlight">\(R_A\)</span> is the rating of player A
-- <span class="math notranslate nohighlight">\(R_B\)</span> is the rating of player B</p>
-<p>After a match, the ratings are updated using:</p>
-<div class="math notranslate nohighlight">
-\[R'_A = R_A + K \times (S_A - E_A)\]</div>
-<p>Where:
-- <span class="math notranslate nohighlight">\(R'_A\)</span> is the new rating for player A
-- <span class="math notranslate nohighlight">\(K\)</span> is the K-factor (determines how quickly ratings change)
-- <span class="math notranslate nohighlight">\(S_A\)</span> is the actual score (1 for win, 0.5 for draw, 0 for loss)
-- <span class="math notranslate nohighlight">\(E_A\)</span> is the expected score</p>
+<p>The probability that one player beats another depends on the difference in their means relative to
+their combined uncertainty and a skill factor <code class="docutils literal notranslate"><span class="pre">beta</span></code>. After each match, both players’ distributions
+are updated via Bayesian inference: the winner’s mean rises, the loser’s falls, and both players’
+sigma typically shrinks as evidence accumulates. A small dynamics factor <code class="docutils literal notranslate"><span class="pre">tau</span></code> is added to the
+uncertainty over time so that skill can drift.</p>
+<p>Because a single Gaussian would over-state confidence, Elote reports a <strong>conservative</strong> rating of
+<code class="docutils literal notranslate"><span class="pre">mu</span> <span class="pre">-</span> <span class="pre">3</span> <span class="pre">*</span> <span class="pre">sigma</span></code> – a value you can be roughly 99% sure the player’s true skill exceeds.</p>
 </section>
 <section id="advantages">
 <h2>Advantages<a class="headerlink" href="#advantages" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>Simplicity</strong>: The Elo system is easy to understand and implement</p></li>
-<li><p><strong>Transparency</strong>: Players can easily see how their rating changes after each match</p></li>
-<li><p><strong>Proven Track Record</strong>: Used successfully for decades in various competitive domains</p></li>
-<li><p><strong>Zero-Sum</strong>: In a two-player game, the rating points one player gains are exactly what the other player loses</p></li>
-<li><p><strong>Self-Correcting</strong>: Ratings naturally adjust over time as more matches are played</p></li>
+<li><p><strong>Uncertainty Aware</strong>: models both skill and confidence, like Glicko.</p></li>
+<li><p><strong>Team and Multiplayer Support</strong>: naturally extends to games with more than two participants.</p></li>
+<li><p><strong>Fast Convergence</strong>: new players’ ratings settle quickly as sigma shrinks.</p></li>
+<li><p><strong>Principled</strong>: grounded in Bayesian inference over factor graphs.</p></li>
 </ul>
 </section>
 <section id="limitations">
 <h2>Limitations<a class="headerlink" href="#limitations" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>Requires Many Matches</strong>: Needs a significant number of matches to reach an accurate rating</p></li>
-<li><p><strong>No Confidence Intervals</strong>: Unlike Glicko, Elo doesn’t account for rating reliability</p></li>
-<li><p><strong>Assumes Stable Performance</strong>: Doesn’t account for player improvement or decline over time</p></li>
-<li><p><strong>K-Factor Sensitivity</strong>: Results are highly dependent on the chosen K-factor</p></li>
-<li><p><strong>No Team Dynamics</strong>: In team sports, doesn’t account for individual contributions</p></li>
+<li><p><strong>Complexity</strong>: the underlying factor-graph inference is the most complex of the systems here.</p></li>
+<li><p><strong>No Direct Rating Setter</strong>: the reported rating is derived from mu and sigma, so you set <code class="docutils literal notranslate"><span class="pre">mu</span></code>
+and <code class="docutils literal notranslate"><span class="pre">sigma</span></code> rather than the rating directly.</p></li>
+<li><p><strong>Parameter Sensitivity</strong>: depends on <code class="docutils literal notranslate"><span class="pre">beta</span></code>, <code class="docutils literal notranslate"><span class="pre">tau</span></code>, and the assumed draw probability.</p></li>
+<li><p><strong>Different Scale</strong>: works on a mu/sigma scale (default μ = 25) rather than the 1500-centered
+chess scale.</p></li>
 </ul>
 </section>
 <section id="implementation-in-elote">
 <h2>Implementation in Elote<a class="headerlink" href="#implementation-in-elote" title="Link to this heading">¶</a></h2>
-<p>Elote provides a straightforward implementation of the Elo rating system through the <code class="docutils literal notranslate"><span class="pre">EloCompetitor</span></code> class:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span>
+<p>Elote implements TrueSkill through the <code class="docutils literal notranslate"><span class="pre">TrueSkillCompetitor</span></code> class:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrueSkillCompetitor</span>
 
-<span class="c1"># Create two competitors with different initial ratings</span>
-<span class="n">player1</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
-<span class="n">player2</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1600</span><span class="p">)</span>
+<span class="c1"># Create two competitors (defaults: mu=25.0, sigma=8.333)</span>
+<span class="n">player1</span> <span class="o">=</span> <span class="n">TrueSkillCompetitor</span><span class="p">()</span>
+<span class="n">player2</span> <span class="o">=</span> <span class="n">TrueSkillCompetitor</span><span class="p">(</span><span class="n">initial_mu</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span> <span class="n">initial_sigma</span><span class="o">=</span><span class="mf">5.0</span><span class="p">)</span>
 
 <span class="c1"># Get win probability</span>
-<span class="n">win_probability</span> <span class="o">=</span> <span class="n">player2</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player1</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 win probability: </span><span class="si">{</span><span class="n">win_probability</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 win probability: </span><span class="si">{</span><span class="n">player2</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player1</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Record a match result</span>
-<span class="n">player1</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">player2</span><span class="p">)</span>  <span class="c1"># Player 1 won!</span>
+<span class="n">player1</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">player2</span><span class="p">)</span>
 
-<span class="c1"># Ratings are automatically updated</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 1 new rating: </span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 new rating: </span><span class="si">{</span><span class="n">player2</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># The conservative rating is mu - 3 * sigma</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 1: mu=</span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">mu</span><span class="si">}</span><span class="s2">, sigma=</span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">sigma</span><span class="si">}</span><span class="s2">, rating=</span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can also measure how evenly matched two players are:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">quality</span> <span class="o">=</span> <span class="n">TrueSkillCompetitor</span><span class="o">.</span><span class="n">match_quality</span><span class="p">(</span><span class="n">player1</span><span class="p">,</span> <span class="n">player2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Match quality: </span><span class="si">{</span><span class="n">quality</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="customization">
 <h2>Customization<a class="headerlink" href="#customization" title="Link to this heading">¶</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">EloCompetitor</span></code> class allows for customization of the K-factor:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a competitor with a custom K-factor</span>
-<span class="n">player</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">k_factor</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>A higher K-factor makes ratings change more quickly, while a lower K-factor makes them more stable. Common K-factor values:</p>
+<p>Key parameters:</p>
 <ul class="simple">
-<li><p>40: For new players with fewer than 30 games (FIDE standard)</p></li>
-<li><p>20: For players with ratings under 2400 (FIDE standard)</p></li>
-<li><p>10: For elite players with ratings over 2400 (FIDE standard)</p></li>
+<li><p><strong>initial_mu</strong>: starting mean skill (default: 25.0).</p></li>
+<li><p><strong>initial_sigma</strong>: starting uncertainty (default: 8.333).</p></li>
+</ul>
+<p>Class-level constants can be tuned with <code class="docutils literal notranslate"><span class="pre">TrueSkillCompetitor.configure_class(...)</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">beta</span></code> – skill factor governing how much outcomes depend on skill vs. chance (default 4.166).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tau</span></code> – dynamics factor adding uncertainty over time (default 0.083).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">draw_probability</span></code> – assumed probability of a draw (default 0.10).</p></li>
 </ul>
 </section>
 <section id="real-world-applications">
 <h2>Real-World Applications<a class="headerlink" href="#real-world-applications" title="Link to this heading">¶</a></h2>
-<p>The Elo rating system is used in many domains:</p>
 <ul class="simple">
-<li><p><strong>Chess</strong>: FIDE and national chess federations</p></li>
-<li><p><strong>Video Games</strong>: League of Legends, DOTA 2, and many other competitive games</p></li>
-<li><p><strong>Sports</strong>: Used for international football rankings</p></li>
-<li><p><strong>Online Matchmaking</strong>: Many platforms use Elo or Elo-derived systems to match players of similar skill</p></li>
+<li><p><strong>Xbox Live</strong>: the original use case, for matchmaking across many titles.</p></li>
+<li><p><strong>Esports and Multiplayer Games</strong>: team-based skill estimation and matchmaking.</p></li>
+<li><p><strong>Any Multiplayer Ranking</strong>: settings where uncertainty and team composition matter.</p></li>
 </ul>
 </section>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Elo, Arpad (1978). <em>The Rating of Chessplayers, Past and Present</em>. Arco. ISBN 0-668-04721-6.</p></li>
-<li><p>Glickman, Mark E. (1995). “A Comprehensive Guide to Chess Ratings”. American Chess Journal, 3, 59-102.</p></li>
-<li><p>Silver, Nate (2015). “How We Calculate NBA Elo Ratings”. FiveThirtyEight.</p></li>
+<li><p>Herbrich, R., Minka, T., &amp; Graepel, T. (2007). “TrueSkill(TM): A Bayesian Skill Rating System”.
+Advances in Neural Information Processing Systems 20.</p></li>
+<li><p>Microsoft Research. “TrueSkill Ranking System”.
+<a class="reference external" href="https://www.microsoft.com/en-us/research/project/trueskill-ranking-system/">https://www.microsoft.com/en-us/research/project/trueskill-ranking-system/</a></p></li>
 </ol>
 </section>
 </section>
@@ -297,10 +291,10 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Elo Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="elo.html">Elo Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glicko.html">Glicko Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glicko2.html">Glicko-2 Rating System</a></li>
-<li class="toctree-l1"><a class="reference internal" href="trueskill.html">TrueSkill Rating System</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">TrueSkill Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ecf.html">ECF Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dwz.html">DWZ Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="colley.html">Colley Matrix Method</a></li>

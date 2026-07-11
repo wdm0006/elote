@@ -15,18 +15,18 @@
         gtag('config', 'G-Z43R9PWW0B');
     </script>
     
-    <title>Bradley-Terry Model &#8212; elote 1.1.0 documentation</title>
+    <title>Bradley-Terry Model &#8212; elote 1.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=30d13653" />
     <link rel="stylesheet" type="text/css" href="../_static/css/wabi.css?v=501c8ac3" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=71d92741" />
-    <script src="../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Ensemble Rating System" href="ensemble.html" />
-    <link rel="prev" title="DWZ Rating System" href="dwz.html" />
+    <link rel="prev" title="Colley Matrix Method" href="colley.html" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -195,11 +195,13 @@ function</p>
 ratings on an Elo-like scale, <code class="docutils literal notranslate"><span class="pre">rating</span> <span class="pre">=</span> <span class="pre">1500</span> <span class="pre">+</span> <span class="pre">s</span> <span class="pre">\\cdot</span> <span class="pre">\\beta</span></code> with <code class="docutils literal notranslate"><span class="pre">s</span> <span class="pre">=</span> <span class="pre">400</span> <span class="pre">/</span> <span class="pre">\\ln(10)</span></code>,
 so that the expected score is numerically identical to Elo’s and the ratings are directly
 comparable to Elo ratings.</p>
-<p>The strengths are fit with the iterative MM update of Newman (2023). Given win counts
-<code class="docutils literal notranslate"><span class="pre">w_{ij}</span></code> (the number of times <code class="docutils literal notranslate"><span class="pre">i</span></code> beat <code class="docutils literal notranslate"><span class="pre">j</span></code>), each iteration applies</p>
+<p>The strengths are fit with the minorization-maximization (MM) update of Hunter (2004). Writing
+<code class="docutils literal notranslate"><span class="pre">W_i</span></code> for the total number of wins by <code class="docutils literal notranslate"><span class="pre">i</span></code> and <code class="docutils literal notranslate"><span class="pre">n_{ij}</span></code> for the number of games between <code class="docutils literal notranslate"><span class="pre">i</span></code>
+and <code class="docutils literal notranslate"><span class="pre">j</span></code>, each iteration applies</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}p_i' = \\frac{\\sum_j w_{ij}\\, p_j / (p_i + p_j)}{\\sum_j w_{ji} / (p_i + p_j)}\end{split}\]</div>
-<p>followed by normalization by the geometric mean of the strengths. Because the strengths are
+\[\begin{split}p_i' = \\frac{W_i}{\\sum_j n_{ij} / (p_i + p_j)}\end{split}\]</div>
+<p>followed by normalization by the geometric mean of the strengths. This update is guaranteed to
+increase the likelihood at every step and converges to the unique regularized maximum. Because the strengths are
 only identified up to an overall scale, Elote re-centers them so that the mean log-strength of
 a connected group is zero.</p>
 <p>A small amount of <strong>regularization</strong> (a virtual win and loss against an average phantom
@@ -257,7 +259,7 @@ live links to its opponents.</p></li>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">anchor_rating</span></code> – the rating assigned to the mean log-strength (default <code class="docutils literal notranslate"><span class="pre">1500</span></code>).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">scale</span></code> – points per unit of log-strength (default <code class="docutils literal notranslate"><span class="pre">400</span> <span class="pre">/</span> <span class="pre">ln(10)</span></code>).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">reg</span></code> – regularization strength (default <code class="docutils literal notranslate"><span class="pre">0.01</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reg</span></code> – regularization strength (default <code class="docutils literal notranslate"><span class="pre">0.1</span></code>).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">max_iter</span></code> / <code class="docutils literal notranslate"><span class="pre">tol</span></code> – iteration budget and convergence tolerance for the fit.</p></li>
 </ul>
 </section>
@@ -274,8 +276,8 @@ live links to its opponents.</p></li>
 <ul class="simple">
 <li><p>Bradley, R. A., &amp; Terry, M. E. (1952). Rank Analysis of Incomplete Block Designs: I. The
 Method of Paired Comparisons. <em>Biometrika</em>, 39(3/4), 324-345.</p></li>
-<li><p>Newman, M. E. J. (2023). Efficient computation of rankings from pairwise comparisons.
-<em>Journal of Machine Learning Research</em>, 24(238), 1-25.</p></li>
+<li><p>Hunter, D. R. (2004). MM Algorithms for Generalized Bradley-Terry Models. <em>The Annals of
+Statistics</em>, 32(1), 384-406.</p></li>
 </ul>
 </section>
 </section>
@@ -304,8 +306,11 @@ Method of Paired Comparisons. <em>Biometrika</em>, 39(3/4), 324-345.</p></li>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="elo.html">Elo Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glicko2.html">Glicko-2 Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="trueskill.html">TrueSkill Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ecf.html">ECF Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dwz.html">DWZ Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="colley.html">Colley Matrix Method</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Bradley-Terry Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="comparison.html">Comparing Rating Systems</a></li>

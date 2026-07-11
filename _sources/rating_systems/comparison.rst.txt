@@ -8,62 +8,72 @@ Overview Comparison
 
 .. list-table::
    :header-rows: 1
-   :widths: 20 16 16 16 16 16
+   :widths: 16 18 14 20 14 18
 
-   * - Feature
-     - Elo
-     - Glicko
-     - ECF
-     - DWZ
-     - Ensemble
-   * - **Origin**
+   * - System
+     - Origin
+     - Complexity
+     - Uncertainty Tracking
+     - Order Independent
+     - Typical Use Cases
+   * - **Elo**
      - Chess (1960s)
-     - Chess (1995)
-     - England (1950s)
-     - Germany (1990s)
-     - Meta-system
-   * - **Complexity**
      - Low
-     - Medium
-     - Low
-     - Medium
-     - High
-   * - **Uncertainty Tracking**
      - No
+     - No
+     - General purpose
+   * - **Glicko**
+     - Chess (1995)
+     - Medium
      - Yes (RD)
      - No
+     - Sparse competitions
+   * - **Glicko-2**
+     - Chess (2000s)
+     - Medium-High
+     - Yes (RD + volatility)
+     - No
+     - Online chess, volatile skill
+   * - **TrueSkill**
+     - Microsoft (2007)
+     - High
+     - Yes (sigma)
+     - No
+     - Teams and multiplayer
+   * - **ECF**
+     - England (1950s)
+     - Low
+     - No
+     - No
+     - English chess
+   * - **DWZ**
+     - Germany (1990s)
+     - Medium
      - Partial
-     - Depends on components
-   * - **Expected Score Formula**
-     - Logistic
-     - Modified Logistic
-     - Linear
-     - Logistic
-     - Weighted Average
-   * - **Inactivity Handling**
+     - No
+     - Youth development
+   * - **Colley Matrix**
+     - Sports (2002)
+     - Medium
      - No
      - Yes
+     - Bias-free sports ranking
+   * - **Bradley-Terry**
+     - Statistics (1952)
+     - Medium
      - No
-     - Partial
-     - Depends on components
-   * - **Implementation Difficulty**
-     - Easy
-     - Moderate
-     - Easy
-     - Moderate
-     - Complex
-   * - **Computational Cost**
-     - Low
-     - Medium
-     - Low
-     - Medium
+     - Yes
+     - Maximum-likelihood ranking
+   * - **Ensemble**
+     - Meta-system
      - High
-   * - **Typical Use Cases**
-     - General purpose
-     - Sparse competitions
-     - English chess
-     - Youth development
+     - Depends on components
+     - Depends on components
      - Complex domains
+
+Online systems (Elo, Glicko, Glicko-2, TrueSkill, ECF, DWZ) update ratings incrementally after each
+result. Global-fit systems (Colley Matrix and Bradley-Terry) re-solve the whole connected group of
+competitors from the full set of results, which makes them order independent.
 
 Mathematical Formulation
 -----------------------
@@ -78,10 +88,18 @@ Mathematical Formulation
      - :math:`E_A = \frac{1}{1 + 10^{(R_B - R_A) / 400}}`
    * - **Glicko**
      - :math:`E(A, B) = \frac{1}{1 + 10^{-g(RD_B) \times (r_A - r_B) / 400}}` where :math:`g(RD) = \frac{1}{\sqrt{1 + 3 \times RD^2 / \pi^2}}`
+   * - **Glicko-2**
+     - Same logistic form as Glicko, evaluated on an internal transformed scale with an added volatility term
+   * - **TrueSkill**
+     - :math:`E_A = \Phi\!\left(\frac{\mu_A - \mu_B}{\sqrt{2\beta^2 + \sigma_A^2 + \sigma_B^2}}\right)` where :math:`\Phi` is the normal CDF
    * - **ECF**
      - :math:`E_A = 0.5 + \frac{R_A - R_B}{F}` where F is typically 120
    * - **DWZ**
      - :math:`W_e = \frac{1}{1 + 10^{-(R_A - R_B) / 400}}`
+   * - **Colley Matrix**
+     - Ratings solve :math:`C r = b`; :math:`E_A = \frac{1}{1 + e^{-4 (r_A - r_B)}}`
+   * - **Bradley-Terry**
+     - :math:`P(A \text{ beats } B) = \frac{p_A}{p_A + p_B} = \frac{1}{1 + e^{-(\beta_A - \beta_B)}}`
    * - **Ensemble**
      - :math:`E_{ensemble} = \sum_{i=1}^{n} w_i \times E_i` where :math:`w_i` are weights
 
@@ -98,10 +116,18 @@ Key Parameters
      - K-factor (determines rating change magnitude)
    * - **Glicko**
      - Initial rating, Initial RD, Volatility, Tau
+   * - **Glicko-2**
+     - Initial rating, Initial RD, Initial volatility, Tau
+   * - **TrueSkill**
+     - Initial mu, Initial sigma, Beta, Tau, Draw probability
    * - **ECF**
-     - K-factor, F-factor (conversion factor)
+     - Delta (max rating difference), Number of periods
    * - **DWZ**
-     - Initial rating, Development coefficient
+     - Initial rating, Development coefficient (age-dependent)
+   * - **Colley Matrix**
+     - Initial rating (default 0.5)
+   * - **Bradley-Terry**
+     - Initial rating, Scale, Regularization, Max iterations
    * - **Ensemble**
      - Component systems, Weights
 
@@ -138,6 +164,36 @@ Glicko
 - More parameters to tune
 - Less intuitive interpretation
 
+Glicko-2
+^^^^^^^^
+
+**Strengths:**
+- Adds volatility to capture how consistent a competitor is
+- Retains Glicko's uncertainty and inactivity handling
+- Fast, stable convergence for both erratic and steady players
+- Used by major online chess platforms
+
+**Weaknesses:**
+- The most involved of the Glicko family to implement
+- Sensitive to the tau system constant
+- Iterative volatility update adds computational cost
+- Designed around rating periods rather than single games
+
+TrueSkill
+^^^^^^^^^
+
+**Strengths:**
+- Models both skill and uncertainty as a Gaussian
+- Naturally extends to teams and multiplayer games
+- Fast convergence as uncertainty shrinks
+- Principled Bayesian foundation
+
+**Weaknesses:**
+- Most complex inference of the individual systems
+- Rating is derived from mu and sigma (no direct setter)
+- Works on a mu/sigma scale rather than the chess scale
+- Sensitive to beta, tau, and draw-probability settings
+
 ECF
 ^^^
 
@@ -168,6 +224,36 @@ DWZ
 - Parameter sensitivity
 - Less international recognition
 
+Colley Matrix
+^^^^^^^^^^^^^
+
+**Strengths:**
+- Order independent: depends only on the set of results
+- Bias free: no margin-of-victory influence
+- Clean least-squares interpretation with a unique solution
+- Self-normalizing ratings in [0, 1] that sum to n/2
+
+**Weaknesses:**
+- Re-solves the whole connected group after each result
+- Uses only win/loss/tie outcomes
+- Ratings are on a [0, 1] scale, not the chess scale
+- Requires a connected schedule to compare competitors
+
+Bradley-Terry
+^^^^^^^^^^^^^
+
+**Strengths:**
+- Order independent maximum-likelihood estimate
+- Statistically principled paired-comparison model
+- Reported on an Elo-compatible scale for easy interpretation
+- Regularized so undefeated or winless competitors stay finite
+
+**Weaknesses:**
+- Re-fits the whole connected group after each result
+- Uses only win/loss/tie outcomes
+- The match graph cannot be serialized (only aggregate counts)
+- More expensive than Elo for very large populations
+
 Ensemble
 ^^^^^^^^
 
@@ -189,26 +275,27 @@ Choosing the Right System
 Consider the following factors when choosing a rating system:
 
 1. **Data Density**: How frequently do competitors face each other?
-   - Sparse data: Consider Glicko
+   - Sparse data: Consider Glicko or Glicko-2
    - Dense data: Elo may be sufficient
 
 2. **Domain Specifics**:
    - Chess in England: ECF
    - Chess in Germany: DWZ
    - Youth development: DWZ
+   - Team and multiplayer games: TrueSkill
    - General purpose: Elo or Glicko
 
-3. **Computational Resources**:
+3. **Order Independence**: Do you need a ranking that ignores schedule order?
+   - Yes: Colley Matrix or Bradley-Terry
+   - No: any online system (Elo, Glicko, etc.)
+
+4. **Computational Resources**:
    - Limited resources: Elo or ECF
-   - Sufficient resources: Glicko, DWZ, or Ensemble
+   - Sufficient resources: Glicko, Glicko-2, TrueSkill, or Ensemble
 
-4. **Uncertainty Importance**:
-   - Critical to track uncertainty: Glicko
+5. **Uncertainty Importance**:
+   - Critical to track uncertainty: Glicko, Glicko-2, or TrueSkill
    - Uncertainty less important: Elo or ECF
-
-5. **Complexity Tolerance**:
-   - Need simple explanation: Elo or ECF
-   - Can handle complexity: Glicko, DWZ, or Ensemble
 
 6. **Prediction Accuracy**:
    - Highest accuracy needed: Consider Ensemble
@@ -221,44 +308,55 @@ Here's a quick comparison of how to use each system in Elote:
 
 .. code-block:: python
 
-    from elote import EloCompetitor, GlickoCompetitor, ECFCompetitor, DWZCompetitor, EnsembleCompetitor
+    from elote import (
+        EloCompetitor,
+        GlickoCompetitor,
+        Glicko2Competitor,
+        TrueSkillCompetitor,
+        ECFCompetitor,
+        DWZCompetitor,
+        ColleyMatrixCompetitor,
+        BradleyTerryCompetitor,
+        BlendedCompetitor,
+    )
 
     # Elo
     elo_player = EloCompetitor(initial_rating=1500, k_factor=32)
 
     # Glicko
-    glicko_player = GlickoCompetitor(initial_rating=1500, initial_rd=350, volatility=0.06)
+    glicko_player = GlickoCompetitor(initial_rating=1500, initial_rd=350)
+
+    # Glicko-2
+    glicko2_player = Glicko2Competitor(initial_rating=1500, initial_rd=350)
+
+    # TrueSkill (mu/sigma scale)
+    trueskill_player = TrueSkillCompetitor(initial_mu=25.0, initial_sigma=8.333)
 
     # ECF
-    ecf_player = ECFCompetitor(initial_rating=120, k_factor=16, f_factor=120)
+    ecf_player = ECFCompetitor(initial_rating=100)
 
     # DWZ
-    dwz_player = DWZCompetitor(initial_rating=1600, initial_development_coeff=30)
+    dwz_player = DWZCompetitor(initial_rating=1600)
 
-    # Ensemble
-    ensemble_player = EnsembleCompetitor(
-        rating_systems=[
-            (EloCompetitor(initial_rating=1500), 0.5),
-            (GlickoCompetitor(initial_rating=1500), 0.5)
+    # Colley Matrix ([0, 1] scale)
+    colley_player = ColleyMatrixCompetitor()
+
+    # Bradley-Terry (Elo-compatible scale)
+    bt_player = BradleyTerryCompetitor(initial_rating=1500)
+
+    # Ensemble (blend of sub-competitors)
+    ensemble_player = BlendedCompetitor(
+        competitors=[
+            {"type": "EloCompetitor", "competitor_kwargs": {"initial_rating": 1500}},
+            {"type": "GlickoCompetitor", "competitor_kwargs": {"initial_rating": 1500}},
         ]
     )
 
-    # Usage is the same for all systems
+    # Usage is the same for all systems: expected_score, beat, tied, lost_to
+    player = EloCompetitor(initial_rating=1500)
     opponent = EloCompetitor(initial_rating=1400)
-    
-    # Get expected scores
-    print(f"Elo expected: {elo_player.expected_score(opponent):.2%}")
-    print(f"Glicko expected: {glicko_player.expected_score(opponent):.2%}")
-    print(f"ECF expected: {ecf_player.expected_score(opponent):.2%}")
-    print(f"DWZ expected: {dwz_player.expected_score(opponent):.2%}")
-    print(f"Ensemble expected: {ensemble_player.expected_score(opponent):.2%}")
-
-    # Record a win
-    elo_player.beat(opponent)
-    glicko_player.beat(opponent)
-    ecf_player.beat(opponent)
-    dwz_player.beat(opponent)
-    ensemble_player.beat(opponent)
+    print(f"Expected score: {player.expected_score(opponent):.2%}")
+    player.beat(opponent)  # record a win
 
 Empirical Comparison
 -------------------
@@ -272,4 +370,4 @@ Here's a simple approach to compare systems:
 3. Evaluate prediction accuracy on the test data
 4. Choose the system with the best performance for your specific use case
 
-Remember that no rating system is universally best - the right choice depends on your specific requirements, data characteristics, and domain constraints. 
+Remember that no rating system is universally best - the right choice depends on your specific requirements, data characteristics, and domain constraints.

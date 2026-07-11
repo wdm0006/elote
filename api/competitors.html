@@ -15,11 +15,11 @@
         gtag('config', 'G-Z43R9PWW0B');
     </script>
     
-    <title>Competitors API Reference &#8212; elote 1.1.0 documentation</title>
+    <title>Competitors API Reference &#8212; elote 1.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=30d13653" />
     <link rel="stylesheet" type="text/css" href="../_static/css/wabi.css?v=501c8ac3" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=71d92741" />
-    <script src="../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -780,6 +780,405 @@ and the number of rating periods that have passed.</p>
 </dd></dl>
 
 </section>
+<section id="glicko-2-competitor">
+<h2>Glicko-2 Competitor<a class="headerlink" href="#glicko-2-competitor" title="Link to this heading">¶</a></h2>
+<dl class="py class" id="module-elote.competitors.glicko2">
+<dt class="sig sig-object py" id="elote.competitors.glicko2.Glicko2Competitor">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">elote.competitors.glicko2.</span></span><span class="sig-name descname"><span class="pre">Glicko2Competitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_rd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">350</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_volatility</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/competitors/glicko2.html#Glicko2Competitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko2.Glicko2Competitor" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCompetitor</span></code></a></p>
+<p>Glicko-2 rating system competitor.</p>
+<p>The Glicko-2 rating system is an improvement on the original Glicko system,
+developed by Mark Glickman. It introduces a volatility parameter that measures
+the degree of expected fluctuation in a player’s rating.</p>
+<p>In Glicko-2, ratings are internally represented in a different scale than
+displayed to users. The internal scale uses a mean of 0 and a standard deviation
+of 1, while the displayed scale uses a mean of 1500 and a standard deviation of 173.7.</p>
+<dl>
+<dt>Class Attributes:</dt><dd><dl class="simple">
+<dt>_tau (float): System constant that constrains the volatility over time. Default: 0.5.</dt><dd><p>Smaller values (e.g., 0.3 to 0.2) make volatility change more slowly.
+Larger values (e.g., 0.6 to 1.0) allow volatility to change more quickly.</p>
+</dd>
+</dl>
+<p>_epsilon (float): Convergence tolerance for the volatility iteration. Default: 0.000001.
+_default_volatility (float): Default volatility for new competitors. Default: 0.06.
+_scale_factor (float): Scale factor for converting between Glicko-2 and original scales. Default: 173.7178.
+_rating_period_days (float): Number of days that constitute one rating period. Default: 1.0.</p>
+</dd>
+</dl>
+<p>Initialize a Glicko-2 competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>initial_rating (float, optional): The initial rating of this competitor. Default: 1500.
+initial_rd (float, optional): The initial rating deviation of this competitor. Default: 350.
+initial_volatility (float, optional): The initial volatility of this competitor. Default: _default_volatility.
+initial_time (datetime, optional): The initial timestamp for this competitor. Default: current time.</p>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidRatingValueException: If the initial rating is below the minimum rating.
+InvalidParameterException: If the initial RD is not positive or if the initial volatility is not positive.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko2.Glicko2Competitor.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_rd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">350</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_volatility</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/competitors/glicko2.html#Glicko2Competitor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko2.Glicko2Competitor.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialize a Glicko-2 competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>initial_rating (float, optional): The initial rating of this competitor. Default: 1500.
+initial_rd (float, optional): The initial rating deviation of this competitor. Default: 350.
+initial_volatility (float, optional): The initial volatility of this competitor. Default: _default_volatility.
+initial_time (datetime, optional): The initial timestamp for this competitor. Default: current time.</p>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidRatingValueException: If the initial rating is below the minimum rating.
+InvalidParameterException: If the initial RD is not positive or if the initial volatility is not positive.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko2.Glicko2Competitor.beat">
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko2.html#Glicko2Competitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko2.Glicko2Competitor.beat" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this competitor has won against the given competitor.</p>
+<p>This method records the match result for later processing during the rating period update.
+The actual rating update happens when update_ratings() is called.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.
+match_time (datetime, optional): The time when the match occurred. Default: current time.</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.
+InvalidParameterException: If the match time is before either competitor’s last activity.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko2.Glicko2Competitor.expected_score">
+<span class="sig-name descname"><span class="pre">expected_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko2.html#Glicko2Competitor.expected_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko2.Glicko2Competitor.expected_score" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the expected score (probability of winning) against another competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor to compare against.</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: The probability of winning (between 0 and 1).</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko2.Glicko2Competitor.export_state">
+<span class="sig-name descname"><span class="pre">export_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko2.html#Glicko2Competitor.export_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko2.Glicko2Competitor.export_state" title="Link to this definition">¶</a></dt>
+<dd><p>Export the current state of this competitor for serialization.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>dict: A dictionary containing all necessary information to recreate</dt><dd><p>this competitor’s current state.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko2.Glicko2Competitor.from_state">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko2.html#Glicko2Competitor.from_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko2.Glicko2Competitor.from_state" title="Link to this definition">¶</a></dt>
+<dd><p>Create a new competitor from a previously exported state.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>state (dict): A dictionary containing the state of a competitor,</dt><dd><p>as returned by export_state().</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><p>Glicko2Competitor: A new competitor with the same state as the exported one.</p>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidParameterException: If any parameter in the state is invalid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="elote.competitors.glicko2.Glicko2Competitor.rating">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rating</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#elote.competitors.glicko2.Glicko2Competitor.rating" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current rating of this competitor.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>float: The current rating.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="elote.competitors.glicko2.Glicko2Competitor.rd">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rd</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#elote.competitors.glicko2.Glicko2Competitor.rd" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current rating deviation of this competitor.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>float: The current rating deviation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko2.Glicko2Competitor.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko2.html#Glicko2Competitor.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko2.Glicko2Competitor.reset" title="Link to this definition">¶</a></dt>
+<dd><p>Reset this competitor to its initial state.</p>
+<p>This method resets the competitor’s rating, RD, and volatility to their initial values.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko2.Glicko2Competitor.tied">
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko2.html#Glicko2Competitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko2.Glicko2Competitor.tied" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this competitor has tied with the given competitor.</p>
+<p>This method records the match result for later processing during the rating period update.
+The actual rating update happens when update_ratings() is called.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.
+match_time (datetime, optional): The time when the match occurred. Default: current time.</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.
+InvalidParameterException: If the match time is before either competitor’s last activity.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko2.Glicko2Competitor.update_ratings">
+<span class="sig-name descname"><span class="pre">update_ratings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko2.html#Glicko2Competitor.update_ratings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko2.Glicko2Competitor.update_ratings" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings based on recorded match results.</p>
+<p>This method implements the Glicko-2 rating system update algorithm.
+It processes all recorded match results and updates the rating, RD, and volatility.
+If no matches were played, it updates the RD based on inactivity.
+After updating, the match results are cleared.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko2.Glicko2Competitor.update_rd_for_inactivity">
+<span class="sig-name descname"><span class="pre">update_rd_for_inactivity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko2.html#Glicko2Competitor.update_rd_for_inactivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko2.Glicko2Competitor.update_rd_for_inactivity" title="Link to this definition">¶</a></dt>
+<dd><p>Update the rating deviation based on time elapsed since last activity.</p>
+<p>This implements Glickman’s formula for increasing uncertainty in ratings
+over time when a player is inactive. In Glicko-2, the phi (internal RD)
+increases based on the current volatility (sigma) parameter and the number
+of rating periods that have passed.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>current_time (datetime, optional): The current time to calculate inactivity against.</dt><dd><p>If None, uses the current system time.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="elote.competitors.glicko2.Glicko2Competitor.volatility">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">volatility</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#elote.competitors.glicko2.Glicko2Competitor.volatility" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current volatility of this competitor.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>float: The current volatility.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="trueskill-competitor">
+<h2>TrueSkill Competitor<a class="headerlink" href="#trueskill-competitor" title="Link to this heading">¶</a></h2>
+<dl class="py class" id="module-elote.competitors.trueskill">
+<dt class="sig sig-object py" id="elote.competitors.trueskill.TrueSkillCompetitor">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">elote.competitors.trueskill.</span></span><span class="sig-name descname"><span class="pre">TrueSkillCompetitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_mu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_sigma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/competitors/trueskill.html#TrueSkillCompetitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.trueskill.TrueSkillCompetitor" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCompetitor</span></code></a></p>
+<p>TrueSkill rating system competitor.</p>
+<p>TrueSkill is a Bayesian skill rating system developed by Microsoft Research.
+It generalizes the Elo and Glicko rating systems to handle team-based games
+and multiplayer scenarios. TrueSkill models each player’s skill as a Gaussian
+distribution with a mean (mu) and standard deviation (sigma).</p>
+<p>The mean represents the player’s estimated skill, while the standard deviation
+represents the system’s uncertainty about that estimate. As more games are played,
+the uncertainty typically decreases.</p>
+<dl>
+<dt>Class Attributes:</dt><dd><dl class="simple">
+<dt>_beta (float): The skill factor that controls how much the game outcome depends</dt><dd><p>on skill vs. chance. Default: 4.166.</p>
+</dd>
+<dt>_tau (float): The additive dynamics factor that increases uncertainty over time.</dt><dd><p>Default: 0.083.</p>
+</dd>
+</dl>
+<p>_draw_probability (float): The probability of a draw. Default: 0.10 (10%).
+_default_mu (float): The default mean skill value for new players. Default: 25.0.
+_default_sigma (float): The default standard deviation for new players. Default: 8.333.</p>
+</dd>
+</dl>
+<p>Initialize a TrueSkill competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>initial_mu (float, optional): The initial mean skill value. Default: _default_mu.
+initial_sigma (float, optional): The initial standard deviation. Default: _default_sigma.</p>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidParameterException: If the initial sigma is not positive.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.trueskill.TrueSkillCompetitor.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_mu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_sigma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/competitors/trueskill.html#TrueSkillCompetitor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.trueskill.TrueSkillCompetitor.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialize a TrueSkill competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>initial_mu (float, optional): The initial mean skill value. Default: _default_mu.
+initial_sigma (float, optional): The initial standard deviation. Default: _default_sigma.</p>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidParameterException: If the initial sigma is not positive.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.trueskill.TrueSkillCompetitor.beat">
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/trueskill.html#TrueSkillCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.trueskill.TrueSkillCompetitor.beat" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this competitor has won against the given competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.trueskill.TrueSkillCompetitor.create_team">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">create_team</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">players</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../competitors.html#elote.competitors.trueskill.TrueSkillCompetitor" title="elote.competitors.trueskill.TrueSkillCompetitor"><span class="pre">TrueSkillCompetitor</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/elote/competitors/trueskill.html#TrueSkillCompetitor.create_team"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.trueskill.TrueSkillCompetitor.create_team" title="Link to this definition">¶</a></dt>
+<dd><p>Create a virtual team competitor from a list of players.</p>
+<p>This method combines the skills of multiple players into a single team skill.
+The team’s mu is the sum of the players’ mus, and the team’s sigma is the
+square root of the sum of the players’ sigma squared.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>players (List[TrueSkillCompetitor]): The list of players in the team.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Tuple[float, float]: The team’s mu and sigma.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.trueskill.TrueSkillCompetitor.expected_score">
+<span class="sig-name descname"><span class="pre">expected_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/elote/competitors/trueskill.html#TrueSkillCompetitor.expected_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.trueskill.TrueSkillCompetitor.expected_score" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the expected score (probability of winning) against another competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor to compare against.</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: The probability of winning (between 0 and 1).</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.trueskill.TrueSkillCompetitor.export_state">
+<span class="sig-name descname"><span class="pre">export_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/elote/competitors/trueskill.html#TrueSkillCompetitor.export_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.trueskill.TrueSkillCompetitor.export_state" title="Link to this definition">¶</a></dt>
+<dd><p>Export the current state of this competitor for serialization.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>dict: A dictionary containing all necessary information to recreate</dt><dd><p>this competitor’s current state.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.trueskill.TrueSkillCompetitor.from_state">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="reference internal" href="../_modules/elote/competitors/trueskill.html#TrueSkillCompetitor.from_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.trueskill.TrueSkillCompetitor.from_state" title="Link to this definition">¶</a></dt>
+<dd><p>Create a new competitor from a previously exported state.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>state (dict): A dictionary containing the state of a competitor,</dt><dd><p>as returned by export_state().</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><p>TrueSkillCompetitor: A new competitor with the same state as the exported one.</p>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidParameterException: If any parameter in the state is invalid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.trueskill.TrueSkillCompetitor.match_quality">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">match_quality</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../competitors.html#elote.competitors.trueskill.TrueSkillCompetitor" title="elote.competitors.trueskill.TrueSkillCompetitor"><span class="pre">TrueSkillCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">player2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../competitors.html#elote.competitors.trueskill.TrueSkillCompetitor" title="elote.competitors.trueskill.TrueSkillCompetitor"><span class="pre">TrueSkillCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/elote/competitors/trueskill.html#TrueSkillCompetitor.match_quality"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.trueskill.TrueSkillCompetitor.match_quality" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the match quality between two players.</p>
+<p>Match quality is a value between 0 and 1 that represents how evenly matched
+two players are. A value of 1 indicates a perfectly even match, while a value
+of 0 indicates a completely one-sided match.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>player1 (TrueSkillCompetitor): The first player.
+player2 (TrueSkillCompetitor): The second player.</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: The match quality (between 0 and 1).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="elote.competitors.trueskill.TrueSkillCompetitor.mu">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">mu</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#elote.competitors.trueskill.TrueSkillCompetitor.mu" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current mean skill value of this competitor.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>float: The current mean skill value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="elote.competitors.trueskill.TrueSkillCompetitor.rating">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rating</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#elote.competitors.trueskill.TrueSkillCompetitor.rating" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current conservative rating of this competitor.</p>
+<p>TrueSkill uses a conservative rating estimate (mu - 3*sigma) to ensure
+that a player’s displayed rating has a 99% chance of being below their
+actual skill level. This encourages players to keep playing to reduce
+uncertainty and increase their displayed rating.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>float: The current conservative rating.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.trueskill.TrueSkillCompetitor.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/trueskill.html#TrueSkillCompetitor.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.trueskill.TrueSkillCompetitor.reset" title="Link to this definition">¶</a></dt>
+<dd><p>Reset this competitor to its initial state.</p>
+<p>This method resets the competitor’s mu and sigma to their initial values.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="elote.competitors.trueskill.TrueSkillCompetitor.sigma">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">sigma</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#elote.competitors.trueskill.TrueSkillCompetitor.sigma" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current standard deviation of this competitor.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>float: The current standard deviation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.trueskill.TrueSkillCompetitor.tied">
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/trueskill.html#TrueSkillCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.trueskill.TrueSkillCompetitor.tied" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this competitor has tied with the given competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.trueskill.TrueSkillCompetitor.update_team">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">update_team</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">team_players</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../competitors.html#elote.competitors.trueskill.TrueSkillCompetitor" title="elote.competitors.trueskill.TrueSkillCompetitor"><span class="pre">TrueSkillCompetitor</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">team_mu_diff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">team_sigma_squared</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">callable</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/trueskill.html#TrueSkillCompetitor.update_team"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.trueskill.TrueSkillCompetitor.update_team" title="Link to this definition">¶</a></dt>
+<dd><p>Update the ratings of players in a team.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>team_players (List[TrueSkillCompetitor]): The list of players in the team.
+team_mu_diff (float): The difference in team mu.
+team_sigma_squared (float): The team’s sigma squared.
+v (float): The skill variance factor.
+result_func (callable): The function to calculate the performance update.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="dwz-competitor">
 <h2>DWZ Competitor<a class="headerlink" href="#dwz-competitor" title="Link to this heading">¶</a></h2>
 <dl class="py class" id="module-elote.competitors.dwz">
@@ -1056,6 +1455,337 @@ based on a drawn match outcome.</p>
 </dd></dl>
 
 </section>
+<section id="colley-matrix-competitor">
+<h2>Colley Matrix Competitor<a class="headerlink" href="#colley-matrix-competitor" title="Link to this heading">¶</a></h2>
+<p id="module-elote.competitors.colley">Colley Matrix Method implementation for the Elote library.</p>
+<p>The Colley Matrix Method is a least-squares rating system developed by Dr. Wesley Colley
+that solves a system of linear equations to obtain rankings. It’s widely used in sports
+rankings, particularly college football.</p>
+<p>References:
+- Colley, W. N. (2002). Colley’s Bias Free College Football Ranking Method: The Colley Matrix Explained.</p>
+<blockquote>
+<div><p><a class="reference external" href="https://colleyrankings.com/matrate.pdf">https://colleyrankings.com/matrate.pdf</a></p>
+</div></blockquote>
+<dl class="py class">
+<dt class="sig sig-object py" id="elote.competitors.colley.ColleyMatrixCompetitor">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">elote.competitors.colley.</span></span><span class="sig-name descname"><span class="pre">ColleyMatrixCompetitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/competitors/colley.html#ColleyMatrixCompetitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.colley.ColleyMatrixCompetitor" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCompetitor</span></code></a></p>
+<p>Colley Matrix Method competitor.</p>
+<p>The Colley Matrix Method is a least-squares rating system that solves a system of linear
+equations to obtain rankings. Unlike Elo which updates ratings incrementally after each match,
+Colley Matrix recalculates all ratings using the entire match history.</p>
+<p>Key characteristics:
+- Bias-free (doesn’t depend on schedule order)
+- Considers only wins and losses (not margin of victory)
+- Initial rating of 0.5 for all competitors
+- Final ratings are between 0 and 1
+- Sum of all ratings equals n/2 (where n is number of competitors)</p>
+<dl class="simple">
+<dt>Class Attributes:</dt><dd><p>_minimum_rating (float): The minimum allowed rating value. Default: 0.0
+_default_initial_rating (float): Default initial rating for all competitors. Default: 0.5</p>
+</dd>
+</dl>
+<p>Initialize a new Colley Matrix competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>initial_rating (float, optional): The initial rating of this competitor. Default: 0.5.</p>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidRatingValueException: If the initial rating is below the minimum rating.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.colley.ColleyMatrixCompetitor.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/competitors/colley.html#ColleyMatrixCompetitor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.colley.ColleyMatrixCompetitor.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialize a new Colley Matrix competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>initial_rating (float, optional): The initial rating of this competitor. Default: 0.5.</p>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidRatingValueException: If the initial rating is below the minimum rating.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.colley.ColleyMatrixCompetitor.beat">
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/colley.html#ColleyMatrixCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.colley.ColleyMatrixCompetitor.beat" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this competitor has won against the given competitor.</p>
+<p>In Colley Matrix Method, we store the match result and recalculate ratings for all
+related competitors.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.colley.ColleyMatrixCompetitor.expected_score">
+<span class="sig-name descname"><span class="pre">expected_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/elote/competitors/colley.html#ColleyMatrixCompetitor.expected_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.colley.ColleyMatrixCompetitor.expected_score" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the expected score against another competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The competitor to compare against.</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: The expected score (probability of winning).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.colley.ColleyMatrixCompetitor.export_state">
+<span class="sig-name descname"><span class="pre">export_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/elote/competitors/colley.html#ColleyMatrixCompetitor.export_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.colley.ColleyMatrixCompetitor.export_state" title="Link to this definition">¶</a></dt>
+<dd><p>Export the current state of this competitor for serialization.</p>
+<p>This method exports the competitor’s state in a standardized format that can be
+used to recreate the competitor with the same state.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>dict: A dictionary containing all necessary information to recreate</dt><dd><p>this competitor’s current state.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.colley.ColleyMatrixCompetitor.from_state">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="reference internal" href="../_modules/elote/competitors/colley.html#ColleyMatrixCompetitor.from_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.colley.ColleyMatrixCompetitor.from_state" title="Link to this definition">¶</a></dt>
+<dd><p>Create a new competitor from a previously exported state.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>state (dict): A dictionary containing the state of a competitor,</dt><dd><p>as returned by export_state().</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><p>ColleyMatrixCompetitor: A new competitor with the same state as the exported one.</p>
+</dd>
+<dt>Raises:</dt><dd><p>KeyError: If the state dictionary is missing required keys.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.colley.ColleyMatrixCompetitor.lost_to">
+<span class="sig-name descname"><span class="pre">lost_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/colley.html#ColleyMatrixCompetitor.lost_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.colley.ColleyMatrixCompetitor.lost_to" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this competitor has lost to the given competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that won.</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="elote.competitors.colley.ColleyMatrixCompetitor.num_games">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">num_games</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#elote.competitors.colley.ColleyMatrixCompetitor.num_games" title="Link to this definition">¶</a></dt>
+<dd><p>Get the total number of games played by this competitor.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: The total number of games played.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="elote.competitors.colley.ColleyMatrixCompetitor.rating">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rating</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#elote.competitors.colley.ColleyMatrixCompetitor.rating" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current rating of this competitor.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>float: The current rating.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.colley.ColleyMatrixCompetitor.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/colley.html#ColleyMatrixCompetitor.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.colley.ColleyMatrixCompetitor.reset" title="Link to this definition">¶</a></dt>
+<dd><p>Reset this competitor to its initial state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.colley.ColleyMatrixCompetitor.tied">
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/colley.html#ColleyMatrixCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.colley.ColleyMatrixCompetitor.tied" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this competitor has tied with the given competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="bradley-terry-competitor">
+<h2>Bradley-Terry Competitor<a class="headerlink" href="#bradley-terry-competitor" title="Link to this heading">¶</a></h2>
+<p id="module-elote.competitors.bradley_terry">Bradley-Terry model implementation for the Elote library.</p>
+<p>The Bradley-Terry model is a probabilistic model for paired comparisons. Each competitor
+is assigned a latent strength, and the probability that competitor <code class="docutils literal notranslate"><span class="pre">i</span></code> beats competitor
+<code class="docutils literal notranslate"><span class="pre">j</span></code> is <code class="docutils literal notranslate"><span class="pre">p_i</span> <span class="pre">/</span> <span class="pre">(p_i</span> <span class="pre">+</span> <span class="pre">p_j)</span></code>. Working in the log domain with <code class="docutils literal notranslate"><span class="pre">p_i</span> <span class="pre">=</span> <span class="pre">exp(beta_i)</span></code> this is
+the logistic function <code class="docutils literal notranslate"><span class="pre">sigmoid(beta_i</span> <span class="pre">-</span> <span class="pre">beta_j)</span></code> – the same functional form as the Elo
+expected score.</p>
+<p>Unlike Elo, which nudges ratings incrementally after every game, the Bradley-Terry strengths
+are obtained by maximum likelihood estimation over the full set of observed comparisons. This
+implementation follows the same approach as <a class="reference internal" href="../competitors.html#elote.competitors.colley.ColleyMatrixCompetitor" title="elote.competitors.colley.ColleyMatrixCompetitor"><code class="xref py py-class docutils literal notranslate"><span class="pre">ColleyMatrixCompetitor</span></code></a>:
+each competitor accumulates its match history and, after every result, the strengths of the
+whole connected component are re-fit. The fit uses the minorization-maximization (MM) update of
+Hunter (2004) with geometric-mean normalization and a small amount of regularization so that a
+unique, finite solution exists even when a competitor is undefeated or winless within its
+component.</p>
+<p>References:
+- Bradley, R. A., &amp; Terry, M. E. (1952). Rank Analysis of Incomplete Block Designs: I. The</p>
+<blockquote>
+<div><p>Method of Paired Comparisons. Biometrika, 39(3/4), 324-345.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>Hunter, D. R. (2004). MM algorithms for generalized Bradley-Terry models. The Annals of
+Statistics, 32(1), 384-406.</p></li>
+</ul>
+<dl class="py class">
+<dt class="sig sig-object py" id="elote.competitors.bradley_terry.BradleyTerryCompetitor">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">elote.competitors.bradley_terry.</span></span><span class="sig-name descname"><span class="pre">BradleyTerryCompetitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/competitors/bradley_terry.html#BradleyTerryCompetitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.bradley_terry.BradleyTerryCompetitor" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCompetitor</span></code></a></p>
+<p>Bradley-Terry model competitor.</p>
+<p>The Bradley-Terry model assigns each competitor a latent strength and models the
+probability that one competitor beats another as a function of the difference of their
+log-strengths. Unlike Elo, which updates ratings incrementally, Bradley-Terry re-fits the
+strengths of every connected competitor via maximum likelihood after each result.</p>
+<p>Ratings are reported on an Elo-like scale via <code class="docutils literal notranslate"><span class="pre">rating</span> <span class="pre">=</span> <span class="pre">anchor</span> <span class="pre">+</span> <span class="pre">scale</span> <span class="pre">*</span> <span class="pre">beta</span></code>, where
+<code class="docutils literal notranslate"><span class="pre">beta</span></code> is the internal log-strength (re-centered so the mean log-strength of a component
+is zero). Choosing <code class="docutils literal notranslate"><span class="pre">scale</span> <span class="pre">=</span> <span class="pre">400</span> <span class="pre">/</span> <span class="pre">ln(10)</span></code> makes <a class="reference internal" href="../competitors.html#elote.competitors.bradley_terry.BradleyTerryCompetitor.expected_score" title="elote.competitors.bradley_terry.BradleyTerryCompetitor.expected_score"><code class="xref py py-meth docutils literal notranslate"><span class="pre">expected_score()</span></code></a> numerically
+identical to the Elo expected score, so ratings are directly comparable to Elo ratings.</p>
+<p>Key characteristics:
+- Global maximum-likelihood fit (does not depend on the order of results)
+- Considers only wins and losses (ties are counted as half a win for each side)
+- Regularized so a unique, finite fit exists even for undefeated/winless competitors</p>
+<dl>
+<dt>Class Attributes:</dt><dd><p>_minimum_rating (float): The minimum allowed rating value. Default: 0.0.
+_anchor_rating (float): Rating assigned to the mean log-strength. Default: 1500.0.
+_scale (float): Points per unit of log-strength. Default: 400 / ln(10).
+_reg (float): Regularization strength (virtual wins/losses against an average</p>
+<blockquote>
+<div><p>phantom opponent). Default: 0.1.</p>
+</div></blockquote>
+<p>_max_iter (int): Maximum MM iterations per fit. Default: 10000.
+_tol (float): Convergence tolerance on the max change in log-strength. Default: 1e-8.</p>
+</dd>
+</dl>
+<p>Initialize a new Bradley-Terry competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>initial_rating (float, optional): The initial rating of this competitor, on the</dt><dd><p>Elo-like reporting scale. Default: the anchor rating (1500).</p>
+</dd>
+</dl>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidParameterException: If the regularization or iteration parameters are invalid.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.bradley_terry.BradleyTerryCompetitor.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/competitors/bradley_terry.html#BradleyTerryCompetitor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.bradley_terry.BradleyTerryCompetitor.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialize a new Bradley-Terry competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>initial_rating (float, optional): The initial rating of this competitor, on the</dt><dd><p>Elo-like reporting scale. Default: the anchor rating (1500).</p>
+</dd>
+</dl>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidParameterException: If the regularization or iteration parameters are invalid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.bradley_terry.BradleyTerryCompetitor.beat">
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/bradley_terry.html#BradleyTerryCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.bradley_terry.BradleyTerryCompetitor.beat" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this competitor has won against the given competitor.</p>
+<p>The result is recorded on both competitors and the strengths of the entire connected
+component are re-fit by maximum likelihood.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.bradley_terry.BradleyTerryCompetitor.configure_class">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">configure_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/bradley_terry.html#BradleyTerryCompetitor.configure_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.bradley_terry.BradleyTerryCompetitor.configure_class" title="Link to this definition">¶</a></dt>
+<dd><p>Configure class-level parameters for this rating system.</p>
+<p>Overrides the base implementation to validate the regularization and iteration
+parameters.</p>
+<dl class="simple">
+<dt>Raises:</dt><dd><p>InvalidParameterException: If any parameter is invalid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.bradley_terry.BradleyTerryCompetitor.expected_score">
+<span class="sig-name descname"><span class="pre">expected_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/elote/competitors/bradley_terry.html#BradleyTerryCompetitor.expected_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.bradley_terry.BradleyTerryCompetitor.expected_score" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the expected score against another competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The competitor to compare against.</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: The expected score (probability of winning).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.bradley_terry.BradleyTerryCompetitor.lost_to">
+<span class="sig-name descname"><span class="pre">lost_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/bradley_terry.html#BradleyTerryCompetitor.lost_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.bradley_terry.BradleyTerryCompetitor.lost_to" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this competitor has lost to the given competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that won.</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="elote.competitors.bradley_terry.BradleyTerryCompetitor.num_games">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">num_games</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#elote.competitors.bradley_terry.BradleyTerryCompetitor.num_games" title="Link to this definition">¶</a></dt>
+<dd><p>Get the total number of games played by this competitor.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: The total number of games played.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="elote.competitors.bradley_terry.BradleyTerryCompetitor.rating">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rating</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#elote.competitors.bradley_terry.BradleyTerryCompetitor.rating" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current rating of this competitor on the Elo-like reporting scale.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>float: The current rating.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.bradley_terry.BradleyTerryCompetitor.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/bradley_terry.html#BradleyTerryCompetitor.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.bradley_terry.BradleyTerryCompetitor.reset" title="Link to this definition">¶</a></dt>
+<dd><p>Reset this competitor to its initial state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.bradley_terry.BradleyTerryCompetitor.tied">
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/bradley_terry.html#BradleyTerryCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.bradley_terry.BradleyTerryCompetitor.tied" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this competitor has tied with the given competitor.</p>
+<p>A tie is counted as half a win for each side.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="blended-competitor">
 <h2>Blended Competitor<a class="headerlink" href="#blended-competitor" title="Link to this heading">¶</a></h2>
 <dl class="py class" id="module-elote.competitors.ensemble">
@@ -1239,8 +1969,11 @@ method provides a more accurate way to compare competitors.</p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../rating_systems/elo.html">Elo Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rating_systems/glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/glicko2.html">Glicko-2 Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/trueskill.html">TrueSkill Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rating_systems/ecf.html">ECF Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rating_systems/dwz.html">DWZ Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/colley.html">Colley Matrix Method</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rating_systems/ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rating_systems/comparison.html">Comparing Rating Systems</a></li>

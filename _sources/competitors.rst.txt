@@ -13,6 +13,18 @@ Glicko Competitor
 .. autoclass:: elote.competitors.glicko.GlickoCompetitor
     :members: export_state,expected_score,beat,tied,rating,to_json,from_json
 
+Glicko-2 Competitor
+-------------------
+
+.. autoclass:: elote.competitors.glicko2.Glicko2Competitor
+    :members: export_state,expected_score,beat,tied,rating,to_json,from_json
+
+TrueSkill Competitor
+--------------------
+
+.. autoclass:: elote.competitors.trueskill.TrueSkillCompetitor
+    :members: export_state,expected_score,beat,tied,rating,to_json,from_json
+
 DWZ Competitor
 --------------
 
@@ -23,6 +35,18 @@ ECF Competitor
 --------------
 
 .. autoclass:: elote.competitors.ecf.ECFCompetitor
+    :members: export_state,expected_score,beat,tied,rating,to_json,from_json
+
+Colley Matrix Competitor
+------------------------
+
+.. autoclass:: elote.competitors.colley.ColleyMatrixCompetitor
+    :members: export_state,expected_score,beat,tied,rating,to_json,from_json
+
+Bradley-Terry Competitor
+------------------------
+
+.. autoclass:: elote.competitors.bradley_terry.BradleyTerryCompetitor
     :members: export_state,expected_score,beat,tied,rating,to_json,from_json
 
 BlendedCompetitor

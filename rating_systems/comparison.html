@@ -15,11 +15,11 @@
         gtag('config', 'G-Z43R9PWW0B');
     </script>
     
-    <title>Comparing Rating Systems &#8212; elote 1.1.0 documentation</title>
+    <title>Comparing Rating Systems &#8212; elote 1.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=30d13653" />
     <link rel="stylesheet" type="text/css" href="../_static/css/wabi.css?v=501c8ac3" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=71d92741" />
-    <script src="../_static/documentation_options.js?v=fc837d61"></script>
+    <script src="../_static/documentation_options.js?v=6efca38a"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
@@ -175,81 +175,91 @@
 <h2>Overview Comparison<a class="headerlink" href="#overview-comparison" title="Link to this heading">¶</a></h2>
 <table class="docutils align-default">
 <colgroup>
+<col style="width: 16.0%" />
+<col style="width: 18.0%" />
+<col style="width: 14.0%" />
 <col style="width: 20.0%" />
-<col style="width: 16.0%" />
-<col style="width: 16.0%" />
-<col style="width: 16.0%" />
-<col style="width: 16.0%" />
-<col style="width: 16.0%" />
+<col style="width: 14.0%" />
+<col style="width: 18.0%" />
 </colgroup>
 <thead>
-<tr class="row-odd"><th class="head"><p>Feature</p></th>
-<th class="head"><p>Elo</p></th>
-<th class="head"><p>Glicko</p></th>
-<th class="head"><p>ECF</p></th>
-<th class="head"><p>DWZ</p></th>
-<th class="head"><p>Ensemble</p></th>
+<tr class="row-odd"><th class="head"><p>System</p></th>
+<th class="head"><p>Origin</p></th>
+<th class="head"><p>Complexity</p></th>
+<th class="head"><p>Uncertainty Tracking</p></th>
+<th class="head"><p>Order Independent</p></th>
+<th class="head"><p>Typical Use Cases</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><strong>Origin</strong></p></td>
+<tr class="row-even"><td><p><strong>Elo</strong></p></td>
 <td><p>Chess (1960s)</p></td>
-<td><p>Chess (1995)</p></td>
-<td><p>England (1950s)</p></td>
-<td><p>Germany (1990s)</p></td>
-<td><p>Meta-system</p></td>
-</tr>
-<tr class="row-odd"><td><p><strong>Complexity</strong></p></td>
 <td><p>Low</p></td>
-<td><p>Medium</p></td>
-<td><p>Low</p></td>
-<td><p>Medium</p></td>
-<td><p>High</p></td>
-</tr>
-<tr class="row-even"><td><p><strong>Uncertainty Tracking</strong></p></td>
 <td><p>No</p></td>
+<td><p>No</p></td>
+<td><p>General purpose</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Glicko</strong></p></td>
+<td><p>Chess (1995)</p></td>
+<td><p>Medium</p></td>
 <td><p>Yes (RD)</p></td>
 <td><p>No</p></td>
+<td><p>Sparse competitions</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Glicko-2</strong></p></td>
+<td><p>Chess (2000s)</p></td>
+<td><p>Medium-High</p></td>
+<td><p>Yes (RD + volatility)</p></td>
+<td><p>No</p></td>
+<td><p>Online chess, volatile skill</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>TrueSkill</strong></p></td>
+<td><p>Microsoft (2007)</p></td>
+<td><p>High</p></td>
+<td><p>Yes (sigma)</p></td>
+<td><p>No</p></td>
+<td><p>Teams and multiplayer</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>ECF</strong></p></td>
+<td><p>England (1950s)</p></td>
+<td><p>Low</p></td>
+<td><p>No</p></td>
+<td><p>No</p></td>
+<td><p>English chess</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>DWZ</strong></p></td>
+<td><p>Germany (1990s)</p></td>
+<td><p>Medium</p></td>
 <td><p>Partial</p></td>
-<td><p>Depends on components</p></td>
+<td><p>No</p></td>
+<td><p>Youth development</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Expected Score Formula</strong></p></td>
-<td><p>Logistic</p></td>
-<td><p>Modified Logistic</p></td>
-<td><p>Linear</p></td>
-<td><p>Logistic</p></td>
-<td><p>Weighted Average</p></td>
-</tr>
-<tr class="row-even"><td><p><strong>Inactivity Handling</strong></p></td>
+<tr class="row-even"><td><p><strong>Colley Matrix</strong></p></td>
+<td><p>Sports (2002)</p></td>
+<td><p>Medium</p></td>
 <td><p>No</p></td>
 <td><p>Yes</p></td>
+<td><p>Bias-free sports ranking</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Bradley-Terry</strong></p></td>
+<td><p>Statistics (1952)</p></td>
+<td><p>Medium</p></td>
 <td><p>No</p></td>
-<td><p>Partial</p></td>
-<td><p>Depends on components</p></td>
+<td><p>Yes</p></td>
+<td><p>Maximum-likelihood ranking</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Implementation Difficulty</strong></p></td>
-<td><p>Easy</p></td>
-<td><p>Moderate</p></td>
-<td><p>Easy</p></td>
-<td><p>Moderate</p></td>
-<td><p>Complex</p></td>
-</tr>
-<tr class="row-even"><td><p><strong>Computational Cost</strong></p></td>
-<td><p>Low</p></td>
-<td><p>Medium</p></td>
-<td><p>Low</p></td>
-<td><p>Medium</p></td>
+<tr class="row-even"><td><p><strong>Ensemble</strong></p></td>
+<td><p>Meta-system</p></td>
 <td><p>High</p></td>
-</tr>
-<tr class="row-odd"><td><p><strong>Typical Use Cases</strong></p></td>
-<td><p>General purpose</p></td>
-<td><p>Sparse competitions</p></td>
-<td><p>English chess</p></td>
-<td><p>Youth development</p></td>
+<td><p>Depends on components</p></td>
+<td><p>Depends on components</p></td>
 <td><p>Complex domains</p></td>
 </tr>
 </tbody>
 </table>
+<p>Online systems (Elo, Glicko, Glicko-2, TrueSkill, ECF, DWZ) update ratings incrementally after each
+result. Global-fit systems (Colley Matrix and Bradley-Terry) re-solve the whole connected group of
+competitors from the full set of results, which makes them order independent.</p>
 </section>
 <section id="mathematical-formulation">
 <h2>Mathematical Formulation<a class="headerlink" href="#mathematical-formulation" title="Link to this heading">¶</a></h2>
@@ -270,11 +280,23 @@
 <tr class="row-odd"><td><p><strong>Glicko</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(E(A, B) = \frac{1}{1 + 10^{-g(RD_B) \times (r_A - r_B) / 400}}\)</span> where <span class="math notranslate nohighlight">\(g(RD) = \frac{1}{\sqrt{1 + 3 \times RD^2 / \pi^2}}\)</span></p></td>
 </tr>
+<tr class="row-even"><td><p><strong>Glicko-2</strong></p></td>
+<td><p>Same logistic form as Glicko, evaluated on an internal transformed scale with an added volatility term</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>TrueSkill</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(E_A = \Phi\!\left(\frac{\mu_A - \mu_B}{\sqrt{2\beta^2 + \sigma_A^2 + \sigma_B^2}}\right)\)</span> where <span class="math notranslate nohighlight">\(\Phi\)</span> is the normal CDF</p></td>
+</tr>
 <tr class="row-even"><td><p><strong>ECF</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(E_A = 0.5 + \frac{R_A - R_B}{F}\)</span> where F is typically 120</p></td>
 </tr>
 <tr class="row-odd"><td><p><strong>DWZ</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(W_e = \frac{1}{1 + 10^{-(R_A - R_B) / 400}}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Colley Matrix</strong></p></td>
+<td><p>Ratings solve <span class="math notranslate nohighlight">\(C r = b\)</span>; <span class="math notranslate nohighlight">\(E_A = \frac{1}{1 + e^{-4 (r_A - r_B)}}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Bradley-Terry</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(P(A \text{ beats } B) = \frac{p_A}{p_A + p_B} = \frac{1}{1 + e^{-(\beta_A - \beta_B)}}\)</span></p></td>
 </tr>
 <tr class="row-even"><td><p><strong>Ensemble</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(E_{ensemble} = \sum_{i=1}^{n} w_i \times E_i\)</span> where <span class="math notranslate nohighlight">\(w_i\)</span> are weights</p></td>
@@ -301,11 +323,23 @@
 <tr class="row-odd"><td><p><strong>Glicko</strong></p></td>
 <td><p>Initial rating, Initial RD, Volatility, Tau</p></td>
 </tr>
+<tr class="row-even"><td><p><strong>Glicko-2</strong></p></td>
+<td><p>Initial rating, Initial RD, Initial volatility, Tau</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>TrueSkill</strong></p></td>
+<td><p>Initial mu, Initial sigma, Beta, Tau, Draw probability</p></td>
+</tr>
 <tr class="row-even"><td><p><strong>ECF</strong></p></td>
-<td><p>K-factor, F-factor (conversion factor)</p></td>
+<td><p>Delta (max rating difference), Number of periods</p></td>
 </tr>
 <tr class="row-odd"><td><p><strong>DWZ</strong></p></td>
-<td><p>Initial rating, Development coefficient</p></td>
+<td><p>Initial rating, Development coefficient (age-dependent)</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Colley Matrix</strong></p></td>
+<td><p>Initial rating (default 0.5)</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Bradley-Terry</strong></p></td>
+<td><p>Initial rating, Scale, Regularization, Max iterations</p></td>
 </tr>
 <tr class="row-even"><td><p><strong>Ensemble</strong></p></td>
 <td><p>Component systems, Weights</p></td>
@@ -341,6 +375,32 @@
 - More parameters to tune
 - Less intuitive interpretation</p>
 </section>
+<section id="glicko-2">
+<h3>Glicko-2<a class="headerlink" href="#glicko-2" title="Link to this heading">¶</a></h3>
+<p><strong>Strengths:</strong>
+- Adds volatility to capture how consistent a competitor is
+- Retains Glicko’s uncertainty and inactivity handling
+- Fast, stable convergence for both erratic and steady players
+- Used by major online chess platforms</p>
+<p><strong>Weaknesses:</strong>
+- The most involved of the Glicko family to implement
+- Sensitive to the tau system constant
+- Iterative volatility update adds computational cost
+- Designed around rating periods rather than single games</p>
+</section>
+<section id="trueskill">
+<h3>TrueSkill<a class="headerlink" href="#trueskill" title="Link to this heading">¶</a></h3>
+<p><strong>Strengths:</strong>
+- Models both skill and uncertainty as a Gaussian
+- Naturally extends to teams and multiplayer games
+- Fast convergence as uncertainty shrinks
+- Principled Bayesian foundation</p>
+<p><strong>Weaknesses:</strong>
+- Most complex inference of the individual systems
+- Rating is derived from mu and sigma (no direct setter)
+- Works on a mu/sigma scale rather than the chess scale
+- Sensitive to beta, tau, and draw-probability settings</p>
+</section>
 <section id="ecf">
 <h3>ECF<a class="headerlink" href="#ecf" title="Link to this heading">¶</a></h3>
 <p><strong>Strengths:</strong>
@@ -367,6 +427,32 @@
 - Parameter sensitivity
 - Less international recognition</p>
 </section>
+<section id="colley-matrix">
+<h3>Colley Matrix<a class="headerlink" href="#colley-matrix" title="Link to this heading">¶</a></h3>
+<p><strong>Strengths:</strong>
+- Order independent: depends only on the set of results
+- Bias free: no margin-of-victory influence
+- Clean least-squares interpretation with a unique solution
+- Self-normalizing ratings in [0, 1] that sum to n/2</p>
+<p><strong>Weaknesses:</strong>
+- Re-solves the whole connected group after each result
+- Uses only win/loss/tie outcomes
+- Ratings are on a [0, 1] scale, not the chess scale
+- Requires a connected schedule to compare competitors</p>
+</section>
+<section id="bradley-terry">
+<h3>Bradley-Terry<a class="headerlink" href="#bradley-terry" title="Link to this heading">¶</a></h3>
+<p><strong>Strengths:</strong>
+- Order independent maximum-likelihood estimate
+- Statistically principled paired-comparison model
+- Reported on an Elo-compatible scale for easy interpretation
+- Regularized so undefeated or winless competitors stay finite</p>
+<p><strong>Weaknesses:</strong>
+- Re-fits the whole connected group after each result
+- Uses only win/loss/tie outcomes
+- The match graph cannot be serialized (only aggregate counts)
+- More expensive than Elo for very large populations</p>
+</section>
 <section id="ensemble">
 <h3>Ensemble<a class="headerlink" href="#ensemble" title="Link to this heading">¶</a></h3>
 <p><strong>Strengths:</strong>
@@ -386,22 +472,23 @@
 <p>Consider the following factors when choosing a rating system:</p>
 <ol class="arabic simple">
 <li><p><strong>Data Density</strong>: How frequently do competitors face each other?
-- Sparse data: Consider Glicko
+- Sparse data: Consider Glicko or Glicko-2
 - Dense data: Elo may be sufficient</p></li>
 <li><p><strong>Domain Specifics</strong>:
 - Chess in England: ECF
 - Chess in Germany: DWZ
 - Youth development: DWZ
+- Team and multiplayer games: TrueSkill
 - General purpose: Elo or Glicko</p></li>
+<li><p><strong>Order Independence</strong>: Do you need a ranking that ignores schedule order?
+- Yes: Colley Matrix or Bradley-Terry
+- No: any online system (Elo, Glicko, etc.)</p></li>
 <li><p><strong>Computational Resources</strong>:
 - Limited resources: Elo or ECF
-- Sufficient resources: Glicko, DWZ, or Ensemble</p></li>
+- Sufficient resources: Glicko, Glicko-2, TrueSkill, or Ensemble</p></li>
 <li><p><strong>Uncertainty Importance</strong>:
-- Critical to track uncertainty: Glicko
+- Critical to track uncertainty: Glicko, Glicko-2, or TrueSkill
 - Uncertainty less important: Elo or ECF</p></li>
-<li><p><strong>Complexity Tolerance</strong>:
-- Need simple explanation: Elo or ECF
-- Can handle complexity: Glicko, DWZ, or Ensemble</p></li>
 <li><p><strong>Prediction Accuracy</strong>:
 - Highest accuracy needed: Consider Ensemble
 - Reasonable accuracy sufficient: Any individual system</p></li>
@@ -410,44 +497,55 @@
 <section id="code-comparison">
 <h2>Code Comparison<a class="headerlink" href="#code-comparison" title="Link to this heading">¶</a></h2>
 <p>Here’s a quick comparison of how to use each system in Elote:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span><span class="p">,</span> <span class="n">GlickoCompetitor</span><span class="p">,</span> <span class="n">ECFCompetitor</span><span class="p">,</span> <span class="n">DWZCompetitor</span><span class="p">,</span> <span class="n">EnsembleCompetitor</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">EloCompetitor</span><span class="p">,</span>
+    <span class="n">GlickoCompetitor</span><span class="p">,</span>
+    <span class="n">Glicko2Competitor</span><span class="p">,</span>
+    <span class="n">TrueSkillCompetitor</span><span class="p">,</span>
+    <span class="n">ECFCompetitor</span><span class="p">,</span>
+    <span class="n">DWZCompetitor</span><span class="p">,</span>
+    <span class="n">ColleyMatrixCompetitor</span><span class="p">,</span>
+    <span class="n">BradleyTerryCompetitor</span><span class="p">,</span>
+    <span class="n">BlendedCompetitor</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="c1"># Elo</span>
 <span class="n">elo_player</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">k_factor</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
 
 <span class="c1"># Glicko</span>
-<span class="n">glicko_player</span> <span class="o">=</span> <span class="n">GlickoCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">initial_rd</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> <span class="n">volatility</span><span class="o">=</span><span class="mf">0.06</span><span class="p">)</span>
+<span class="n">glicko_player</span> <span class="o">=</span> <span class="n">GlickoCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">initial_rd</span><span class="o">=</span><span class="mi">350</span><span class="p">)</span>
+
+<span class="c1"># Glicko-2</span>
+<span class="n">glicko2_player</span> <span class="o">=</span> <span class="n">Glicko2Competitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">initial_rd</span><span class="o">=</span><span class="mi">350</span><span class="p">)</span>
+
+<span class="c1"># TrueSkill (mu/sigma scale)</span>
+<span class="n">trueskill_player</span> <span class="o">=</span> <span class="n">TrueSkillCompetitor</span><span class="p">(</span><span class="n">initial_mu</span><span class="o">=</span><span class="mf">25.0</span><span class="p">,</span> <span class="n">initial_sigma</span><span class="o">=</span><span class="mf">8.333</span><span class="p">)</span>
 
 <span class="c1"># ECF</span>
-<span class="n">ecf_player</span> <span class="o">=</span> <span class="n">ECFCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span> <span class="n">k_factor</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">f_factor</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+<span class="n">ecf_player</span> <span class="o">=</span> <span class="n">ECFCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
 
 <span class="c1"># DWZ</span>
-<span class="n">dwz_player</span> <span class="o">=</span> <span class="n">DWZCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1600</span><span class="p">,</span> <span class="n">initial_development_coeff</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">dwz_player</span> <span class="o">=</span> <span class="n">DWZCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1600</span><span class="p">)</span>
 
-<span class="c1"># Ensemble</span>
-<span class="n">ensemble_player</span> <span class="o">=</span> <span class="n">EnsembleCompetitor</span><span class="p">(</span>
-    <span class="n">rating_systems</span><span class="o">=</span><span class="p">[</span>
-        <span class="p">(</span><span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">),</span> <span class="mf">0.5</span><span class="p">),</span>
-        <span class="p">(</span><span class="n">GlickoCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">),</span> <span class="mf">0.5</span><span class="p">)</span>
+<span class="c1"># Colley Matrix ([0, 1] scale)</span>
+<span class="n">colley_player</span> <span class="o">=</span> <span class="n">ColleyMatrixCompetitor</span><span class="p">()</span>
+
+<span class="c1"># Bradley-Terry (Elo-compatible scale)</span>
+<span class="n">bt_player</span> <span class="o">=</span> <span class="n">BradleyTerryCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
+
+<span class="c1"># Ensemble (blend of sub-competitors)</span>
+<span class="n">ensemble_player</span> <span class="o">=</span> <span class="n">BlendedCompetitor</span><span class="p">(</span>
+    <span class="n">competitors</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;EloCompetitor&quot;</span><span class="p">,</span> <span class="s2">&quot;competitor_kwargs&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1500</span><span class="p">}},</span>
+        <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;GlickoCompetitor&quot;</span><span class="p">,</span> <span class="s2">&quot;competitor_kwargs&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1500</span><span class="p">}},</span>
     <span class="p">]</span>
 <span class="p">)</span>
 
-<span class="c1"># Usage is the same for all systems</span>
+<span class="c1"># Usage is the same for all systems: expected_score, beat, tied, lost_to</span>
+<span class="n">player</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
 <span class="n">opponent</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1400</span><span class="p">)</span>
-
-<span class="c1"># Get expected scores</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Elo expected: </span><span class="si">{</span><span class="n">elo_player</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Glicko expected: </span><span class="si">{</span><span class="n">glicko_player</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ECF expected: </span><span class="si">{</span><span class="n">ecf_player</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DWZ expected: </span><span class="si">{</span><span class="n">dwz_player</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ensemble expected: </span><span class="si">{</span><span class="n">ensemble_player</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="c1"># Record a win</span>
-<span class="n">elo_player</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span>
-<span class="n">glicko_player</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span>
-<span class="n">ecf_player</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span>
-<span class="n">dwz_player</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span>
-<span class="n">ensemble_player</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected score: </span><span class="si">{</span><span class="n">player</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">player</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span>  <span class="c1"># record a win</span>
 </pre></div>
 </div>
 </section>
@@ -489,8 +587,11 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="elo.html">Elo Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glicko2.html">Glicko-2 Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="trueskill.html">TrueSkill Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ecf.html">ECF Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dwz.html">DWZ Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="colley.html">Colley Matrix Method</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bradley_terry.html">Bradley-Terry Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Comparing Rating Systems</a></li>

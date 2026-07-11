@@ -36,14 +36,16 @@ ratings on an Elo-like scale, ``rating = 1500 + s \\cdot \\beta`` with ``s = 400
 so that the expected score is numerically identical to Elo's and the ratings are directly
 comparable to Elo ratings.
 
-The strengths are fit with the iterative MM update of Newman (2023). Given win counts
-``w_{ij}`` (the number of times ``i`` beat ``j``), each iteration applies
+The strengths are fit with the minorization-maximization (MM) update of Hunter (2004). Writing
+``W_i`` for the total number of wins by ``i`` and ``n_{ij}`` for the number of games between ``i``
+and ``j``, each iteration applies
 
 .. math::
 
-   p_i' = \\frac{\\sum_j w_{ij}\\, p_j / (p_i + p_j)}{\\sum_j w_{ji} / (p_i + p_j)}
+   p_i' = \\frac{W_i}{\\sum_j n_{ij} / (p_i + p_j)}
 
-followed by normalization by the geometric mean of the strengths. Because the strengths are
+followed by normalization by the geometric mean of the strengths. This update is guaranteed to
+increase the likelihood at every step and converges to the unique regularized maximum. Because the strengths are
 only identified up to an overall scale, Elote re-centers them so that the mean log-strength of
 a connected group is zero.
 
@@ -105,7 +107,7 @@ Class-level parameters can be tuned with ``configure_class``:
 
 - ``anchor_rating`` -- the rating assigned to the mean log-strength (default ``1500``).
 - ``scale`` -- points per unit of log-strength (default ``400 / ln(10)``).
-- ``reg`` -- regularization strength (default ``0.01``).
+- ``reg`` -- regularization strength (default ``0.1``).
 - ``max_iter`` / ``tol`` -- iteration budget and convergence tolerance for the fit.
 
 Real-World Applications
@@ -120,5 +122,5 @@ References
 
 - Bradley, R. A., & Terry, M. E. (1952). Rank Analysis of Incomplete Block Designs: I. The
   Method of Paired Comparisons. *Biometrika*, 39(3/4), 324-345.
-- Newman, M. E. J. (2023). Efficient computation of rankings from pairwise comparisons.
-  *Journal of Machine Learning Research*, 24(238), 1-25.
+- Hunter, D. R. (2004). MM Algorithms for Generalized Bradley-Terry Models. *The Annals of
+  Statistics*, 32(1), 384-406.

@@ -1,0 +1,983 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z43R9PWW0B"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-Z43R9PWW0B');
+    </script>
+    
+    <title>elote.competitors.trueskill &#8212; elote 1.2.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=30d13653" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/wabi.css?v=501c8ac3" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=71d92741" />
+    <script src="../../../_static/documentation_options.js?v=6efca38a"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+
+
+
+<meta name="description" content="elote.competitors.trueskill - elote documentation">
+
+
+
+
+
+<meta property="og:title" content="elote.competitors.trueskill">
+<meta property="og:description" content="elote.competitors.trueskill - elote documentation">
+<meta property="og:type" content="website">
+
+<meta property="og:url" content="https://elote.mcginniscommawill.com/_modules/elote/competitors/trueskill.html">
+
+
+<meta property="og:site_name" content="elote">
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="elote.competitors.trueskill">
+<meta name="twitter:description" content="elote.competitors.trueskill - elote documentation">
+
+<meta name="twitter:site" content="@willmcginniser">
+
+
+
+
+
+<link rel="canonical" href="https://elote.mcginniscommawill.com/_modules/elote/competitors/trueskill.html">
+
+
+ 
+
+  </head><body>
+<header class="header">
+  <div class="header__inner">
+    
+    <a href="https://mcginniscommawill.com" class="header__logo">
+      McGinnis, Will
+    </a>
+
+    
+    <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+      </svg>
+    </button>
+
+    
+    <nav class="nav" role="navigation">
+      
+      
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/guides/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Guides
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/topics/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Topics
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/posts/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Blog
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/about/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            About
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/coffee/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Free Coffee
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/oss/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            OSS
+          </a>
+        
+      
+
+      
+      
+      <a href="../../../index.html" class="nav__link nav__link--active">
+        Docs
+      </a>
+      
+    </nav>
+  </div>
+</header>
+
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <div class="breadcrumbs__inner">
+    
+    <a href="https://mcginniscommawill.com">Home</a>
+    <span class="breadcrumbs__separator">/</span>
+    
+    <a href="../../../index.html">Docs</a>
+    
+      
+      <span class="breadcrumbs__separator">/</span>
+      <a href="../../index.html">Module code</a>
+      
+    
+    
+    <span class="breadcrumbs__separator">/</span>
+    <span>elote.competitors.trueskill</span>
+    
+  </div>
+</nav>
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for elote.competitors.trueskill</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">special</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote.competitors.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="n">InvalidParameterException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>  <span class="c1"># Import directly from the logging submodule</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;TrueSkillCompetitor&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="TrueSkillCompetitor">
+<a class="viewcode-back" href="../../../competitors.html#elote.competitors.trueskill.TrueSkillCompetitor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TrueSkillCompetitor</span><span class="p">(</span><span class="n">BaseCompetitor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;TrueSkill rating system competitor.</span>
+
+<span class="sd">    TrueSkill is a Bayesian skill rating system developed by Microsoft Research.</span>
+<span class="sd">    It generalizes the Elo and Glicko rating systems to handle team-based games</span>
+<span class="sd">    and multiplayer scenarios. TrueSkill models each player&#39;s skill as a Gaussian</span>
+<span class="sd">    distribution with a mean (mu) and standard deviation (sigma).</span>
+
+<span class="sd">    The mean represents the player&#39;s estimated skill, while the standard deviation</span>
+<span class="sd">    represents the system&#39;s uncertainty about that estimate. As more games are played,</span>
+<span class="sd">    the uncertainty typically decreases.</span>
+
+<span class="sd">    Class Attributes:</span>
+<span class="sd">        _beta (float): The skill factor that controls how much the game outcome depends</span>
+<span class="sd">                      on skill vs. chance. Default: 4.166.</span>
+<span class="sd">        _tau (float): The additive dynamics factor that increases uncertainty over time.</span>
+<span class="sd">                     Default: 0.083.</span>
+<span class="sd">        _draw_probability (float): The probability of a draw. Default: 0.10 (10%).</span>
+<span class="sd">        _default_mu (float): The default mean skill value for new players. Default: 25.0.</span>
+<span class="sd">        _default_sigma (float): The default standard deviation for new players. Default: 8.333.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_beta</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.166</span>
+    <span class="n">_tau</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.083</span>
+    <span class="n">_draw_probability</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.10</span>
+    <span class="n">_default_mu</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">25.0</span>
+    <span class="n">_default_sigma</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">8.333</span>
+
+<div class="viewcode-block" id="TrueSkillCompetitor.__init__">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_mu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">initial_sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a TrueSkill competitor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            initial_mu (float, optional): The initial mean skill value. Default: _default_mu.</span>
+<span class="sd">            initial_sigma (float, optional): The initial standard deviation. Default: _default_sigma.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidParameterException: If the initial sigma is not positive.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>  <span class="c1"># Call base class constructor</span>
+        <span class="c1"># Set default values if not provided</span>
+        <span class="k">if</span> <span class="n">initial_mu</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">initial_mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_mu</span>
+        <span class="k">if</span> <span class="n">initial_sigma</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">initial_sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_sigma</span>
+
+        <span class="k">if</span> <span class="n">initial_sigma</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Initial sigma must be positive&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Store initial values for reset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initial_mu</span> <span class="o">=</span> <span class="n">initial_mu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initial_sigma</span> <span class="o">=</span> <span class="n">initial_sigma</span>
+
+        <span class="c1"># Current skill parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">=</span> <span class="n">initial_mu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">initial_sigma</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Initialized TrueSkillCompetitor: mu=</span><span class="si">%.2f</span><span class="s2">, sigma=</span><span class="si">%.2f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of this competitor.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: A string representation of this competitor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;TrueSkillCompetitor: mu=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, sigma=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rating</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of this competitor.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: A string representation of this competitor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;TrueSkillCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rating</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_export_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the parameters used to initialize this competitor.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: A dictionary containing the initialization parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;initial_mu&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_mu</span><span class="p">,</span>
+            <span class="s2">&quot;initial_sigma&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_sigma</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_export_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the current state variables of this competitor.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: A dictionary containing the current state variables.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;mu&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span>
+            <span class="s2">&quot;sigma&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_import_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Import parameters from a state dictionary.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            parameters (dict): A dictionary containing parameters.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidParameterException: If any parameter is invalid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Validate and set initial_mu</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Importing parameters for TrueSkillCompetitor: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+        <span class="n">initial_mu</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_mu&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_mu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initial_mu</span> <span class="o">=</span> <span class="n">initial_mu</span>
+
+        <span class="c1"># Validate and set initial_sigma</span>
+        <span class="n">initial_sigma</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_sigma&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_sigma</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">initial_sigma</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Initial sigma must be positive&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initial_sigma</span> <span class="o">=</span> <span class="n">initial_sigma</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_import_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Import current state variables from a state dictionary.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            state (dict): A dictionary containing state variables.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidParameterException: If any state variable is invalid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Validate and set mu</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Importing current state for TrueSkillCompetitor: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mu&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_mu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">=</span> <span class="n">mu</span>
+
+        <span class="c1"># Validate and set sigma</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sigma&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_sigma</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sigma</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Sigma must be positive&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">sigma</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_from_parameters</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new competitor instance from parameters.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            parameters (dict): A dictionary containing parameters.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            TrueSkillCompetitor: A new competitor instance.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidParameterException: If any parameter is invalid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">initial_mu</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_mu&quot;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_mu</span><span class="p">),</span>
+            <span class="n">initial_sigma</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_sigma&quot;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_sigma</span><span class="p">),</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="TrueSkillCompetitor.export_state">
+<a class="viewcode-back" href="../../../competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.export_state">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">export_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the current state of this competitor for serialization.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: A dictionary containing all necessary information to recreate</span>
+<span class="sd">                 this competitor&#39;s current state.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Use the standardized format</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">export_state</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TrueSkillCompetitor.from_state">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.from_state">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_state</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new competitor from a previously exported state.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            state (dict): A dictionary containing the state of a competitor,</span>
+<span class="sd">                         as returned by export_state().</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            TrueSkillCompetitor: A new competitor with the same state as the exported one.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidParameterException: If any parameter in the state is invalid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating TrueSkillCompetitor from state: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="c1"># Handle legacy state format</span>
+        <span class="k">if</span> <span class="s2">&quot;type&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Using legacy state format for TrueSkillCompetitor.from_state&quot;</span><span class="p">)</span>
+            <span class="c1"># Configure class variables if provided</span>
+            <span class="k">if</span> <span class="s2">&quot;class_vars&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Applying legacy class variables: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;class_vars&quot;</span><span class="p">])</span>
+                <span class="n">class_vars</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;class_vars&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s2">&quot;beta&quot;</span> <span class="ow">in</span> <span class="n">class_vars</span><span class="p">:</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">_beta</span> <span class="o">=</span> <span class="n">class_vars</span><span class="p">[</span><span class="s2">&quot;beta&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s2">&quot;tau&quot;</span> <span class="ow">in</span> <span class="n">class_vars</span><span class="p">:</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">_tau</span> <span class="o">=</span> <span class="n">class_vars</span><span class="p">[</span><span class="s2">&quot;tau&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s2">&quot;draw_probability&quot;</span> <span class="ow">in</span> <span class="n">class_vars</span><span class="p">:</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">_draw_probability</span> <span class="o">=</span> <span class="n">class_vars</span><span class="p">[</span><span class="s2">&quot;draw_probability&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s2">&quot;default_mu&quot;</span> <span class="ow">in</span> <span class="n">class_vars</span><span class="p">:</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">_default_mu</span> <span class="o">=</span> <span class="n">class_vars</span><span class="p">[</span><span class="s2">&quot;default_mu&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s2">&quot;default_sigma&quot;</span> <span class="ow">in</span> <span class="n">class_vars</span><span class="p">:</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">_default_sigma</span> <span class="o">=</span> <span class="n">class_vars</span><span class="p">[</span><span class="s2">&quot;default_sigma&quot;</span><span class="p">]</span>
+
+            <span class="c1"># Create a new competitor with the initial parameters</span>
+            <span class="n">competitor</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span>
+                <span class="n">initial_mu</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_mu&quot;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_mu</span><span class="p">),</span>
+                <span class="n">initial_sigma</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_sigma&quot;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_sigma</span><span class="p">),</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Set the current state if provided</span>
+            <span class="k">if</span> <span class="s2">&quot;current_mu&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+                <span class="n">competitor</span><span class="o">.</span><span class="n">_mu</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;current_mu&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">&quot;current_sigma&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+                <span class="n">competitor</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;current_sigma&quot;</span><span class="p">]</span>
+
+            <span class="k">return</span> <span class="n">competitor</span>
+
+        <span class="c1"># Use the standardized format</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">from_state</span><span class="p">(</span><span class="n">state</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TrueSkillCompetitor.reset">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.reset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset this competitor to its initial state.</span>
+
+<span class="sd">        This method resets the competitor&#39;s mu and sigma to their initial values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Resetting TrueSkillCompetitor to initial state (mu=</span><span class="si">%.2f</span><span class="s2">, sigma=</span><span class="si">%.2f</span><span class="s2">)&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initial_mu</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initial_sigma</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_mu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_sigma</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current conservative rating of this competitor.</span>
+
+<span class="sd">        TrueSkill uses a conservative rating estimate (mu - 3*sigma) to ensure</span>
+<span class="sd">        that a player&#39;s displayed rating has a 99% chance of being below their</span>
+<span class="sd">        actual skill level. This encourages players to keep playing to reduce</span>
+<span class="sd">        uncertainty and increase their displayed rating.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The current conservative rating.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">-</span> <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">)</span>
+
+    <span class="nd">@rating</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the current rating of this competitor.</span>
+
+<span class="sd">        This method is not directly supported by TrueSkill, as ratings are derived</span>
+<span class="sd">        from mu and sigma. This implementation raises an exception.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (float): The new rating value.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NotImplementedError: Always, as setting the rating directly is not supported.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Attempted to set rating directly on TrueSkillCompetitor, which is not supported.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Cannot directly set the rating of a TrueSkillCompetitor. Set mu and sigma instead.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mu</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current mean skill value of this competitor.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The current mean skill value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span>
+
+    <span class="nd">@mu</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the current mean skill value of this competitor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (float): The new mean skill value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Set TrueSkillCompetitor mu to </span><span class="si">%.2f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current standard deviation of this competitor.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The current standard deviation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span>
+
+    <span class="nd">@sigma</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the current standard deviation of this competitor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (float): The new standard deviation value.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidParameterException: If the standard deviation is not positive.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Attempted to set non-positive sigma: </span><span class="si">%.2f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Sigma must be positive&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Set TrueSkillCompetitor sigma to </span><span class="si">%.2f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_v</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beta_squared</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sigma_squared</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the skill variance factor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            beta_squared (float): The squared beta parameter.</span>
+<span class="sd">            sigma_squared (float): The squared sigma parameter.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The skill variance factor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">beta_squared</span> <span class="o">+</span> <span class="n">sigma_squared</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_w</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the win probability factor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            v (float): The skill variance factor.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The win probability factor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">v</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_gaussian_cdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the cumulative distribution function of the standard Gaussian.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x (float): The input value.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The CDF value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">erf</span><span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_gaussian_pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the probability density function of the standard Gaussian.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x (float): The input value.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The PDF value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_v_win</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the v function for win probability.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            t (float): The input value.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The v function value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gaussian_pdf</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">cdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gaussian_cdf</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pdf</span> <span class="o">/</span> <span class="n">cdf</span> <span class="k">if</span> <span class="n">cdf</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_w_win</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the w function for win probability.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            t (float): The input value.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The w function value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v_win</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span> <span class="o">*</span> <span class="p">(</span><span class="n">v</span> <span class="o">+</span> <span class="n">t</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_v_draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the v function for draw probability.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            t (float): The input value.</span>
+<span class="sd">            epsilon (float): The draw margin.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The v function value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pdf_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gaussian_pdf</span><span class="p">(</span><span class="n">t</span> <span class="o">-</span> <span class="n">epsilon</span><span class="p">)</span>
+        <span class="n">pdf_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gaussian_pdf</span><span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="n">epsilon</span><span class="p">)</span>
+        <span class="n">cdf_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gaussian_cdf</span><span class="p">(</span><span class="n">t</span> <span class="o">-</span> <span class="n">epsilon</span><span class="p">)</span>
+        <span class="n">cdf_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gaussian_cdf</span><span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="n">epsilon</span><span class="p">)</span>
+        <span class="n">denominator</span> <span class="o">=</span> <span class="n">cdf_2</span> <span class="o">-</span> <span class="n">cdf_1</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">pdf_1</span> <span class="o">-</span> <span class="n">pdf_2</span><span class="p">)</span> <span class="o">/</span> <span class="n">denominator</span> <span class="k">if</span> <span class="n">denominator</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_w_draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the w function for draw probability.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            t (float): The input value.</span>
+<span class="sd">            epsilon (float): The draw margin.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The w function value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v_draw</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">)</span>
+        <span class="n">pdf_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gaussian_pdf</span><span class="p">(</span><span class="n">t</span> <span class="o">-</span> <span class="n">epsilon</span><span class="p">)</span>
+        <span class="n">pdf_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gaussian_pdf</span><span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="n">epsilon</span><span class="p">)</span>
+        <span class="n">cdf_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gaussian_cdf</span><span class="p">(</span><span class="n">t</span> <span class="o">-</span> <span class="n">epsilon</span><span class="p">)</span>
+        <span class="n">cdf_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gaussian_cdf</span><span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="n">epsilon</span><span class="p">)</span>
+        <span class="n">denominator</span> <span class="o">=</span> <span class="n">cdf_2</span> <span class="o">-</span> <span class="n">cdf_1</span>
+        <span class="k">return</span> <span class="n">v</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">((</span><span class="n">t</span> <span class="o">-</span> <span class="n">epsilon</span><span class="p">)</span> <span class="o">*</span> <span class="n">pdf_1</span> <span class="o">-</span> <span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="n">epsilon</span><span class="p">)</span> <span class="o">*</span> <span class="n">pdf_2</span><span class="p">)</span> <span class="o">/</span> <span class="n">denominator</span> <span class="k">if</span> <span class="n">denominator</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_draw_margin</span><span class="p">(</span><span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">draw_probability</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the draw margin based on beta and draw probability.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            beta: The beta parameter</span>
+<span class="sd">            draw_probability: The probability of a draw</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The draw margin</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">draw_probability</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Draw probability must be between 0 and 1&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">special</span><span class="o">.</span><span class="n">erfinv</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">draw_probability</span><span class="p">))</span>
+
+<div class="viewcode-block" id="TrueSkillCompetitor.expected_score">
+<a class="viewcode-back" href="../../../competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.expected_score">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the expected score (probability of winning) against another competitor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            competitor (BaseCompetitor): The opponent competitor to compare against.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The probability of winning (between 0 and 1).</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Calculating expected score between </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+        <span class="n">competitor_ts</span> <span class="o">=</span> <span class="n">competitor</span>  <span class="c1"># type: TrueSkillCompetitor</span>
+
+        <span class="c1"># Calculate the skill difference</span>
+        <span class="n">mu_diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">-</span> <span class="n">competitor_ts</span><span class="o">.</span><span class="n">_mu</span>
+
+        <span class="c1"># Calculate the total variance</span>
+        <span class="n">beta_squared</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">sigma_squared_sum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">competitor_ts</span><span class="o">.</span><span class="n">_sigma</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">beta_squared</span> <span class="o">+</span> <span class="n">sigma_squared_sum</span><span class="p">)</span>
+
+        <span class="c1"># Calculate the win probability</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">mu_diff</span> <span class="o">/</span> <span class="n">v</span>
+        <span class="n">win_prob</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gaussian_cdf</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+
+        <span class="c1"># Calculate the draw probability</span>
+        <span class="n">draw_margin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_draw_margin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_beta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_draw_probability</span><span class="p">)</span>
+        <span class="n">draw_prob</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gaussian_cdf</span><span class="p">((</span><span class="n">mu_diff</span> <span class="o">+</span> <span class="n">draw_margin</span><span class="p">)</span> <span class="o">/</span> <span class="n">v</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gaussian_cdf</span><span class="p">((</span><span class="n">mu_diff</span> <span class="o">-</span> <span class="n">draw_margin</span><span class="p">)</span> <span class="o">/</span> <span class="n">v</span><span class="p">)</span>
+
+        <span class="c1"># Adjust win probability to account for draws</span>
+        <span class="n">adjusted_win_prob</span> <span class="o">=</span> <span class="n">win_prob</span> <span class="o">-</span> <span class="n">draw_prob</span> <span class="o">/</span> <span class="mi">2</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;Expected score calculation: mu_diff=</span><span class="si">%.2f</span><span class="s2">, v=</span><span class="si">%.2f</span><span class="s2">, win_prob=</span><span class="si">%.4f</span><span class="s2">, draw_prob=</span><span class="si">%.4f</span><span class="s2">, adjusted_win_prob=</span><span class="si">%.4f</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">mu_diff</span><span class="p">,</span>
+            <span class="n">v</span><span class="p">,</span>
+            <span class="n">win_prob</span><span class="p">,</span>
+            <span class="n">draw_prob</span><span class="p">,</span>
+            <span class="n">adjusted_win_prob</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">adjusted_win_prob</span></div>
+
+
+<div class="viewcode-block" id="TrueSkillCompetitor.beat">
+<a class="viewcode-back" href="../../../competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.beat">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has won against the given competitor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            competitor (BaseCompetitor): The opponent competitor that lost.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> beat </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+        <span class="n">competitor_ts</span> <span class="o">=</span> <span class="n">competitor</span>  <span class="c1"># type: TrueSkillCompetitor</span>
+
+        <span class="c1"># Calculate the skill difference</span>
+        <span class="n">mu_diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">-</span> <span class="n">competitor_ts</span><span class="o">.</span><span class="n">_mu</span>
+
+        <span class="c1"># Calculate the total variance</span>
+        <span class="n">beta_squared</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">sigma_squared_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">sigma_squared_2</span> <span class="o">=</span> <span class="n">competitor_ts</span><span class="o">.</span><span class="n">_sigma</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">sigma_squared_sum</span> <span class="o">=</span> <span class="n">sigma_squared_1</span> <span class="o">+</span> <span class="n">sigma_squared_2</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">beta_squared</span> <span class="o">+</span> <span class="n">sigma_squared_sum</span><span class="p">)</span>
+
+        <span class="c1"># Calculate the performance update</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">mu_diff</span> <span class="o">/</span> <span class="n">v</span>
+        <span class="n">v_win_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v_win</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">w_win_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_w_win</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+
+        <span class="c1"># Update the winner&#39;s mu and sigma</span>
+        <span class="n">sigma_squared_to_v_squared</span> <span class="o">=</span> <span class="n">sigma_squared_1</span> <span class="o">/</span> <span class="n">v</span><span class="o">**</span><span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">+</span> <span class="n">sigma_squared_to_v_squared</span> <span class="o">*</span> <span class="n">v_win_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sigma_squared_1</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">sigma_squared_to_v_squared</span> <span class="o">*</span> <span class="n">w_win_value</span><span class="p">))</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Winner update: new_mu=</span><span class="si">%.2f</span><span class="s2">, new_sigma=</span><span class="si">%.2f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="p">)</span>
+        <span class="c1"># Update the loser&#39;s mu and sigma</span>
+        <span class="n">sigma_squared_to_v_squared</span> <span class="o">=</span> <span class="n">sigma_squared_2</span> <span class="o">/</span> <span class="n">v</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">competitor_ts</span><span class="o">.</span><span class="n">_mu</span> <span class="o">=</span> <span class="n">competitor_ts</span><span class="o">.</span><span class="n">_mu</span> <span class="o">-</span> <span class="n">sigma_squared_to_v_squared</span> <span class="o">*</span> <span class="n">v_win_value</span>
+        <span class="n">competitor_ts</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sigma_squared_2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">sigma_squared_to_v_squared</span> <span class="o">*</span> <span class="n">w_win_value</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;Loser update (</span><span class="si">%s</span><span class="s2">): new_mu=</span><span class="si">%.2f</span><span class="s2">, new_sigma=</span><span class="si">%.2f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">competitor_ts</span><span class="p">,</span> <span class="n">competitor_ts</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span> <span class="n">competitor_ts</span><span class="o">.</span><span class="n">_sigma</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Apply the dynamic factor to increase uncertainty over time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tau</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">competitor_ts</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">competitor_ts</span><span class="o">.</span><span class="n">_sigma</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tau</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TrueSkillCompetitor.tied">
+<a class="viewcode-back" href="../../../competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.tied">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has tied with the given competitor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            competitor (BaseCompetitor): The opponent competitor that tied.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> tied with </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+        <span class="n">competitor_ts</span> <span class="o">=</span> <span class="n">competitor</span>  <span class="c1"># type: TrueSkillCompetitor</span>
+
+        <span class="c1"># Calculate the skill difference</span>
+        <span class="n">mu_diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">-</span> <span class="n">competitor_ts</span><span class="o">.</span><span class="n">_mu</span>
+
+        <span class="c1"># Calculate the total variance</span>
+        <span class="n">beta_squared</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">sigma_squared_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">sigma_squared_2</span> <span class="o">=</span> <span class="n">competitor_ts</span><span class="o">.</span><span class="n">_sigma</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">sigma_squared_sum</span> <span class="o">=</span> <span class="n">sigma_squared_1</span> <span class="o">+</span> <span class="n">sigma_squared_2</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">beta_squared</span> <span class="o">+</span> <span class="n">sigma_squared_sum</span><span class="p">)</span>
+
+        <span class="c1"># Calculate the draw margin</span>
+        <span class="n">draw_margin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_draw_margin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_beta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_draw_probability</span><span class="p">)</span>
+
+        <span class="c1"># Calculate the performance update for a draw</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">mu_diff</span> <span class="o">/</span> <span class="n">v</span>
+        <span class="n">v_draw_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v_draw</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">draw_margin</span> <span class="o">/</span> <span class="n">v</span><span class="p">)</span>
+        <span class="n">w_draw_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_w_draw</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">draw_margin</span> <span class="o">/</span> <span class="n">v</span><span class="p">)</span>
+
+        <span class="c1"># Update the first player&#39;s mu and sigma</span>
+        <span class="n">sigma_squared_to_v_squared</span> <span class="o">=</span> <span class="n">sigma_squared_1</span> <span class="o">/</span> <span class="n">v</span><span class="o">**</span><span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">+</span> <span class="n">sigma_squared_to_v_squared</span> <span class="o">*</span> <span class="n">v_draw_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sigma_squared_1</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">sigma_squared_to_v_squared</span> <span class="o">*</span> <span class="n">w_draw_value</span><span class="p">))</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Player 1 tie update: new_mu=</span><span class="si">%.2f</span><span class="s2">, new_sigma=</span><span class="si">%.2f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="p">)</span>
+        <span class="c1"># Update the second player&#39;s mu and sigma</span>
+        <span class="n">sigma_squared_to_v_squared</span> <span class="o">=</span> <span class="n">sigma_squared_2</span> <span class="o">/</span> <span class="n">v</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">competitor_ts</span><span class="o">.</span><span class="n">_mu</span> <span class="o">=</span> <span class="n">competitor_ts</span><span class="o">.</span><span class="n">_mu</span> <span class="o">-</span> <span class="n">sigma_squared_to_v_squared</span> <span class="o">*</span> <span class="n">v_draw_value</span>
+        <span class="n">competitor_ts</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sigma_squared_2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">sigma_squared_to_v_squared</span> <span class="o">*</span> <span class="n">w_draw_value</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;Player 2 tie update (</span><span class="si">%s</span><span class="s2">): new_mu=</span><span class="si">%.2f</span><span class="s2">, new_sigma=</span><span class="si">%.2f</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">competitor_ts</span><span class="p">,</span>
+            <span class="n">competitor_ts</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span>
+            <span class="n">competitor_ts</span><span class="o">.</span><span class="n">_sigma</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Apply the dynamic factor to increase uncertainty over time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tau</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">competitor_ts</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">competitor_ts</span><span class="o">.</span><span class="n">_sigma</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tau</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TrueSkillCompetitor.match_quality">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.match_quality">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">match_quality</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">player1</span><span class="p">:</span> <span class="s2">&quot;TrueSkillCompetitor&quot;</span><span class="p">,</span> <span class="n">player2</span><span class="p">:</span> <span class="s2">&quot;TrueSkillCompetitor&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the match quality between two players.</span>
+
+<span class="sd">        Match quality is a value between 0 and 1 that represents how evenly matched</span>
+<span class="sd">        two players are. A value of 1 indicates a perfectly even match, while a value</span>
+<span class="sd">        of 0 indicates a completely one-sided match.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            player1 (TrueSkillCompetitor): The first player.</span>
+<span class="sd">            player2 (TrueSkillCompetitor): The second player.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The match quality (between 0 and 1).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Calculating match quality between </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">player1</span><span class="p">,</span> <span class="n">player2</span><span class="p">)</span>
+        <span class="c1"># Calculate the skill difference</span>
+        <span class="n">mu_diff</span> <span class="o">=</span> <span class="n">player1</span><span class="o">.</span><span class="n">_mu</span> <span class="o">-</span> <span class="n">player2</span><span class="o">.</span><span class="n">_mu</span>
+
+        <span class="c1"># Calculate the total variance</span>
+        <span class="n">beta_squared</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_beta</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">sigma_squared_sum</span> <span class="o">=</span> <span class="n">player1</span><span class="o">.</span><span class="n">_sigma</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">player2</span><span class="o">.</span><span class="n">_sigma</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">beta_squared</span> <span class="o">+</span> <span class="n">sigma_squared_sum</span><span class="p">)</span>
+
+        <span class="c1"># Calculate the match quality</span>
+        <span class="n">exp_term</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">mu_diff</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">v</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">sqrt_term</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">beta_squared</span><span class="p">)</span> <span class="o">/</span> <span class="n">v</span>
+
+        <span class="n">quality</span> <span class="o">=</span> <span class="n">sqrt_term</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">exp_term</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Match quality calculated: </span><span class="si">%.4f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">quality</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">quality</span></div>
+
+
+<div class="viewcode-block" id="TrueSkillCompetitor.create_team">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.create_team">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_team</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">players</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;TrueSkillCompetitor&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a virtual team competitor from a list of players.</span>
+
+<span class="sd">        This method combines the skills of multiple players into a single team skill.</span>
+<span class="sd">        The team&#39;s mu is the sum of the players&#39; mus, and the team&#39;s sigma is the</span>
+<span class="sd">        square root of the sum of the players&#39; sigma squared.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            players (List[TrueSkillCompetitor]): The list of players in the team.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple[float, float]: The team&#39;s mu and sigma.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating TrueSkill team from </span><span class="si">%d</span><span class="s2"> players&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">players</span><span class="p">))</span>
+        <span class="n">team_mu</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">player</span><span class="o">.</span><span class="n">_mu</span> <span class="k">for</span> <span class="n">player</span> <span class="ow">in</span> <span class="n">players</span><span class="p">)</span>
+        <span class="n">team_sigma</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">player</span><span class="o">.</span><span class="n">_sigma</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">player</span> <span class="ow">in</span> <span class="n">players</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Team created: team_mu=</span><span class="si">%.2f</span><span class="s2">, team_sigma=</span><span class="si">%.2f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">team_mu</span><span class="p">,</span> <span class="n">team_sigma</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">team_mu</span><span class="p">,</span> <span class="n">team_sigma</span></div>
+
+
+<div class="viewcode-block" id="TrueSkillCompetitor.update_team">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.update_team">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_team</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">team_players</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;TrueSkillCompetitor&quot;</span><span class="p">],</span>
+        <span class="n">team_mu_diff</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">team_sigma_squared</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">v</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">result_func</span><span class="p">:</span> <span class="nb">callable</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the ratings of players in a team.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            team_players (List[TrueSkillCompetitor]): The list of players in the team.</span>
+<span class="sd">            team_mu_diff (float): The difference in team mu.</span>
+<span class="sd">            team_sigma_squared (float): The team&#39;s sigma squared.</span>
+<span class="sd">            v (float): The skill variance factor.</span>
+<span class="sd">            result_func (callable): The function to calculate the performance update.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Updating TrueSkill team (</span><span class="si">%d</span><span class="s2"> players)&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">team_players</span><span class="p">))</span>
+        <span class="c1"># Calculate the performance update</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">team_mu_diff</span> <span class="o">/</span> <span class="n">v</span>
+        <span class="n">v_value</span> <span class="o">=</span> <span class="n">result_func</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">w_value</span> <span class="o">=</span> <span class="n">result_func</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">derivative</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Update each player&#39;s mu and sigma</span>
+        <span class="k">for</span> <span class="n">player</span> <span class="ow">in</span> <span class="n">team_players</span><span class="p">:</span>
+            <span class="n">sigma_squared</span> <span class="o">=</span> <span class="n">player</span><span class="o">.</span><span class="n">_sigma</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">sigma_squared_to_v_squared</span> <span class="o">=</span> <span class="n">sigma_squared</span> <span class="o">/</span> <span class="n">v</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">player</span><span class="o">.</span><span class="n">_mu</span> <span class="o">=</span> <span class="n">player</span><span class="o">.</span><span class="n">_mu</span> <span class="o">+</span> <span class="n">sigma_squared_to_v_squared</span> <span class="o">*</span> <span class="n">v_value</span>
+            <span class="n">player</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sigma_squared</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">sigma_squared_to_v_squared</span> <span class="o">*</span> <span class="n">w_value</span><span class="p">))</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Updated player </span><span class="si">%s</span><span class="s2">: new_mu=</span><span class="si">%.2f</span><span class="s2">, new_sigma=</span><span class="si">%.2f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">player</span><span class="p">,</span> <span class="n">player</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span> <span class="n">player</span><span class="o">.</span><span class="n">_sigma</span><span class="p">)</span>
+            <span class="c1"># Apply the dynamic factor to increase uncertainty over time</span>
+            <span class="n">player</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">player</span><span class="o">.</span><span class="n">_sigma</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_tau</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Applied dynamic factor to player </span><span class="si">%s</span><span class="s2">: sigma=</span><span class="si">%.2f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">player</span><span class="p">,</span> <span class="n">player</span><span class="o">.</span><span class="n">_sigma</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../competitors.html">Competitors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../arenas.html">Arenas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../serialization.html">Serialization</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/elo.html">Elo Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/glicko2.html">Glicko-2 Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/trueskill.html">TrueSkill Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/ecf.html">ECF Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/dwz.html">DWZ Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/colley.html">Colley Matrix Method</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/ensemble.html">Ensemble Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/comparison.html">Comparing Rating Systems</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advance_example.html">Advanced Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../use_cases/product_ranking.html">Product Ranking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../use_cases/matchmaking.html">Matchmaking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../use_cases/feature_prioritization.html">Feature Prioritization with Elote</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/competitors.html">Competitors API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/arenas.html">Arenas API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../blog_posts.html">Blog Posts</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to Elote</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <div class="footer__inner">
+    
+    
+    <div class="footer__links">
+      
+        <a href="https://github.com/wdm0006" class="footer__link" target="_blank" rel="noopener noreferrer">
+          GitHub
+        </a>
+      
+        <a href="https://www.linkedin.com/in/wmcginnis/" class="footer__link" target="_blank" rel="noopener noreferrer">
+          LinkedIn
+        </a>
+      
+        <a href="https://x.com/willmcginniser" class="footer__link" target="_blank" rel="noopener noreferrer">
+          Twitter
+        </a>
+      
+    </div>
+    
+
+    
+    <p class="footer__copy">
+      
+        &copy; 2020, Will McGinnis
+      
+    </p>
+  </div>
+</footer>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggle = document.querySelector('.nav-toggle');
+    const nav = document.querySelector('.nav');
+    if (toggle && nav) {
+      toggle.addEventListener('click', function() {
+        nav.classList.toggle('is-open');
+        const isOpen = nav.classList.contains('is-open');
+        toggle.setAttribute('aria-expanded', isOpen);
+      });
+    }
+  });
+</script>
+
+  </body>
+</html>
