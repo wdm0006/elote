@@ -104,13 +104,18 @@ class History:
         report = list()
         logger.info("Generating results report for %d bouts", len(self.bouts))
         for bout in self.bouts:
+            predicted_winner = bout.predicted_winner(lower_threshold, upper_threshold)
             report.append(
                 {
-                    "predicted_winnder": bout.predicted_winner(lower_threshold, upper_threshold),
+                    "predicted_winner": predicted_winner,
+                    # Deprecated misspelled alias of "predicted_winner", kept for
+                    # backward compatibility. Prefer "predicted_winner"; this key
+                    # will be removed in a future release.
+                    "predicted_winnder": predicted_winner,
                     "predicted_loser": bout.predicted_loser(lower_threshold, upper_threshold),
                     "probability": bout.predicted_outcome * 100,
                     "actual_winner": bout.actual_winner(),
-                    "correct": bout.predicted_winner(lower_threshold, upper_threshold) == bout.actual_winner(),
+                    "correct": predicted_winner == bout.actual_winner(),
                 }
             )
         return report
