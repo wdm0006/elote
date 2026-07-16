@@ -49,11 +49,36 @@ class TestHistory(unittest.TestCase):
 
         # Check that each report entry has the expected keys
         for entry in report:
-            self.assertIn("predicted_winnder", entry)  # Note: there's a typo in the original code
+            self.assertIn("predicted_winner", entry)
+            # Deprecated misspelled alias, retained for backward compatibility;
+            # must carry the same value as the corrected key.
+            self.assertIn("predicted_winnder", entry)
+            self.assertEqual(entry["predicted_winnder"], entry["predicted_winner"])
             self.assertIn("predicted_loser", entry)
             self.assertIn("probability", entry)
             self.assertIn("actual_winner", entry)
             self.assertIn("correct", entry)
+
+        # Verify the corrected field carries Bout.predicted_winner(...) values.
+        self.assertEqual([r["predicted_winner"] for r in report], ["a", "c", "f", "h"])
+
+    def test_report_results_predicted_winner_with_thresholds(self):
+        """The corrected field and its alias track Bout.predicted_winner under custom thresholds."""
+        self.history.bouts = []
+        self.history.add_bout(Bout("A", "B", 0.8, "win"))  # > upper -> "a"
+        self.history.add_bout(Bout("C", "D", 0.6, "loss"))  # between thresholds -> None
+        self.history.add_bout(Bout("E", "F", 0.2, "win"))  # < lower -> "f"
+
+        report = self.history.report_results(lower_threshold=0.3, upper_threshold=0.7)
+
+        expected = [
+            b.predicted_winner(lower_threshold=0.3, upper_threshold=0.7) for b in self.history.bouts
+        ]
+        self.assertEqual([r["predicted_winner"] for r in report], expected)
+        self.assertEqual([r["predicted_winner"] for r in report], ["a", None, "f"])
+        # The deprecated alias mirrors the corrected field for every entry.
+        for entry in report:
+            self.assertEqual(entry["predicted_winnder"], entry["predicted_winner"])
 
     def test_report_results_with_thresholds(self):
         """Test that the history can report results with custom thresholds."""
