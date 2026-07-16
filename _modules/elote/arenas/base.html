@@ -36,6 +36,10 @@
 
 
 
+
+
+
+
 <meta property="og:title" content="elote.arenas.base">
 <meta property="og:description" content="elote.arenas.base - elote documentation">
 <meta property="og:type" content="website">
@@ -304,13 +308,18 @@
         <span class="n">report</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Generating results report for </span><span class="si">%d</span><span class="s2"> bouts&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">:</span>
+            <span class="n">predicted_winner</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_winner</span><span class="p">(</span><span class="n">lower_threshold</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="p">)</span>
             <span class="n">report</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="p">{</span>
-                    <span class="s2">&quot;predicted_winnder&quot;</span><span class="p">:</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_winner</span><span class="p">(</span><span class="n">lower_threshold</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="p">),</span>
+                    <span class="s2">&quot;predicted_winner&quot;</span><span class="p">:</span> <span class="n">predicted_winner</span><span class="p">,</span>
+                    <span class="c1"># Deprecated misspelled alias of &quot;predicted_winner&quot;, kept for</span>
+                    <span class="c1"># backward compatibility. Prefer &quot;predicted_winner&quot;; this key</span>
+                    <span class="c1"># will be removed in a future release.</span>
+                    <span class="s2">&quot;predicted_winnder&quot;</span><span class="p">:</span> <span class="n">predicted_winner</span><span class="p">,</span>
                     <span class="s2">&quot;predicted_loser&quot;</span><span class="p">:</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_loser</span><span class="p">(</span><span class="n">lower_threshold</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="p">),</span>
                     <span class="s2">&quot;probability&quot;</span><span class="p">:</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
                     <span class="s2">&quot;actual_winner&quot;</span><span class="p">:</span> <span class="n">bout</span><span class="o">.</span><span class="n">actual_winner</span><span class="p">(),</span>
-                    <span class="s2">&quot;correct&quot;</span><span class="p">:</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_winner</span><span class="p">(</span><span class="n">lower_threshold</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="p">)</span> <span class="o">==</span> <span class="n">bout</span><span class="o">.</span><span class="n">actual_winner</span><span class="p">(),</span>
+                    <span class="s2">&quot;correct&quot;</span><span class="p">:</span> <span class="n">predicted_winner</span> <span class="o">==</span> <span class="n">bout</span><span class="o">.</span><span class="n">actual_winner</span><span class="p">(),</span>
                 <span class="p">}</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">report</span></div>
