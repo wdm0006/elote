@@ -35,10 +35,33 @@ class TestGlickoKnownValues(unittest.TestCase):
         player1 = GlickoCompetitor(initial_rating=1500, initial_rd=300)
         player2 = GlickoCompetitor(initial_rating=1700, initial_rd=300)
 
-        # Calculate expected score manually
-        g = player1._g(300**2)  # Use rd squared as per the implementation
+        # Calculate expected score manually per Glickman's formula:
+        # E = 1 / (1 + 10^(-g(RD_j)(r_i - r_j)/400)), where RD_j is the opponent's RD.
+        g = player2._g(player2.rd)
         E = 1 / (1 + 10 ** ((-g * (1500 - 1700)) / 400))
         self.assertAlmostEqual(player1.expected_score(player2), E)
+
+    def test_expected_score_large_gap(self):
+        """A large positive rating gap should give an expected score near 1 (and its mirror near 0)."""
+        strong = GlickoCompetitor(initial_rating=2500, initial_rd=350)
+        weak = GlickoCompetitor(initial_rating=1500, initial_rd=350)
+
+        self.assertGreater(strong.expected_score(weak), 0.9)
+        self.assertLess(weak.expected_score(strong), 0.1)
+
+    def test_expected_score_symmetric(self):
+        """Equal ratings and RD should give an expected score of exactly 0.5."""
+        player1 = GlickoCompetitor(initial_rating=1500, initial_rd=200)
+        player2 = GlickoCompetitor(initial_rating=1500, initial_rd=200)
+        self.assertAlmostEqual(player1.expected_score(player2), 0.5)
+
+    def test_expected_score_monotonic_in_gap(self):
+        """Expected score should increase monotonically with the rating gap."""
+        base = GlickoCompetitor(initial_rating=1500, initial_rd=200)
+        opponents = [GlickoCompetitor(initial_rating=r, initial_rd=200) for r in (1200, 1400, 1500, 1600, 1800)]
+        scores = [base.expected_score(o) for o in opponents]
+        for earlier, later in zip(scores, scores[1:], strict=False):
+            self.assertGreater(earlier, later)
 
     def test_beat_with_known_values(self):
         """Test beat method with known values."""
