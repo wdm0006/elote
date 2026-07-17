@@ -85,8 +85,8 @@ class TestGlicko(unittest.TestCase):
 
     def test_expected_score_calculation(self):
         """Test that the expected score is calculated correctly."""
-        # The expected score is calculated as:
-        # E = 1 / (1 + 10^(-g(RD_i^2) * (R_i - R_j) / 400))
+        # The expected score is calculated per Glickman's formula:
+        # E = 1 / (1 + 10^(-g(RD_j) * (R_i - R_j) / 400)), where RD_j is the opponent's RD.
 
         # Test with equal ratings
         player1 = GlickoCompetitor(initial_rating=1500, initial_rd=350)
@@ -98,7 +98,7 @@ class TestGlicko(unittest.TestCase):
         player2 = GlickoCompetitor(initial_rating=1500, initial_rd=350)
 
         # Calculate the expected score manually
-        g_term = GlickoCompetitor._g(player1.rd**2)
+        g_term = GlickoCompetitor._g(player2.rd)
         expected_score = 1 / (1 + 10 ** ((-1 * g_term * (player1.rating - player2.rating)) / 400))
 
         self.assertAlmostEqual(player1.expected_score(player2), expected_score, places=5)

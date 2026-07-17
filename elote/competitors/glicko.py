@@ -303,7 +303,7 @@ class GlickoCompetitor(BaseCompetitor):
         self.verify_competitor_types(competitor)
         logger.debug("Calculating expected score between %s and %s", self, competitor)
 
-        g_term = self._g(self.rd**2)
+        g_term = self._g(competitor.rd)
         E = 1 / (1 + 10 ** ((-1 * g_term * (self._rating - competitor.rating)) / 400))
         return E
 
@@ -401,7 +401,7 @@ class GlickoCompetitor(BaseCompetitor):
             tuple: A tuple containing the new rating and RD.
         """
         E_term = self.expected_score(competitor)
-        g = self._g(competitor.rd**2)
+        g = self._g(competitor.rd)
         logger.debug("Calculating rating update for %s: E=%.4f, g=%.4f", self, E_term, g)
         d_squared = (self._q**2 * (g**2 * E_term * (1 - E_term))) ** -1
 
