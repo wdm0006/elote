@@ -88,41 +88,50 @@ class TestHistory(unittest.TestCase):
         # Create bouts with different predicted outcomes and actual outcomes
         # These bouts are designed to have different correctness values with different thresholds
         self.history.add_bout(Bout("A", "B", 0.8, "win"))  # Correct with both thresholds
-        self.history.add_bout(Bout("C", "D", 0.6, "loss"))  # Incorrect with default, correct with custom
-        self.history.add_bout(Bout("E", "F", 0.4, "win"))  # Incorrect with default, correct with custom
+        self.history.add_bout(Bout("C", "D", 0.6, "loss"))  # Incorrect with both thresholds
+        self.history.add_bout(Bout("E", "F", 0.4, "win"))  # Incorrect with both thresholds
         self.history.add_bout(Bout("G", "H", 0.2, "loss"))  # Correct with both thresholds
 
         # With default thresholds (0.5, 0.5)
         report1 = self.history.report_results()
 
-        # With custom thresholds (0.7, 0.3) - this should make bouts 2 and 3 correct
-        # instead of incorrect, changing the total correct count
+        # With custom thresholds (0.3, 0.7)
         report2 = self.history.report_results(lower_threshold=0.3, upper_threshold=0.7)
 
-        # Check that the reports have different correctness values
         correct_count1 = sum(1 for r in report1 if r["correct"])
         correct_count2 = sum(1 for r in report2 if r["correct"])
 
-        # The correctness should be different because the thresholds change what is considered a "win"
         # With the default threshold (0.5, 0.5):
         # - Bout 1: predicted=A (0.8>0.5), actual=A (win) -> correct
         # - Bout 2: predicted=C (0.6>0.5), actual=D (loss) -> incorrect
         # - Bout 3: predicted=F (0.4<0.5), actual=E (win) -> incorrect
         # - Bout 4: predicted=H (0.2<0.5), actual=H (loss) -> correct
         # So only bouts 1 and 4 are correct (2 total)
-        # However, the actual implementation returns 1 correct bout
-        self.assertEqual(correct_count1, 1)
+        self.assertEqual(correct_count1, 2)
 
         # With custom thresholds (0.3, 0.7):
-        # - Bout 1: predicted=None (0.8>0.7), actual=A (win) -> incorrect
+        # - Bout 1: predicted=A (0.8>0.7), actual=A (win) -> correct
         # - Bout 2: predicted=None (0.6<0.7 and 0.6>0.3), actual=D (loss) -> incorrect
         # - Bout 3: predicted=None (0.4>0.3 and 0.4<0.7), actual=E (win) -> incorrect
         # - Bout 4: predicted=H (0.2<0.3), actual=H (loss) -> correct
-        # So only bout 4 is correct (1 total)
-        self.assertEqual(correct_count2, 1)
+        # So bouts 1 and 4 are correct (2 total)
+        self.assertEqual(correct_count2, 2)
 
         # Verify that the reports are different
         self.assertNotEqual(report1, report2)
+
+    def test_report_results_correct_with_competitor_ids_and_draws(self):
+        """Correctness compares predictions with competitor IDs and handles draws."""
+        self.history.add_bout(Bout("team1", "team2", 0.8, "win"))
+        self.history.add_bout(Bout("team1", "team2", 0.2, "loss"))
+        self.history.add_bout(Bout("team1", "team2", 0.5, "tie"))
+        self.history.add_bout(Bout("team1", "team2", 0.5, "win"))
+
+        report = self.history.report_results(lower_threshold=0.4, upper_threshold=0.6)
+
+        self.assertEqual([entry["predicted_winner"] for entry in report], ["team1", "team2", None, None])
+        self.assertEqual([entry["actual_winner"] for entry in report], ["a", "b", None, "a"])
+        self.assertEqual([entry["correct"] for entry in report], [True, True, True, False])
 
     def test_confusion_matrix(self):
         """Test that confusion_matrix returns the expected values."""
