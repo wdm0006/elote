@@ -105,6 +105,10 @@ class History:
         logger.info("Generating results report for %d bouts", len(self.bouts))
         for bout in self.bouts:
             predicted_winner = bout.predicted_winner(lower_threshold, upper_threshold)
+            actual_winner = bout.actual_winner()
+            actual_winner_id = bout.a if actual_winner == "a" else bout.b if actual_winner == "b" else None
+            if isinstance(actual_winner_id, str):
+                actual_winner_id = actual_winner_id.lower()
             report.append(
                 {
                     "predicted_winner": predicted_winner,
@@ -114,8 +118,8 @@ class History:
                     "predicted_winnder": predicted_winner,
                     "predicted_loser": bout.predicted_loser(lower_threshold, upper_threshold),
                     "probability": bout.predicted_outcome * 100,
-                    "actual_winner": bout.actual_winner(),
-                    "correct": predicted_winner == bout.actual_winner(),
+                    "actual_winner": actual_winner,
+                    "correct": predicted_winner == actual_winner_id,
                 }
             )
         return report
