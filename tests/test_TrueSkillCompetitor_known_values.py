@@ -116,7 +116,7 @@ class TestTrueSkillKnownValues(unittest.TestCase):
         self.assertLessEqual(expected_score, 1.0)
 
     def test_beat_with_known_values(self):
-        """Test beat method with known values."""
+        """Test beat against values from the trueskill 0.4.5 reference implementation."""
         # Create players with specific ratings
         player1 = TrueSkillCompetitor(initial_mu=25.0, initial_sigma=8.333)
         player2 = TrueSkillCompetitor(initial_mu=25.0, initial_sigma=8.333)
@@ -129,6 +129,11 @@ class TestTrueSkillKnownValues(unittest.TestCase):
 
         # Player1 beats player2
         player1.beat(player2)
+
+        self.assertAlmostEqual(player1.mu, 29.395741, places=5)
+        self.assertAlmostEqual(player1.sigma, 7.171128, places=5)
+        self.assertAlmostEqual(player2.mu, 20.604259, places=5)
+        self.assertAlmostEqual(player2.sigma, 7.171128, places=5)
 
         # Player1's mu should increase
         self.assertGreater(player1.mu, initial_mu1)
@@ -162,7 +167,7 @@ class TestTrueSkillKnownValues(unittest.TestCase):
         self.assertGreater(mu_change, 0.5)  # Updated to a more realistic value
 
     def test_tied_with_known_values(self):
-        """Test tied method with known values."""
+        """Test tied against values from the trueskill 0.4.5 reference implementation."""
         # Create players with equal ratings
         player1 = TrueSkillCompetitor(initial_mu=25.0, initial_sigma=8.333)
         player2 = TrueSkillCompetitor(initial_mu=25.0, initial_sigma=8.333)
@@ -195,11 +200,14 @@ class TestTrueSkillKnownValues(unittest.TestCase):
         # Players tie
         player1.tied(player2)
 
+        self.assertAlmostEqual(player1.mu, 27.054816, places=5)
+        self.assertAlmostEqual(player1.sigma, 4.200224, places=5)
+        self.assertAlmostEqual(player2.mu, 22.945184, places=5)
+        self.assertAlmostEqual(player2.sigma, 4.200224, places=5)
+
         # Check that mu values change in the expected direction
-        # Note: In some implementations, the higher-rated player's mu might increase slightly
-        # and the lower-rated player's mu might decrease
-        self.assertNotEqual(player1.mu, initial_mu1)
-        self.assertNotEqual(player2.mu, initial_mu2)
+        self.assertLess(player1.mu, initial_mu1)
+        self.assertGreater(player2.mu, initial_mu2)
 
     def test_match_quality(self):
         """Test match quality calculation with known values."""
