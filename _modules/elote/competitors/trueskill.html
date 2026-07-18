@@ -640,10 +640,11 @@
         <span class="c1"># Calculate the skill difference</span>
         <span class="n">mu_diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">-</span> <span class="n">competitor_ts</span><span class="o">.</span><span class="n">_mu</span>
 
-        <span class="c1"># Calculate the total variance</span>
+        <span class="c1"># Calculate the total variance. Canonical two-player TrueSkill has</span>
+        <span class="c1"># independent performance noise for both players, so beta is counted twice.</span>
         <span class="n">beta_squared</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span><span class="o">**</span><span class="mi">2</span>
         <span class="n">sigma_squared_sum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">competitor_ts</span><span class="o">.</span><span class="n">_sigma</span><span class="o">**</span><span class="mi">2</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">beta_squared</span> <span class="o">+</span> <span class="n">sigma_squared_sum</span><span class="p">)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">beta_squared</span> <span class="o">+</span> <span class="n">sigma_squared_sum</span><span class="p">)</span>
 
         <span class="c1"># Calculate the win probability</span>
         <span class="n">t</span> <span class="o">=</span> <span class="n">mu_diff</span> <span class="o">/</span> <span class="n">v</span>
