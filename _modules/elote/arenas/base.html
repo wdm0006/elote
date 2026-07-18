@@ -357,7 +357,7 @@
 
         <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">:</span>
             <span class="c1"># Extract the actual winner and predicted probability</span>
-            <span class="n">actual_winner</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">actual_winner</span><span class="p">()</span>
+            <span class="n">actual_winner</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">_normalized_outcome</span><span class="p">()</span>
             <span class="n">predicted_prob</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span>
 
             <span class="c1"># Skip if we don&#39;t have both actual and predicted values</span>
@@ -387,33 +387,6 @@
                 <span class="n">predicted_winner</span> <span class="o">=</span> <span class="s2">&quot;b&quot;</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">predicted_winner</span> <span class="o">=</span> <span class="s2">&quot;draw&quot;</span>
-
-            <span class="c1"># Normalize actual winner to &#39;a&#39;, &#39;b&#39;, or &#39;draw&#39;</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">actual_winner</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="n">actual_winner</span> <span class="o">=</span> <span class="n">actual_winner</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">actual_winner</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;win&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">]:</span>
-                    <span class="n">actual_winner</span> <span class="o">=</span> <span class="s2">&quot;a&quot;</span>
-                <span class="k">elif</span> <span class="n">actual_winner</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">]:</span>
-                    <span class="n">actual_winner</span> <span class="o">=</span> <span class="s2">&quot;b&quot;</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">actual_winner</span> <span class="o">=</span> <span class="s2">&quot;draw&quot;</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">actual_winner</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
-                <span class="k">if</span> <span class="n">actual_winner</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="n">actual_winner</span> <span class="o">=</span> <span class="s2">&quot;a&quot;</span>
-                <span class="k">elif</span> <span class="n">actual_winner</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">actual_winner</span> <span class="o">=</span> <span class="s2">&quot;b&quot;</span>
-                <span class="k">elif</span> <span class="n">actual_winner</span> <span class="o">==</span> <span class="mf">0.5</span><span class="p">:</span>
-                    <span class="n">actual_winner</span> <span class="o">=</span> <span class="s2">&quot;draw&quot;</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="c1"># Skip if actual winner is not a recognized value</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Unrecognized actual_winner value: </span><span class="si">%s</span><span class="s2">, skipping bout.&quot;</span><span class="p">,</span> <span class="n">bout</span><span class="o">.</span><span class="n">outcome</span><span class="p">)</span>
-                    <span class="n">skipped_bouts</span> <span class="o">+=</span> <span class="mi">1</span>
-                    <span class="k">continue</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># Skip if actual winner is not a recognized type</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Unrecognized actual_winner type: </span><span class="si">%s</span><span class="s2">, skipping bout.&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">bout</span><span class="o">.</span><span class="n">outcome</span><span class="p">))</span>
-                <span class="n">skipped_bouts</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">continue</span>
 
             <span class="c1"># Update confusion matrix</span>
             <span class="k">if</span> <span class="n">predicted_winner</span> <span class="o">==</span> <span class="s2">&quot;draw&quot;</span><span class="p">:</span>
@@ -716,8 +689,10 @@
         <span class="p">)</span>
 
         <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">:</span>
+            <span class="n">actual</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">_normalized_outcome</span><span class="p">()</span>
+
             <span class="c1"># Skip if we don&#39;t have both actual and predicted values</span>
-            <span class="k">if</span> <span class="n">bout</span><span class="o">.</span><span class="n">actual_winner</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">actual</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">skipped_bouts</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">continue</span>
 
@@ -730,24 +705,6 @@
                 <span class="n">predicted</span> <span class="o">=</span> <span class="s2">&quot;b&quot;</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">predicted</span> <span class="o">=</span> <span class="s2">&quot;draw&quot;</span>
-
-            <span class="c1"># Determine actual outcome</span>
-            <span class="n">actual</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">actual_winner</span><span class="p">()</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
-                <span class="k">if</span> <span class="n">actual</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="n">actual</span> <span class="o">=</span> <span class="s2">&quot;a&quot;</span>
-                <span class="k">elif</span> <span class="n">actual</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">actual</span> <span class="o">=</span> <span class="s2">&quot;b&quot;</span>
-                <span class="k">elif</span> <span class="n">actual</span> <span class="o">==</span> <span class="mf">0.5</span><span class="p">:</span>
-                    <span class="n">actual</span> <span class="o">=</span> <span class="s2">&quot;draw&quot;</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">actual</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="n">actual</span> <span class="o">=</span> <span class="n">actual</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">actual</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;win&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">]:</span>
-                    <span class="n">actual</span> <span class="o">=</span> <span class="s2">&quot;a&quot;</span>
-                <span class="k">elif</span> <span class="n">actual</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">]:</span>
-                    <span class="n">actual</span> <span class="o">=</span> <span class="s2">&quot;b&quot;</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">actual</span> <span class="o">=</span> <span class="s2">&quot;draw&quot;</span>
 
             <span class="c1"># Count correct predictions</span>
             <span class="k">if</span> <span class="n">predicted</span> <span class="o">==</span> <span class="n">actual</span><span class="p">:</span>
@@ -982,6 +939,25 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span> <span class="o">=</span> <span class="n">attributes</span> <span class="ow">or</span> <span class="p">{}</span></div>
 
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_normalized_outcome</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcome</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">outcome</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;win&quot;</span><span class="p">,</span> <span class="s2">&quot;won&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span> <span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="s2">&quot;a&quot;</span>
+            <span class="k">if</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="s2">&quot;lost&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> <span class="s2">&quot;n&quot;</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="s2">&quot;b&quot;</span>
+            <span class="k">if</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;draw&quot;</span><span class="p">,</span> <span class="s2">&quot;tie&quot;</span><span class="p">,</span> <span class="s2">&quot;tied&quot;</span><span class="p">,</span> <span class="s2">&quot;0.5&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;equal&quot;</span><span class="p">,</span> <span class="s2">&quot;eq&quot;</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="s2">&quot;draw&quot;</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcome</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;a&quot;</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;b&quot;</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="mf">0.5</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;draw&quot;</span>
+
+        <span class="k">return</span> <span class="kc">None</span>
+
 <div class="viewcode-block" id="Bout.actual_winner">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout.actual_winner">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">actual_winner</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -991,23 +967,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            str or None: &#39;a&#39; if a won, &#39;b&#39; if b won, None if it was a draw or unclear</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcome</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">outcome_lower</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">outcome_lower</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;win&quot;</span><span class="p">,</span> <span class="s2">&quot;won&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span> <span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">]:</span>
-                <span class="k">return</span> <span class="s2">&quot;a&quot;</span>
-            <span class="k">elif</span> <span class="n">outcome_lower</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="s2">&quot;lost&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> <span class="s2">&quot;n&quot;</span><span class="p">]:</span>
-                <span class="k">return</span> <span class="s2">&quot;b&quot;</span>
-            <span class="k">elif</span> <span class="n">outcome_lower</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;draw&quot;</span><span class="p">,</span> <span class="s2">&quot;tie&quot;</span><span class="p">,</span> <span class="s2">&quot;tied&quot;</span><span class="p">,</span> <span class="s2">&quot;draw&quot;</span><span class="p">,</span> <span class="s2">&quot;0.5&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;equal&quot;</span><span class="p">,</span> <span class="s2">&quot;eq&quot;</span><span class="p">]:</span>
-                <span class="k">return</span> <span class="kc">None</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcome</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">return</span> <span class="s2">&quot;a&quot;</span>
-            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">return</span> <span class="s2">&quot;b&quot;</span>
-            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="mf">0.5</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">None</span>
-
-        <span class="k">return</span> <span class="kc">None</span></div>
+        <span class="n">outcome</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalized_outcome</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">outcome</span> <span class="k">if</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="Bout.true_positive">
