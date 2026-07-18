@@ -448,10 +448,11 @@ class TrueSkillCompetitor(BaseCompetitor):
         # Calculate the skill difference
         mu_diff = self._mu - competitor_ts._mu
 
-        # Calculate the total variance
+        # Calculate the total variance. Canonical two-player TrueSkill has
+        # independent performance noise for both players, so beta is counted twice.
         beta_squared = self._beta**2
         sigma_squared_sum = self._sigma**2 + competitor_ts._sigma**2
-        v = math.sqrt(beta_squared + sigma_squared_sum)
+        v = math.sqrt(2 * beta_squared + sigma_squared_sum)
 
         # Calculate the win probability
         t = mu_diff / v

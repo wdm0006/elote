@@ -86,7 +86,9 @@ class TestTrueSkill(unittest.TestCase):
         # Test with equal ratings
         player1 = TrueSkillCompetitor(initial_mu=25, initial_sigma=8.333)
         player2 = TrueSkillCompetitor(initial_mu=25, initial_sigma=8.333)
-        self.assertAlmostEqual(player1.expected_score(player2), 0.335, places=3)  # Updated expected value
+        # Externally derived from sqrt(2*beta^2 + sigma_i^2 + sigma_j^2); the
+        # single-noise form gives ~0.335.
+        self.assertAlmostEqual(player1.expected_score(player2), 0.342657, places=5)
 
         # Test with different ratings
         player1 = TrueSkillCompetitor(initial_mu=30, initial_sigma=8.333)
