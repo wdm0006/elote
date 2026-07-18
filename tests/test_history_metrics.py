@@ -116,6 +116,42 @@ class TestHistoryMetrics(unittest.TestCase):
             places=5,
         )
 
+    def test_calculate_metrics_includes_draws(self):
+        history = History()
+        history.bouts = [
+            Bout("a", "b", 0.8, "win"),
+            Bout("a", "b", 0.5, 0.5),
+            Bout("a", "b", 0.5, "tie"),
+            Bout("a", "b", 0.5, "draw"),
+            Bout("a", "b", 0.8, "loss"),
+            Bout("a", "b", 0.5, "win"),
+            Bout("a", "b", 0.2, "loss"),
+            Bout("a", "b", 0.2, "win"),
+            Bout("a", "b", 0.8, 0.5),
+            Bout("a", "b", 0.2, "tie"),
+            Bout("a", "b", 0.8, "draw"),
+            Bout("a", "b", None, "draw"),
+            Bout("a", "b", 0.5, None),
+            Bout("a", "b", 0.5, "unknown"),
+        ]
+
+        metrics = history.calculate_metrics(lower_threshold=0.4, upper_threshold=0.6)
+
+        self.assertEqual(metrics["confusion_matrix"], {"tp": 4, "fp": 2, "tn": 1, "fn": 4})
+        self.assertAlmostEqual(metrics["accuracy"], 5 / 11)
+        self.assertAlmostEqual(metrics["precision"], 2 / 3)
+        self.assertAlmostEqual(metrics["recall"], 1 / 2)
+        self.assertAlmostEqual(metrics["f1"], 4 / 7)
+
+    def test_optimize_thresholds_evaluates_draws(self):
+        history = History()
+        history.add_bout(Bout("a", "b", 0.5, "draw"))
+
+        accuracy, thresholds = history.optimize_thresholds(initial_thresholds=(0.5, 0.5))
+
+        self.assertEqual(accuracy, 1.0)
+        self.assertEqual(thresholds, [0.5, 0.5])
+
     def test_calculate_metrics_edge_cases(self):
         """Test that calculate_metrics handles edge cases correctly."""
         # Create a new empty history

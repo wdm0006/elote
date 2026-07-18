@@ -150,7 +150,7 @@ class History:
 
         for bout in self.bouts:
             # Extract the actual winner and predicted probability
-            actual_winner = bout.actual_winner()
+            actual_winner = bout._normalized_outcome()
             predicted_prob = bout.predicted_outcome
 
             # Skip if we don't have both actual and predicted values
@@ -180,33 +180,6 @@ class History:
                 predicted_winner = "b"
             else:
                 predicted_winner = "draw"
-
-            # Normalize actual winner to 'a', 'b', or 'draw'
-            if isinstance(actual_winner, str):
-                actual_winner = actual_winner.lower()
-                if actual_winner in ["a", "win", "true", "1"]:
-                    actual_winner = "a"
-                elif actual_winner in ["b", "loss", "false", "0"]:
-                    actual_winner = "b"
-                else:
-                    actual_winner = "draw"
-            elif isinstance(actual_winner, (int, float)):
-                if actual_winner == 1:
-                    actual_winner = "a"
-                elif actual_winner == 0:
-                    actual_winner = "b"
-                elif actual_winner == 0.5:
-                    actual_winner = "draw"
-                else:
-                    # Skip if actual winner is not a recognized value
-                    logger.debug("Unrecognized actual_winner value: %s, skipping bout.", bout.outcome)
-                    skipped_bouts += 1
-                    continue
-            else:
-                # Skip if actual winner is not a recognized type
-                logger.debug("Unrecognized actual_winner type: %s, skipping bout.", type(bout.outcome))
-                skipped_bouts += 1
-                continue
 
             # Update confusion matrix
             if predicted_winner == "draw":
@@ -497,8 +470,10 @@ class History:
         )
 
         for bout in self.bouts:
+            actual = bout._normalized_outcome()
+
             # Skip if we don't have both actual and predicted values
-            if bout.actual_winner() is None or bout.predicted_outcome is None:
+            if actual is None or bout.predicted_outcome is None:
                 skipped_bouts += 1
                 continue
 
@@ -511,24 +486,6 @@ class History:
                 predicted = "b"
             else:
                 predicted = "draw"
-
-            # Determine actual outcome
-            actual = bout.actual_winner()
-            if isinstance(actual, (int, float)):
-                if actual == 1:
-                    actual = "a"
-                elif actual == 0:
-                    actual = "b"
-                elif actual == 0.5:
-                    actual = "draw"
-            elif isinstance(actual, str):
-                actual = actual.lower()
-                if actual in ["a", "win", "true", "1"]:
-                    actual = "a"
-                elif actual in ["b", "loss", "false", "0"]:
-                    actual = "b"
-                else:
-                    actual = "draw"
 
             # Count correct predictions
             if predicted == actual:
@@ -750,6 +707,25 @@ class Bout:
         self.outcome = outcome
         self.attributes = attributes or {}
 
+    def _normalized_outcome(self) -> Optional[str]:
+        if isinstance(self.outcome, str):
+            outcome = self.outcome.lower()
+            if outcome in ["win", "won", "1", "a", "true", "t", "yes", "y"]:
+                return "a"
+            if outcome in ["loss", "lost", "0", "b", "false", "f", "no", "n"]:
+                return "b"
+            if outcome in ["draw", "tie", "tied", "0.5", "d", "equal", "eq"]:
+                return "draw"
+        elif isinstance(self.outcome, (int, float)):
+            if self.outcome == 1:
+                return "a"
+            if self.outcome == 0:
+                return "b"
+            if self.outcome == 0.5:
+                return "draw"
+
+        return None
+
     def actual_winner(self) -> Optional[str]:
         """
         Return the actual winner of the bout based on the outcome.
@@ -757,23 +733,8 @@ class Bout:
         Returns:
             str or None: 'a' if a won, 'b' if b won, None if it was a draw or unclear
         """
-        if isinstance(self.outcome, str):
-            outcome_lower = self.outcome.lower()
-            if outcome_lower in ["win", "won", "1", "a", "true", "t", "yes", "y"]:
-                return "a"
-            elif outcome_lower in ["loss", "lost", "0", "b", "false", "f", "no", "n"]:
-                return "b"
-            elif outcome_lower in ["draw", "tie", "tied", "draw", "0.5", "d", "equal", "eq"]:
-                return None
-        elif isinstance(self.outcome, (int, float)):
-            if self.outcome == 1:
-                return "a"
-            elif self.outcome == 0:
-                return "b"
-            elif self.outcome == 0.5:
-                return None
-
-        return None
+        outcome = self._normalized_outcome()
+        return outcome if outcome in ["a", "b"] else None
 
     def true_positive(self, threshold: float = 0.5) -> bool:
         """Check if this bout is a true positive prediction.
