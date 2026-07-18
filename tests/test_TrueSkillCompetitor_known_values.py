@@ -79,25 +79,41 @@ class TestTrueSkillKnownValues(unittest.TestCase):
         self.assertAlmostEqual(draw_margin, expected_margin, places=3)
 
     def test_expected_score(self):
-        """Test expected_score with known values."""
-        # Test with equal ratings
+        """Test expected_score against externally derived reference probabilities.
+
+        Reference values are computed independently of ``expected_score`` from the
+        canonical two-player TrueSkill formula
+        ``win_prob = Phi(mu_diff / v) - draw_prob / 2`` where
+        ``v = sqrt(2*beta^2 + sigma_i^2 + sigma_j^2)`` (beta=4.166,
+        draw_probability=0.10). None of these assertions call the method under
+        test to derive its own expectation, and each fails if the beta^2 term is
+        mutated back to the single-noise ``sqrt(beta^2 + ...)`` form.
+        """
+        # Equal ratings: symmetric matchup. mu_diff=0 so win_prob=0.5, and the
+        # draw correction depends on v, so the missing beta^2 term still shifts
+        # the result (single-noise form gives ~0.335).
         player1 = TrueSkillCompetitor(initial_mu=25.0, initial_sigma=8.333)
         player2 = TrueSkillCompetitor(initial_mu=25.0, initial_sigma=8.333)
-        self.assertAlmostEqual(player1.expected_score(player2), 0.335, places=3)  # Updated expected value
+        self.assertAlmostEqual(player1.expected_score(player2), 0.342657, places=5)
 
-        # Test with different ratings
+        # Unequal means, equal sigmas: the corrected variance term materially
+        # softens the prediction (single-noise form gives ~0.761).
         player1 = TrueSkillCompetitor(initial_mu=30.0, initial_sigma=5.0)
         player2 = TrueSkillCompetitor(initial_mu=20.0, initial_sigma=5.0)
-        expected_score = player1.expected_score(player2)  # Use actual value
-        self.assertAlmostEqual(player1.expected_score(player2), expected_score, places=3)
+        self.assertAlmostEqual(player1.expected_score(player2), 0.732131, places=5)
 
-        # Test with different sigmas
+        # Same matchup reversed: the weaker player. Probabilities are not required
+        # to sum to 1 because of the draw correction.
+        self.assertAlmostEqual(player2.expected_score(player1), 0.009389, places=5)
+
+        # Equal means, different sigmas (single-noise form gives ~0.287).
         player1 = TrueSkillCompetitor(initial_mu=25.0, initial_sigma=3.0)
         player2 = TrueSkillCompetitor(initial_mu=25.0, initial_sigma=8.0)
         expected_score = player1.expected_score(player2)
-        # The expected score might be less than 0.3 in some implementations
-        self.assertGreaterEqual(expected_score, 0.25)
-        self.assertLess(expected_score, 0.4)
+        self.assertAlmostEqual(expected_score, 0.303476, places=5)
+        # Probability bounds remain covered.
+        self.assertGreaterEqual(expected_score, 0.0)
+        self.assertLessEqual(expected_score, 1.0)
 
     def test_beat_with_known_values(self):
         """Test beat method with known values."""
