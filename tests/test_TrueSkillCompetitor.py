@@ -109,10 +109,8 @@ class TestTrueSkill(unittest.TestCase):
         player1.tied(player2)
 
         # The higher-rated player should lose rating, and the lower-rated player should gain rating
-        self.assertGreater(player1.mu, initial_mu1 - 1)  # Allow for small changes
-        self.assertLess(player1.mu, initial_mu1 + 1)
-        self.assertGreater(player2.mu, initial_mu2 - 1)
-        self.assertLess(player2.mu, initial_mu2 + 1)
+        self.assertLess(player1.mu, initial_mu1)
+        self.assertGreater(player2.mu, initial_mu2)
 
     def test_reset(self):
         """Test that reset returns the competitor to its initial state."""

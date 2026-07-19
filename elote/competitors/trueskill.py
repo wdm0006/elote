@@ -411,7 +411,7 @@ class TrueSkillCompetitor(BaseCompetitor):
         cdf_1 = self._gaussian_cdf(t - epsilon)
         cdf_2 = self._gaussian_cdf(t + epsilon)
         denominator = cdf_2 - cdf_1
-        return v**2 + ((t - epsilon) * pdf_1 - (t + epsilon) * pdf_2) / denominator if denominator > 0 else 0
+        return v**2 + ((epsilon - t) * pdf_1 + (epsilon + t) * pdf_2) / denominator if denominator > 0 else 0
 
     @staticmethod
     def _calculate_draw_margin(beta: float, draw_probability: float) -> float:
@@ -491,35 +491,34 @@ class TrueSkillCompetitor(BaseCompetitor):
         # Calculate the skill difference
         mu_diff = self._mu - competitor_ts._mu
 
-        # Calculate the total variance
+        # Apply the dynamic factor before incorporating the match result.
+        sigma_squared_1 = self._sigma**2 + self._tau**2
+        sigma_squared_2 = competitor_ts._sigma**2 + competitor_ts._tau**2
+
+        # Calculate the total performance-difference variance
         beta_squared = self._beta**2
-        sigma_squared_1 = self._sigma**2
-        sigma_squared_2 = competitor_ts._sigma**2
         sigma_squared_sum = sigma_squared_1 + sigma_squared_2
-        v = math.sqrt(beta_squared + sigma_squared_sum)
+        v = math.sqrt(2 * beta_squared + sigma_squared_sum)
 
         # Calculate the performance update
-        t = mu_diff / v
+        draw_margin = math.sqrt(2) * self._beta * special.ndtri((self._draw_probability + 1) / 2)
+        t = (mu_diff - draw_margin) / v
         v_win_value = self._v_win(t)
         w_win_value = self._w_win(t)
 
         # Update the winner's mu and sigma
         sigma_squared_to_v_squared = sigma_squared_1 / v**2
-        self._mu = self._mu + sigma_squared_to_v_squared * v_win_value
+        self._mu = self._mu + sigma_squared_1 / v * v_win_value
         self._sigma = math.sqrt(sigma_squared_1 * (1 - sigma_squared_to_v_squared * w_win_value))
 
         logger.debug("Winner update: new_mu=%.2f, new_sigma=%.2f", self._mu, self._sigma)
         # Update the loser's mu and sigma
         sigma_squared_to_v_squared = sigma_squared_2 / v**2
-        competitor_ts._mu = competitor_ts._mu - sigma_squared_to_v_squared * v_win_value
+        competitor_ts._mu = competitor_ts._mu - sigma_squared_2 / v * v_win_value
         competitor_ts._sigma = math.sqrt(sigma_squared_2 * (1 - sigma_squared_to_v_squared * w_win_value))
         logger.debug(
             "Loser update (%s): new_mu=%.2f, new_sigma=%.2f", competitor_ts, competitor_ts._mu, competitor_ts._sigma
         )
-
-        # Apply the dynamic factor to increase uncertainty over time
-        self._sigma = math.sqrt(self._sigma**2 + self._tau**2)
-        competitor_ts._sigma = math.sqrt(competitor_ts._sigma**2 + self._tau**2)
 
     def tied(self, competitor: BaseCompetitor) -> None:
         """Update ratings after this competitor has tied with the given competitor.
@@ -537,15 +536,17 @@ class TrueSkillCompetitor(BaseCompetitor):
         # Calculate the skill difference
         mu_diff = self._mu - competitor_ts._mu
 
-        # Calculate the total variance
+        # Apply the dynamic factor before incorporating the match result.
+        sigma_squared_1 = self._sigma**2 + self._tau**2
+        sigma_squared_2 = competitor_ts._sigma**2 + competitor_ts._tau**2
+
+        # Calculate the total performance-difference variance
         beta_squared = self._beta**2
-        sigma_squared_1 = self._sigma**2
-        sigma_squared_2 = competitor_ts._sigma**2
         sigma_squared_sum = sigma_squared_1 + sigma_squared_2
-        v = math.sqrt(beta_squared + sigma_squared_sum)
+        v = math.sqrt(2 * beta_squared + sigma_squared_sum)
 
         # Calculate the draw margin
-        draw_margin = self._calculate_draw_margin(self._beta, self._draw_probability)
+        draw_margin = math.sqrt(2) * self._beta * special.ndtri((self._draw_probability + 1) / 2)
 
         # Calculate the performance update for a draw
         t = mu_diff / v
@@ -554,13 +555,13 @@ class TrueSkillCompetitor(BaseCompetitor):
 
         # Update the first player's mu and sigma
         sigma_squared_to_v_squared = sigma_squared_1 / v**2
-        self._mu = self._mu + sigma_squared_to_v_squared * v_draw_value
+        self._mu = self._mu - sigma_squared_1 / v * v_draw_value
         self._sigma = math.sqrt(sigma_squared_1 * (1 - sigma_squared_to_v_squared * w_draw_value))
 
         logger.debug("Player 1 tie update: new_mu=%.2f, new_sigma=%.2f", self._mu, self._sigma)
         # Update the second player's mu and sigma
         sigma_squared_to_v_squared = sigma_squared_2 / v**2
-        competitor_ts._mu = competitor_ts._mu - sigma_squared_to_v_squared * v_draw_value
+        competitor_ts._mu = competitor_ts._mu + sigma_squared_2 / v * v_draw_value
         competitor_ts._sigma = math.sqrt(sigma_squared_2 * (1 - sigma_squared_to_v_squared * w_draw_value))
         logger.debug(
             "Player 2 tie update (%s): new_mu=%.2f, new_sigma=%.2f",
@@ -568,10 +569,6 @@ class TrueSkillCompetitor(BaseCompetitor):
             competitor_ts._mu,
             competitor_ts._sigma,
         )
-
-        # Apply the dynamic factor to increase uncertainty over time
-        self._sigma = math.sqrt(self._sigma**2 + self._tau**2)
-        competitor_ts._sigma = math.sqrt(competitor_ts._sigma**2 + self._tau**2)
 
     @classmethod
     def match_quality(cls, player1: "TrueSkillCompetitor", player2: "TrueSkillCompetitor") -> float:
