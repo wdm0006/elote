@@ -175,13 +175,23 @@
             
   <h1>Source code for elote.competitors.glicko2</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">cast</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote.competitors.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="n">InvalidRatingValueException</span><span class="p">,</span> <span class="n">InvalidParameterException</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>  <span class="c1"># Import directly from the logging submodule</span>
 
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;Glicko2Competitor&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_MatchResult</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A recorded match result plus the opponent&#39;s pre-match Glicko-2 scale state.&quot;&quot;&quot;</span>
+
+    <span class="n">opponent</span><span class="p">:</span> <span class="s2">&quot;Glicko2Competitor&quot;</span>
+    <span class="n">score</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">match_time</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">opponent_mu</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">opponent_phi</span><span class="p">:</span> <span class="nb">float</span>
 
 
 <div class="viewcode-block" id="Glicko2Competitor">
@@ -262,7 +272,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_rd</span> <span class="o">=</span> <span class="n">initial_rd</span>
 
         <span class="c1"># Store match results for rating period and track last activity</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_match_results</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="s2">&quot;Glicko2Competitor&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">datetime</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_match_results</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">_MatchResult</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="n">initial_time</span> <span class="k">if</span> <span class="n">initial_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
@@ -680,6 +690,10 @@
 <span class="sd">        increases based on the current volatility (sigma) parameter and the number</span>
 <span class="sd">        of rating periods that have passed.</span>
 
+<span class="sd">        The last-activity timestamp is advanced to ``current_time`` so that the</span>
+<span class="sd">        inflation is applied exactly once per elapsed period: calling this method</span>
+<span class="sd">        repeatedly with the same timestamp is a no-op after the first call.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            current_time (datetime, optional): The current time to calculate inactivity against.</span>
 <span class="sd">                If None, uses the current system time.</span>
@@ -703,6 +717,7 @@
                 <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;RD capped at 350 (was </span><span class="si">%.1f</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rd</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_rd</span> <span class="o">=</span> <span class="mi">350</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_phi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rd_to_phi</span><span class="p">(</span><span class="mi">350</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="n">current_time</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
                 <span class="s2">&quot;Updated RD for </span><span class="si">%s</span><span class="s2"> due to inactivity (</span><span class="si">%.1f</span><span class="s2"> periods): </span><span class="si">%.1f</span><span class="s2"> -&gt; </span><span class="si">%.1f</span><span class="s2">&quot;</span><span class="p">,</span>
                 <span class="bp">self</span><span class="p">,</span>
@@ -729,7 +744,7 @@
             <span class="k">return</span>
 
         <span class="c1"># Get the most recent match time</span>
-        <span class="n">current_time</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">match_time</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">match_time</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_match_results</span><span class="p">)</span>
+        <span class="n">current_time</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">match_time</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_match_results</span><span class="p">)</span>
 
         <span class="c1"># Update RD for inactivity before processing matches</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Updating RD for </span><span class="si">%s</span><span class="s2"> before processing </span><span class="si">%d</span><span class="s2"> matches.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_match_results</span><span class="p">))</span>
@@ -747,14 +762,15 @@
         <span class="c1"># Step 2: For each opponent j, compute g(phi_j) and E(mu, mu_j, phi_j)</span>
         <span class="n">v_inv</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="n">delta_sum</span> <span class="o">=</span> <span class="mf">0.0</span>
-        <span class="k">for</span> <span class="n">opponent</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_match_results</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span>
-            <span class="n">opponent_glicko2</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Glicko2Competitor</span><span class="p">,</span> <span class="n">opponent</span><span class="p">)</span>
-            <span class="n">phi_j</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rd_to_phi</span><span class="p">(</span><span class="n">opponent</span><span class="o">.</span><span class="n">rd</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_match_results</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">opponent</span><span class="p">)</span>
+            <span class="c1"># Read the opponent&#39;s state as recorded at match time, so that both players</span>
+            <span class="c1"># of a bout update against the same pre-match snapshot.</span>
+            <span class="n">phi_j</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">opponent_phi</span>
             <span class="n">g_j</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span><span class="p">(</span><span class="n">phi_j</span><span class="p">)</span>
-            <span class="n">E_j</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_E</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">opponent_glicko2</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span> <span class="n">phi_j</span><span class="p">)</span>
+            <span class="n">E_j</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_E</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">opponent_mu</span><span class="p">,</span> <span class="n">phi_j</span><span class="p">)</span>
             <span class="n">v_inv</span> <span class="o">+=</span> <span class="n">g_j</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">E_j</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">E_j</span><span class="p">)</span>
-            <span class="n">delta_sum</span> <span class="o">+=</span> <span class="n">g_j</span> <span class="o">*</span> <span class="p">(</span><span class="n">score</span> <span class="o">-</span> <span class="n">E_j</span><span class="p">)</span>
+            <span class="n">delta_sum</span> <span class="o">+=</span> <span class="n">g_j</span> <span class="o">*</span> <span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">score</span> <span class="o">-</span> <span class="n">E_j</span><span class="p">)</span>
 
         <span class="c1"># Step 3: Compute v and delta</span>
         <span class="n">v</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">v_inv</span>
@@ -859,51 +875,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> beat </span><span class="si">%s</span><span class="s2"> (time=</span><span class="si">%s</span><span class="s2">). Recording result.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">,</span> <span class="n">match_time</span><span class="p">)</span>
-        <span class="n">competitor_glicko2</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Glicko2Competitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
-
-        <span class="c1"># Get the match time</span>
-        <span class="n">current_time</span> <span class="o">=</span> <span class="n">match_time</span> <span class="k">if</span> <span class="n">match_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
-
-        <span class="c1"># Validate match time is not before last activity</span>
-        <span class="k">if</span> <span class="n">current_time</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Match time </span><span class="si">%s</span><span class="s2"> is before self last activity </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">current_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Match time cannot be before competitor&#39;s last activity time&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">current_time</span> <span class="o">&lt;</span> <span class="n">competitor_glicko2</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                <span class="s2">&quot;Match time </span><span class="si">%s</span><span class="s2"> is before opponent last activity </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">current_time</span><span class="p">,</span> <span class="n">competitor_glicko2</span><span class="o">.</span><span class="n">_last_activity</span>
-            <span class="p">)</span>
-            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Match time cannot be before opponent&#39;s last activity time&quot;</span><span class="p">)</span>
-
-        <span class="c1"># Update RDs for both competitors based on inactivity before recording match</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">update_rd_for_inactivity</span><span class="p">(</span><span class="n">current_time</span><span class="p">)</span>
-        <span class="n">competitor_glicko2</span><span class="o">.</span><span class="n">update_rd_for_inactivity</span><span class="p">(</span><span class="n">current_time</span><span class="p">)</span>
-
-        <span class="c1"># Get the match time</span>
-        <span class="n">current_time</span> <span class="o">=</span> <span class="n">match_time</span> <span class="k">if</span> <span class="n">match_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
-
-        <span class="c1"># Validate match time is not before last activity</span>
-        <span class="k">if</span> <span class="n">current_time</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Match time </span><span class="si">%s</span><span class="s2"> is before self last activity </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">current_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Match time cannot be before competitor&#39;s last activity time&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">current_time</span> <span class="o">&lt;</span> <span class="n">competitor_glicko2</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                <span class="s2">&quot;Match time </span><span class="si">%s</span><span class="s2"> is before opponent last activity </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">current_time</span><span class="p">,</span> <span class="n">competitor_glicko2</span><span class="o">.</span><span class="n">_last_activity</span>
-            <span class="p">)</span>
-            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Match time cannot be before opponent&#39;s last activity time&quot;</span><span class="p">)</span>
-
-        <span class="c1"># Update RDs for both competitors based on inactivity before recording match</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">update_rd_for_inactivity</span><span class="p">(</span><span class="n">current_time</span><span class="p">)</span>
-        <span class="n">competitor_glicko2</span><span class="o">.</span><span class="n">update_rd_for_inactivity</span><span class="p">(</span><span class="n">current_time</span><span class="p">)</span>
-
-        <span class="c1"># Record the match result for this competitor</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_match_results</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">competitor_glicko2</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">current_time</span><span class="p">))</span>
-
-        <span class="c1"># Record the match result for the opponent</span>
-        <span class="n">competitor_glicko2</span><span class="o">.</span><span class="n">_match_results</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="bp">self</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">current_time</span><span class="p">))</span>
-
-        <span class="c1"># Update ratings immediately</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">update_ratings</span><span class="p">()</span>
-        <span class="n">competitor_glicko2</span><span class="o">.</span><span class="n">update_ratings</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_compute_match_result</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="n">Glicko2Competitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">),</span> <span class="n">s</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">match_time</span><span class="o">=</span><span class="n">match_time</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Glicko2Competitor.tied">
@@ -924,52 +896,49 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> tied with </span><span class="si">%s</span><span class="s2"> (time=</span><span class="si">%s</span><span class="s2">). Recording result.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">,</span> <span class="n">match_time</span><span class="p">)</span>
-        <span class="n">competitor_glicko2</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Glicko2Competitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_compute_match_result</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="n">Glicko2Competitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">),</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">match_time</span><span class="o">=</span><span class="n">match_time</span><span class="p">)</span></div>
 
-        <span class="c1"># Get the match time</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compute_match_result</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;Glicko2Competitor&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">match_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record a match result for both competitors and update both ratings.</span>
+
+<span class="sd">        Both players&#39; updates are computed from the same pre-match snapshot: inactivity</span>
+<span class="sd">        is applied once to each competitor, each competitor&#39;s Glicko-2 scale state is</span>
+<span class="sd">        then recorded on the opponent&#39;s match result, and only afterwards are the two</span>
+<span class="sd">        ratings updated. Without the snapshot the second update would read the first</span>
+<span class="sd">        player&#39;s already-updated rating and RD.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            competitor (Glicko2Competitor): The opponent competitor.</span>
+<span class="sd">            s (float): The score of this competitor (1 for win, 0.5 for draw, 0 for loss).</span>
+<span class="sd">            match_time (datetime, optional): The time when the match occurred. Default: current time.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidParameterException: If the match time is before either competitor&#39;s last activity.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">current_time</span> <span class="o">=</span> <span class="n">match_time</span> <span class="k">if</span> <span class="n">match_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
 
         <span class="c1"># Validate match time is not before last activity</span>
         <span class="k">if</span> <span class="n">current_time</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Match time </span><span class="si">%s</span><span class="s2"> is before self last activity </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">current_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Match time cannot be before competitor&#39;s last activity time&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">current_time</span> <span class="o">&lt;</span> <span class="n">competitor_glicko2</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                <span class="s2">&quot;Match time </span><span class="si">%s</span><span class="s2"> is before opponent last activity </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">current_time</span><span class="p">,</span> <span class="n">competitor_glicko2</span><span class="o">.</span><span class="n">_last_activity</span>
-            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">current_time</span> <span class="o">&lt;</span> <span class="n">competitor</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Match time </span><span class="si">%s</span><span class="s2"> is before opponent last activity </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">current_time</span><span class="p">,</span> <span class="n">competitor</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Match time cannot be before opponent&#39;s last activity time&quot;</span><span class="p">)</span>
 
-        <span class="c1"># Update RDs for both competitors based on inactivity before recording match</span>
+        <span class="c1"># Update RDs for both competitors based on inactivity before recording the match</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_rd_for_inactivity</span><span class="p">(</span><span class="n">current_time</span><span class="p">)</span>
-        <span class="n">competitor_glicko2</span><span class="o">.</span><span class="n">update_rd_for_inactivity</span><span class="p">(</span><span class="n">current_time</span><span class="p">)</span>
+        <span class="n">competitor</span><span class="o">.</span><span class="n">update_rd_for_inactivity</span><span class="p">(</span><span class="n">current_time</span><span class="p">)</span>
 
-        <span class="c1"># Get the match time</span>
-        <span class="n">current_time</span> <span class="o">=</span> <span class="n">match_time</span> <span class="k">if</span> <span class="n">match_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
-
-        <span class="c1"># Validate match time is not before last activity</span>
-        <span class="k">if</span> <span class="n">current_time</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Match time </span><span class="si">%s</span><span class="s2"> is before self last activity </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">current_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Match time cannot be before competitor&#39;s last activity time&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">current_time</span> <span class="o">&lt;</span> <span class="n">competitor_glicko2</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                <span class="s2">&quot;Match time </span><span class="si">%s</span><span class="s2"> is before opponent last activity </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">current_time</span><span class="p">,</span> <span class="n">competitor_glicko2</span><span class="o">.</span><span class="n">_last_activity</span>
-            <span class="p">)</span>
-            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Match time cannot be before opponent&#39;s last activity time&quot;</span><span class="p">)</span>
-
-        <span class="c1"># Update RDs for both competitors based on inactivity before recording match</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">update_rd_for_inactivity</span><span class="p">(</span><span class="n">current_time</span><span class="p">)</span>
-        <span class="n">competitor_glicko2</span><span class="o">.</span><span class="n">update_rd_for_inactivity</span><span class="p">(</span><span class="n">current_time</span><span class="p">)</span>
-
-        <span class="c1"># Record the match result for this competitor</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_match_results</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">competitor_glicko2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">current_time</span><span class="p">))</span>
-
-        <span class="c1"># Record the match result for the opponent</span>
-        <span class="n">competitor_glicko2</span><span class="o">.</span><span class="n">_match_results</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="bp">self</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">current_time</span><span class="p">))</span>
+        <span class="c1"># Record the match result for each competitor against the other&#39;s pre-match state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_match_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_MatchResult</span><span class="p">(</span><span class="n">competitor</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">current_time</span><span class="p">,</span> <span class="n">competitor</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span> <span class="n">competitor</span><span class="o">.</span><span class="n">_phi</span><span class="p">))</span>
+        <span class="n">competitor</span><span class="o">.</span><span class="n">_match_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_MatchResult</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">s</span><span class="p">,</span> <span class="n">current_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phi</span><span class="p">))</span>
 
         <span class="c1"># Update ratings immediately</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_ratings</span><span class="p">()</span>
-        <span class="n">competitor_glicko2</span><span class="o">.</span><span class="n">update_ratings</span><span class="p">()</span></div>
-</div>
+        <span class="n">competitor</span><span class="o">.</span><span class="n">update_ratings</span><span class="p">()</span></div>
 
 </pre></div>
 

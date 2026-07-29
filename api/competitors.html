@@ -957,6 +957,9 @@ After updating, the match results are cleared.</p>
 over time when a player is inactive. In Glicko-2, the phi (internal RD)
 increases based on the current volatility (sigma) parameter and the number
 of rating periods that have passed.</p>
+<p>The last-activity timestamp is advanced to <code class="docutils literal notranslate"><span class="pre">current_time</span></code> so that the
+inflation is applied exactly once per elapsed period: calling this method
+repeatedly with the same timestamp is a no-op after the first call.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><dl class="simple">
 <dt>current_time (datetime, optional): The current time to calculate inactivity against.</dt><dd><p>If None, uses the current system time.</p>
