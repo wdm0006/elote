@@ -1,3 +1,10 @@
+Unreleased
+==========
+
+Bug fixes
+
+ * Fixed ECF rating updates to apply the rating-difference cap independently for each competitor.
+
 v1.2.0
 ======
 

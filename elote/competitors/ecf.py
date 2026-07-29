@@ -335,6 +335,9 @@ class ECFCompetitor(BaseCompetitor):
         their_transformed = competitor_ecf.transformed_elo_rating
         return my_transformed / (their_transformed + my_transformed)
 
+    def _clamp_opponent_rating(self, own_rating: float, opponent_rating: float) -> float:
+        return max(own_rating - self._delta, min(own_rating + self._delta, opponent_rating))
+
     def beat(self, competitor: BaseCompetitor) -> None:
         """Update ratings after this competitor has won against the given competitor.
 
@@ -358,14 +361,11 @@ class ECFCompetitor(BaseCompetitor):
         self_rating = self.rating
         competitors_rating = competitor_ecf.rating
 
-        if abs(self_rating - competitors_rating) > self._delta:
-            if self_rating > competitors_rating:
-                competitors_rating = self_rating - self._delta
-            else:
-                competitors_rating = self_rating + self._delta
+        opponent_rating_for_self = self._clamp_opponent_rating(self_rating, competitors_rating)
+        opponent_rating_for_competitor = self._clamp_opponent_rating(competitors_rating, self_rating)
 
-        performance_rating_self = competitors_rating + self._delta
-        performance_rating_competitor = self_rating - self._delta
+        performance_rating_self = opponent_rating_for_self + self._delta
+        performance_rating_competitor = opponent_rating_for_competitor - self._delta
 
         # Update scores
         self._update(performance_rating_self)
@@ -394,14 +394,8 @@ class ECFCompetitor(BaseCompetitor):
         self_rating = self.rating
         competitors_rating = competitor_ecf.rating
 
-        if abs(self_rating - competitors_rating) > self._delta:
-            if self_rating > competitors_rating:
-                competitors_rating = self_rating - self._delta
-            else:
-                competitors_rating = self_rating + self._delta
-
-        performance_rating_self = competitors_rating
-        performance_rating_competitor = self_rating
+        performance_rating_self = self._clamp_opponent_rating(self_rating, competitors_rating)
+        performance_rating_competitor = self._clamp_opponent_rating(competitors_rating, self_rating)
 
         # Update scores
         self._update(performance_rating_self)
