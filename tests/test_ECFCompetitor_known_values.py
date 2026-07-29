@@ -100,6 +100,40 @@ class TestECFKnownValues(unittest.TestCase):
         # After beat, player1's scores deque contains [100, 150+50] = [100, 200]
         # So the mean is (100 + 200) / 2 = 150
         self.assertEqual(player1.rating, 150)
+        self.assertEqual(player2.rating, 150)
+
+    def test_expected_result_outside_delta_leaves_ratings_unchanged(self):
+        """Test that an expected result outside the delta changes neither rating."""
+        stronger = ECFCompetitor(initial_rating=200)
+        weaker = ECFCompetitor(initial_rating=100)
+
+        stronger.beat(weaker)
+
+        self.assertEqual(stronger.rating, 200)
+        self.assertEqual(weaker.rating, 100)
+
+    def test_draw_outside_delta_with_known_values(self):
+        """Test a draw between players whose ratings differ by more than delta."""
+        stronger = ECFCompetitor(initial_rating=200)
+        weaker = ECFCompetitor(initial_rating=100)
+
+        stronger.tied(weaker)
+
+        self.assertEqual(stronger.rating, 175)
+        self.assertEqual(weaker.rating, 125)
+
+    def test_draw_outside_delta_is_independent_of_argument_order(self):
+        """Test that reversing the caller does not change draw updates."""
+        stronger_first = ECFCompetitor(initial_rating=200)
+        weaker_second = ECFCompetitor(initial_rating=100)
+        stronger_first.tied(weaker_second)
+
+        weaker_first = ECFCompetitor(initial_rating=100)
+        stronger_second = ECFCompetitor(initial_rating=200)
+        weaker_first.tied(stronger_second)
+
+        self.assertEqual(stronger_first.rating, stronger_second.rating)
+        self.assertEqual(weaker_second.rating, weaker_first.rating)
 
     def test_scores_deque_behavior(self):
         """Test that the scores deque behaves correctly with maxlen."""
