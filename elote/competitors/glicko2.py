@@ -1,11 +1,21 @@
 import math
-from typing import Dict, Any, ClassVar, Type, TypeVar, Optional, List, Tuple, cast
+from typing import Dict, Any, ClassVar, NamedTuple, Type, TypeVar, Optional, List, cast
 from datetime import datetime
 
 from elote.competitors.base import BaseCompetitor, InvalidRatingValueException, InvalidParameterException
 from elote.logging import logger  # Import directly from the logging submodule
 
 T = TypeVar("T", bound="Glicko2Competitor")
+
+
+class _MatchResult(NamedTuple):
+    """A recorded match result plus the opponent's pre-match Glicko-2 scale state."""
+
+    opponent: "Glicko2Competitor"
+    score: float
+    match_time: datetime
+    opponent_mu: float
+    opponent_phi: float
 
 
 class Glicko2Competitor(BaseCompetitor):
@@ -82,7 +92,7 @@ class Glicko2Competitor(BaseCompetitor):
         self._rd = initial_rd
 
         # Store match results for rating period and track last activity
-        self._match_results: List[Tuple["Glicko2Competitor", float, datetime]] = []
+        self._match_results: List[_MatchResult] = []
         self._last_activity = initial_time if initial_time is not None else datetime.now()
 
         logger.debug(
@@ -485,6 +495,10 @@ class Glicko2Competitor(BaseCompetitor):
         increases based on the current volatility (sigma) parameter and the number
         of rating periods that have passed.
 
+        The last-activity timestamp is advanced to ``current_time`` so that the
+        inflation is applied exactly once per elapsed period: calling this method
+        repeatedly with the same timestamp is a no-op after the first call.
+
         Args:
             current_time (datetime, optional): The current time to calculate inactivity against.
                 If None, uses the current system time.
@@ -508,6 +522,7 @@ class Glicko2Competitor(BaseCompetitor):
                 logger.debug("RD capped at 350 (was %.1f)", self._rd)
                 self._rd = 350
                 self._phi = self._rd_to_phi(350)
+            self._last_activity = current_time
             logger.debug(
                 "Updated RD for %s due to inactivity (%.1f periods): %.1f -> %.1f",
                 self,
@@ -531,7 +546,7 @@ class Glicko2Competitor(BaseCompetitor):
             return
 
         # Get the most recent match time
-        current_time = max(match_time for _, _, match_time in self._match_results)
+        current_time = max(result.match_time for result in self._match_results)
 
         # Update RD for inactivity before processing matches
         logger.debug("Updating RD for %s before processing %d matches.", self, len(self._match_results))
@@ -549,14 +564,15 @@ class Glicko2Competitor(BaseCompetitor):
         # Step 2: For each opponent j, compute g(phi_j) and E(mu, mu_j, phi_j)
         v_inv = 0.0
         delta_sum = 0.0
-        for opponent, score, _ in self._match_results:
-            self.verify_competitor_types(opponent)
-            opponent_glicko2 = cast(Glicko2Competitor, opponent)
-            phi_j = self._rd_to_phi(opponent.rd)
+        for result in self._match_results:
+            self.verify_competitor_types(result.opponent)
+            # Read the opponent's state as recorded at match time, so that both players
+            # of a bout update against the same pre-match snapshot.
+            phi_j = result.opponent_phi
             g_j = self._g(phi_j)
-            E_j = self._E(mu, opponent_glicko2._mu, phi_j)
+            E_j = self._E(mu, result.opponent_mu, phi_j)
             v_inv += g_j**2 * E_j * (1 - E_j)
-            delta_sum += g_j * (score - E_j)
+            delta_sum += g_j * (result.score - E_j)
 
         # Step 3: Compute v and delta
         v = 1 / v_inv
@@ -658,51 +674,7 @@ class Glicko2Competitor(BaseCompetitor):
         """
         self.verify_competitor_types(competitor)
         logger.debug("%s beat %s (time=%s). Recording result.", self, competitor, match_time)
-        competitor_glicko2 = cast(Glicko2Competitor, competitor)
-
-        # Get the match time
-        current_time = match_time if match_time is not None else datetime.now()
-
-        # Validate match time is not before last activity
-        if current_time < self._last_activity:
-            logger.error("Match time %s is before self last activity %s", current_time, self._last_activity)
-            raise InvalidParameterException("Match time cannot be before competitor's last activity time")
-        if current_time < competitor_glicko2._last_activity:
-            logger.error(
-                "Match time %s is before opponent last activity %s", current_time, competitor_glicko2._last_activity
-            )
-            raise InvalidParameterException("Match time cannot be before opponent's last activity time")
-
-        # Update RDs for both competitors based on inactivity before recording match
-        self.update_rd_for_inactivity(current_time)
-        competitor_glicko2.update_rd_for_inactivity(current_time)
-
-        # Get the match time
-        current_time = match_time if match_time is not None else datetime.now()
-
-        # Validate match time is not before last activity
-        if current_time < self._last_activity:
-            logger.error("Match time %s is before self last activity %s", current_time, self._last_activity)
-            raise InvalidParameterException("Match time cannot be before competitor's last activity time")
-        if current_time < competitor_glicko2._last_activity:
-            logger.error(
-                "Match time %s is before opponent last activity %s", current_time, competitor_glicko2._last_activity
-            )
-            raise InvalidParameterException("Match time cannot be before opponent's last activity time")
-
-        # Update RDs for both competitors based on inactivity before recording match
-        self.update_rd_for_inactivity(current_time)
-        competitor_glicko2.update_rd_for_inactivity(current_time)
-
-        # Record the match result for this competitor
-        self._match_results.append((competitor_glicko2, 1.0, current_time))
-
-        # Record the match result for the opponent
-        competitor_glicko2._match_results.append((self, 0.0, current_time))
-
-        # Update ratings immediately
-        self.update_ratings()
-        competitor_glicko2.update_ratings()
+        self._compute_match_result(cast(Glicko2Competitor, competitor), s=1.0, match_time=match_time)
 
     def tied(self, competitor: BaseCompetitor, match_time: Optional[datetime] = None) -> None:
         """Update ratings after this competitor has tied with the given competitor.
@@ -720,48 +692,45 @@ class Glicko2Competitor(BaseCompetitor):
         """
         self.verify_competitor_types(competitor)
         logger.debug("%s tied with %s (time=%s). Recording result.", self, competitor, match_time)
-        competitor_glicko2 = cast(Glicko2Competitor, competitor)
+        self._compute_match_result(cast(Glicko2Competitor, competitor), s=0.5, match_time=match_time)
 
-        # Get the match time
+    def _compute_match_result(
+        self, competitor: "Glicko2Competitor", s: float, match_time: Optional[datetime] = None
+    ) -> None:
+        """Record a match result for both competitors and update both ratings.
+
+        Both players' updates are computed from the same pre-match snapshot: inactivity
+        is applied once to each competitor, each competitor's Glicko-2 scale state is
+        then recorded on the opponent's match result, and only afterwards are the two
+        ratings updated. Without the snapshot the second update would read the first
+        player's already-updated rating and RD.
+
+        Args:
+            competitor (Glicko2Competitor): The opponent competitor.
+            s (float): The score of this competitor (1 for win, 0.5 for draw, 0 for loss).
+            match_time (datetime, optional): The time when the match occurred. Default: current time.
+
+        Raises:
+            InvalidParameterException: If the match time is before either competitor's last activity.
+        """
         current_time = match_time if match_time is not None else datetime.now()
 
         # Validate match time is not before last activity
         if current_time < self._last_activity:
             logger.error("Match time %s is before self last activity %s", current_time, self._last_activity)
             raise InvalidParameterException("Match time cannot be before competitor's last activity time")
-        if current_time < competitor_glicko2._last_activity:
-            logger.error(
-                "Match time %s is before opponent last activity %s", current_time, competitor_glicko2._last_activity
-            )
+        if current_time < competitor._last_activity:
+            logger.error("Match time %s is before opponent last activity %s", current_time, competitor._last_activity)
             raise InvalidParameterException("Match time cannot be before opponent's last activity time")
 
-        # Update RDs for both competitors based on inactivity before recording match
+        # Update RDs for both competitors based on inactivity before recording the match
         self.update_rd_for_inactivity(current_time)
-        competitor_glicko2.update_rd_for_inactivity(current_time)
+        competitor.update_rd_for_inactivity(current_time)
 
-        # Get the match time
-        current_time = match_time if match_time is not None else datetime.now()
-
-        # Validate match time is not before last activity
-        if current_time < self._last_activity:
-            logger.error("Match time %s is before self last activity %s", current_time, self._last_activity)
-            raise InvalidParameterException("Match time cannot be before competitor's last activity time")
-        if current_time < competitor_glicko2._last_activity:
-            logger.error(
-                "Match time %s is before opponent last activity %s", current_time, competitor_glicko2._last_activity
-            )
-            raise InvalidParameterException("Match time cannot be before opponent's last activity time")
-
-        # Update RDs for both competitors based on inactivity before recording match
-        self.update_rd_for_inactivity(current_time)
-        competitor_glicko2.update_rd_for_inactivity(current_time)
-
-        # Record the match result for this competitor
-        self._match_results.append((competitor_glicko2, 0.5, current_time))
-
-        # Record the match result for the opponent
-        competitor_glicko2._match_results.append((self, 0.5, current_time))
+        # Record the match result for each competitor against the other's pre-match state
+        self._match_results.append(_MatchResult(competitor, s, current_time, competitor._mu, competitor._phi))
+        competitor._match_results.append(_MatchResult(self, 1.0 - s, current_time, self._mu, self._phi))
 
         # Update ratings immediately
         self.update_ratings()
-        competitor_glicko2.update_ratings()
+        competitor.update_ratings()
