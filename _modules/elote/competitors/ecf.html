@@ -528,6 +528,9 @@
         <span class="k">return</span> <span class="n">my_transformed</span> <span class="o">/</span> <span class="p">(</span><span class="n">their_transformed</span> <span class="o">+</span> <span class="n">my_transformed</span><span class="p">)</span></div>
 
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_clamp_opponent_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">own_rating</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">opponent_rating</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">own_rating</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">own_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span><span class="p">,</span> <span class="n">opponent_rating</span><span class="p">))</span>
+
 <div class="viewcode-block" id="ECFCompetitor.beat">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.ecf.ECFCompetitor.beat">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -553,14 +556,11 @@
         <span class="n">self_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rating</span>
         <span class="n">competitors_rating</span> <span class="o">=</span> <span class="n">competitor_ecf</span><span class="o">.</span><span class="n">rating</span>
 
-        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">self_rating</span> <span class="o">-</span> <span class="n">competitors_rating</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">self_rating</span> <span class="o">&gt;</span> <span class="n">competitors_rating</span><span class="p">:</span>
-                <span class="n">competitors_rating</span> <span class="o">=</span> <span class="n">self_rating</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">competitors_rating</span> <span class="o">=</span> <span class="n">self_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span>
+        <span class="n">opponent_rating_for_self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clamp_opponent_rating</span><span class="p">(</span><span class="n">self_rating</span><span class="p">,</span> <span class="n">competitors_rating</span><span class="p">)</span>
+        <span class="n">opponent_rating_for_competitor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clamp_opponent_rating</span><span class="p">(</span><span class="n">competitors_rating</span><span class="p">,</span> <span class="n">self_rating</span><span class="p">)</span>
 
-        <span class="n">performance_rating_self</span> <span class="o">=</span> <span class="n">competitors_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span>
-        <span class="n">performance_rating_competitor</span> <span class="o">=</span> <span class="n">self_rating</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span>
+        <span class="n">performance_rating_self</span> <span class="o">=</span> <span class="n">opponent_rating_for_self</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span>
+        <span class="n">performance_rating_competitor</span> <span class="o">=</span> <span class="n">opponent_rating_for_competitor</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span>
 
         <span class="c1"># Update scores</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">performance_rating_self</span><span class="p">)</span>
@@ -592,14 +592,8 @@
         <span class="n">self_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rating</span>
         <span class="n">competitors_rating</span> <span class="o">=</span> <span class="n">competitor_ecf</span><span class="o">.</span><span class="n">rating</span>
 
-        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">self_rating</span> <span class="o">-</span> <span class="n">competitors_rating</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">self_rating</span> <span class="o">&gt;</span> <span class="n">competitors_rating</span><span class="p">:</span>
-                <span class="n">competitors_rating</span> <span class="o">=</span> <span class="n">self_rating</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">competitors_rating</span> <span class="o">=</span> <span class="n">self_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delta</span>
-
-        <span class="n">performance_rating_self</span> <span class="o">=</span> <span class="n">competitors_rating</span>
-        <span class="n">performance_rating_competitor</span> <span class="o">=</span> <span class="n">self_rating</span>
+        <span class="n">performance_rating_self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clamp_opponent_rating</span><span class="p">(</span><span class="n">self_rating</span><span class="p">,</span> <span class="n">competitors_rating</span><span class="p">)</span>
+        <span class="n">performance_rating_competitor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clamp_opponent_rating</span><span class="p">(</span><span class="n">competitors_rating</span><span class="p">,</span> <span class="n">self_rating</span><span class="p">)</span>
 
         <span class="c1"># Update scores</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update</span><span class="p">(</span><span class="n">performance_rating_self</span><span class="p">)</span>
