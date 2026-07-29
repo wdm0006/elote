@@ -246,7 +246,7 @@ class TrueSkillCompetitor(BaseCompetitor):
         Returns:
             float: The current conservative rating.
         """
-        return max(self._mu - 3 * self._sigma, self._minimum_rating)
+        return self._mu - 3 * self._sigma
 
     @rating.setter
     def rating(self, value: float) -> None:

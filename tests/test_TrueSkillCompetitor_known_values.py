@@ -12,13 +12,13 @@ class TestTrueSkillKnownValues(unittest.TestCase):
         player = TrueSkillCompetitor()
         self.assertEqual(player.mu, 25.0)
         self.assertEqual(player.sigma, 8.333)
-        self.assertEqual(player.rating, 100)  # Updated expected value
+        self.assertAlmostEqual(player.rating, 0.001)
 
         # Test custom initialization
         player = TrueSkillCompetitor(initial_mu=30.0, initial_sigma=5.0)
         self.assertEqual(player.mu, 30.0)
         self.assertEqual(player.sigma, 5.0)
-        self.assertEqual(player.rating, 100)  # Updated expected value
+        self.assertEqual(player.rating, 15.0)
 
     def test_gaussian_functions(self):
         """Test the Gaussian CDF and PDF functions with known values."""

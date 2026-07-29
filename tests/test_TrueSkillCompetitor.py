@@ -1,6 +1,6 @@
 import unittest
 import math
-from elote import TrueSkillCompetitor, EloCompetitor
+from elote import TrueSkillCompetitor, EloCompetitor, LambdaArena
 from elote.competitors.base import MissMatchedCompetitorTypesException, InvalidParameterException
 
 
@@ -41,13 +41,13 @@ class TestTrueSkill(unittest.TestCase):
         player = TrueSkillCompetitor()
         self.assertEqual(player.mu, player._default_mu)
         self.assertEqual(player.sigma, player._default_sigma)
-        self.assertEqual(player.rating, max(player.mu - 3 * player.sigma, player._minimum_rating))
+        self.assertEqual(player.rating, player.mu - 3 * player.sigma)
 
         # Test with custom parameters
         player = TrueSkillCompetitor(initial_mu=30, initial_sigma=5)
         self.assertEqual(player.mu, 30)
         self.assertEqual(player.sigma, 5)
-        self.assertEqual(player.rating, max(30 - 3 * 5, player._minimum_rating))
+        self.assertEqual(player.rating, 30 - 3 * 5)
 
         # Test with invalid parameters
         with self.assertRaises(InvalidParameterException):
@@ -62,14 +62,14 @@ class TestTrueSkill(unittest.TestCase):
         # Test getters
         self.assertEqual(player.mu, 25)
         self.assertEqual(player.sigma, 8.333)
-        self.assertEqual(player.rating, max(25 - 3 * 8.333, player._minimum_rating))
+        self.assertEqual(player.rating, 25 - 3 * 8.333)
 
         # Test setters
         player.mu = 30
         self.assertEqual(player.mu, 30)
         player.sigma = 5
         self.assertEqual(player.sigma, 5)
-        self.assertEqual(player.rating, max(30 - 3 * 5, player._minimum_rating))
+        self.assertEqual(player.rating, 30 - 3 * 5)
 
         # Test invalid values
         with self.assertRaises(InvalidParameterException):
@@ -80,6 +80,33 @@ class TestTrueSkill(unittest.TestCase):
         # Test that rating cannot be set directly
         with self.assertRaises(NotImplementedError):
             player.rating = 100
+
+    def test_comparison_uses_conservative_rating(self):
+        winner = TrueSkillCompetitor()
+        loser = TrueSkillCompetitor()
+
+        for _ in range(50):
+            winner.beat(loser)
+
+        self.assertGreater(winner, loser)
+        self.assertNotEqual(winner, loser)
+
+    def test_arena_leaderboard_uses_conservative_rating(self):
+        arena = LambdaArena(lambda a, b: a > b, base_competitor=TrueSkillCompetitor)
+        arena.competitors = {
+            "low": TrueSkillCompetitor(initial_mu=10, initial_sigma=5),
+            "high": TrueSkillCompetitor(initial_mu=30, initial_sigma=5),
+            "medium": TrueSkillCompetitor(initial_mu=20, initial_sigma=5),
+        }
+
+        self.assertEqual(
+            arena.leaderboard(),
+            [
+                {"competitor": "high", "rating": 15},
+                {"competitor": "medium", "rating": 5},
+                {"competitor": "low", "rating": -5},
+            ],
+        )
 
     def test_expected_score_calculation(self):
         """Test that the expected score is calculated correctly."""
