@@ -14,9 +14,43 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
+  test-matrix:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - python-version: '3.10'
+            tox-env: py310
+          - python-version: '3.11'
+            tox-env: py311
+          - python-version: '3.12'
+            tox-env: py312
     
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+    
+    - name: Install dependencies
+      run: |
+        uv pip install --system -e ".[dev,datasets]"
+    
+    - name: Run tests
+      run: uv run tox -e ${{ matrix.tox-env }}
+
+  lint:
+    runs-on: ubuntu-latest
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
@@ -30,15 +64,24 @@ jobs:
       uses: astral-sh/setup-uv@v5
       with:
         enable-cache: true
-    
+
     - name: Install dependencies
       run: |
         uv pip install --system -e ".[dev,datasets]"
-    
-    - name: Run tests
-      run: |
-        make test-all
-    
+
     - name: Run linting
       run: |
         make lint
+
+  # Single stable check name for branch protection; the matrix job names change
+  # whenever the Python version list does.
+  test:
+    runs-on: ubuntu-latest
+    needs: [test-matrix, lint]
+    if: always()
+
+    steps:
+    - name: Check results
+      run: |
+        [ "${{ needs.test-matrix.result }}" = "success" ] || exit 1
+        [ "${{ needs.lint.result }}" = "success" ] || exit 1
