@@ -22,13 +22,9 @@ print(json.dumps(arena.leaderboard(), indent=4))
 # Use a simple dict comprehension instead of deepcopy to avoid issues with non-serializable types
 saved_state = {k: v for k, v in arena.export_state().items()}
 
-# Create a new arena with the saved state
+# Create a new arena from the saved state and run more matches
 matchups = [(random.randint(1, 10), random.randint(1, 10)) for _ in range(100)]
-new_arena = LambdaArena(func, base_competitor=GlickoCompetitor)
-
-# Use from_state to recreate competitors
-for k, v in saved_state.items():
-    new_arena.competitors[k] = GlickoCompetitor.from_state(v)
+new_arena = LambdaArena(func, base_competitor=GlickoCompetitor, initial_state=saved_state)
 
 # Run more matches
 new_arena.tournament(matchups)
