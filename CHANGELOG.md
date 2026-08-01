@@ -1,9 +1,55 @@
-Unreleased
-==========
+v1.2.1
+======
+
+A correctness release. Every shipped rating system except Elo, DWZ, Colley and Bradley-Terry had at
+least one numeric defect, and the prediction-quality metrics silently discarded drawn bouts. Ratings
+and predicted probabilities produced by this version differ from v1.2.0; state exported by v1.2.0
+still loads without changes.
 
 Bug fixes
 
+ * Fixed `GlickoCompetitor.expected_score` and the Glicko rating update squaring the rating deviation
+   twice and reading the wrong player's deviation. Expected scores had collapsed to roughly 0.5 for
+   any rating gap; a 2500-vs-1500 matchup now returns 0.979 instead of 0.504.
+ * Fixed `Glicko2Competitor.beat`/`tied` applying the inactivity rating-deviation inflation three
+   times per match, and updating the two competitors sequentially so the second update read the
+   first competitor's already-updated state. Both competitors are now updated from the same
+   pre-match snapshot, and `update_rd_for_inactivity` is idempotent for a repeated timestamp.
+ * Fixed `TrueSkillCompetitor.expected_score` using `sqrt(beta^2 + sigma_i^2 + sigma_j^2)` where
+   two-player TrueSkill uses `sqrt(2*beta^2 + ...)`. Predictions were too sharp.
+ * Fixed the TrueSkill win, loss and draw updates: skill variance is now inflated by `tau^2` before
+   the match, mean corrections are scaled by `sigma^2/c` and variance corrections by `sigma^2/c^2`,
+   and draws apply both the mean correction and the positive draw correction. Regression tested
+   against the reference `trueskill` package.
+ * Fixed `TrueSkillCompetitor.rating` clamping the conservative estimate at the inherited minimum
+   rating. It now returns `mu - 3*sigma` unclamped, so comparisons and `LambdaArena.leaderboard()`
+   order competitors on TrueSkill's own scale.
  * Fixed ECF rating updates to apply the rating-difference cap independently for each competitor.
+   Draws between widely-separated competitors were argument-order dependent, and a competitor could
+   gain rating from losing an expected result.
+ * Fixed `History.report_results()` comparing a predicted competitor identifier against a bout slot
+   label when computing `"correct"`, which made the field wrong for essentially every bout.
+ * Fixed `History.confusion_matrix`, `calculate_metrics`, `calculate_metrics_with_draws`,
+   `optimize_thresholds` and `random_search` discarding every drawn bout. Draw handling in those
+   methods had been unreachable; draws now count as true positives when predicted, false positives
+   when wrongly predicted, and false negatives when missed.
+
+Improvements
+
+ * `History.report_results()` now reports the winner under the correctly spelled key
+   `predicted_winner`. The historical misspelling `predicted_winnder` is retained as a deprecated
+   alias with the same value and will be removed in a future release.
+ * CI now runs the test suite against every supported Python version (3.10, 3.11, 3.12) instead of
+   3.10 only, lints in a separate job, and uses current GitHub Actions.
+
+Compatibility notes
+
+ * Metrics computed from a `History` will change for any dataset containing draws, and predicted
+   probabilities change for Glicko, Glicko-2 and TrueSkill. Recalibrate any thresholds tuned against
+   v1.2.0.
+ * `TrueSkillCompetitor.rating` may now be negative for a competitor that has played few matches.
+ * Recording a Glicko-2 match timestamped before a competitor's last recorded activity now raises
+   `InvalidParameterException` where it previously could be accepted.
 
 v1.2.0
 ======
