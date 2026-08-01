@@ -1,4 +1,4 @@
-from typing import Dict, Any, ClassVar, Optional, Type, TypeVar
+from typing import Dict, Any, ClassVar, Optional, Type, TypeVar, cast
 
 from elote.competitors.base import BaseCompetitor, InvalidRatingValueException, InvalidParameterException
 from elote.logging import logger  # Import directly from the logging submodule
@@ -240,6 +240,21 @@ class EloCompetitor(BaseCompetitor):
             raise InvalidRatingValueException(f"Rating cannot be below the minimum rating of {self._minimum_rating}")
         self._rating = value
 
+    def _new_rating(self, actual_score: float, expected_score: float) -> float:
+        """Calculate this competitor's new rating after a match.
+
+        Args:
+            actual_score (float): The score achieved in the match (1.0, 0.5, or 0.0).
+            expected_score (float): The expected score against the opponent.
+
+        Returns:
+            float: The new rating, saturated at the minimum rating.
+        """
+        new_rating = self._rating + self._k_factor * (actual_score - expected_score)
+        new_rating_clamped = max(self._minimum_rating, new_rating)
+        logger.debug("New rating calculated: %.1f (Clamped: %.1f)", new_rating, new_rating_clamped)
+        return float(new_rating_clamped)
+
     def expected_score(self, competitor: "BaseCompetitor") -> float:
         """Calculate the expected score against another competitor.
 
@@ -265,13 +280,17 @@ class EloCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
-        logger.debug("%s beat %s", self, competitor)
-        # Revert to original logic
-        win_es = self.expected_score(competitor)
-        lose_es = competitor.expected_score(self)
+        competitor_elo = cast(EloCompetitor, competitor)
+        logger.debug("%s beat %s", self, competitor_elo)
 
-        self._rating = self._rating + self._k_factor * (1 - win_es)
-        competitor.rating = competitor.rating + self._k_factor * (0 - lose_es)
+        win_es = self.expected_score(competitor_elo)
+        lose_es = competitor_elo.expected_score(self)
+
+        my_new_rating = self._new_rating(1, win_es)
+        opponent_new_rating = competitor_elo._new_rating(0, lose_es)
+
+        self.rating = my_new_rating
+        competitor_elo.rating = opponent_new_rating
 
     def tied(self, competitor: BaseCompetitor) -> None:
         """Update ratings after this competitor has tied with the given competitor.
@@ -286,10 +305,14 @@ class EloCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
-        logger.debug("%s tied with %s", self, competitor)
-        # Revert to original logic
-        win_es = self.expected_score(competitor)
-        lose_es = competitor.expected_score(self)
+        competitor_elo = cast(EloCompetitor, competitor)
+        logger.debug("%s tied with %s", self, competitor_elo)
 
-        self._rating = self._rating + self._k_factor * (0.5 - win_es)
-        competitor.rating = competitor.rating + self._k_factor * (0.5 - lose_es)
+        win_es = self.expected_score(competitor_elo)
+        lose_es = competitor_elo.expected_score(self)
+
+        my_new_rating = self._new_rating(0.5, win_es)
+        opponent_new_rating = competitor_elo._new_rating(0.5, lose_es)
+
+        self.rating = my_new_rating
+        competitor_elo.rating = opponent_new_rating
