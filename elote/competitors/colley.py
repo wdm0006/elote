@@ -268,18 +268,12 @@ class ColleyMatrixCompetitor(BaseCompetitor):
                 C_sparse = csc_matrix(C)
                 r = spsolve(C_sparse, b)
 
+            r = np.round(r, decimals=15)
+
             # Update ratings efficiently
             logger.debug("Updating ratings for %d competitors", n)
             for i, comp in enumerate(competitors):
                 comp._rating = float(r[i])  # Ensure Python float type
-
-            # Check for duplicate ratings and add small perturbations if needed
-            ratings = r.copy()
-            unique_ratings = np.unique(ratings)
-            if len(unique_ratings) < n:
-                # Add small perturbations to make ratings unique
-                for i in range(n):
-                    competitors[i]._rating += (i + 1) * 1e-10
 
             # Normalize ratings to ensure sum is n/2
             total_rating = np.sum(r)

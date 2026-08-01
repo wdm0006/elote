@@ -5,6 +5,15 @@ from elote.competitors.base import MissMatchedCompetitorTypesException
 
 
 class TestColleyMatrix(unittest.TestCase):
+    @staticmethod
+    def _symmetric_connected_population():
+        a, b, c, d = (ColleyMatrixCompetitor() for _ in range(4))
+        a.beat(b)
+        c.beat(d)
+        a.tied(c)
+        b.tied(d)
+        return a, b, c, d
+
     def test_improvement(self):
         """Test that beating stronger opponents improves rating."""
         initial_rating = 0.5
@@ -50,11 +59,9 @@ class TestColleyMatrix(unittest.TestCase):
         competitors[3].beat(competitors[4])
         competitors[4].beat(competitors[0])
 
-        # All ratings should be different after this circular pattern
+        # All competitors have identical records in this circular pattern
         ratings = [c.rating for c in competitors]
-        self.assertEqual(
-            len(set(ratings)), len(ratings), "Each competitor should have a unique rating after circular matches"
-        )
+        self.assertEqual(len(set(ratings)), 1)
 
         # Ratings should sum to n/2 = 2.5 (property of Colley Matrix Method)
         self.assertAlmostEqual(sum(ratings), len(competitors) / 2)
@@ -76,6 +83,17 @@ class TestColleyMatrix(unittest.TestCase):
 
         with self.assertRaises(MissMatchedCompetitorTypesException):
             player1.expected_score(player2)
+
+    def test_identical_records_have_identical_ratings(self):
+        a, b, c, d = self._symmetric_connected_population()
+
+        self.assertEqual(a.rating, c.rating)
+        self.assertEqual(b.rating, d.rating)
+
+    def test_duplicate_ratings_preserve_sum_invariant(self):
+        competitors = self._symmetric_connected_population()
+
+        self.assertAlmostEqual(sum(competitor.rating for competitor in competitors), 2.0, places=12)
 
 
 if __name__ == "__main__":
