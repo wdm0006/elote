@@ -26,6 +26,8 @@ References:
 import math
 from typing import Dict, Any, ClassVar, Type, TypeVar, List, Optional, cast, Set
 
+import numpy as np
+
 from elote.competitors.base import BaseCompetitor, InvalidParameterException
 from elote.logging import logger
 
@@ -240,57 +242,49 @@ class BradleyTerryCompetitor(BaseCompetitor):
         idx = {comp: i for i, comp in enumerate(competitors)}
 
         # Win counts: wins[i][j] = number of times i beat j (ties count as 0.5 to each side).
-        wins = [[0.0] * n for _ in range(n)]
+        wins = np.zeros((n, n), dtype=np.float64)
         for i, comp in enumerate(competitors):
             for opponent, w in comp._head_to_head.items():
                 j = idx.get(opponent)
                 if j is not None:
-                    wins[i][j] += w
+                    wins[i, j] += w
 
         # Total games between each pair (symmetric).
-        games = [[wins[i][j] + wins[j][i] for j in range(n)] for i in range(n)]
+        games = wins + wins.T
 
         # Total wins per competitor (ties are already counted as half in the win matrix).
-        total_wins = [math.fsum(wins[i]) for i in range(n)]
+        total_wins = wins.sum(axis=1)
 
         # Strengths p_i = exp(beta_i). The Bradley-Terry log-likelihood is concave with a
         # unique maximum, so we seed from a flat, well-conditioned starting point rather than
         # warm-starting from the (possibly extreme) current strengths.
-        p = [1.0] * n
+        p = np.ones(n, dtype=np.float64)
 
         reg = self._reg
+        # Regularization: a virtual win and loss against a phantom opponent of unit strength,
+        # guaranteeing a finite, unique solution even for undefeated or winless competitors.
+        numerator = total_wins + reg
         for iteration in range(self._max_iter):
-            new_p = [0.0] * n
-            for i in range(n):
-                denominator = 0.0
-                for j in range(n):
-                    if i == j or games[i][j] == 0:
-                        continue
-                    denominator += games[i][j] / (p[i] + p[j])
-                # Regularization: a virtual win and loss against a phantom opponent of unit
-                # strength, guaranteeing a finite, unique solution even for undefeated or
-                # winless competitors.
-                numerator = total_wins[i] + reg
-                denominator += 2.0 * reg / (p[i] + 1.0)
-                new_p[i] = numerator / denominator if denominator > 0 else p[i]
+            # games[i][i] is zero, so the diagonal contributes nothing and needs no masking.
+            denominator = (games / (p[:, None] + p[None, :])).sum(axis=1) + 2.0 * reg / (p + 1.0)
+            new_p = np.divide(numerator, denominator, out=p.copy(), where=denominator > 0)
 
             # Normalize by the geometric mean to fix the overall scale.
-            log_sum = sum(math.log(v) for v in new_p if v > 0)
-            geo_mean = math.exp(log_sum / n)
+            geo_mean = math.exp(np.log(new_p).sum() / n)
             if geo_mean > 0:
-                new_p = [v / geo_mean for v in new_p]
+                new_p = new_p / geo_mean
 
-            max_delta = max(abs(math.log(new_p[i]) - math.log(p[i])) for i in range(n) if new_p[i] > 0)
+            max_delta = float(np.max(np.abs(np.log(new_p) - np.log(p))))
             p = new_p
             if max_delta < self._tol:
                 logger.debug("Bradley-Terry fit converged in %d iterations", iteration + 1)
                 break
 
         # Write back re-centered log-strengths (mean beta == 0).
-        betas = [math.log(v) for v in p]
-        mean_beta = sum(betas) / n
+        betas = np.log(p)
+        betas = betas - betas.mean()
         for i, comp in enumerate(competitors):
-            comp._beta = betas[i] - mean_beta
+            comp._beta = float(betas[i])
 
     def _export_parameters(self) -> Dict[str, Any]:
         """Export the parameters used to initialize this competitor.
