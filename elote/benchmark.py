@@ -5,8 +5,10 @@ This module provides functions for benchmarking and comparing different rating s
 using consistent evaluation metrics and visualization.
 """
 
+import contextlib
+import inspect
 import logging
-from typing import Dict, List, Type, Optional, Any, Callable
+from typing import Dict, Iterator, List, Type, Optional, Any, Callable
 import time
 
 from elote.arenas.lambda_arena import LambdaArena
@@ -16,6 +18,56 @@ from elote.datasets.utils import train_arena_with_dataset, evaluate_arena_with_d
 
 
 logger = logging.getLogger(__name__)
+
+
+#: Starting rating handed to every benchmarked rating system that accepts one, so the
+#: systems are compared from a common point rather than from their own varied defaults.
+BENCHMARK_INITIAL_RATING = 1500
+
+_UNSET = object()
+
+
+def _accepts_common_initial_rating(competitor_class: Type[BaseCompetitor]) -> bool:
+    """Report whether the common benchmark starting rating is meaningful for a class.
+
+    A class qualifies when its constructor actually takes an ``initial_rating`` and it is
+    not a global-fit system. Global-fit systems (marked by a ``_recalculate_ratings`` hook)
+    re-derive every rating from the whole match graph, so their starting value is a pre-fit
+    placeholder the first refit discards -- and their scales are not Elo-like, so forcing
+    1500 on them is meaningless at best.
+
+    Args:
+        competitor_class: The competitor class being benchmarked.
+
+    Returns:
+        bool: True if ``initial_rating`` should be passed to the constructor.
+    """
+    if hasattr(competitor_class, "_recalculate_ratings"):
+        return False
+    return "initial_rating" in inspect.signature(competitor_class.__init__).parameters
+
+
+@contextlib.contextmanager
+def _restored_class_vars(cls: Type[BaseCompetitor], names: List[str]) -> Iterator[None]:
+    """Restore the given class variables on ``cls`` when the block exits.
+
+    Attributes that were inherited rather than set directly on ``cls`` are deleted again
+    so the class is left exactly as it was found.
+
+    Args:
+        cls: The class whose attributes will be mutated inside the block.
+        names: The attribute names to snapshot and restore.
+    """
+    saved = {name: cls.__dict__.get(name, _UNSET) for name in names}
+    try:
+        yield
+    finally:
+        for name, value in saved.items():
+            if value is _UNSET:
+                if name in cls.__dict__:
+                    delattr(cls, name)
+            else:
+                setattr(cls, name, value)
 
 
 def evaluate_competitor(
@@ -36,7 +88,8 @@ def evaluate_competitor(
         data_split: DataSplit object containing train and test sets
         comparison_function: Function to compare competitors (used in LambdaArena)
         competitor_name: Name for the competitor (defaults to class name if None)
-        competitor_params: Dictionary of parameters to set on the competitor
+        competitor_params: Dictionary of parameters to set as class variables on the
+            competitor class for the duration of this call; they are restored afterwards
         batch_size: Number of matchups to process in each batch
         progress_callback: Callback function for reporting progress
         optimize_thresholds: Whether to optimize prediction thresholds
@@ -52,77 +105,88 @@ def evaluate_competitor(
 
     logger.info(f"Evaluating {competitor_name}...")
 
+    # Put every rating system that accepts a starting rating on a common scale. This has to
+    # go through the constructor: __init__ assigns self._initial_rating, which would shadow
+    # any class attribute set here.
+    base_competitor_kwargs: Dict[str, Any] = {}
+    if _accepts_common_initial_rating(competitor_class):
+        base_competitor_kwargs["initial_rating"] = BENCHMARK_INITIAL_RATING
+
     # Create the arena with the specified rating system
-    arena = LambdaArena(comparison_function, base_competitor=competitor_class)
-
-    # Set common parameters
-    arena.set_competitor_class_var("_minimum_rating", 0)
-    arena.set_competitor_class_var("_initial_rating", 1500)
-
-    # Set any additional parameters
-    for param, value in competitor_params.items():
-        arena.set_competitor_class_var(f"_{param}", value)
-
-    # Train the arena on training data
-    start_time = time.time()
-
-    if progress_callback:
-
-        def train_progress(current: int, total: int) -> None:
-            return progress_callback("train", current, total)
-    else:
-        train_progress = None
-
-    train_arena_with_dataset(arena, data_split.train, batch_size=batch_size, progress_callback=train_progress)
-
-    train_time = time.time() - start_time
-    logger.info(f"Training completed in {train_time:.2f} seconds")
-
-    # Evaluate on test data
-    start_time = time.time()
-
-    if progress_callback:
-
-        def eval_progress(current: int, total: int) -> None:
-            return progress_callback("eval", current, total)
-    else:
-        eval_progress = None
-
-    history = evaluate_arena_with_dataset(
-        arena, data_split.test, batch_size=batch_size, progress_callback=eval_progress
+    arena = LambdaArena(
+        comparison_function, base_competitor=competitor_class, base_competitor_kwargs=base_competitor_kwargs
     )
 
-    eval_time = time.time() - start_time
-    logger.info(f"Evaluation completed in {eval_time:.2f} seconds")
+    mutated_class_vars = ["_minimum_rating"] + [f"_{param}" for param in competitor_params]
 
-    # Calculate metrics with default thresholds
-    metrics = history.calculate_metrics()
+    with _restored_class_vars(competitor_class, mutated_class_vars):
+        # Set common parameters
+        arena.set_competitor_class_var("_minimum_rating", 0)
 
-    # Optimize thresholds if requested
-    if optimize_thresholds:
-        best_accuracy, best_thresholds = history.optimize_thresholds()
-        optimized_metrics = history.calculate_metrics(*best_thresholds)
-        metrics["accuracy_opt"] = optimized_metrics["accuracy"]
-        metrics["optimized_thresholds"] = best_thresholds
+        # Set any additional parameters
+        for param, value in competitor_params.items():
+            arena.set_competitor_class_var(f"_{param}", value)
 
-    # Add competitor info and timing
-    metrics["name"] = competitor_name
-    metrics["train_time"] = train_time
-    metrics["eval_time"] = eval_time
+        # Train the arena on training data
+        start_time = time.time()
 
-    # Get top teams (leaderboard is already sorted best-first)
-    top_teams = arena.leaderboard()[:5]
-    metrics["top_teams"] = top_teams
+        if progress_callback:
 
-    # Add history and arena to metrics
-    metrics["history"] = history
-    metrics["arena"] = arena
+            def train_progress(current: int, total: int) -> None:
+                return progress_callback("train", current, total)
+        else:
+            train_progress = None
 
-    # Calculate accuracy by prior bouts if optimize_thresholds is True
-    if optimize_thresholds:
-        thresholds = best_thresholds
-        bout_data = history.accuracy_by_prior_bouts(arena, thresholds)
-        metrics["accuracy_by_prior_bouts"] = bout_data
+        train_arena_with_dataset(arena, data_split.train, batch_size=batch_size, progress_callback=train_progress)
+
+        train_time = time.time() - start_time
+        logger.info(f"Training completed in {train_time:.2f} seconds")
+
+        # Evaluate on test data
+        start_time = time.time()
+
+        if progress_callback:
+
+            def eval_progress(current: int, total: int) -> None:
+                return progress_callback("eval", current, total)
+        else:
+            eval_progress = None
+
+        history = evaluate_arena_with_dataset(
+            arena, data_split.test, batch_size=batch_size, progress_callback=eval_progress
+        )
+
+        eval_time = time.time() - start_time
+        logger.info(f"Evaluation completed in {eval_time:.2f} seconds")
+
+        # Calculate metrics with default thresholds
+        metrics = history.calculate_metrics()
+
+        # Optimize thresholds if requested
+        if optimize_thresholds:
+            best_accuracy, best_thresholds = history.optimize_thresholds()
+            optimized_metrics = history.calculate_metrics(*best_thresholds)
+            metrics["accuracy_opt"] = optimized_metrics["accuracy"]
+            metrics["optimized_thresholds"] = best_thresholds
+
+        # Add competitor info and timing
+        metrics["name"] = competitor_name
+        metrics["train_time"] = train_time
+        metrics["eval_time"] = eval_time
+
+        # Get top teams (leaderboard is already sorted best-first)
+        top_teams = arena.leaderboard()[:5]
+        metrics["top_teams"] = top_teams
+
+        # Add history and arena to metrics
+        metrics["history"] = history
+        metrics["arena"] = arena
+
+        # Calculate accuracy by prior bouts if optimize_thresholds is True
+        if optimize_thresholds:
+            thresholds = best_thresholds
+            bout_data = history.accuracy_by_prior_bouts(arena, thresholds)
+            metrics["accuracy_by_prior_bouts"] = bout_data
 
     # Log results
     logger.info(f"Results for {competitor_name}:")
