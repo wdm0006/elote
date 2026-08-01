@@ -210,7 +210,9 @@
 <span class="sd">            base_competitor_kwargs (dict, optional): Keyword arguments to pass to</span>
 <span class="sd">                the base_competitor constructor.</span>
 <span class="sd">            initial_state (dict, optional): Initial state for competitors, mapping</span>
-<span class="sd">                competitor IDs to their initial parameters.</span>
+<span class="sd">                competitor IDs either to exported competitor state documents (as</span>
+<span class="sd">                produced by :meth:`export_state`) or to plain keyword arguments for</span>
+<span class="sd">                the base_competitor constructor, such as ``{&quot;initial_rating&quot;: 1200}``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Initializing LambdaArena with competitor type: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
@@ -227,7 +229,13 @@
         <span class="c1"># if some initial state is passed in, we can seed the population</span>
         <span class="k">if</span> <span class="n">initial_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">initial_state</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_competitor</span><span class="p">(</span><span class="o">**</span><span class="n">v</span><span class="p">)</span>
+                <span class="c1"># An exported competitor state document carries its own concrete type,</span>
+                <span class="c1"># which from_state resolves through the subclass registry. Anything else</span>
+                <span class="c1"># is treated as constructor keyword arguments.</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;type&quot;</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">BaseCompetitor</span><span class="o">.</span><span class="n">from_state</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_competitor</span><span class="p">(</span><span class="o">**</span><span class="n">v</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="p">:</span> <span class="n">History</span> <span class="o">=</span> <span class="n">History</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eval_history</span> <span class="o">=</span> <span class="n">History</span><span class="p">()</span>

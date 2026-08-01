@@ -192,7 +192,9 @@ aren’t competitors themselves.</p>
 </dd>
 <dt>base_competitor_kwargs (dict, optional): Keyword arguments to pass to</dt><dd><p>the base_competitor constructor.</p>
 </dd>
-<dt>initial_state (dict, optional): Initial state for competitors, mapping</dt><dd><p>competitor IDs to their initial parameters.</p>
+<dt>initial_state (dict, optional): Initial state for competitors, mapping</dt><dd><p>competitor IDs either to exported competitor state documents (as
+produced by <a class="reference internal" href="#elote.arenas.lambda_arena.LambdaArena.export_state" title="elote.arenas.lambda_arena.LambdaArena.export_state"><code class="xref py py-meth docutils literal notranslate"><span class="pre">export_state()</span></code></a>) or to plain keyword arguments for
+the base_competitor constructor, such as <code class="docutils literal notranslate"><span class="pre">{&quot;initial_rating&quot;:</span> <span class="pre">1200}</span></code>.</p>
 </dd>
 </dl>
 </dd>
