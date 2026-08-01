@@ -88,7 +88,8 @@ def evaluate_competitor(
         data_split: DataSplit object containing train and test sets
         comparison_function: Function to compare competitors (used in LambdaArena)
         competitor_name: Name for the competitor (defaults to class name if None)
-        competitor_params: Dictionary of parameters to set on the competitor
+        competitor_params: Dictionary of parameters to set as class variables on the
+            competitor class for the duration of this call; they are restored afterwards
         batch_size: Number of matchups to process in each batch
         progress_callback: Callback function for reporting progress
         optimize_thresholds: Whether to optimize prediction thresholds
