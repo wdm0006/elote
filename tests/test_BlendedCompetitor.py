@@ -4,6 +4,10 @@ from elote.competitors.base import MissMatchedCompetitorTypesException
 
 
 class TestBlendedCompetitor(unittest.TestCase):
+    @staticmethod
+    def _blended(*competitor_types):
+        return BlendedCompetitor(competitors=[{"type": competitor_type} for competitor_type in competitor_types])
+
     def test_Improvement(self):
         player1 = BlendedCompetitor(
             competitors=[
@@ -96,3 +100,31 @@ class TestBlendedCompetitor(unittest.TestCase):
 
         with self.assertRaises(MissMatchedCompetitorTypesException):
             player1.verify_competitor_types(player2)
+
+    def test_rejects_different_composition_lengths_before_mutation(self):
+        for operation in ("expected_score", "beat", "tied"):
+            with self.subTest(operation=operation):
+                player1 = self._blended("EloCompetitor", "GlickoCompetitor")
+                player2 = self._blended("EloCompetitor")
+                sub_competitors = player1.sub_competitors + player2.sub_competitors
+                initial_ratings = [c.rating for c in sub_competitors]
+
+                with self.assertRaisesRegex(
+                    MissMatchedCompetitorTypesException,
+                    r"\['EloCompetitor', 'GlickoCompetitor'\].*\['EloCompetitor'\]",
+                ):
+                    getattr(player1, operation)(player2)
+
+                self.assertEqual([c.rating for c in sub_competitors], initial_ratings)
+
+    def test_rejects_different_ordered_compositions(self):
+        for operation in ("expected_score", "beat", "tied"):
+            with self.subTest(operation=operation):
+                player1 = self._blended("EloCompetitor", "GlickoCompetitor")
+                player2 = self._blended("GlickoCompetitor", "EloCompetitor")
+
+                with self.assertRaisesRegex(
+                    MissMatchedCompetitorTypesException,
+                    r"BlendedCompetitor compositions .* cannot be co-mingled",
+                ):
+                    getattr(player1, operation)(player2)
