@@ -1,11 +1,14 @@
 import unittest
 from unittest.mock import patch, MagicMock
 import logging
-from elote.benchmark import evaluate_competitor, benchmark_competitors
+from elote.benchmark import BENCHMARK_INITIAL_RATING, evaluate_competitor, benchmark_competitors
 from elote.competitors.elo import EloCompetitor
+from elote.competitors.dwz import DWZCompetitor
 from elote.competitors.glicko import GlickoCompetitor
+from elote.competitors.trueskill import TrueSkillCompetitor
 from elote.arenas.base import History, Bout
 from elote.datasets.base import DataSplit
+from elote.datasets.synthetic import SyntheticDataset
 
 
 class TestBenchmarkModule(unittest.TestCase):
@@ -280,6 +283,111 @@ class TestBenchmarkModule(unittest.TestCase):
         self.assertEqual(len(results), 2)
         self.assertEqual(results[0]["name"], "Elo")
         self.assertEqual(results[1]["name"], "Glicko")
+
+
+def _always_true(a, b, attributes=None):
+    """Comparison function for the dataset helpers.
+
+    ``train_arena_with_dataset`` encodes the real outcome in the argument order it hands to
+    ``arena.matchup``, so the comparison function only has to agree that the first argument
+    won. It must accept ``attributes`` as a keyword because rows carry attributes.
+    """
+    return True
+
+
+class TestBenchmarkEndToEnd(unittest.TestCase):
+    """Exercises evaluate_competitor against real data, with nothing mocked out."""
+
+    @classmethod
+    def setUpClass(cls):
+        dataset = SyntheticDataset(num_competitors=20, num_matchups=200, seed=42)
+        cls.data_split = dataset.time_split(test_ratio=0.3)
+
+    def test_class_variables_are_restored_after_evaluation(self):
+        """evaluate_competitor must leave no residue on the competitor class."""
+        before_minimum = EloCompetitor._minimum_rating
+        before_minimum_is_own = "_minimum_rating" in vars(EloCompetitor)
+        before_k_factor = EloCompetitor._k_factor
+
+        evaluate_competitor(
+            competitor_class=EloCompetitor,
+            data_split=self.data_split,
+            comparison_function=_always_true,
+            competitor_params={"k_factor": 12},
+            optimize_thresholds=False,
+        )
+
+        self.assertEqual(EloCompetitor._minimum_rating, before_minimum)
+        self.assertEqual("_minimum_rating" in vars(EloCompetitor), before_minimum_is_own)
+        self.assertEqual(EloCompetitor._k_factor, before_k_factor)
+
+    def test_competitors_start_from_the_common_initial_rating(self):
+        """The competitors the arena actually built must start at the benchmark rating.
+
+        Asserted on real competitor objects rather than on the class attribute: every
+        __init__ assigns self._initial_rating from its own argument, so a class attribute
+        set on the competitor class is shadowed and proves nothing.
+        """
+        for competitor_class in (EloCompetitor, DWZCompetitor):
+            with self.subTest(competitor=competitor_class.__name__):
+                result = evaluate_competitor(
+                    competitor_class=competitor_class,
+                    data_split=self.data_split,
+                    comparison_function=_always_true,
+                    optimize_thresholds=False,
+                )
+                competitors = list(result["arena"].competitors.values())
+                self.assertGreater(len(competitors), 0)
+                for competitor in competitors:
+                    self.assertEqual(competitor._initial_rating, BENCHMARK_INITIAL_RATING)
+
+    def test_competitor_without_initial_rating_argument(self):
+        """A class whose __init__ takes no initial_rating must not be handed one."""
+        result = evaluate_competitor(
+            competitor_class=TrueSkillCompetitor,
+            data_split=self.data_split,
+            comparison_function=_always_true,
+            optimize_thresholds=False,
+        )
+
+        competitors = list(result["arena"].competitors.values())
+        self.assertGreater(len(competitors), 0)
+        for competitor in competitors:
+            self.assertIsInstance(competitor, TrueSkillCompetitor)
+
+    def test_end_to_end_metrics_are_non_degenerate(self):
+        """A real train/evaluate run must produce plausible, fully accounted-for metrics."""
+        result = evaluate_competitor(
+            competitor_class=EloCompetitor,
+            data_split=self.data_split,
+            comparison_function=_always_true,
+            optimize_thresholds=True,
+        )
+
+        arena = result["arena"]
+        scored_bouts = sum(
+            1 for a, b, _, _, _ in self.data_split.test if a in arena.competitors and b in arena.competitors
+        )
+        self.assertGreater(scored_bouts, 0)
+        self.assertEqual(len(result["history"].bouts), scored_bouts)
+
+        confusion_matrix = result["confusion_matrix"]
+        self.assertEqual(sum(confusion_matrix.values()), scored_bouts)
+
+        self.assertGreater(result["accuracy"], 0.0)
+        self.assertLess(result["accuracy"], 1.0)
+        expected_accuracy = (confusion_matrix["tp"] + confusion_matrix["tn"]) / scored_bouts
+        self.assertAlmostEqual(result["accuracy"], expected_accuracy)
+
+        # Optimized thresholds can only improve on the default ones.
+        self.assertGreaterEqual(result["accuracy_opt"], result["accuracy"])
+        lower, upper = result["optimized_thresholds"]
+        self.assertLessEqual(lower, upper)
+
+        self.assertEqual(len(result["top_teams"]), 5)
+        ratings = [team["rating"] for team in result["top_teams"]]
+        self.assertEqual(ratings, sorted(ratings, reverse=True))
+        self.assertGreater(ratings[0], ratings[-1])
 
 
 if __name__ == "__main__":
