@@ -304,22 +304,42 @@ class TestBenchmarkEndToEnd(unittest.TestCase):
         cls.data_split = dataset.time_split(test_ratio=0.3)
 
     def test_class_variables_are_restored_after_evaluation(self):
-        """evaluate_competitor must leave no residue on the competitor class."""
-        before_minimum = EloCompetitor._minimum_rating
-        before_minimum_is_own = "_minimum_rating" in vars(EloCompetitor)
-        before_k_factor = EloCompetitor._k_factor
+        """evaluate_competitor must leave no residue on the competitor class.
+
+        GlickoCompetitor is used because no other test in this module benchmarks it, so a
+        leak from an earlier test cannot mask the assertions here.
+        """
+        # _minimum_rating is inherited from BaseCompetitor rather than declared on
+        # GlickoCompetitor, so restoring it means removing the attribute again.
+        self.assertNotIn("_minimum_rating", vars(GlickoCompetitor))
+        before_minimum = GlickoCompetitor._minimum_rating
+        before_c = GlickoCompetitor._c
+
+        evaluate_competitor(
+            competitor_class=GlickoCompetitor,
+            data_split=self.data_split,
+            comparison_function=_always_true,
+            competitor_params={"c": 20.0},
+            optimize_thresholds=False,
+        )
+
+        self.assertNotIn("_minimum_rating", vars(GlickoCompetitor))
+        self.assertEqual(GlickoCompetitor._minimum_rating, before_minimum)
+        self.assertEqual(GlickoCompetitor._c, before_c)
+
+    def test_unknown_competitor_params_are_not_left_behind(self):
+        """A class variable that did not exist before the run must not exist after it."""
+        self.assertNotIn("_benchmark_probe", vars(EloCompetitor))
 
         evaluate_competitor(
             competitor_class=EloCompetitor,
             data_split=self.data_split,
             comparison_function=_always_true,
-            competitor_params={"k_factor": 12},
+            competitor_params={"benchmark_probe": 123},
             optimize_thresholds=False,
         )
 
-        self.assertEqual(EloCompetitor._minimum_rating, before_minimum)
-        self.assertEqual("_minimum_rating" in vars(EloCompetitor), before_minimum_is_own)
-        self.assertEqual(EloCompetitor._k_factor, before_k_factor)
+        self.assertNotIn("_benchmark_probe", vars(EloCompetitor))
 
     def test_competitors_start_from_the_common_initial_rating(self):
         """The competitors the arena actually built must start at the benchmark rating.
