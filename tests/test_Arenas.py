@@ -1,5 +1,19 @@
+import datetime
+import json
+import random
 import unittest
-from elote import LambdaArena, EloCompetitor, GlickoCompetitor
+
+from elote import (
+    BradleyTerryCompetitor,
+    ColleyMatrixCompetitor,
+    DWZCompetitor,
+    ECFCompetitor,
+    EloCompetitor,
+    Glicko2Competitor,
+    GlickoCompetitor,
+    LambdaArena,
+    TrueSkillCompetitor,
+)
 
 
 class TestArenas(unittest.TestCase):
@@ -228,3 +242,115 @@ class TestArenas(unittest.TestCase):
                 # validate only records predictions; it must not update ratings.
                 ratings_after = {cid: c.rating for cid, c in arena.competitors.items()}
                 self.assertEqual(ratings_before, ratings_after)
+
+
+class TestArenaStateRoundTrip(unittest.TestCase):
+    """LambdaArena must be restorable from its own export_state() output."""
+
+    # Every shipped competitor class must survive the round trip.
+    ALL_COMPETITORS = (
+        EloCompetitor,
+        GlickoCompetitor,
+        Glicko2Competitor,
+        TrueSkillCompetitor,
+        ECFCompetitor,
+        DWZCompetitor,
+        ColleyMatrixCompetitor,
+        BradleyTerryCompetitor,
+    )
+
+    # Colley and Bradley-Terry reset their opponent match graph on import by design
+    # (documented in their own docstrings), so only the incremental systems can be
+    # expected to keep rating identically after a restore.
+    INCREMENTAL_COMPETITORS = (
+        EloCompetitor,
+        GlickoCompetitor,
+        Glicko2Competitor,
+        TrueSkillCompetitor,
+        ECFCompetitor,
+        DWZCompetitor,
+    )
+
+    # Elo aborts on its rating floor when a competitor loses repeatedly from the
+    # default start of 400, so give it the same headroom the examples use.
+    COMPETITOR_KWARGS = {EloCompetitor: {"initial_rating": 1200}}
+
+    @staticmethod
+    def _matchups(seed, count):
+        rng = random.Random(seed)
+        pairs = []
+        while len(pairs) < count:
+            a, b = str(rng.randint(1, 8)), str(rng.randint(1, 8))
+            if a != b:
+                pairs.append((a, b))
+        return pairs
+
+    @classmethod
+    def _trained_arena(cls, competitor_cls):
+        arena = LambdaArena(
+            lambda a, b: a > b,
+            base_competitor=competitor_cls,
+            base_competitor_kwargs=cls.COMPETITOR_KWARGS.get(competitor_cls),
+        )
+        for a, b in cls._matchups(seed=1, count=60):
+            arena.matchup(a, b)
+        return arena
+
+    @staticmethod
+    def _ratings(arena):
+        return {entry["competitor"]: entry["rating"] for entry in arena.leaderboard()}
+
+    def test_round_trip_through_json_reproduces_leaderboard(self):
+        """A JSON round trip of export_state() must reproduce the leaderboard exactly."""
+        for competitor_cls in self.ALL_COMPETITORS:
+            with self.subTest(competitor=competitor_cls.__name__):
+                arena = self._trained_arena(competitor_cls)
+
+                # Going through JSON proves the exported state is serializable, which
+                # is the whole point of the persist-and-resume journey.
+                state = json.loads(json.dumps(arena.export_state()))
+                restored = LambdaArena(lambda a, b: a > b, base_competitor=competitor_cls, initial_state=state)
+
+                self.assertEqual(arena.leaderboard(), restored.leaderboard())
+
+    def test_round_trip_resolves_concrete_type_from_state(self):
+        """The recorded type in the state decides the class, not base_competitor."""
+        arena = self._trained_arena(GlickoCompetitor)
+        state = json.loads(json.dumps(arena.export_state()))
+
+        # base_competitor is left at its default (EloCompetitor) on purpose.
+        restored = LambdaArena(lambda a, b: a > b, initial_state=state)
+
+        self.assertEqual(len(restored.competitors), len(arena.competitors))
+        for competitor in restored.competitors.values():
+            self.assertIsInstance(competitor, GlickoCompetitor)
+        self.assertEqual(arena.leaderboard(), restored.leaderboard())
+
+    def test_restored_arena_keeps_rating_identically(self):
+        """Playing on further must give the same ratings as never having restored."""
+        # A fixed match time keeps the time-aware systems deterministic; without it
+        # the two arenas inflate rating deviations by slightly different elapsed times.
+        match_time = datetime.datetime.now() + datetime.timedelta(days=1)
+
+        for competitor_cls in self.INCREMENTAL_COMPETITORS:
+            with self.subTest(competitor=competitor_cls.__name__):
+                arena = self._trained_arena(competitor_cls)
+                state = json.loads(json.dumps(arena.export_state()))
+                restored = LambdaArena(lambda a, b: a > b, base_competitor=competitor_cls, initial_state=state)
+
+                for a, b in self._matchups(seed=2, count=25):
+                    arena.matchup(a, b, match_time=match_time)
+                    restored.matchup(a, b, match_time=match_time)
+
+                self.assertEqual(self._ratings(arena), self._ratings(restored))
+
+    def test_plain_constructor_kwargs_are_still_supported(self):
+        """The pre-existing kwargs form of initial_state must keep working."""
+        arena = LambdaArena(
+            lambda a, b: a > b,
+            initial_state={"A": {"initial_rating": 1200}, "B": {"initial_rating": 800}},
+        )
+
+        self.assertIsInstance(arena.competitors["A"], EloCompetitor)
+        self.assertEqual(arena.competitors["A"].rating, 1200)
+        self.assertEqual(arena.competitors["B"].rating, 800)

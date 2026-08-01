@@ -30,7 +30,9 @@ class LambdaArena(BaseArena):
             base_competitor_kwargs (dict, optional): Keyword arguments to pass to
                 the base_competitor constructor.
             initial_state (dict, optional): Initial state for competitors, mapping
-                competitor IDs to their initial parameters.
+                competitor IDs either to exported competitor state documents (as
+                produced by :meth:`export_state`) or to plain keyword arguments for
+                the base_competitor constructor, such as ``{"initial_rating": 1200}``.
         """
         super().__init__()
         logger.debug("Initializing LambdaArena with competitor type: %s", base_competitor.__name__)
@@ -47,7 +49,13 @@ class LambdaArena(BaseArena):
         # if some initial state is passed in, we can seed the population
         if initial_state is not None:
             for k, v in initial_state.items():
-                self.competitors[k] = self.base_competitor(**v)
+                # An exported competitor state document carries its own concrete type,
+                # which from_state resolves through the subclass registry. Anything else
+                # is treated as constructor keyword arguments.
+                if isinstance(v, dict) and "type" in v:
+                    self.competitors[k] = BaseCompetitor.from_state(v)
+                else:
+                    self.competitors[k] = self.base_competitor(**v)
 
         self.history: History = History()
         self.eval_history = History()
