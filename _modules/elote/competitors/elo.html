@@ -174,7 +174,7 @@
           <div class="body" role="main">
             
   <h1>Source code for elote.competitors.elo</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote.competitors.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="n">InvalidRatingValueException</span><span class="p">,</span> <span class="n">InvalidParameterException</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>  <span class="c1"># Import directly from the logging submodule</span>
@@ -430,6 +430,21 @@
             <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">value</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_new_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actual_score</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">expected_score</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate this competitor&#39;s new rating after a match.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            actual_score (float): The score achieved in the match (1.0, 0.5, or 0.0).</span>
+<span class="sd">            expected_score (float): The expected score against the opponent.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The new rating, saturated at the minimum rating.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">*</span> <span class="p">(</span><span class="n">actual_score</span> <span class="o">-</span> <span class="n">expected_score</span><span class="p">)</span>
+        <span class="n">new_rating_clamped</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">,</span> <span class="n">new_rating</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;New rating calculated: </span><span class="si">%.1f</span><span class="s2"> (Clamped: </span><span class="si">%.1f</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">new_rating</span><span class="p">,</span> <span class="n">new_rating_clamped</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">new_rating_clamped</span><span class="p">)</span>
+
 <div class="viewcode-block" id="EloCompetitor.expected_score">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.elo.EloCompetitor.expected_score">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;BaseCompetitor&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -460,13 +475,17 @@
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> beat </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
-        <span class="c1"># Revert to original logic</span>
-        <span class="n">win_es</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
-        <span class="n">lose_es</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">competitor_elo</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">EloCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> beat </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor_elo</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">win_es</span><span class="p">)</span>
-        <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">*</span> <span class="p">(</span><span class="mi">0</span> <span class="o">-</span> <span class="n">lose_es</span><span class="p">)</span></div>
+        <span class="n">win_es</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">competitor_elo</span><span class="p">)</span>
+        <span class="n">lose_es</span> <span class="o">=</span> <span class="n">competitor_elo</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="n">my_new_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_rating</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">win_es</span><span class="p">)</span>
+        <span class="n">opponent_new_rating</span> <span class="o">=</span> <span class="n">competitor_elo</span><span class="o">.</span><span class="n">_new_rating</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">lose_es</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">my_new_rating</span>
+        <span class="n">competitor_elo</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">opponent_new_rating</span></div>
 
 
 <div class="viewcode-block" id="EloCompetitor.tied">
@@ -484,13 +503,17 @@
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> tied with </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
-        <span class="c1"># Revert to original logic</span>
-        <span class="n">win_es</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
-        <span class="n">lose_es</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">competitor_elo</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">EloCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> tied with </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor_elo</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">-</span> <span class="n">win_es</span><span class="p">)</span>
-        <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">-</span> <span class="n">lose_es</span><span class="p">)</span></div>
+        <span class="n">win_es</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">competitor_elo</span><span class="p">)</span>
+        <span class="n">lose_es</span> <span class="o">=</span> <span class="n">competitor_elo</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="n">my_new_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_rating</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">win_es</span><span class="p">)</span>
+        <span class="n">opponent_new_rating</span> <span class="o">=</span> <span class="n">competitor_elo</span><span class="o">.</span><span class="n">_new_rating</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">lose_es</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">my_new_rating</span>
+        <span class="n">competitor_elo</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">opponent_new_rating</span></div>
 </div>
 
 </pre></div>
