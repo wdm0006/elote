@@ -1,6 +1,11 @@
 from typing import Dict, Any, List, Type, TypeVar
 
-from elote.competitors.base import BaseCompetitor, InvalidParameterException, InvalidStateException
+from elote.competitors.base import (
+    BaseCompetitor,
+    InvalidParameterException,
+    InvalidStateException,
+    MissMatchedCompetitorTypesException,
+)
 from elote import (
     EloCompetitor,
     ECFCompetitor,
@@ -310,6 +315,20 @@ class BlendedCompetitor(BaseCompetitor):
             logger.debug("Resetting sub-competitor: %s", competitor)
             competitor.reset()
 
+    def verify_competitor_types(self, competitor: BaseCompetitor) -> None:
+        """Verify that both ensembles have matching sub-competitor types."""
+        super().verify_competitor_types(competitor)
+
+        self_composition = [type(c).__name__ for c in self.sub_competitors]
+        competitor_composition = [type(c).__name__ for c in competitor.sub_competitors]
+        if self_composition != competitor_composition:
+            logger.warning(
+                "Blended competitor composition mismatch: %s vs %s", self_composition, competitor_composition
+            )
+            raise MissMatchedCompetitorTypesException(
+                f"BlendedCompetitor compositions {self_composition} and {competitor_composition} cannot be co-mingled"
+            )
+
     def expected_score(self, competitor: BaseCompetitor) -> float:
         """Calculate the expected score (probability of winning) against another competitor.
 
@@ -333,7 +352,7 @@ class BlendedCompetitor(BaseCompetitor):
 
         if self.blend_mode == "mean":
             es = []
-            for c, other_c in zip(self.sub_competitors, competitor.sub_competitors, strict=False):
+            for c, other_c in zip(self.sub_competitors, competitor.sub_competitors, strict=True):
                 es.append(c.expected_score(other_c))
             result = sum(es) / len(es)
             logger.debug("Mean expected score: %.4f", result)
@@ -356,7 +375,7 @@ class BlendedCompetitor(BaseCompetitor):
         self.verify_competitor_types(competitor)
         logger.debug("%s beat %s. Updating %d sub-competitors.", self, competitor, len(self.sub_competitors))
 
-        for c, other_c in zip(self.sub_competitors, competitor.sub_competitors, strict=False):
+        for c, other_c in zip(self.sub_competitors, competitor.sub_competitors, strict=True):
             logger.debug("Updating sub-competitors via beat: %s vs %s", c, other_c)
             c.beat(other_c)
 
@@ -374,6 +393,6 @@ class BlendedCompetitor(BaseCompetitor):
         self.verify_competitor_types(competitor)
         logger.debug("%s tied with %s. Updating %d sub-competitors.", self, competitor, len(self.sub_competitors))
 
-        for c, other_c in zip(self.sub_competitors, competitor.sub_competitors, strict=False):
+        for c, other_c in zip(self.sub_competitors, competitor.sub_competitors, strict=True):
             logger.debug("Updating sub-competitors via tied: %s vs %s", c, other_c)
             c.tied(other_c)  # Fixed: was using beat() instead of tied()
