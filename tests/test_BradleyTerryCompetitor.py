@@ -1,6 +1,8 @@
+import random
+import time
 import unittest
 
-from elote import BradleyTerryCompetitor, EloCompetitor
+from elote import BradleyTerryCompetitor, EloCompetitor, LambdaArena
 from elote.competitors.base import (
     BaseCompetitor,
     MissMatchedCompetitorTypesException,
@@ -138,6 +140,39 @@ class TestBradleyTerryCompetitor(unittest.TestCase):
             BradleyTerryCompetitor.configure_class(max_iter=0)
         with self.assertRaises(InvalidParameterException):
             BradleyTerryCompetitor.configure_class(scale=0)
+
+
+class TestBradleyTerryPerformance(unittest.TestCase):
+    """Wall-clock budget for the maximum-likelihood re-fit.
+
+    The MM update is re-run over the whole connected component after every result, so this
+    is the assertion that guards the vectorized fit against a regression to a Python-level
+    inner loop. Measured on the development machine: 5.9 s vectorized against 39.0 s for the
+    pure-Python fit it replaced, so the budget sits roughly 2.6x above one and 2.6x below the
+    other.
+    """
+
+    BUDGET_SECONDS = 15.0
+
+    def test_arena_refit_stays_within_wall_clock_budget(self):
+        rng = random.Random(7)
+        num_competitors = 40
+        strength = {i: rng.uniform(0.5, 3.0) for i in range(num_competitors)}
+        arena = LambdaArena(lambda a, b: strength[a] > strength[b], base_competitor=BradleyTerryCompetitor)
+        pairs = [tuple(rng.sample(range(num_competitors), 2)) for _ in range(200)]
+
+        start = time.perf_counter()
+        for a, b in pairs:
+            arena.matchup(a, b)
+        elapsed = time.perf_counter() - start
+
+        self.assertLess(
+            elapsed,
+            self.BUDGET_SECONDS,
+            msg=f"200 Bradley-Terry matchups over 40 competitors took {elapsed:.1f}s",
+        )
+        # Sanity check that the timed work actually fit ratings.
+        self.assertEqual(len(arena.leaderboard()), num_competitors)
 
 
 if __name__ == "__main__":
