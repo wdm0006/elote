@@ -2,6 +2,8 @@ import unittest
 from elote import (
     EloCompetitor,
     GlickoCompetitor,
+    Glicko2Competitor,
+    TrueSkillCompetitor,
     ECFCompetitor,
     DWZCompetitor,
     BlendedCompetitor,
@@ -417,6 +419,35 @@ class TestUnifiedInterface(unittest.TestCase):
 
         with self.assertRaises(NotImplementedError):
             competitor1.rating = 1500
+
+
+class TestExpectedScoreBounds(unittest.TestCase):
+    """Every concrete competitor must return a probability in [0, 1]."""
+
+    COMPETITOR_CLASSES = (
+        EloCompetitor,
+        GlickoCompetitor,
+        Glicko2Competitor,
+        TrueSkillCompetitor,
+        ECFCompetitor,
+        DWZCompetitor,
+        ColleyMatrixCompetitor,
+        BradleyTerryCompetitor,
+    )
+
+    def test_expected_score_within_bounds_after_results(self):
+        """A run of wins and draws never pushes expected_score outside [0, 1]."""
+        for competitor_class in self.COMPETITOR_CLASSES:
+            with self.subTest(competitor=competitor_class.__name__):
+                a = competitor_class()
+                b = competitor_class()
+
+                for step, result in enumerate(["beat", "beat", "tied", "beat", "beat", "tied", "beat"]):
+                    getattr(a, result)(b)
+                    for first, second in ((a, b), (b, a)):
+                        score = first.expected_score(second)
+                        self.assertGreaterEqual(score, 0.0, f"step {step} ({result}) produced {score}")
+                        self.assertLessEqual(score, 1.0, f"step {step} ({result}) produced {score}")
 
 
 if __name__ == "__main__":

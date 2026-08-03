@@ -83,34 +83,34 @@ class TestTrueSkillKnownValues(unittest.TestCase):
 
         Reference values are computed independently of ``expected_score`` from the
         canonical two-player TrueSkill formula
-        ``win_prob = Phi(mu_diff / v) - draw_prob / 2`` where
-        ``v = sqrt(2*beta^2 + sigma_i^2 + sigma_j^2)`` (beta=4.166,
-        draw_probability=0.10). None of these assertions call the method under
-        test to derive its own expectation, and each fails if the beta^2 term is
-        mutated back to the single-noise ``sqrt(beta^2 + ...)`` form.
+        ``0.5 * (Phi((mu_diff + eps) / v) + Phi((mu_diff - eps) / v))`` where
+        ``v = sqrt(2*beta^2 + sigma_i^2 + sigma_j^2)`` and ``eps`` is the draw
+        margin (beta=4.166, draw_probability=0.10). None of these assertions call
+        the method under test to derive its own expectation, and the unequal-mean
+        pair fails if the beta^2 term is mutated back to the single-noise
+        ``sqrt(beta^2 + ...)`` form.
         """
-        # Equal ratings: symmetric matchup. mu_diff=0 so win_prob=0.5, and the
-        # draw correction depends on v, so the missing beta^2 term still shifts
-        # the result (single-noise form gives ~0.335).
+        # Equal ratings: symmetric matchup, so the draw-aware expected score is
+        # exactly 0.5 for any v.
         player1 = TrueSkillCompetitor(initial_mu=25.0, initial_sigma=8.333)
         player2 = TrueSkillCompetitor(initial_mu=25.0, initial_sigma=8.333)
-        self.assertAlmostEqual(player1.expected_score(player2), 0.342657, places=5)
+        self.assertAlmostEqual(player1.expected_score(player2), 0.500000, places=5)
 
         # Unequal means, equal sigmas: the corrected variance term materially
-        # softens the prediction (single-noise form gives ~0.761).
+        # softens the prediction (single-noise form gives ~0.842074).
         player1 = TrueSkillCompetitor(initial_mu=30.0, initial_sigma=5.0)
         player2 = TrueSkillCompetitor(initial_mu=20.0, initial_sigma=5.0)
-        self.assertAlmostEqual(player1.expected_score(player2), 0.732131, places=5)
+        self.assertAlmostEqual(player1.expected_score(player2), 0.822961, places=5)
 
-        # Same matchup reversed: the weaker player. Probabilities are not required
-        # to sum to 1 because of the draw correction.
-        self.assertAlmostEqual(player2.expected_score(player1), 0.009389, places=5)
+        # Same matchup reversed: the weaker player, complementary by construction
+        # (single-noise form gives ~0.157926).
+        self.assertAlmostEqual(player2.expected_score(player1), 0.177039, places=5)
 
-        # Equal means, different sigmas (single-noise form gives ~0.287).
+        # Equal means, different sigmas: still an even matchup.
         player1 = TrueSkillCompetitor(initial_mu=25.0, initial_sigma=3.0)
         player2 = TrueSkillCompetitor(initial_mu=25.0, initial_sigma=8.0)
         expected_score = player1.expected_score(player2)
-        self.assertAlmostEqual(expected_score, 0.303476, places=5)
+        self.assertAlmostEqual(expected_score, 0.500000, places=5)
         # Probability bounds remain covered.
         self.assertGreaterEqual(expected_score, 0.0)
         self.assertLessEqual(expected_score, 1.0)
@@ -276,33 +276,37 @@ class TestTrueSkillKnownValues(unittest.TestCase):
         self.assertNotEqual(player1_low_sigma.sigma, 3.0)
         self.assertNotEqual(player1_high_sigma.sigma, 8.333)
 
-    def test_draw_probability_effect(self):
-        """Test the effect of draw probability on expected scores."""
-        # Create a player with default parameters
+    def test_draw_margin_effect(self):
+        """A wider draw margin pulls the expected score toward 0.5.
+
+        The sweep is ordered by the resulting margin, not by draw probability:
+        ``_calculate_draw_margin`` (used only by ``expected_score``) maps a
+        HIGHER draw probability to a SMALLER margin, the opposite direction from
+        the ``ndtri((p + 1) / 2)`` margin ``beat``/``tied`` use. That
+        inconsistency is a separate defect and is out of scope here.
+        """
         player1 = TrueSkillCompetitor(initial_mu=25.0, initial_sigma=8.333)
         player2 = TrueSkillCompetitor(initial_mu=30.0, initial_sigma=5.0)
 
-        # Store the original draw probability
         original_draw_prob = TrueSkillCompetitor._draw_probability
 
         try:
-            # Test with different draw probabilities
-            expected_scores = []
-            draw_probs = [0.05, 0.10, 0.20]
+            # Ordered so that the draw margin strictly increases.
+            draw_probs = [0.20, 0.10, 0.05]
+            margins = []
+            distances_from_even = []
 
             for draw_prob in draw_probs:
-                # Change the draw probability
                 TrueSkillCompetitor._draw_probability = draw_prob
+                margins.append(TrueSkillCompetitor._calculate_draw_margin(TrueSkillCompetitor._beta, draw_prob))
+                distances_from_even.append(abs(player1.expected_score(player2) - 0.5))
 
-                # Calculate expected score
-                expected_scores.append(player1.expected_score(player2))
-
-            # Higher draw probability should make expected scores closer to 0.5
-            self.assertLess(expected_scores[0], expected_scores[1])
-            self.assertLess(expected_scores[1], expected_scores[2])
+            self.assertLess(margins[0], margins[1])
+            self.assertLess(margins[1], margins[2])
+            self.assertLess(distances_from_even[2], distances_from_even[1])
+            self.assertLess(distances_from_even[1], distances_from_even[0])
 
         finally:
-            # Restore the original draw probability
             TrueSkillCompetitor._draw_probability = original_draw_prob
 
 

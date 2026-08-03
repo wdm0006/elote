@@ -454,26 +454,22 @@ class TrueSkillCompetitor(BaseCompetitor):
         sigma_squared_sum = self._sigma**2 + competitor_ts._sigma**2
         v = math.sqrt(2 * beta_squared + sigma_squared_sum)
 
-        # Calculate the win probability
-        t = mu_diff / v
-        win_prob = self._gaussian_cdf(t)
-
-        # Calculate the draw probability
+        # Decompose the outcome into win/draw/loss against the draw margin, then
+        # score a draw as half a win.
         draw_margin = self._calculate_draw_margin(self._beta, self._draw_probability)
-        draw_prob = self._gaussian_cdf((mu_diff + draw_margin) / v) - self._gaussian_cdf((mu_diff - draw_margin) / v)
-
-        # Adjust win probability to account for draws
-        adjusted_win_prob = win_prob - draw_prob / 2
+        win_prob = self._gaussian_cdf((mu_diff - draw_margin) / v)
+        draw_prob = self._gaussian_cdf((mu_diff + draw_margin) / v) - win_prob
+        expected = win_prob + draw_prob / 2
 
         logger.debug(
-            "Expected score calculation: mu_diff=%.2f, v=%.2f, win_prob=%.4f, draw_prob=%.4f, adjusted_win_prob=%.4f",
+            "Expected score calculation: mu_diff=%.2f, v=%.2f, win_prob=%.4f, draw_prob=%.4f, expected=%.4f",
             mu_diff,
             v,
             win_prob,
             draw_prob,
-            adjusted_win_prob,
+            expected,
         )
-        return adjusted_win_prob
+        return expected
 
     def beat(self, competitor: BaseCompetitor) -> None:
         """Update ratings after this competitor has won against the given competitor.
