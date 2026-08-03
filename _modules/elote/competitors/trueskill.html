@@ -646,26 +646,22 @@
         <span class="n">sigma_squared_sum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">competitor_ts</span><span class="o">.</span><span class="n">_sigma</span><span class="o">**</span><span class="mi">2</span>
         <span class="n">v</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">beta_squared</span> <span class="o">+</span> <span class="n">sigma_squared_sum</span><span class="p">)</span>
 
-        <span class="c1"># Calculate the win probability</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="n">mu_diff</span> <span class="o">/</span> <span class="n">v</span>
-        <span class="n">win_prob</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gaussian_cdf</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
-
-        <span class="c1"># Calculate the draw probability</span>
+        <span class="c1"># Decompose the outcome into win/draw/loss against the draw margin, then</span>
+        <span class="c1"># score a draw as half a win.</span>
         <span class="n">draw_margin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_draw_margin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_beta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_draw_probability</span><span class="p">)</span>
-        <span class="n">draw_prob</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gaussian_cdf</span><span class="p">((</span><span class="n">mu_diff</span> <span class="o">+</span> <span class="n">draw_margin</span><span class="p">)</span> <span class="o">/</span> <span class="n">v</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gaussian_cdf</span><span class="p">((</span><span class="n">mu_diff</span> <span class="o">-</span> <span class="n">draw_margin</span><span class="p">)</span> <span class="o">/</span> <span class="n">v</span><span class="p">)</span>
-
-        <span class="c1"># Adjust win probability to account for draws</span>
-        <span class="n">adjusted_win_prob</span> <span class="o">=</span> <span class="n">win_prob</span> <span class="o">-</span> <span class="n">draw_prob</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">win_prob</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gaussian_cdf</span><span class="p">((</span><span class="n">mu_diff</span> <span class="o">-</span> <span class="n">draw_margin</span><span class="p">)</span> <span class="o">/</span> <span class="n">v</span><span class="p">)</span>
+        <span class="n">draw_prob</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gaussian_cdf</span><span class="p">((</span><span class="n">mu_diff</span> <span class="o">+</span> <span class="n">draw_margin</span><span class="p">)</span> <span class="o">/</span> <span class="n">v</span><span class="p">)</span> <span class="o">-</span> <span class="n">win_prob</span>
+        <span class="n">expected</span> <span class="o">=</span> <span class="n">win_prob</span> <span class="o">+</span> <span class="n">draw_prob</span> <span class="o">/</span> <span class="mi">2</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-            <span class="s2">&quot;Expected score calculation: mu_diff=</span><span class="si">%.2f</span><span class="s2">, v=</span><span class="si">%.2f</span><span class="s2">, win_prob=</span><span class="si">%.4f</span><span class="s2">, draw_prob=</span><span class="si">%.4f</span><span class="s2">, adjusted_win_prob=</span><span class="si">%.4f</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Expected score calculation: mu_diff=</span><span class="si">%.2f</span><span class="s2">, v=</span><span class="si">%.2f</span><span class="s2">, win_prob=</span><span class="si">%.4f</span><span class="s2">, draw_prob=</span><span class="si">%.4f</span><span class="s2">, expected=</span><span class="si">%.4f</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">mu_diff</span><span class="p">,</span>
             <span class="n">v</span><span class="p">,</span>
             <span class="n">win_prob</span><span class="p">,</span>
             <span class="n">draw_prob</span><span class="p">,</span>
-            <span class="n">adjusted_win_prob</span><span class="p">,</span>
+            <span class="n">expected</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">adjusted_win_prob</span></div>
+        <span class="k">return</span> <span class="n">expected</span></div>
 
 
 <div class="viewcode-block" id="TrueSkillCompetitor.beat">
