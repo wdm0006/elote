@@ -21,6 +21,7 @@ from elote import (
     train_and_evaluate_arena,
     list_available_datasets,
 )
+from elote.arenas.base import Bout, History
 
 # Conditionally import optional datasets
 try:
@@ -588,6 +589,111 @@ class TestDatasetUtils(unittest.TestCase):
         self.assertEqual(train_progress.call_args_list, [unittest.mock.call(2, 3), unittest.mock.call(3, 3)])
         self.assertEqual(eval_progress.call_args_list, [unittest.mock.call(2, 3), unittest.mock.call(3, 3)])
         self.assertEqual(len(history.bouts), 3)
+
+    def test_train_arena_records_a_bout_for_every_row_including_draws(self):
+        """Every training row, drawn or decisive, must appear in the arena history."""
+        dataset = SyntheticDataset(
+            num_competitors=12,
+            num_matchups=200,
+            seed=7,
+            draw_probability=0.9,
+            noise_std=200.0,
+        )
+        rows = dataset.get_data()
+        draws = [row for row in rows if row[2] == 0.5]
+        self.assertEqual(len(draws), 62)
+
+        arena = LambdaArena(lambda a, b, attributes=None: True, base_competitor=EloCompetitor)
+        trained_arena = train_arena_with_dataset(arena, rows)
+
+        self.assertEqual(len(trained_arena.history.bouts), len(rows))
+
+    def test_train_arena_records_draw_bouts_with_outcome_and_attributes(self):
+        """Drawn rows must record a draw outcome and carry their attributes through."""
+        draw_attributes = {"event": "round-3", "board": 7}
+        win_attributes = {"event": "round-4", "board": 2}
+        data = [
+            ("A", "B", 0.5, None, draw_attributes),
+            ("A", "B", 1.0, None, win_attributes),
+        ]
+
+        arena = LambdaArena(lambda a, b, attributes=None: True, base_competitor=EloCompetitor)
+        trained_arena = train_arena_with_dataset(arena, data)
+
+        self.assertEqual(len(trained_arena.history.bouts), 2)
+        draw_bout, win_bout = trained_arena.history.bouts
+        self.assertEqual((draw_bout.a, draw_bout.b), ("A", "B"))
+        self.assertEqual(draw_bout._normalized_outcome(), "draw")
+        self.assertEqual(draw_bout.attributes, draw_attributes)
+        self.assertEqual(win_bout._normalized_outcome(), "a")
+        self.assertEqual(win_bout.attributes, win_attributes)
+
+    def test_accuracy_by_prior_bouts_counts_drawn_training_bouts(self):
+        """Prior-bout bins must be seeded from the complete training history."""
+        dataset = SyntheticDataset(
+            num_competitors=12,
+            num_matchups=200,
+            seed=7,
+            draw_probability=0.9,
+            noise_std=200.0,
+        )
+        split = dataset.time_split(test_ratio=0.3)
+        self.assertEqual(len(split.train), 140)
+        self.assertEqual(sum(1 for row in split.train if row[2] == 0.5), 43)
+
+        arena = LambdaArena(lambda a, b, attributes=None: True, base_competitor=EloCompetitor)
+        train_arena_with_dataset(arena, split.train)
+
+        # competitor_0 and competitor_2 appear in 23 and 24 training rows respectively,
+        # of which 20 and 17 are decisive -- so the pre-fix history binned this bout at 17.
+        history = History()
+        history.add_bout(Bout("competitor_0", "competitor_2", 0.5, 0.5))
+        binned = history.accuracy_by_prior_bouts(arena, bin_size=1)["binned"]
+
+        self.assertEqual(list(binned.keys()), [23])
+        self.assertEqual(binned[23]["total"], 1)
+
+    def test_train_arena_ratings_unchanged_by_draw_bout_recording(self):
+        """Recording draw bouts must not change the ratings the draws produce.
+
+        The expected values were captured before the draw branch was routed through
+        ``LambdaArena.matchup``, when draws called ``competitor.tied()`` directly.
+        """
+        dataset = SyntheticDataset(
+            num_competitors=12,
+            num_matchups=200,
+            seed=7,
+            draw_probability=0.9,
+            noise_std=200.0,
+        )
+
+        arena = LambdaArena(
+            lambda a, b, attributes=None: True,
+            base_competitor=EloCompetitor,
+            base_competitor_kwargs={"initial_rating": 1500},
+        )
+        trained_arena = train_arena_with_dataset(arena, dataset.get_data())
+
+        expected = [
+            ("competitor_8", 1713.983015442147),
+            ("competitor_0", 1693.4325854310873),
+            ("competitor_3", 1587.1903055628625),
+            ("competitor_9", 1533.9165724655888),
+            ("competitor_5", 1527.8487497240067),
+            ("competitor_2", 1512.8963021933225),
+            ("competitor_6", 1505.589946609411),
+            ("competitor_11", 1484.3664770734704),
+            ("competitor_1", 1436.529021706998),
+            ("competitor_10", 1385.3428838446823),
+            ("competitor_4", 1376.9278018383588),
+            ("competitor_7", 1241.976338108064),
+        ]
+        leaderboard = trained_arena.leaderboard()
+        self.assertEqual(len(leaderboard), len(expected))
+        for entry, (name, rating) in zip(leaderboard, expected, strict=True):
+            with self.subTest(competitor=name):
+                self.assertEqual(entry["competitor"], name)
+                self.assertAlmostEqual(entry["rating"], rating, places=10)
 
     def test_train_and_evaluate_arena(self):
         """Test that train_and_evaluate_arena works correctly."""

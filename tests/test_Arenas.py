@@ -68,6 +68,46 @@ class TestArenas(unittest.TestCase):
         # Y should have won despite X normally being greater alphabetically
         self.assertGreater(arena.competitors["Y"].rating, initial_rating)
 
+    def test_lambda_arena_matchup_outcome_override(self):
+        """A supplied outcome bypasses the comparison function and is recorded as a bout."""
+        calls = []
+
+        def compare(a, b, attributes=None):
+            calls.append((a, b))
+            return True
+
+        arena = LambdaArena(compare)
+        attributes = {"round": 1}
+
+        arena.matchup("A", "B", attributes=attributes, outcome=0.5)
+        arena.matchup("C", "D", outcome=1.0)
+        arena.matchup("E", "F", outcome=0.0)
+
+        self.assertEqual(calls, [])
+        self.assertEqual(len(arena.history.bouts), 3)
+
+        draw_bout, win_bout, loss_bout = arena.history.bouts
+        self.assertEqual(draw_bout._normalized_outcome(), "draw")
+        self.assertEqual(draw_bout.attributes, attributes)
+        self.assertEqual(win_bout._normalized_outcome(), "a")
+        self.assertEqual(loss_bout._normalized_outcome(), "b")
+
+        # The ratings follow the supplied outcome, not the comparison function.
+        initial_rating = EloCompetitor().rating
+        self.assertEqual(arena.competitors["A"].rating, initial_rating)
+        self.assertGreater(arena.competitors["C"].rating, initial_rating)
+        self.assertGreater(arena.competitors["F"].rating, initial_rating)
+
+    def test_lambda_arena_matchup_rejects_unknown_outcome(self):
+        """Only 1.0, 0.0 and 0.5 are valid explicit outcomes."""
+        arena = LambdaArena(lambda a, b: True)
+
+        with self.assertRaisesRegex(ValueError, "outcome must be one of"):
+            arena.matchup("A", "B", outcome=0.25)
+
+        self.assertEqual(arena.history.bouts, [])
+        self.assertEqual(arena.competitors, {})
+
     def test_lambda_arena_tournament(self):
         """Test that tournaments work correctly in the LambdaArena."""
         arena = LambdaArena(lambda a, b: a > b)

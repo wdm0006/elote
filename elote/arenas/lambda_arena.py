@@ -95,6 +95,7 @@ class LambdaArena(BaseArena):
         b: Any,
         attributes: Optional[Dict[str, Any]] = None,
         match_time: Optional[datetime.datetime] = None,
+        outcome: Optional[float] = None,
     ) -> None:
         """Process a single matchup between two competitors.
 
@@ -107,7 +108,16 @@ class LambdaArena(BaseArena):
             b: The second competitor or competitor identifier.
             attributes (dict, optional): Additional attributes to record with this bout.
             match_time (datetime, optional): The time when the match occurred.
+            outcome (float, optional): A known result for this matchup, expressed from
+                a's perspective as ``1.0`` (a wins), ``0.0`` (b wins) or ``0.5`` (draw).
+                When supplied, the comparison function is not called.
+
+        Raises:
+            ValueError: If ``outcome`` is supplied and is not one of 1.0, 0.0 or 0.5.
         """
+        if outcome is not None and outcome not in (1.0, 0.0, 0.5):
+            raise ValueError(f"outcome must be one of 1.0, 0.0 or 0.5, got {outcome!r}")
+
         if a not in self.competitors:
             self.competitors[a] = self.base_competitor(**self.base_competitor_kwargs)
         if b not in self.competitors:
@@ -115,10 +125,18 @@ class LambdaArena(BaseArena):
 
         predicted_outcome: float = self.expected_score(a, b)
 
-        if attributes:
-            res = self.func(a, b, attributes=attributes)
+        res: Optional[bool]
+        if outcome is None:
+            if attributes:
+                res = self.func(a, b, attributes=attributes)
+            else:
+                res = self.func(a, b)
+        elif outcome == 1.0:
+            res = True
+        elif outcome == 0.0:
+            res = False
         else:
-            res = self.func(a, b)
+            res = None
 
         # Check if the competitor supports time-based ratings
         supports_time = hasattr(self.competitors[a], "_last_activity")

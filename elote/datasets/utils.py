@@ -67,15 +67,8 @@ def train_arena_with_dataset(
                 # B wins
                 arena.matchup(b, a, attributes=attributes)
             else:
-                # Draw - we need to handle this specially
-                # First, get the competitors
-                if a not in arena.competitors:
-                    arena.competitors[a] = arena.base_competitor(**arena.base_competitor_kwargs)
-                if b not in arena.competitors:
-                    arena.competitors[b] = arena.base_competitor(**arena.base_competitor_kwargs)
-
-                # Then, record the draw
-                arena.competitors[a].tied(arena.competitors[b])
+                # Draw
+                arena.matchup(a, b, attributes=attributes, outcome=0.5)
 
         # Report progress
         if progress_callback is not None:
