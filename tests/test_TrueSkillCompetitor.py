@@ -1,6 +1,6 @@
 import unittest
 import math
-from elote import TrueSkillCompetitor, EloCompetitor, LambdaArena
+from elote import TrueSkillCompetitor, EloCompetitor, BlendedCompetitor, LambdaArena
 from elote.competitors.base import MissMatchedCompetitorTypesException, InvalidParameterException
 
 
@@ -113,9 +113,8 @@ class TestTrueSkill(unittest.TestCase):
         # Test with equal ratings
         player1 = TrueSkillCompetitor(initial_mu=25, initial_sigma=8.333)
         player2 = TrueSkillCompetitor(initial_mu=25, initial_sigma=8.333)
-        # Externally derived from sqrt(2*beta^2 + sigma_i^2 + sigma_j^2); the
-        # single-noise form gives ~0.335.
-        self.assertAlmostEqual(player1.expected_score(player2), 0.342657, places=5)
+        # An even matchup is exactly 0.5 under the draw-aware expected score.
+        self.assertAlmostEqual(player1.expected_score(player2), 0.500000, places=5)
 
         # Test with different ratings
         player1 = TrueSkillCompetitor(initial_mu=30, initial_sigma=8.333)
@@ -212,6 +211,52 @@ class TestTrueSkill(unittest.TestCase):
         # Trying to tie with a different competitor type should raise an exception
         with self.assertRaises(MissMatchedCompetitorTypesException):
             player1.tied(player2)
+
+
+class TestTrueSkillExpectedScoreContract(unittest.TestCase):
+    """Probability contract for TrueSkill's draw-aware expected score."""
+
+    def test_identical_competitors_predict_even(self):
+        """Two default competitors are an even matchup."""
+        self.assertAlmostEqual(TrueSkillCompetitor().expected_score(TrueSkillCompetitor()), 0.5, places=12)
+
+    def test_identical_blends_containing_trueskill_predict_even(self):
+        """A blend containing TrueSkill inherits the even-matchup prediction."""
+
+        def blend():
+            return BlendedCompetitor(
+                competitors=[
+                    {"type": "EloCompetitor", "competitor_kwargs": {}},
+                    {"type": "TrueSkillCompetitor", "competitor_kwargs": {}},
+                ]
+            )
+
+        self.assertAlmostEqual(blend().expected_score(blend()), 0.5, places=12)
+
+    def test_expected_scores_are_complementary(self):
+        """expected_score is exactly complementary in both argument orders."""
+        cases = [
+            (TrueSkillCompetitor(initial_mu=30, initial_sigma=5), TrueSkillCompetitor(initial_mu=20, initial_sigma=5)),
+            (TrueSkillCompetitor(initial_mu=25, initial_sigma=3), TrueSkillCompetitor(initial_mu=25, initial_sigma=8)),
+        ]
+
+        # The configuration that returned a negative probability before the draw
+        # adjustment was corrected: four (and then five) wins for the same player.
+        winner = TrueSkillCompetitor()
+        loser = TrueSkillCompetitor()
+        for _ in range(4):
+            winner.beat(loser)
+        cases.append((winner, loser))
+        winner.beat(loser)
+        cases.append((winner, loser))
+
+        for a, b in cases:
+            with self.subTest(a=repr(a), b=repr(b)):
+                forward = a.expected_score(b)
+                reverse = b.expected_score(a)
+                self.assertAlmostEqual(forward + reverse, 1.0, places=12)
+                self.assertGreaterEqual(reverse, 0.0)
+                self.assertLessEqual(forward, 1.0)
 
 
 if __name__ == "__main__":
