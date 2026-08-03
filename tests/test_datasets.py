@@ -521,6 +521,15 @@ class TestDatasetUtils(unittest.TestCase):
         # Check that history was recorded
         self.assertGreater(len(trained_arena.history.bouts), 0)
 
+    def test_train_arena_with_empty_dataset(self):
+        arena = LambdaArena(lambda a, b, attributes=None: True)
+        progress_callback = MagicMock()
+
+        trained_arena = train_arena_with_dataset(arena, [], progress_callback=progress_callback)
+
+        self.assertIs(trained_arena, arena)
+        progress_callback.assert_not_called()
+
     def test_evaluate_arena_with_dataset(self):
         """Test that evaluate_arena_with_dataset works correctly."""
         # Create a synthetic dataset
@@ -542,6 +551,43 @@ class TestDatasetUtils(unittest.TestCase):
 
         # Check that history was recorded
         self.assertGreater(len(history.bouts), 0)
+
+    def test_evaluate_arena_with_empty_dataset(self):
+        arena = LambdaArena(lambda a, b, attributes=None: True)
+        progress_callback = MagicMock()
+
+        history = evaluate_arena_with_dataset(arena, [], progress_callback=progress_callback)
+
+        self.assertEqual(history.bouts, [])
+        progress_callback.assert_not_called()
+
+    def test_dataset_helpers_reject_non_positive_batch_sizes(self):
+        arena = LambdaArena(lambda a, b, attributes=None: True)
+        data = [("A", "B", 1.0, None, None)]
+
+        for helper in (train_arena_with_dataset, evaluate_arena_with_dataset):
+            for batch_size in (0, -1):
+                for dataset in ([], data):
+                    with self.subTest(helper=helper.__name__, batch_size=batch_size, empty=not dataset):
+                        with self.assertRaisesRegex(ValueError, "batch_size must be a positive integer"):
+                            helper(arena, dataset, batch_size=batch_size)
+
+    def test_dataset_helpers_report_batched_progress(self):
+        data = [
+            ("A", "B", 1.0, None, None),
+            ("A", "C", 1.0, None, None),
+            ("B", "C", 1.0, None, None),
+        ]
+        arena = LambdaArena(lambda a, b, attributes=None: True)
+        train_progress = MagicMock()
+        eval_progress = MagicMock()
+
+        train_arena_with_dataset(arena, data, batch_size=2, progress_callback=train_progress)
+        history = evaluate_arena_with_dataset(arena, data, batch_size=2, progress_callback=eval_progress)
+
+        self.assertEqual(train_progress.call_args_list, [unittest.mock.call(2, 3), unittest.mock.call(3, 3)])
+        self.assertEqual(eval_progress.call_args_list, [unittest.mock.call(2, 3), unittest.mock.call(3, 3)])
+        self.assertEqual(len(history.bouts), 3)
 
     def test_train_and_evaluate_arena(self):
         """Test that train_and_evaluate_arena works correctly."""

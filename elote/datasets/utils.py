@@ -29,6 +29,9 @@ def train_arena_with_dataset(
     Returns:
         The trained arena
     """
+    if batch_size is not None and batch_size <= 0:
+        raise ValueError("batch_size must be a positive integer")
+
     # Sort by timestamp if available
     train_data_with_time = [(a, b, outcome, ts, attrs) for a, b, outcome, ts, attrs in train_data if ts is not None]
     train_data_without_time = [(a, b, outcome, ts, attrs) for a, b, outcome, ts, attrs in train_data if ts is None]
@@ -40,6 +43,9 @@ def train_arena_with_dataset(
         sorted_data = train_data_with_time + train_data_without_time
     else:
         sorted_data = train_data
+
+    if not sorted_data:
+        return arena
 
     # Process in batches if requested
     if batch_size is None:
@@ -96,6 +102,9 @@ def evaluate_arena_with_dataset(
     Returns:
         History object containing the evaluation results
     """
+    if batch_size is not None and batch_size <= 0:
+        raise ValueError("batch_size must be a positive integer")
+
     # Create a new history object
     history = History()
 
@@ -110,6 +119,9 @@ def evaluate_arena_with_dataset(
         sorted_data = test_data_with_time + test_data_without_time
     else:
         sorted_data = test_data
+
+    if not sorted_data:
+        return history
 
     # Process in batches if requested
     if batch_size is None:
