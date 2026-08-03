@@ -435,6 +435,10 @@ class TestExpectedScoreBounds(unittest.TestCase):
         BradleyTerryCompetitor,
     )
 
+    # A lopsided run: long enough that a one-sided rating gap opens up, with
+    # draws interleaved so draw handling is exercised too.
+    RESULTS = ["beat"] * 5 + ["tied"] + ["beat"] * 3
+
     def test_expected_score_within_bounds_after_results(self):
         """A run of wins and draws never pushes expected_score outside [0, 1]."""
         for competitor_class in self.COMPETITOR_CLASSES:
@@ -442,7 +446,7 @@ class TestExpectedScoreBounds(unittest.TestCase):
                 a = competitor_class()
                 b = competitor_class()
 
-                for step, result in enumerate(["beat", "beat", "tied", "beat", "beat", "tied", "beat"]):
+                for step, result in enumerate(self.RESULTS):
                     getattr(a, result)(b)
                     for first, second in ((a, b), (b, a)):
                         score = first.expected_score(second)
