@@ -191,6 +191,54 @@ class TestSyntheticDataset(unittest.TestCase):
         self.assertFalse(dataset_high._memory_efficient)
 
 
+class TestDatasetArgumentValidation(unittest.TestCase):
+    """Tests for argument validation on the BaseDataset split and iterator helpers."""
+
+    def _dataset(self):
+        return SyntheticDataset(num_competitors=12, num_matchups=100, seed=42)
+
+    def test_splits_reject_ratios_outside_the_unit_interval(self):
+        dataset = self._dataset()
+
+        for split_name in ("time_split", "random_split", "competitor_split"):
+            for test_ratio in (-1.0, -0.2, 1.2, 2.0):
+                with self.subTest(split=split_name, test_ratio=test_ratio):
+                    with self.assertRaisesRegex(ValueError, "test_ratio must be between 0.0 and 1.0"):
+                        getattr(dataset, split_name)(test_ratio=test_ratio)
+
+    def test_splits_accept_the_endpoint_ratios(self):
+        dataset = self._dataset()
+        total = len(dataset.get_data())
+        self.assertEqual(total, 100)
+
+        for split_name in ("time_split", "random_split", "competitor_split"):
+            with self.subTest(split=split_name):
+                no_test = getattr(dataset, split_name)(test_ratio=0.0)
+                self.assertEqual(len(no_test.train), total)
+                self.assertEqual(len(no_test.test), 0)
+
+                no_train = getattr(dataset, split_name)(test_ratio=1.0)
+                self.assertEqual(len(no_train.train), 0)
+                self.assertEqual(len(no_train.test), total)
+
+    def test_get_data_iterator_rejects_non_positive_batch_sizes(self):
+        for batch_size in (0, -1):
+            with self.subTest(batch_size=batch_size):
+                dataset = self._dataset()
+                with self.assertRaisesRegex(ValueError, "batch_size must be a positive integer"):
+                    dataset.get_data_iterator(batch_size=batch_size)
+
+                # The error is raised eagerly, before the dataset is loaded.
+                self.assertIsNone(dataset._data)
+
+    def test_get_data_iterator_still_batches_positive_sizes(self):
+        dataset = self._dataset()
+
+        batches = list(dataset.get_data_iterator(batch_size=30))
+
+        self.assertEqual([len(batch) for batch in batches], [30, 30, 30, 10])
+
+
 class TestAvailableDatasets(unittest.TestCase):
     """Tests for dataset availability functions."""
 

@@ -107,16 +107,35 @@ class BaseDataset(abc.ABC):
                 
         return self._data
 
+    @staticmethod
+    def _validate_test_ratio(test_ratio: float) -> None:
+        """Reject a test ratio outside the documented 0.0 to 1.0 range."""
+        if not 0.0 <= test_ratio <= 1.0:
+            raise ValueError(f"test_ratio must be between 0.0 and 1.0, got {test_ratio!r}")
+
+    @staticmethod
+    def _validate_batch_size(batch_size: int) -> None:
+        """Reject a non-positive batch size."""
+        if batch_size <= 0:
+            raise ValueError("batch_size must be a positive integer")
+
     def get_data_iterator(self, batch_size: int = 1000) -> Iterator[List[Tuple[Any, Any, float, Optional[datetime.datetime], Optional[Dict[str, Any]]]]]:
         """
         Get an iterator over the dataset in batches for memory-efficient processing.
-        
+
         Args:
             batch_size: Number of matchups per batch.
-            
+
         Yields:
             Batches of matchup tuples.
+
+        Raises:
+            ValueError: If batch_size is not a positive integer.
         """
+        self._validate_batch_size(batch_size)
+        return self._iter_batches(batch_size)
+
+    def _iter_batches(self, batch_size: int) -> Iterator[List[Tuple[Any, Any, float, Optional[datetime.datetime], Optional[Dict[str, Any]]]]]:
         data = self.get_data()
         for i in range(0, len(data), batch_size):
             yield data[i:i + batch_size]
@@ -148,7 +167,12 @@ class BaseDataset(abc.ABC):
 
         Returns:
             DataSplit object containing train and test sets
+
+        Raises:
+            ValueError: If test_ratio is outside the 0.0 to 1.0 range.
         """
+        self._validate_test_ratio(test_ratio)
+
         data = self.get_data()
 
         # Sort by timestamp if available
@@ -179,7 +203,12 @@ class BaseDataset(abc.ABC):
 
         Returns:
             DataSplit object containing train and test sets
+
+        Raises:
+            ValueError: If test_ratio is outside the 0.0 to 1.0 range.
         """
+        self._validate_test_ratio(test_ratio)
+
         data = self.get_data()
 
         # Set random seed if provided
@@ -211,7 +240,12 @@ class BaseDataset(abc.ABC):
 
         Returns:
             DataSplit object containing train and test sets
+
+        Raises:
+            ValueError: If test_ratio is outside the 0.0 to 1.0 range.
         """
+        self._validate_test_ratio(test_ratio)
+
         data = self.get_data()
 
         # Set random seed if provided
