@@ -1,4 +1,5 @@
 import abc
+import math
 import random
 from typing import Dict, Any, List, Tuple, Optional
 
@@ -206,14 +207,20 @@ class History:
         # Return results as a dictionary
         return {"tp": true_positives, "fp": false_positives, "tn": true_negatives, "fn": false_negatives}
 
-    def random_search(self, trials: int = 1000) -> Tuple[float, List[float]]:
+    def random_search(self, trials: int = 1000, seed: Optional[int] = None) -> Tuple[float, List[float]]:
         """Search for optimal prediction thresholds using random sampling.
 
         This method performs a random search to find the best lower and upper
         thresholds that maximize the overall accuracy, including draws.
 
+        Note:
+            :meth:`optimize_thresholds` computes the exact optimum deterministically
+            and should be preferred; this method is retained for backward compatibility.
+
         Args:
             trials (int): The number of random threshold pairs to try.
+            seed (int, optional): Seed for the sampling. When omitted the unseeded
+                global random module is used, so results vary between calls.
 
         Returns:
             tuple: A tuple containing (best_accuracy, best_thresholds).
@@ -227,17 +234,19 @@ class History:
             logger.warning("Cannot perform random search on empty history.")
             return best_accuracy, best_thresholds
 
-        for i in range(trials):
-            # Find min and max predicted outcomes in history
-            predicted_outcomes = [bout.predicted_outcome for bout in self.bouts if bout.predicted_outcome is not None]
-            min_outcome = min(predicted_outcomes) if predicted_outcomes else 0
-            max_outcome = max(predicted_outcomes) if predicted_outcomes else 1
+        rng: Any = random if seed is None else random.Random(seed)
 
+        # Find min and max predicted outcomes in history
+        predicted_outcomes = [bout.predicted_outcome for bout in self.bouts if bout.predicted_outcome is not None]
+        min_outcome = min(predicted_outcomes) if predicted_outcomes else 0
+        max_outcome = max(predicted_outcomes) if predicted_outcomes else 1
+
+        for i in range(trials):
             # Generate two random numbers between min and max
             thresholds = sorted(
                 [
-                    min_outcome + random.random() * (max_outcome - min_outcome),
-                    min_outcome + random.random() * (max_outcome - min_outcome),
+                    min_outcome + rng.random() * (max_outcome - min_outcome),
+                    min_outcome + rng.random() * (max_outcome - min_outcome),
                 ]
             )
 
@@ -260,144 +269,154 @@ class History:
         )
         return best_accuracy, best_thresholds
 
+    def _labeled_predictions(self) -> List[Tuple[float, str]]:
+        """Collect the (predicted probability, actual label) pairs used for scoring.
+
+        The skipping and coercion rules mirror :meth:`confusion_matrix` exactly, so the
+        number of returned pairs is the denominator of ``calculate_metrics()["accuracy"]``.
+
+        Returns:
+            list: A list of ``(probability, label)`` tuples where label is 'a', 'b' or 'draw'.
+        """
+        pairs: List[Tuple[float, str]] = []
+        for bout in self.bouts:
+            actual = bout._normalized_outcome()
+            predicted_prob = bout.predicted_outcome
+            if actual is None or predicted_prob is None:
+                continue
+            if isinstance(predicted_prob, str):
+                try:
+                    predicted_prob = float(predicted_prob)
+                except ValueError:
+                    continue
+            pairs.append((float(predicted_prob), actual))
+        return pairs
+
     def optimize_thresholds(
         self, method: str = "L-BFGS-B", initial_thresholds: Tuple[float, float] = (0.5, 0.5)
     ) -> Tuple[float, List[float]]:
-        """Optimize prediction thresholds using scipy.optimize.
+        """Find the prediction thresholds that maximize accuracy.
 
-        This method uses scipy's optimization algorithms to find the best thresholds
-        for maximizing prediction accuracy.
+        Accuracy is a step function of the thresholds: it only changes at the distinct
+        values of ``Bout.predicted_outcome``. This method therefore evaluates every
+        distinct threshold pair exactly, in ``O(n log n)``, rather than sampling. The
+        result is deterministic — repeated calls on an unchanged history return
+        identical values.
 
         Args:
-            method (str): The optimization method to use (e.g., 'L-BFGS-B', 'Nelder-Mead')
-            initial_thresholds (tuple): Initial guess for (lower_threshold, upper_threshold)
+            method (str): Deprecated and ignored. Retained for backward compatibility;
+                the search is exact, so no optimizer is selected.
+            initial_thresholds (tuple): Thresholds to fall back to. They are returned
+                unchanged whenever they already achieve the optimal accuracy.
 
         Returns:
             tuple: (best_accuracy, best_thresholds) where:
                 - best_accuracy: The accuracy achieved with the optimized thresholds
                 - best_thresholds: List of [lower_threshold, upper_threshold]
         """
-        from scipy import optimize
-
         num_bouts = len(self.bouts)
-        logger.info("Optimizing thresholds using scipy ('%s') on %d bouts.", method, num_bouts)
+        logger.info("Optimizing thresholds by exact sweep over %d bouts.", num_bouts)
 
         if num_bouts == 0:
             logger.warning("Cannot optimize thresholds on empty history.")
             return 0.0, list(initial_thresholds)
 
-        # Find min and max predicted outcomes in history
-        predicted_outcomes = [bout.predicted_outcome for bout in self.bouts if bout.predicted_outcome is not None]
-        if not predicted_outcomes:
+        pairs = self._labeled_predictions()
+        if not pairs:
             logger.warning("No valid predicted outcomes found in history. Cannot optimize.")
             return 0.0, list(initial_thresholds)
-        min_outcome = min(predicted_outcomes)
-        max_outcome = max(predicted_outcomes)
-        logger.debug("Predicted outcome range: [%.4f, %.4f]", min_outcome, max_outcome)
 
-        # Define the objective function to minimize (negative accuracy)
-        def objective(thresholds: List[float]) -> float:
-            # Ensure thresholds are sorted
-            sorted_thresholds = sorted(thresholds)
-            metrics = self.calculate_metrics(*sorted_thresholds)
-            return -metrics["accuracy"]  # Negative because we want to maximize accuracy
+        pairs.sort(key=lambda pair: pair[0])
+        total = len(pairs)
+        logger.debug("Predicted outcome range: [%.4f, %.4f]", pairs[0][0], pairs[-1][0])
 
-        # Calculate baseline accuracy with initial thresholds
-        baseline_metrics = self.calculate_metrics(*initial_thresholds)
-        baseline_accuracy = baseline_metrics["accuracy"]
+        # Group the sorted pairs by distinct probability and count each label per group.
+        values: List[float] = []
+        group_counts: List[List[int]] = []
+        label_index = {"a": 0, "b": 1, "draw": 2}
+        for probability, label in pairs:
+            if not values or probability != values[-1]:
+                values.append(probability)
+                group_counts.append([0, 0, 0])
+            group_counts[-1][label_index[label]] += 1
+
+        # Prefix counts: *_prefix[k] counts the label over the first k groups.
+        m = len(values)
+        a_prefix = [0] * (m + 1)
+        b_prefix = [0] * (m + 1)
+        d_prefix = [0] * (m + 1)
+        for k in range(m):
+            a_prefix[k + 1] = a_prefix[k] + group_counts[k][0]
+            b_prefix[k + 1] = b_prefix[k] + group_counts[k][1]
+            d_prefix[k + 1] = d_prefix[k] + group_counts[k][2]
+        a_total = a_prefix[m]
+
+        # Representative threshold value for each of the m + 1 cut points, chosen so that
+        # no observed probability ever sits exactly on a threshold: midpoints between
+        # adjacent distinct probabilities, plus one sentinel below the minimum and one
+        # above the maximum. The lower/upper values differ only in the degenerate case
+        # where two adjacent probabilities have no representable midpoint between them.
+        lower_cut = [0.0] * (m + 1)
+        upper_cut = [0.0] * (m + 1)
+        for k in range(m + 1):
+            if k == 0:
+                lower_cut[k] = upper_cut[k] = math.nextafter(values[0], -math.inf)
+            elif k == m:
+                lower_cut[k] = upper_cut[k] = math.nextafter(values[-1], math.inf)
+            else:
+                low, high = values[k - 1], values[k]
+                midpoint = (low + high) / 2.0
+                if low < midpoint < high:
+                    lower_cut[k] = upper_cut[k] = midpoint
+                else:
+                    lower_cut[k] = high
+                    upper_cut[k] = low
+
+        # With lower cut i and upper cut j (i <= j), the number of correct predictions is
+        #   #b below i + #draw between i and j + #a above j
+        # = (b_prefix[i] - d_prefix[i]) + (d_prefix[j] - a_prefix[j]) + a_total,
+        # so the best j for every i is a suffix maximum of d_prefix[j] - a_prefix[j].
+        best_upper_score = [0] * (m + 1)
+        best_upper_cut = [0] * (m + 1)
+        for j in range(m, -1, -1):
+            score = d_prefix[j] - a_prefix[j]
+            if j == m or score >= best_upper_score[j + 1]:
+                best_upper_score[j] = score
+                best_upper_cut[j] = j
+            else:
+                best_upper_score[j] = best_upper_score[j + 1]
+                best_upper_cut[j] = best_upper_cut[j + 1]
+
+        best_correct = -1
+        best_i = 0
+        best_j = 0
+        for i in range(m + 1):
+            correct = b_prefix[i] - d_prefix[i] + best_upper_score[i] + a_total
+            if correct > best_correct:
+                best_correct = correct
+                best_i = i
+                best_j = best_upper_cut[i]
+
+        best_accuracy = best_correct / total
+        best_thresholds = [lower_cut[best_i], upper_cut[best_j]]
+
+        # Keep the supplied thresholds when they already achieve the optimum.
+        baseline_accuracy = self.calculate_metrics(*initial_thresholds)["accuracy"]
         logger.debug(
             "Baseline accuracy with initial thresholds [%.2f, %.2f]: %.4f", *initial_thresholds, baseline_accuracy
         )
-
-        # Use initial_thresholds as the initial guess
-        initial_guess = list(initial_thresholds)
-
-        # Bounds for the thresholds
-        bounds = [(min_outcome, max_outcome), (min_outcome, max_outcome)]
-
-        # Run multiple optimizations with different methods and starting points
-        best_accuracy = baseline_accuracy
-        best_thresholds = list(initial_thresholds)
-
-        # Try different optimization methods
-        methods = [method]
-        if method != "L-BFGS-B":
-            methods.append("L-BFGS-B")
-        if "Nelder-Mead" not in methods:
-            methods.append("Nelder-Mead")
-
-        for opt_method in methods:
-            try:
-                # Run the optimization with current method
-                logger.debug("Running optimization with method: %s", opt_method)
-                result = optimize.minimize(
-                    objective,
-                    initial_guess,
-                    method=opt_method,
-                    bounds=bounds if opt_method != "Nelder-Mead" else None,
-                    options={"maxiter": 1000},
-                )
-
-                # Get the thresholds and ensure they're sorted
-                opt_thresholds = sorted(result.x)
-
-                # Calculate the accuracy
-                metrics = self.calculate_metrics(*opt_thresholds)
-                accuracy = metrics["accuracy"]
-
-                # Update best if better than current best
-                if accuracy > best_accuracy:
-                    logger.debug(
-                        "Optimization (%s): New best accuracy %.4f with thresholds [%.2f, %.2f]",
-                        opt_method,
-                        accuracy,
-                        *opt_thresholds,
-                    )
-                    best_accuracy = accuracy
-                    best_thresholds = opt_thresholds
-
-                # Try with a few random starting points
-                for j in range(3):
-                    random_guess = [
-                        random.uniform(min_outcome, max_outcome),
-                        random.uniform(min_outcome, max_outcome),
-                    ]
-                    random_guess.sort()
-                    result = optimize.minimize(
-                        objective, random_guess, method=opt_method, bounds=bounds, options={"disp": False}
-                    )
-                    if result.success:
-                        opt_thresholds = sorted(result.x)
-                        metrics = self.calculate_metrics(*opt_thresholds)
-                        accuracy = metrics["accuracy"]
-                        if accuracy > best_accuracy:
-                            logger.debug(
-                                "Optimization (%s, random start %d): New best accuracy %.4f with thresholds [%.2f, %.2f]",
-                                opt_method,
-                                j + 1,
-                                accuracy,
-                                *opt_thresholds,
-                            )
-                            best_accuracy = accuracy
-                            best_thresholds = opt_thresholds
-            except Exception as e:
-                # Skip if optimization fails
-                logger.warning("Optimization with method '%s' failed: %s", opt_method, e)
-                continue
-
-        # If optimized accuracy is worse than baseline, use baseline
-        if best_accuracy < baseline_accuracy:
+        if baseline_accuracy >= best_accuracy:
             logger.info(
-                "Optimized accuracy (%.4f) is worse than baseline (%.4f). Reverting to baseline thresholds.",
-                best_accuracy,
+                "Initial thresholds [%.2f, %.2f] already achieve the optimal accuracy %.4f.",
+                *initial_thresholds,
                 baseline_accuracy,
             )
             return baseline_accuracy, list(initial_thresholds)
 
         logger.info(
-            "Optimization complete. Best accuracy: %.4f with thresholds [%.2f, %.2f]", best_accuracy, *best_thresholds
+            "Optimization complete. Best accuracy: %.4f with thresholds [%.4f, %.4f]", best_accuracy, *best_thresholds
         )
-        return best_accuracy, list(best_thresholds)
+        return best_accuracy, best_thresholds
 
     def calculate_metrics(self, lower_threshold: float = 0.5, upper_threshold: float = 0.5) -> Dict[str, float]:
         """
