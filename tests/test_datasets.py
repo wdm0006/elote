@@ -344,17 +344,19 @@ class TestDatasetReproducibility(unittest.TestCase):
     def test_competitor_split_ordering_does_not_depend_on_set_iteration(self):
         """The shuffled competitor list must come from the data order, not a set."""
         data = [
-            ("z", "a", 1.0, None, None),
-            ("m", "b", 0.0, None, None),
-            ("a", "m", 0.5, None, None),
+            (3, 1, 1.0, None, None),
+            (2, 0, 0.0, None, None),
+            (1, 2, 0.5, None, None),
         ]
         dataset = self._dataset(42)
         dataset._data = data
 
         split = dataset.competitor_split(test_ratio=0.5, seed=1)
 
+        # Small ints hash to themselves, so ``list({3, 1, 2, 0})`` is ``[0, 1, 2, 3]``
+        # under every PYTHONHASHSEED -- reliably different from first-appearance order.
         rng = np.random.RandomState(1)
-        order = ["z", "a", "m", "b"]
+        order = [3, 1, 2, 0]
         rng.shuffle(order)
         train_competitors = set(order[:2])
         expected_train = [row for row in data if row[0] in train_competitors and row[1] in train_competitors]
