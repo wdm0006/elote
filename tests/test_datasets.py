@@ -5,7 +5,9 @@ Tests for the datasets module.
 import unittest
 import datetime
 import os
+import random
 import tempfile
+import numpy as np
 import pandas as pd
 from unittest.mock import patch, MagicMock
 import shutil
@@ -237,6 +239,127 @@ class TestDatasetArgumentValidation(unittest.TestCase):
         batches = list(dataset.get_data_iterator(batch_size=30))
 
         self.assertEqual([len(batch) for batch in batches], [30, 30, 30, 10])
+
+
+def _fingerprint(rows):
+    """Reduce generated rows to the part a seed is supposed to determine.
+
+    Absolute timestamps are anchored to ``datetime.now()`` at generation time, so only
+    the spacing between rows is reproducible; everything else must match exactly.
+    """
+    base = rows[0][3]
+    return [(a, b, outcome, (ts - base).total_seconds(), attrs) for a, b, outcome, ts, attrs in rows]
+
+
+class TestDatasetReproducibility(unittest.TestCase):
+    """A seed must fully determine the data, and must not reach outside the instance."""
+
+    def _dataset(self, seed):
+        return SyntheticDataset(num_competitors=10, num_matchups=50, seed=seed)
+
+    def test_seeded_generation_ignores_other_datasets(self):
+        """Constructing and loading another dataset in between must not change the data."""
+        first = self._dataset(42)
+        other = self._dataset(7)
+        other.get_data()
+        first_rows = first.get_data()
+
+        independent = self._dataset(42)
+
+        self.assertEqual(_fingerprint(first_rows), _fingerprint(independent.get_data()))
+
+    def test_seeded_generation_ignores_the_global_random_stream(self):
+        """Unrelated draws between construction and load must not change the data."""
+        dataset = self._dataset(42)
+        random.random()
+        np.random.random()
+        rows = dataset.get_data()
+
+        self.assertEqual(_fingerprint(rows), _fingerprint(self._dataset(42).get_data()))
+
+    def test_clear_cache_regenerates_identical_rows(self):
+        """One seeded object must reproduce itself across a cache clear."""
+        dataset = self._dataset(42)
+        first = _fingerprint(dataset.get_data())
+
+        dataset.clear_cache()
+        second = _fingerprint(dataset.get_data())
+
+        self.assertEqual(first, second)
+
+    def test_different_seeds_produce_different_data(self):
+        """Guards the reproducibility tests above against a constant generator."""
+        self.assertNotEqual(
+            _fingerprint(self._dataset(42).get_data()),
+            _fingerprint(self._dataset(7).get_data()),
+        )
+
+    def test_generation_preserves_the_callers_global_streams(self):
+        random.seed(1234)
+        np.random.seed(1234)
+        expected_python = [random.random() for _ in range(5)]
+        expected_numpy = np.random.random(5).tolist()
+
+        random.seed(1234)
+        np.random.seed(1234)
+        self._dataset(42).get_data()
+
+        self.assertEqual([random.random() for _ in range(5)], expected_python)
+        self.assertEqual(np.random.random(5).tolist(), expected_numpy)
+
+    def test_splits_preserve_the_callers_global_streams(self):
+        random.seed(1234)
+        np.random.seed(1234)
+        expected_python = [random.random() for _ in range(5)]
+        expected_numpy = np.random.random(5).tolist()
+
+        random.seed(1234)
+        np.random.seed(1234)
+        dataset = self._dataset(42)
+        dataset.random_split(test_ratio=0.3, seed=1)
+        dataset.competitor_split(test_ratio=0.3, seed=1)
+
+        self.assertEqual([random.random() for _ in range(5)], expected_python)
+        self.assertEqual(np.random.random(5).tolist(), expected_numpy)
+
+    def test_random_split_is_reproducible(self):
+        dataset = self._dataset(42)
+
+        first = dataset.random_split(test_ratio=0.3, seed=1)
+        second = dataset.random_split(test_ratio=0.3, seed=1)
+
+        self.assertEqual(list(first.train), list(second.train))
+        self.assertEqual(list(first.test), list(second.test))
+        self.assertNotEqual(list(first.train), list(dataset.random_split(test_ratio=0.3, seed=2).train))
+
+    def test_competitor_split_is_reproducible(self):
+        dataset = self._dataset(42)
+
+        first = dataset.competitor_split(test_ratio=0.3, seed=1)
+        second = dataset.competitor_split(test_ratio=0.3, seed=1)
+
+        self.assertEqual(list(first.train), list(second.train))
+        self.assertEqual(list(first.test), list(second.test))
+
+    def test_competitor_split_ordering_does_not_depend_on_set_iteration(self):
+        """The shuffled competitor list must come from the data order, not a set."""
+        data = [
+            ("z", "a", 1.0, None, None),
+            ("m", "b", 0.0, None, None),
+            ("a", "m", 0.5, None, None),
+        ]
+        dataset = self._dataset(42)
+        dataset._data = data
+
+        split = dataset.competitor_split(test_ratio=0.5, seed=1)
+
+        rng = np.random.RandomState(1)
+        order = ["z", "a", "m", "b"]
+        rng.shuffle(order)
+        train_competitors = set(order[:2])
+        expected_train = [row for row in data if row[0] in train_competitors and row[1] in train_competitors]
+
+        self.assertEqual(list(split.train), expected_train)
 
 
 class TestAvailableDatasets(unittest.TestCase):

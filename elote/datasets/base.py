@@ -211,12 +211,10 @@ class BaseDataset(abc.ABC):
 
         data = self.get_data()
 
-        # Set random seed if provided
-        if seed is not None:
-            np.random.seed(seed)
+        rng = np.random.RandomState(seed)
 
         # Shuffle the data
-        indices = np.random.permutation(len(data))
+        indices = rng.permutation(len(data))
         split_idx = int(len(data) * (1 - test_ratio))
 
         train_indices = indices[:split_idx]
@@ -248,18 +246,17 @@ class BaseDataset(abc.ABC):
 
         data = self.get_data()
 
-        # Set random seed if provided
-        if seed is not None:
-            np.random.seed(seed)
+        rng = np.random.RandomState(seed)
 
-        # Get all unique competitors
-        all_competitors: Set[Any] = set()
+        # Get all unique competitors, in first-appearance order so the shuffle below
+        # depends only on the seed and not on set iteration order.
+        seen: Dict[Any, None] = {}
         for a, b, _, _, _ in data:
-            all_competitors.add(a)
-            all_competitors.add(b)
+            seen[a] = None
+            seen[b] = None
 
-        all_competitors_list: List[Any] = list(all_competitors)
-        np.random.shuffle(all_competitors_list)
+        all_competitors_list: List[Any] = list(seen)
+        rng.shuffle(all_competitors_list)
 
         # Split competitors
         split_idx = int(len(all_competitors_list) * (1 - test_ratio))
