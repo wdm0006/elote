@@ -608,6 +608,9 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the draw margin based on beta and draw probability.</span>
 
+<span class="sd">        This is the canonical TrueSkill draw margin, increasing in the draw</span>
+<span class="sd">        probability: a draw-free configuration gives a zero margin.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            beta: The beta parameter</span>
 <span class="sd">            draw_probability: The probability of a draw</span>
@@ -617,7 +620,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">draw_probability</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Draw probability must be between 0 and 1&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">special</span><span class="o">.</span><span class="n">erfinv</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">draw_probability</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">special</span><span class="o">.</span><span class="n">ndtri</span><span class="p">((</span><span class="n">draw_probability</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
 
 <div class="viewcode-block" id="TrueSkillCompetitor.expected_score">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.expected_score">[docs]</a>
@@ -692,7 +695,7 @@
         <span class="n">v</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">beta_squared</span> <span class="o">+</span> <span class="n">sigma_squared_sum</span><span class="p">)</span>
 
         <span class="c1"># Calculate the performance update</span>
-        <span class="n">draw_margin</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span> <span class="o">*</span> <span class="n">special</span><span class="o">.</span><span class="n">ndtri</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_draw_probability</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">draw_margin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_draw_margin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_beta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_draw_probability</span><span class="p">)</span>
         <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">mu_diff</span> <span class="o">-</span> <span class="n">draw_margin</span><span class="p">)</span> <span class="o">/</span> <span class="n">v</span>
         <span class="n">v_win_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_v_win</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
         <span class="n">w_win_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_w_win</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
@@ -740,7 +743,7 @@
         <span class="n">v</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">beta_squared</span> <span class="o">+</span> <span class="n">sigma_squared_sum</span><span class="p">)</span>
 
         <span class="c1"># Calculate the draw margin</span>
-        <span class="n">draw_margin</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span> <span class="o">*</span> <span class="n">special</span><span class="o">.</span><span class="n">ndtri</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_draw_probability</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">draw_margin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_draw_margin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_beta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_draw_probability</span><span class="p">)</span>
 
         <span class="c1"># Calculate the performance update for a draw</span>
         <span class="n">t</span> <span class="o">=</span> <span class="n">mu_diff</span> <span class="o">/</span> <span class="n">v</span>
