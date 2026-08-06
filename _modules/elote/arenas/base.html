@@ -175,6 +175,7 @@
             
   <h1>Source code for elote.arenas.base</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">abc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
 
@@ -416,14 +417,20 @@
 
 <div class="viewcode-block" id="History.random_search">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.History.random_search">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">random_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">random_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Search for optimal prediction thresholds using random sampling.</span>
 
 <span class="sd">        This method performs a random search to find the best lower and upper</span>
 <span class="sd">        thresholds that maximize the overall accuracy, including draws.</span>
 
+<span class="sd">        Note:</span>
+<span class="sd">            :meth:`optimize_thresholds` computes the exact optimum deterministically</span>
+<span class="sd">            and should be preferred; this method is retained for backward compatibility.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            trials (int): The number of random threshold pairs to try.</span>
+<span class="sd">            seed (int, optional): Seed for the sampling. When omitted the unseeded</span>
+<span class="sd">                global random module is used, so results vary between calls.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            tuple: A tuple containing (best_accuracy, best_thresholds).</span>
@@ -437,17 +444,19 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Cannot perform random search on empty history.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">best_accuracy</span><span class="p">,</span> <span class="n">best_thresholds</span>
 
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">trials</span><span class="p">):</span>
-            <span class="c1"># Find min and max predicted outcomes in history</span>
-            <span class="n">predicted_outcomes</span> <span class="o">=</span> <span class="p">[</span><span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span> <span class="k">if</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
-            <span class="n">min_outcome</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">predicted_outcomes</span><span class="p">)</span> <span class="k">if</span> <span class="n">predicted_outcomes</span> <span class="k">else</span> <span class="mi">0</span>
-            <span class="n">max_outcome</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">predicted_outcomes</span><span class="p">)</span> <span class="k">if</span> <span class="n">predicted_outcomes</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="n">rng</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">random</span> <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
 
+        <span class="c1"># Find min and max predicted outcomes in history</span>
+        <span class="n">predicted_outcomes</span> <span class="o">=</span> <span class="p">[</span><span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span> <span class="k">if</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="n">min_outcome</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">predicted_outcomes</span><span class="p">)</span> <span class="k">if</span> <span class="n">predicted_outcomes</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="n">max_outcome</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">predicted_outcomes</span><span class="p">)</span> <span class="k">if</span> <span class="n">predicted_outcomes</span> <span class="k">else</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">trials</span><span class="p">):</span>
             <span class="c1"># Generate two random numbers between min and max</span>
             <span class="n">thresholds</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
                 <span class="p">[</span>
-                    <span class="n">min_outcome</span> <span class="o">+</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_outcome</span> <span class="o">-</span> <span class="n">min_outcome</span><span class="p">),</span>
-                    <span class="n">min_outcome</span> <span class="o">+</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_outcome</span> <span class="o">-</span> <span class="n">min_outcome</span><span class="p">),</span>
+                    <span class="n">min_outcome</span> <span class="o">+</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_outcome</span> <span class="o">-</span> <span class="n">min_outcome</span><span class="p">),</span>
+                    <span class="n">min_outcome</span> <span class="o">+</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_outcome</span> <span class="o">-</span> <span class="n">min_outcome</span><span class="p">),</span>
                 <span class="p">]</span>
             <span class="p">)</span>
 
@@ -471,146 +480,156 @@
         <span class="k">return</span> <span class="n">best_accuracy</span><span class="p">,</span> <span class="n">best_thresholds</span></div>
 
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_labeled_predictions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Collect the (predicted probability, actual label) pairs used for scoring.</span>
+
+<span class="sd">        The skipping and coercion rules mirror :meth:`confusion_matrix` exactly, so the</span>
+<span class="sd">        number of returned pairs is the denominator of ``calculate_metrics()[&quot;accuracy&quot;]``.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: A list of ``(probability, label)`` tuples where label is &#39;a&#39;, &#39;b&#39; or &#39;draw&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pairs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">:</span>
+            <span class="n">actual</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">_normalized_outcome</span><span class="p">()</span>
+            <span class="n">predicted_prob</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span>
+            <span class="k">if</span> <span class="n">actual</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">predicted_prob</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">predicted_prob</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">predicted_prob</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">predicted_prob</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="k">continue</span>
+            <span class="n">pairs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">float</span><span class="p">(</span><span class="n">predicted_prob</span><span class="p">),</span> <span class="n">actual</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">pairs</span>
+
 <div class="viewcode-block" id="History.optimize_thresholds">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.History.optimize_thresholds">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">optimize_thresholds</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">,</span> <span class="n">initial_thresholds</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Optimize prediction thresholds using scipy.optimize.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find the prediction thresholds that maximize accuracy.</span>
 
-<span class="sd">        This method uses scipy&#39;s optimization algorithms to find the best thresholds</span>
-<span class="sd">        for maximizing prediction accuracy.</span>
+<span class="sd">        Accuracy is a step function of the thresholds: it only changes at the distinct</span>
+<span class="sd">        values of ``Bout.predicted_outcome``. This method therefore evaluates every</span>
+<span class="sd">        distinct threshold pair exactly, in ``O(n log n)``, rather than sampling. The</span>
+<span class="sd">        result is deterministic — repeated calls on an unchanged history return</span>
+<span class="sd">        identical values.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            method (str): The optimization method to use (e.g., &#39;L-BFGS-B&#39;, &#39;Nelder-Mead&#39;)</span>
-<span class="sd">            initial_thresholds (tuple): Initial guess for (lower_threshold, upper_threshold)</span>
+<span class="sd">            method (str): Deprecated and ignored. Retained for backward compatibility;</span>
+<span class="sd">                the search is exact, so no optimizer is selected.</span>
+<span class="sd">            initial_thresholds (tuple): Thresholds to fall back to. They are returned</span>
+<span class="sd">                unchanged whenever they already achieve the optimal accuracy.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            tuple: (best_accuracy, best_thresholds) where:</span>
 <span class="sd">                - best_accuracy: The accuracy achieved with the optimized thresholds</span>
 <span class="sd">                - best_thresholds: List of [lower_threshold, upper_threshold]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize</span>
-
         <span class="n">num_bouts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Optimizing thresholds using scipy (&#39;</span><span class="si">%s</span><span class="s2">&#39;) on </span><span class="si">%d</span><span class="s2"> bouts.&quot;</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">num_bouts</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Optimizing thresholds by exact sweep over </span><span class="si">%d</span><span class="s2"> bouts.&quot;</span><span class="p">,</span> <span class="n">num_bouts</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">num_bouts</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Cannot optimize thresholds on empty history.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="mf">0.0</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">initial_thresholds</span><span class="p">)</span>
 
-        <span class="c1"># Find min and max predicted outcomes in history</span>
-        <span class="n">predicted_outcomes</span> <span class="o">=</span> <span class="p">[</span><span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span> <span class="k">if</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">predicted_outcomes</span><span class="p">:</span>
+        <span class="n">pairs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labeled_predictions</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pairs</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No valid predicted outcomes found in history. Cannot optimize.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="mf">0.0</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">initial_thresholds</span><span class="p">)</span>
-        <span class="n">min_outcome</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">predicted_outcomes</span><span class="p">)</span>
-        <span class="n">max_outcome</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">predicted_outcomes</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Predicted outcome range: [</span><span class="si">%.4f</span><span class="s2">, </span><span class="si">%.4f</span><span class="s2">]&quot;</span><span class="p">,</span> <span class="n">min_outcome</span><span class="p">,</span> <span class="n">max_outcome</span><span class="p">)</span>
 
-        <span class="c1"># Define the objective function to minimize (negative accuracy)</span>
-        <span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">thresholds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-            <span class="c1"># Ensure thresholds are sorted</span>
-            <span class="n">sorted_thresholds</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">thresholds</span><span class="p">)</span>
-            <span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_metrics</span><span class="p">(</span><span class="o">*</span><span class="n">sorted_thresholds</span><span class="p">)</span>
-            <span class="k">return</span> <span class="o">-</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">]</span>  <span class="c1"># Negative because we want to maximize accuracy</span>
+        <span class="n">pairs</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">pair</span><span class="p">:</span> <span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pairs</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Predicted outcome range: [</span><span class="si">%.4f</span><span class="s2">, </span><span class="si">%.4f</span><span class="s2">]&quot;</span><span class="p">,</span> <span class="n">pairs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">pairs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
 
-        <span class="c1"># Calculate baseline accuracy with initial thresholds</span>
-        <span class="n">baseline_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_metrics</span><span class="p">(</span><span class="o">*</span><span class="n">initial_thresholds</span><span class="p">)</span>
-        <span class="n">baseline_accuracy</span> <span class="o">=</span> <span class="n">baseline_metrics</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">]</span>
+        <span class="c1"># Group the sorted pairs by distinct probability and count each label per group.</span>
+        <span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">group_counts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">label_index</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;draw&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">probability</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">values</span> <span class="ow">or</span> <span class="n">probability</span> <span class="o">!=</span> <span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probability</span><span class="p">)</span>
+                <span class="n">group_counts</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="n">group_counts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">label_index</span><span class="p">[</span><span class="n">label</span><span class="p">]]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Prefix counts: *_prefix[k] counts the label over the first k groups.</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">a_prefix</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">b_prefix</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">d_prefix</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+            <span class="n">a_prefix</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">a_prefix</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="n">group_counts</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">b_prefix</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">b_prefix</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="n">group_counts</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">d_prefix</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">d_prefix</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="n">group_counts</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">a_total</span> <span class="o">=</span> <span class="n">a_prefix</span><span class="p">[</span><span class="n">m</span><span class="p">]</span>
+
+        <span class="c1"># Representative threshold value for each of the m + 1 cut points, chosen so that</span>
+        <span class="c1"># no observed probability ever sits exactly on a threshold: midpoints between</span>
+        <span class="c1"># adjacent distinct probabilities, plus one sentinel below the minimum and one</span>
+        <span class="c1"># above the maximum. The lower/upper values differ only in the degenerate case</span>
+        <span class="c1"># where two adjacent probabilities have no representable midpoint between them.</span>
+        <span class="n">lower_cut</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">upper_cut</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">lower_cut</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">upper_cut</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">nextafter</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">k</span> <span class="o">==</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">lower_cut</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">upper_cut</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">nextafter</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">low</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">values</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">midpoint</span> <span class="o">=</span> <span class="p">(</span><span class="n">low</span> <span class="o">+</span> <span class="n">high</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+                <span class="k">if</span> <span class="n">low</span> <span class="o">&lt;</span> <span class="n">midpoint</span> <span class="o">&lt;</span> <span class="n">high</span><span class="p">:</span>
+                    <span class="n">lower_cut</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">upper_cut</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">midpoint</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">lower_cut</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">high</span>
+                    <span class="n">upper_cut</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">low</span>
+
+        <span class="c1"># With lower cut i and upper cut j (i &lt;= j), the number of correct predictions is</span>
+        <span class="c1">#   #b below i + #draw between i and j + #a above j</span>
+        <span class="c1"># = (b_prefix[i] - d_prefix[i]) + (d_prefix[j] - a_prefix[j]) + a_total,</span>
+        <span class="c1"># so the best j for every i is a suffix maximum of d_prefix[j] - a_prefix[j].</span>
+        <span class="n">best_upper_score</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">best_upper_cut</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">score</span> <span class="o">=</span> <span class="n">d_prefix</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">a_prefix</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="n">m</span> <span class="ow">or</span> <span class="n">score</span> <span class="o">&gt;=</span> <span class="n">best_upper_score</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]:</span>
+                <span class="n">best_upper_score</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">score</span>
+                <span class="n">best_upper_cut</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">j</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">best_upper_score</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">best_upper_score</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">best_upper_cut</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">best_upper_cut</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">best_correct</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">best_i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">best_j</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">correct</span> <span class="o">=</span> <span class="n">b_prefix</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">d_prefix</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">best_upper_score</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">a_total</span>
+            <span class="k">if</span> <span class="n">correct</span> <span class="o">&gt;</span> <span class="n">best_correct</span><span class="p">:</span>
+                <span class="n">best_correct</span> <span class="o">=</span> <span class="n">correct</span>
+                <span class="n">best_i</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="n">best_j</span> <span class="o">=</span> <span class="n">best_upper_cut</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="n">best_accuracy</span> <span class="o">=</span> <span class="n">best_correct</span> <span class="o">/</span> <span class="n">total</span>
+        <span class="n">best_thresholds</span> <span class="o">=</span> <span class="p">[</span><span class="n">lower_cut</span><span class="p">[</span><span class="n">best_i</span><span class="p">],</span> <span class="n">upper_cut</span><span class="p">[</span><span class="n">best_j</span><span class="p">]]</span>
+
+        <span class="c1"># Keep the supplied thresholds when they already achieve the optimum.</span>
+        <span class="n">baseline_accuracy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_metrics</span><span class="p">(</span><span class="o">*</span><span class="n">initial_thresholds</span><span class="p">)[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">]</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
             <span class="s2">&quot;Baseline accuracy with initial thresholds [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">]: </span><span class="si">%.4f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">initial_thresholds</span><span class="p">,</span> <span class="n">baseline_accuracy</span>
         <span class="p">)</span>
-
-        <span class="c1"># Use initial_thresholds as the initial guess</span>
-        <span class="n">initial_guess</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">initial_thresholds</span><span class="p">)</span>
-
-        <span class="c1"># Bounds for the thresholds</span>
-        <span class="n">bounds</span> <span class="o">=</span> <span class="p">[(</span><span class="n">min_outcome</span><span class="p">,</span> <span class="n">max_outcome</span><span class="p">),</span> <span class="p">(</span><span class="n">min_outcome</span><span class="p">,</span> <span class="n">max_outcome</span><span class="p">)]</span>
-
-        <span class="c1"># Run multiple optimizations with different methods and starting points</span>
-        <span class="n">best_accuracy</span> <span class="o">=</span> <span class="n">baseline_accuracy</span>
-        <span class="n">best_thresholds</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">initial_thresholds</span><span class="p">)</span>
-
-        <span class="c1"># Try different optimization methods</span>
-        <span class="n">methods</span> <span class="o">=</span> <span class="p">[</span><span class="n">method</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">method</span> <span class="o">!=</span> <span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">:</span>
-            <span class="n">methods</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s2">&quot;Nelder-Mead&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
-            <span class="n">methods</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Nelder-Mead&quot;</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">opt_method</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="c1"># Run the optimization with current method</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running optimization with method: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">opt_method</span><span class="p">)</span>
-                <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span>
-                    <span class="n">objective</span><span class="p">,</span>
-                    <span class="n">initial_guess</span><span class="p">,</span>
-                    <span class="n">method</span><span class="o">=</span><span class="n">opt_method</span><span class="p">,</span>
-                    <span class="n">bounds</span><span class="o">=</span><span class="n">bounds</span> <span class="k">if</span> <span class="n">opt_method</span> <span class="o">!=</span> <span class="s2">&quot;Nelder-Mead&quot;</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-                    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;maxiter&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">},</span>
-                <span class="p">)</span>
-
-                <span class="c1"># Get the thresholds and ensure they&#39;re sorted</span>
-                <span class="n">opt_thresholds</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
-
-                <span class="c1"># Calculate the accuracy</span>
-                <span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_metrics</span><span class="p">(</span><span class="o">*</span><span class="n">opt_thresholds</span><span class="p">)</span>
-                <span class="n">accuracy</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">]</span>
-
-                <span class="c1"># Update best if better than current best</span>
-                <span class="k">if</span> <span class="n">accuracy</span> <span class="o">&gt;</span> <span class="n">best_accuracy</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                        <span class="s2">&quot;Optimization (</span><span class="si">%s</span><span class="s2">): New best accuracy </span><span class="si">%.4f</span><span class="s2"> with thresholds [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">]&quot;</span><span class="p">,</span>
-                        <span class="n">opt_method</span><span class="p">,</span>
-                        <span class="n">accuracy</span><span class="p">,</span>
-                        <span class="o">*</span><span class="n">opt_thresholds</span><span class="p">,</span>
-                    <span class="p">)</span>
-                    <span class="n">best_accuracy</span> <span class="o">=</span> <span class="n">accuracy</span>
-                    <span class="n">best_thresholds</span> <span class="o">=</span> <span class="n">opt_thresholds</span>
-
-                <span class="c1"># Try with a few random starting points</span>
-                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-                    <span class="n">random_guess</span> <span class="o">=</span> <span class="p">[</span>
-                        <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">min_outcome</span><span class="p">,</span> <span class="n">max_outcome</span><span class="p">),</span>
-                        <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">min_outcome</span><span class="p">,</span> <span class="n">max_outcome</span><span class="p">),</span>
-                    <span class="p">]</span>
-                    <span class="n">random_guess</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
-                    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span>
-                        <span class="n">objective</span><span class="p">,</span> <span class="n">random_guess</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">opt_method</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">bounds</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;disp&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
-                    <span class="p">)</span>
-                    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">success</span><span class="p">:</span>
-                        <span class="n">opt_thresholds</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
-                        <span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_metrics</span><span class="p">(</span><span class="o">*</span><span class="n">opt_thresholds</span><span class="p">)</span>
-                        <span class="n">accuracy</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">]</span>
-                        <span class="k">if</span> <span class="n">accuracy</span> <span class="o">&gt;</span> <span class="n">best_accuracy</span><span class="p">:</span>
-                            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                                <span class="s2">&quot;Optimization (</span><span class="si">%s</span><span class="s2">, random start </span><span class="si">%d</span><span class="s2">): New best accuracy </span><span class="si">%.4f</span><span class="s2"> with thresholds [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">]&quot;</span><span class="p">,</span>
-                                <span class="n">opt_method</span><span class="p">,</span>
-                                <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
-                                <span class="n">accuracy</span><span class="p">,</span>
-                                <span class="o">*</span><span class="n">opt_thresholds</span><span class="p">,</span>
-                            <span class="p">)</span>
-                            <span class="n">best_accuracy</span> <span class="o">=</span> <span class="n">accuracy</span>
-                            <span class="n">best_thresholds</span> <span class="o">=</span> <span class="n">opt_thresholds</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="c1"># Skip if optimization fails</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Optimization with method &#39;</span><span class="si">%s</span><span class="s2">&#39; failed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">opt_method</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
-                <span class="k">continue</span>
-
-        <span class="c1"># If optimized accuracy is worse than baseline, use baseline</span>
-        <span class="k">if</span> <span class="n">best_accuracy</span> <span class="o">&lt;</span> <span class="n">baseline_accuracy</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">baseline_accuracy</span> <span class="o">&gt;=</span> <span class="n">best_accuracy</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="s2">&quot;Optimized accuracy (</span><span class="si">%.4f</span><span class="s2">) is worse than baseline (</span><span class="si">%.4f</span><span class="s2">). Reverting to baseline thresholds.&quot;</span><span class="p">,</span>
-                <span class="n">best_accuracy</span><span class="p">,</span>
+                <span class="s2">&quot;Initial thresholds [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">] already achieve the optimal accuracy </span><span class="si">%.4f</span><span class="s2">.&quot;</span><span class="p">,</span>
+                <span class="o">*</span><span class="n">initial_thresholds</span><span class="p">,</span>
                 <span class="n">baseline_accuracy</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">return</span> <span class="n">baseline_accuracy</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">initial_thresholds</span><span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="s2">&quot;Optimization complete. Best accuracy: </span><span class="si">%.4f</span><span class="s2"> with thresholds [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">]&quot;</span><span class="p">,</span> <span class="n">best_accuracy</span><span class="p">,</span> <span class="o">*</span><span class="n">best_thresholds</span>
+            <span class="s2">&quot;Optimization complete. Best accuracy: </span><span class="si">%.4f</span><span class="s2"> with thresholds [</span><span class="si">%.4f</span><span class="s2">, </span><span class="si">%.4f</span><span class="s2">]&quot;</span><span class="p">,</span> <span class="n">best_accuracy</span><span class="p">,</span> <span class="o">*</span><span class="n">best_thresholds</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">best_accuracy</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">best_thresholds</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">best_accuracy</span><span class="p">,</span> <span class="n">best_thresholds</span></div>
 
 
 <div class="viewcode-block" id="History.calculate_metrics">

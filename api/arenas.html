@@ -467,12 +467,19 @@ and prepares them for calibration curve plotting.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.arenas.base.History.optimize_thresholds">
 <span class="sig-name descname"><span class="pre">optimize_thresholds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'L-BFGS-B'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_thresholds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.5,</span> <span class="pre">0.5)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/elote/arenas/base.html#History.optimize_thresholds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.arenas.base.History.optimize_thresholds" title="Link to this definition">¶</a></dt>
-<dd><p>Optimize prediction thresholds using scipy.optimize.</p>
-<p>This method uses scipy’s optimization algorithms to find the best thresholds
-for maximizing prediction accuracy.</p>
+<dd><p>Find the prediction thresholds that maximize accuracy.</p>
+<p>Accuracy is a step function of the thresholds: it only changes at the distinct
+values of <code class="docutils literal notranslate"><span class="pre">Bout.predicted_outcome</span></code>. This method therefore evaluates every
+distinct threshold pair exactly, in <code class="docutils literal notranslate"><span class="pre">O(n</span> <span class="pre">log</span> <span class="pre">n)</span></code>, rather than sampling. The
+result is deterministic — repeated calls on an unchanged history return
+identical values.</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>method (str): The optimization method to use (e.g., ‘L-BFGS-B’, ‘Nelder-Mead’)
-initial_thresholds (tuple): Initial guess for (lower_threshold, upper_threshold)</p>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>method (str): Deprecated and ignored. Retained for backward compatibility;</dt><dd><p>the search is exact, so no optimizer is selected.</p>
+</dd>
+<dt>initial_thresholds (tuple): Thresholds to fall back to. They are returned</dt><dd><p>unchanged whenever they already achieve the optimal accuracy.</p>
+</dd>
+</dl>
 </dd>
 <dt>Returns:</dt><dd><dl class="simple">
 <dt>tuple: (best_accuracy, best_thresholds) where:</dt><dd><ul class="simple">
@@ -487,12 +494,19 @@ initial_thresholds (tuple): Initial guess for (lower_threshold, upper_threshold)
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.arenas.base.History.random_search">
-<span class="sig-name descname"><span class="pre">random_search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trials</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/elote/arenas/base.html#History.random_search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.arenas.base.History.random_search" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">random_search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trials</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/elote/arenas/base.html#History.random_search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.arenas.base.History.random_search" title="Link to this definition">¶</a></dt>
 <dd><p>Search for optimal prediction thresholds using random sampling.</p>
 <p>This method performs a random search to find the best lower and upper
 thresholds that maximize the overall accuracy, including draws.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>trials (int): The number of random threshold pairs to try.</p>
+<dl>
+<dt>Note:</dt><dd><p><a class="reference internal" href="../arenas.html#elote.arenas.base.History.optimize_thresholds" title="elote.arenas.base.History.optimize_thresholds"><code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize_thresholds()</span></code></a> computes the exact optimum deterministically
+and should be preferred; this method is retained for backward compatibility.</p>
+</dd>
+<dt>Args:</dt><dd><p>trials (int): The number of random threshold pairs to try.
+seed (int, optional): Seed for the sampling. When omitted the unseeded</p>
+<blockquote>
+<div><p>global random module is used, so results vary between calls.</p>
+</div></blockquote>
 </dd>
 <dt>Returns:</dt><dd><p>tuple: A tuple containing (best_accuracy, best_thresholds).</p>
 </dd>
