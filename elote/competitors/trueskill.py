@@ -418,6 +418,9 @@ class TrueSkillCompetitor(BaseCompetitor):
         """
         Calculate the draw margin based on beta and draw probability.
 
+        This is the canonical TrueSkill draw margin, increasing in the draw
+        probability: a draw-free configuration gives a zero margin.
+
         Args:
             beta: The beta parameter
             draw_probability: The probability of a draw
@@ -427,7 +430,7 @@ class TrueSkillCompetitor(BaseCompetitor):
         """
         if not 0 <= draw_probability < 1:
             raise InvalidParameterException("Draw probability must be between 0 and 1")
-        return float(math.sqrt(2) * beta * special.erfinv(1 - 2 * draw_probability))
+        return float(math.sqrt(2) * beta * special.ndtri((draw_probability + 1) / 2))
 
     def expected_score(self, competitor: BaseCompetitor) -> float:
         """Calculate the expected score (probability of winning) against another competitor.
@@ -497,7 +500,7 @@ class TrueSkillCompetitor(BaseCompetitor):
         v = math.sqrt(2 * beta_squared + sigma_squared_sum)
 
         # Calculate the performance update
-        draw_margin = math.sqrt(2) * self._beta * special.ndtri((self._draw_probability + 1) / 2)
+        draw_margin = self._calculate_draw_margin(self._beta, self._draw_probability)
         t = (mu_diff - draw_margin) / v
         v_win_value = self._v_win(t)
         w_win_value = self._w_win(t)
@@ -542,7 +545,7 @@ class TrueSkillCompetitor(BaseCompetitor):
         v = math.sqrt(2 * beta_squared + sigma_squared_sum)
 
         # Calculate the draw margin
-        draw_margin = math.sqrt(2) * self._beta * special.ndtri((self._draw_probability + 1) / 2)
+        draw_margin = self._calculate_draw_margin(self._beta, self._draw_probability)
 
         # Calculate the performance update for a draw
         t = mu_diff / v
