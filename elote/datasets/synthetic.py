@@ -61,10 +61,11 @@ class SyntheticDataset(BaseDataset):
         self.time_span_days = time_span_days
         self.seed = seed
 
-        # Set random seed if provided
-        if seed is not None:
-            random.seed(seed)
-            np.random.seed(seed)
+        self._rng, self._np_rng = self._make_generators()
+
+    def _make_generators(self) -> Tuple[random.Random, np.random.RandomState]:
+        """Build the instance-local generators used to produce the dataset."""
+        return random.Random(self.seed), np.random.RandomState(self.seed)
 
     def download(self) -> None:
         """
@@ -85,15 +86,15 @@ class SyntheticDataset(BaseDataset):
             competitor_id = f"competitor_{i}"
 
             if self.skill_distribution == "normal":
-                skill = np.random.normal(self.skill_mean, self.skill_std)
+                skill = self._np_rng.normal(self.skill_mean, self.skill_std)
             elif self.skill_distribution == "uniform":
-                skill = np.random.uniform(
+                skill = self._np_rng.uniform(
                     self.skill_mean - self.skill_std * 1.73,  # Matching variance of normal
                     self.skill_mean + self.skill_std * 1.73,
                 )
             elif self.skill_distribution == "pareto":
                 # Pareto distribution for more realistic skill distribution with few very skilled competitors
-                skill = np.random.pareto(3) * self.skill_std + self.skill_mean - self.skill_std
+                skill = self._np_rng.pareto(3) * self.skill_std + self.skill_mean - self.skill_std
             else:
                 raise ValueError(f"Unknown skill distribution: {self.skill_distribution}")
 
@@ -121,21 +122,21 @@ class SyntheticDataset(BaseDataset):
 
         for _i in range(self.num_matchups):
             # Select two random competitors
-            a, b = random.sample(competitors, 2)
+            a, b = self._rng.sample(competitors, 2)
 
             # Generate a timestamp
-            days_offset = random.uniform(0, self.time_span_days)
+            days_offset = self._rng.uniform(0, self.time_span_days)
             timestamp = start_date + datetime.timedelta(days=days_offset)
 
             # Determine the outcome based on true skills plus noise
-            skill_a = skills[a] + np.random.normal(0, self.noise_std)
-            skill_b = skills[b] + np.random.normal(0, self.noise_std)
+            skill_a = skills[a] + self._np_rng.normal(0, self.noise_std)
+            skill_b = skills[b] + self._np_rng.normal(0, self.noise_std)
 
             # Calculate skill difference and normalize
             skill_diff = skill_a - skill_b
 
             # Determine if it's a draw
-            if abs(skill_diff) < self.noise_std and random.random() < self.draw_probability:
+            if abs(skill_diff) < self.noise_std and self._rng.random() < self.draw_probability:
                 outcome = 0.5  # Draw
             else:
                 outcome = 1.0 if skill_diff > 0 else 0.0
@@ -161,6 +162,9 @@ class SyntheticDataset(BaseDataset):
         Returns:
             List of matchup tuples (competitor_a, competitor_b, outcome, timestamp, attributes)
         """
+        # Restart the generators so a seeded dataset reproduces itself on every load.
+        self._rng, self._np_rng = self._make_generators()
+
         # Generate true skills for all competitors
         skills = self._generate_skills()
 
