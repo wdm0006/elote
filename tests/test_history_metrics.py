@@ -311,5 +311,144 @@ class TestHistoryMetrics(unittest.TestCase):
         self.assertIn("binned", result)
 
 
+def _brute_force_best(history):
+    """Exhaustively evaluate every candidate threshold pair via calculate_metrics.
+
+    Returns the best accuracy reachable by any (lower, upper) pair.
+    """
+    probabilities = sorted({bout.predicted_outcome for bout in history.bouts if bout.predicted_outcome is not None})
+    candidates = (
+        [probabilities[0] - 0.1]
+        + [(probabilities[k - 1] + probabilities[k]) / 2 for k in range(1, len(probabilities))]
+        + [probabilities[-1] + 0.1]
+    )
+    return max(
+        history.calculate_metrics(lower, upper)["accuracy"]
+        for lower in candidates
+        for upper in candidates
+        if lower <= upper
+    )
+
+
+def _mixed_history():
+    """A history whose optimal thresholds are neither (0.5, 0.5) nor a pure split."""
+    history = History()
+    for probability, outcome in [
+        (0.08, "loss"),
+        (0.17, "loss"),
+        (0.24, "win"),
+        (0.31, "loss"),
+        (0.42, "draw"),
+        (0.46, "loss"),
+        (0.53, "draw"),
+        (0.57, "draw"),
+        (0.61, "win"),
+        (0.68, "draw"),
+        (0.74, "win"),
+        (0.79, "loss"),
+        (0.86, "win"),
+        (0.93, "win"),
+    ]:
+        history.add_bout(Bout("a", "b", probability, outcome))
+    return history
+
+
+def _narrow_band_history():
+    """A history whose only perfect thresholds are a narrow band far from (0.5, 0.5).
+
+    No bout has a probability between 0.34 and 0.62, so accuracy is constant in a wide
+    neighbourhood of the default starting point. The single perfect answer requires the
+    lower threshold in (0.28, 0.30) and the upper in (0.32, 0.34) -- two 2%-wide
+    windows, which only an exact sweep locates reliably.
+    """
+    history = History()
+    bouts = (
+        [(round(0.02 + 0.04 * step, 2), "loss") for step in range(7)]  # 0.02 .. 0.26
+        + [(0.28, "loss")]
+        + [(0.30, "draw")] * 8
+        + [(0.32, "draw")] * 8
+        + [(0.34, "win")]
+        + [(round(0.62 + 0.04 * step, 2), "win") for step in range(10)]  # 0.62 .. 0.98
+    )
+    for probability, outcome in bouts:
+        history.add_bout(Bout("a", "b", probability, outcome))
+        if outcome != "draw":
+            history.add_bout(Bout("a", "b", probability, outcome))
+    return history
+
+
+class TestOptimizeThresholds(unittest.TestCase):
+    def test_optimize_thresholds_is_deterministic(self):
+        """Repeated calls on one unchanged history return identical results."""
+        for name, history in [("mixed", _mixed_history()), ("narrow_band", _narrow_band_history())]:
+            with self.subTest(history=name):
+                results = [history.optimize_thresholds() for _ in range(5)]
+
+                for result in results[1:]:
+                    self.assertEqual(result, results[0])
+
+    def test_optimize_thresholds_matches_brute_force(self):
+        """The returned accuracy equals the exhaustively computed optimum."""
+        for name, history in [("mixed", _mixed_history()), ("narrow_band", _narrow_band_history())]:
+            with self.subTest(history=name):
+                accuracy, thresholds = history.optimize_thresholds()
+
+                self.assertEqual(accuracy, _brute_force_best(history))
+                self.assertEqual(accuracy, history.calculate_metrics(*thresholds)["accuracy"])
+
+    def test_optimize_thresholds_finds_draw_band(self):
+        """A history whose optimum is a draw band returns lower < upper."""
+        history = _narrow_band_history()
+
+        accuracy, thresholds = history.optimize_thresholds()
+
+        # Only a band with 0.28 < lower < 0.30 and 0.32 < upper < 0.34 classifies
+        # every bout correctly; a decisive split tops out below 1.0.
+        self.assertEqual(accuracy, 1.0)
+        self.assertLess(thresholds[0], thresholds[1])
+        self.assertTrue(0.28 < thresholds[0] < 0.30, thresholds)
+        self.assertTrue(0.32 < thresholds[1] < 0.34, thresholds)
+        self.assertLess(history.calculate_metrics(0.5, 0.5)["accuracy"], accuracy)
+
+    def test_optimize_thresholds_never_worse_than_initial(self):
+        """The optimum is never below the accuracy of the supplied thresholds."""
+        history = _mixed_history()
+
+        for initial in [(0.5, 0.5), (0.2, 0.8), (0.0, 1.0), (0.45, 0.46)]:
+            with self.subTest(initial_thresholds=initial):
+                baseline = history.calculate_metrics(*initial)["accuracy"]
+                accuracy, thresholds = history.optimize_thresholds(initial_thresholds=initial)
+
+                self.assertGreaterEqual(accuracy, baseline)
+                self.assertEqual(accuracy, history.calculate_metrics(*thresholds)["accuracy"])
+
+    def test_optimize_thresholds_handles_decisive_history(self):
+        """A history with no draws is optimized by a single split point."""
+        history = History()
+        for probability, outcome in [(0.1, "loss"), (0.2, "loss"), (0.7, "win"), (0.9, "win")]:
+            history.add_bout(Bout("a", "b", probability, outcome))
+
+        accuracy, thresholds = history.optimize_thresholds()
+
+        self.assertEqual(accuracy, 1.0)
+        self.assertEqual(accuracy, history.calculate_metrics(*thresholds)["accuracy"])
+
+    def test_optimize_thresholds_ignores_method_argument(self):
+        """The deprecated method argument no longer changes the answer."""
+        history = _mixed_history()
+
+        self.assertEqual(history.optimize_thresholds(method="Nelder-Mead"), history.optimize_thresholds())
+
+    def test_random_search_is_reproducible_with_seed(self):
+        """random_search returns identical results for a fixed seed."""
+        history = _mixed_history()
+
+        first = history.random_search(trials=50, seed=7)
+        second = history.random_search(trials=50, seed=7)
+
+        self.assertEqual(first, second)
+        self.assertLessEqual(first[1][0], first[1][1])
+
+
 if __name__ == "__main__":
     unittest.main()
