@@ -67,16 +67,27 @@ class TestTrueSkillKnownValues(unittest.TestCase):
         self.assertTrue(hasattr(player, "_w_win"))
 
     def test_draw_margin_calculation(self):
-        """Test the draw margin calculation with known values."""
-        # Test with default draw probability
-        draw_margin = TrueSkillCompetitor._calculate_draw_margin(4.166, 0.10)
-        expected_margin = draw_margin  # Use actual value
-        self.assertAlmostEqual(draw_margin, expected_margin, places=3)
+        """Test the draw margin against independently derived literals.
 
-        # Test with different draw probability
-        draw_margin = TrueSkillCompetitor._calculate_draw_margin(4.166, 0.20)
-        expected_margin = draw_margin  # Use actual value
-        self.assertAlmostEqual(draw_margin, expected_margin, places=3)
+        The canonical TrueSkill draw margin is
+        ``sqrt(2) * beta * Phi^-1((p + 1) / 2)``, so at beta=4.166 the margin is
+        0.740348 at p=0.10 and 1.492623 at p=0.20. The values below are computed
+        from that closed form, not from the method under test.
+        """
+        self.assertAlmostEqual(TrueSkillCompetitor._calculate_draw_margin(4.166, 0.10), 0.740348, places=6)
+        self.assertAlmostEqual(TrueSkillCompetitor._calculate_draw_margin(4.166, 0.20), 1.492623, places=6)
+
+    def test_draw_margin_is_increasing_in_draw_probability(self):
+        """The margin grows with the draw probability and is exactly zero at p=0.
+
+        The pre-fix ``erfinv(1 - 2p)`` form is monotonically DECREASING and
+        returns ``inf`` at p=0, so it fails both halves of this test.
+        """
+        margins = [TrueSkillCompetitor._calculate_draw_margin(4.166, p) for p in (0.0, 0.05, 0.10, 0.20, 0.50)]
+
+        self.assertEqual(margins[0], 0.0)
+        for smaller, larger in zip(margins[:-1], margins[1:], strict=True):
+            self.assertLess(smaller, larger)
 
     def test_expected_score(self):
         """Test expected_score against externally derived reference probabilities.
@@ -97,14 +108,14 @@ class TestTrueSkillKnownValues(unittest.TestCase):
         self.assertAlmostEqual(player1.expected_score(player2), 0.500000, places=5)
 
         # Unequal means, equal sigmas: the corrected variance term materially
-        # softens the prediction (single-noise form gives ~0.842074).
+        # softens the prediction (single-noise form gives ~0.887536).
         player1 = TrueSkillCompetitor(initial_mu=30.0, initial_sigma=5.0)
         player2 = TrueSkillCompetitor(initial_mu=20.0, initial_sigma=5.0)
-        self.assertAlmostEqual(player1.expected_score(player2), 0.822961, places=5)
+        self.assertAlmostEqual(player1.expected_score(player2), 0.860595, places=5)
 
         # Same matchup reversed: the weaker player, complementary by construction
-        # (single-noise form gives ~0.157926).
-        self.assertAlmostEqual(player2.expected_score(player1), 0.177039, places=5)
+        # (single-noise form gives ~0.112464).
+        self.assertAlmostEqual(player2.expected_score(player1), 0.139405, places=5)
 
         # Equal means, different sigmas: still an even matchup.
         player1 = TrueSkillCompetitor(initial_mu=25.0, initial_sigma=3.0)
@@ -277,13 +288,11 @@ class TestTrueSkillKnownValues(unittest.TestCase):
         self.assertNotEqual(player1_high_sigma.sigma, 8.333)
 
     def test_draw_margin_effect(self):
-        """A wider draw margin pulls the expected score toward 0.5.
+        """A higher draw probability widens the margin and pulls predictions toward 0.5.
 
-        The sweep is ordered by the resulting margin, not by draw probability:
-        ``_calculate_draw_margin`` (used only by ``expected_score``) maps a
-        HIGHER draw probability to a SMALLER margin, the opposite direction from
-        the ``ndtri((p + 1) / 2)`` margin ``beat``/``tied`` use. That
-        inconsistency is a separate defect and is out of scope here.
+        Both halves move in the same direction under the canonical margin. On the
+        pre-fix ``erfinv(1 - 2p)`` form the margin shrinks as the draw probability
+        rises and predictions get sharper, so this test fails on both counts.
         """
         player1 = TrueSkillCompetitor(initial_mu=25.0, initial_sigma=8.333)
         player2 = TrueSkillCompetitor(initial_mu=30.0, initial_sigma=5.0)
@@ -291,8 +300,7 @@ class TestTrueSkillKnownValues(unittest.TestCase):
         original_draw_prob = TrueSkillCompetitor._draw_probability
 
         try:
-            # Ordered so that the draw margin strictly increases.
-            draw_probs = [0.20, 0.10, 0.05]
+            draw_probs = [0.05, 0.10, 0.20]
             margins = []
             distances_from_even = []
 
@@ -306,6 +314,24 @@ class TestTrueSkillKnownValues(unittest.TestCase):
             self.assertLess(distances_from_even[2], distances_from_even[1])
             self.assertLess(distances_from_even[1], distances_from_even[0])
 
+        finally:
+            TrueSkillCompetitor._draw_probability = original_draw_prob
+
+    def test_expected_score_with_draws_disabled(self):
+        """With draws disabled the prediction still tracks the skill gap.
+
+        The pre-fix margin was ``inf`` at ``draw_probability=0``, collapsing every
+        prediction to exactly 0.5 regardless of the gap.
+        """
+        original_draw_prob = TrueSkillCompetitor._draw_probability
+
+        try:
+            TrueSkillCompetitor._draw_probability = 0.0
+            strong = TrueSkillCompetitor(initial_mu=40.0, initial_sigma=1.0)
+            weak = TrueSkillCompetitor(initial_mu=10.0, initial_sigma=1.0)
+
+            self.assertGreater(strong.expected_score(weak), 0.99)
+            self.assertLess(weak.expected_score(strong), 0.01)
         finally:
             TrueSkillCompetitor._draw_probability = original_draw_prob
 
