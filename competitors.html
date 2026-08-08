@@ -1029,6 +1029,155 @@ InvalidParameterException: If any parameter in the state is invalid.</p>
 </dd></dl>
 
 </section>
+<section id="massey-competitor">
+<h2>Massey Competitor<a class="headerlink" href="#massey-competitor" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="elote.competitors.massey.MasseyCompetitor">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">elote.competitors.massey.</span></span><span class="sig-name descname"><span class="pre">MasseyCompetitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/elote/competitors/massey.html#MasseyCompetitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.massey.MasseyCompetitor" title="Link to this definition">¶</a></dt>
+<dd><p>Massey Ratings competitor.</p>
+<p>Massey’s method assigns every competitor a rating such that the difference between two
+ratings is a least-squares estimate of the margin by which one would beat the other.
+Like Colley and Bradley-Terry – and unlike Elo – ratings are not nudged after each
+result; the whole connected group is re-fit from the complete match history, which makes
+the method order independent.</p>
+<p><strong>Unit margins.</strong> The uniform <code class="docutils literal notranslate"><span class="pre">BaseCompetitor</span></code> API exposes only <code class="docutils literal notranslate"><span class="pre">beat</span></code> / <code class="docutils literal notranslate"><span class="pre">lost_to</span></code> /
+<code class="docutils literal notranslate"><span class="pre">tied</span></code> and has no channel for a score differential, so this implementation is
+<em>unit-margin</em> Massey: a win contributes <code class="docutils literal notranslate"><span class="pre">+1</span></code> to the winner’s cumulative margin and
+<code class="docutils literal notranslate"><span class="pre">-1</span></code> to the loser’s, and a draw contributes <code class="docutils literal notranslate"><span class="pre">0</span></code> to both while still counting as a game
+played for each. Genuine margin-of-victory Massey – the form used in college football
+rankings – would require a base-class level decision about how to carry a score, and is
+not implemented here.</p>
+<p>Key characteristics:
+- Global least-squares fit (does not depend on the order of results)
+- Ratings are zero mean within a connected group, so roughly half of them are negative
+- The rating difference is directly interpretable as a predicted margin</p>
+<dl>
+<dt>Class Attributes:</dt><dd><dl class="simple">
+<dt>_minimum_rating (float): The minimum allowed rating value. Default: <code class="docutils literal notranslate"><span class="pre">-inf</span></code>. Massey</dt><dd><p>ratings are zero mean and routinely negative, so no floor is imposed.</p>
+</dd>
+</dl>
+<p>_default_initial_rating (float): Default initial rating. Default: 0.0.
+_expected_score_scale (float): Logistic scale used by <a class="reference internal" href="#elote.competitors.massey.MasseyCompetitor.expected_score" title="elote.competitors.massey.MasseyCompetitor.expected_score"><code class="xref py py-meth docutils literal notranslate"><span class="pre">expected_score()</span></code></a> to turn a</p>
+<blockquote>
+<div><p>rating difference into a win probability. Default: 2.0, chosen so that the widest
+plausible unit-margin gap maps to roughly the same probability as the widest gap
+under Colley’s <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">/</span> <span class="pre">(1</span> <span class="pre">+</span> <span class="pre">exp(-4</span> <span class="pre">*</span> <span class="pre">diff))</span></code>.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>_round_decimals (int): Number of decimal places fitted ratings are canonicalized to, so</dt><dd><p>that solver noise cannot make mathematically identical records differ. Default: 13.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>Initialize a new Massey competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>initial_rating (float, optional): The initial rating of this competitor. Default: 0.0.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.massey.MasseyCompetitor.beat">
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/competitors/massey.html#MasseyCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.massey.MasseyCompetitor.beat" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this competitor has won against the given competitor.</p>
+<p>The result is recorded in the match graph and the whole connected group is re-fit.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.massey.MasseyCompetitor.expected_score">
+<span class="sig-name descname"><span class="pre">expected_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/elote/competitors/massey.html#MasseyCompetitor.expected_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.massey.MasseyCompetitor.expected_score" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the expected score against another competitor.</p>
+<p>Massey ratings are on a margin scale rather than a probability scale, so the predicted
+margin <code class="docutils literal notranslate"><span class="pre">r_self</span> <span class="pre">-</span> <span class="pre">r_competitor</span></code> is squashed through a logistic function to obtain a
+win probability. Two competitors with equal ratings give exactly 0.5, and the two
+argument orders are exactly complementary.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The competitor to compare against.</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: The expected score (probability of winning).</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.massey.MasseyCompetitor.export_state">
+<span class="sig-name descname"><span class="pre">export_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#elote.competitors.massey.MasseyCompetitor.export_state" title="Link to this definition">¶</a></dt>
+<dd><p>Export the current state of this competitor for serialization.</p>
+<p>This method exports the competitor’s state in a standardized format that can be
+used to recreate the competitor with the same state. The format includes:
+- type: The class name of the competitor
+- version: The version of the serialization format
+- created_at: The timestamp when the state was exported
+- id: A unique identifier for this state export
+- parameters: The parameters used to initialize the competitor
+- state: The current state variables of the competitor</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>dict: A dictionary containing all necessary information to recreate</dt><dd><p>this competitor’s current state.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.massey.MasseyCompetitor.from_json">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="headerlink" href="#elote.competitors.massey.MasseyCompetitor.from_json" title="Link to this definition">¶</a></dt>
+<dd><p>Create a new competitor from a JSON string.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>json_str (str): A JSON string representing a competitor’s state.</p>
+</dd>
+<dt>Returns:</dt><dd><p>BaseCompetitor: A new competitor with the state from the JSON string.</p>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidStateException: If the JSON string is invalid or incompatible.
+InvalidParameterException: If any parameter in the state is invalid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="elote.competitors.massey.MasseyCompetitor.rating">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rating</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#elote.competitors.massey.MasseyCompetitor.rating" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current rating of this competitor.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>float: The current rating.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.massey.MasseyCompetitor.tied">
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/competitors/massey.html#MasseyCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.massey.MasseyCompetitor.tied" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this competitor has tied with the given competitor.</p>
+<p>A draw contributes nothing to either cumulative margin, but counts as a game played
+for both competitors.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.massey.MasseyCompetitor.to_json">
+<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#elote.competitors.massey.MasseyCompetitor.to_json" title="Link to this definition">¶</a></dt>
+<dd><p>Convert this competitor’s state to a JSON string.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: A JSON string representing this competitor’s state.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="bradley-terry-competitor">
 <h2>Bradley-Terry Competitor<a class="headerlink" href="#bradley-terry-competitor" title="Link to this heading">¶</a></h2>
 <dl class="py class">
@@ -1358,6 +1507,7 @@ The serialization format includes the following fields:</p>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/ecf.html">ECF Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/dwz.html">DWZ Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/colley.html">Colley Matrix Method</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/massey.html">Massey Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/comparison.html">Comparing Rating Systems</a></li>

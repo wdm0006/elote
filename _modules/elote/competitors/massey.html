@@ -14,7 +14,7 @@
         gtag('config', 'G-Z43R9PWW0B');
     </script>
     
-    <title>elote.competitors.bradley_terry &#8212; elote 1.2.1 documentation</title>
+    <title>elote.competitors.massey &#8212; elote 1.2.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=30d13653" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/wabi.css?v=501c8ac3" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=71d92741" />
@@ -30,7 +30,7 @@
 
 
 
-<meta name="description" content="elote.competitors.bradley_terry - elote documentation">
+<meta name="description" content="elote.competitors.massey - elote documentation">
 
 
 
@@ -40,19 +40,19 @@
 
 
 
-<meta property="og:title" content="elote.competitors.bradley_terry">
-<meta property="og:description" content="elote.competitors.bradley_terry - elote documentation">
+<meta property="og:title" content="elote.competitors.massey">
+<meta property="og:description" content="elote.competitors.massey - elote documentation">
 <meta property="og:type" content="website">
 
-<meta property="og:url" content="https://elote.mcginniscommawill.com/_modules/elote/competitors/bradley_terry.html">
+<meta property="og:url" content="https://elote.mcginniscommawill.com/_modules/elote/competitors/massey.html">
 
 
 <meta property="og:site_name" content="elote">
 
 
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="elote.competitors.bradley_terry">
-<meta name="twitter:description" content="elote.competitors.bradley_terry - elote documentation">
+<meta name="twitter:title" content="elote.competitors.massey">
+<meta name="twitter:description" content="elote.competitors.massey - elote documentation">
 
 <meta name="twitter:site" content="@willmcginniser">
 
@@ -60,7 +60,7 @@
 
 
 
-<link rel="canonical" href="https://elote.mcginniscommawill.com/_modules/elote/competitors/bradley_terry.html">
+<link rel="canonical" href="https://elote.mcginniscommawill.com/_modules/elote/competitors/massey.html">
 
 
  
@@ -161,7 +161,7 @@
     
     
     <span class="breadcrumbs__separator">/</span>
-    <span>elote.competitors.bradley_terry</span>
+    <span>elote.competitors.massey</span>
     
   </div>
 </nav>
@@ -173,127 +173,136 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>Source code for elote.competitors.bradley_terry</h1><div class="highlight"><pre>
+  <h1>Source code for elote.competitors.massey</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Bradley-Terry model implementation for the Elote library.</span>
+<span class="sd">Massey Ratings implementation for the Elote library.</span>
 
-<span class="sd">The Bradley-Terry model is a probabilistic model for paired comparisons. Each competitor</span>
-<span class="sd">is assigned a latent strength, and the probability that competitor ``i`` beats competitor</span>
-<span class="sd">``j`` is ``p_i / (p_i + p_j)``. Working in the log domain with ``p_i = exp(beta_i)`` this is</span>
-<span class="sd">the logistic function ``sigmoid(beta_i - beta_j)`` -- the same functional form as the Elo</span>
-<span class="sd">expected score.</span>
+<span class="sd">The Massey method is the least-squares counterpart to</span>
+<span class="sd">:class:`~elote.competitors.colley.ColleyMatrixCompetitor`. Where Colley solves a</span>
+<span class="sd">ridge-regularized win-percentage model whose ratings are bounded to [0, 1], Massey solves an</span>
+<span class="sd">unregularized least-squares system whose ratings live on a signed *margin* scale: the fitted</span>
+<span class="sd">rating difference ``r_i - r_j`` is the model&#39;s predicted margin when ``i`` plays ``j``.</span>
 
-<span class="sd">Unlike Elo, which nudges ratings incrementally after every game, the Bradley-Terry strengths</span>
-<span class="sd">are obtained by maximum likelihood estimation over the full set of observed comparisons. This</span>
-<span class="sd">implementation follows the same approach as :class:`~elote.competitors.colley.ColleyMatrixCompetitor`:</span>
-<span class="sd">each competitor accumulates its match history and, after every result, the strengths of the</span>
-<span class="sd">whole connected component are re-fit. The fit uses the minorization-maximization (MM) update of</span>
-<span class="sd">Hunter (2004) with geometric-mean normalization and a small amount of regularization so that a</span>
-<span class="sd">unique, finite solution exists even when a competitor is undefeated or winless within its</span>
-<span class="sd">component.</span>
+<span class="sd">The system is</span>
+
+<span class="sd">.. math::</span>
+
+<span class="sd">   M r = p</span>
+
+<span class="sd">where ``M = D - A`` (``D_ii`` is the number of games played by ``i`` and ``A_ij`` the number of</span>
+<span class="sd">games between ``i`` and ``j``) and ``p_i`` is ``i``&#39;s cumulative margin. ``M`` is a graph</span>
+<span class="sd">Laplacian, so its rows sum to zero and it is singular by construction. The standard fix is</span>
+<span class="sd">applied: the last row is replaced with all ones and the last entry of ``p`` with zero, which</span>
+<span class="sd">pins the ratings to zero mean and makes the solution unique on a connected schedule.</span>
 
 <span class="sd">References:</span>
-<span class="sd">- Bradley, R. A., &amp; Terry, M. E. (1952). Rank Analysis of Incomplete Block Designs: I. The</span>
-<span class="sd">  Method of Paired Comparisons. Biometrika, 39(3/4), 324-345.</span>
-<span class="sd">- Hunter, D. R. (2004). MM algorithms for generalized Bradley-Terry models. The Annals of</span>
-<span class="sd">  Statistics, 32(1), 384-406.</span>
+<span class="sd">- Massey, K. (1997). Statistical Models Applied to the Rating of Sports Teams.</span>
+<span class="sd">  Bluefield College undergraduate honors thesis.</span>
+<span class="sd">- Langville, A. N., &amp; Meyer, C. D. (2012). Who&#39;s #1? The Science of Rating and Ranking.</span>
+<span class="sd">  Princeton University Press, chapter 2.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">cast</span><span class="p">,</span> <span class="n">Set</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">elote.competitors.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="n">InvalidParameterException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote.competitors.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="n">InvalidParameterException</span><span class="p">,</span> <span class="n">InvalidRatingValueException</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 
-<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;BradleyTerryCompetitor&quot;</span><span class="p">)</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;MasseyCompetitor&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="BradleyTerryCompetitor">
-<a class="viewcode-back" href="../../../competitors.html#elote.competitors.bradley_terry.BradleyTerryCompetitor">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">BradleyTerryCompetitor</span><span class="p">(</span><span class="n">BaseCompetitor</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Bradley-Terry model competitor.</span>
+<div class="viewcode-block" id="MasseyCompetitor">
+<a class="viewcode-back" href="../../../competitors.html#elote.competitors.massey.MasseyCompetitor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MasseyCompetitor</span><span class="p">(</span><span class="n">BaseCompetitor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Massey Ratings competitor.</span>
 
-<span class="sd">    The Bradley-Terry model assigns each competitor a latent strength and models the</span>
-<span class="sd">    probability that one competitor beats another as a function of the difference of their</span>
-<span class="sd">    log-strengths. Unlike Elo, which updates ratings incrementally, Bradley-Terry re-fits the</span>
-<span class="sd">    strengths of every connected competitor via maximum likelihood after each result.</span>
+<span class="sd">    Massey&#39;s method assigns every competitor a rating such that the difference between two</span>
+<span class="sd">    ratings is a least-squares estimate of the margin by which one would beat the other.</span>
+<span class="sd">    Like Colley and Bradley-Terry -- and unlike Elo -- ratings are not nudged after each</span>
+<span class="sd">    result; the whole connected group is re-fit from the complete match history, which makes</span>
+<span class="sd">    the method order independent.</span>
 
-<span class="sd">    Ratings are reported on an Elo-like scale via ``rating = anchor + scale * beta``, where</span>
-<span class="sd">    ``beta`` is the internal log-strength (re-centered so the mean log-strength of a component</span>
-<span class="sd">    is zero). Choosing ``scale = 400 / ln(10)`` makes :meth:`expected_score` numerically</span>
-<span class="sd">    identical to the Elo expected score, so ratings are directly comparable to Elo ratings.</span>
+<span class="sd">    **Unit margins.** The uniform ``BaseCompetitor`` API exposes only ``beat`` / ``lost_to`` /</span>
+<span class="sd">    ``tied`` and has no channel for a score differential, so this implementation is</span>
+<span class="sd">    *unit-margin* Massey: a win contributes ``+1`` to the winner&#39;s cumulative margin and</span>
+<span class="sd">    ``-1`` to the loser&#39;s, and a draw contributes ``0`` to both while still counting as a game</span>
+<span class="sd">    played for each. Genuine margin-of-victory Massey -- the form used in college football</span>
+<span class="sd">    rankings -- would require a base-class level decision about how to carry a score, and is</span>
+<span class="sd">    not implemented here.</span>
 
 <span class="sd">    Key characteristics:</span>
-<span class="sd">    - Global maximum-likelihood fit (does not depend on the order of results)</span>
-<span class="sd">    - Considers only wins and losses (ties are counted as half a win for each side)</span>
-<span class="sd">    - Regularized so a unique, finite fit exists even for undefeated/winless competitors</span>
+<span class="sd">    - Global least-squares fit (does not depend on the order of results)</span>
+<span class="sd">    - Ratings are zero mean within a connected group, so roughly half of them are negative</span>
+<span class="sd">    - The rating difference is directly interpretable as a predicted margin</span>
 
 <span class="sd">    Class Attributes:</span>
-<span class="sd">        _minimum_rating (float): The minimum allowed rating value. Default: 0.0.</span>
-<span class="sd">        _anchor_rating (float): Rating assigned to the mean log-strength. Default: 1500.0.</span>
-<span class="sd">        _scale (float): Points per unit of log-strength. Default: 400 / ln(10).</span>
-<span class="sd">        _reg (float): Regularization strength (virtual wins/losses against an average</span>
-<span class="sd">            phantom opponent). Default: 0.1.</span>
-<span class="sd">        _max_iter (int): Maximum MM iterations per fit. Default: 10000.</span>
-<span class="sd">        _tol (float): Convergence tolerance on the max change in log-strength. Default: 1e-8.</span>
+<span class="sd">        _minimum_rating (float): The minimum allowed rating value. Default: ``-inf``. Massey</span>
+<span class="sd">            ratings are zero mean and routinely negative, so no floor is imposed.</span>
+<span class="sd">        _default_initial_rating (float): Default initial rating. Default: 0.0.</span>
+<span class="sd">        _expected_score_scale (float): Logistic scale used by :meth:`expected_score` to turn a</span>
+<span class="sd">            rating difference into a win probability. Default: 2.0, chosen so that the widest</span>
+<span class="sd">            plausible unit-margin gap maps to roughly the same probability as the widest gap</span>
+<span class="sd">            under Colley&#39;s ``1 / (1 + exp(-4 * diff))``.</span>
+<span class="sd">        _round_decimals (int): Number of decimal places fitted ratings are canonicalized to, so</span>
+<span class="sd">            that solver noise cannot make mathematically identical records differ. Default: 13.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">_minimum_rating</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
-    <span class="n">_anchor_rating</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1500.0</span>
-    <span class="n">_scale</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">400.0</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span>
-    <span class="n">_reg</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
-    <span class="n">_max_iter</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10000</span>
-    <span class="n">_tol</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-8</span>
+    <span class="n">_minimum_rating</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;-inf&quot;</span><span class="p">)</span>
+    <span class="n">_default_initial_rating</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">_expected_score_scale</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span>
+    <span class="n">_round_decimals</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">13</span>
 
-<div class="viewcode-block" id="BradleyTerryCompetitor.__init__">
-<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.bradley_terry.BradleyTerryCompetitor.__init__">[docs]</a>
+<div class="viewcode-block" id="MasseyCompetitor.__init__">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.massey.MasseyCompetitor.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_rating</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a new Bradley-Terry competitor.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a new Massey competitor.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            initial_rating (float, optional): The initial rating of this competitor, on the</span>
-<span class="sd">                Elo-like reporting scale. Default: the anchor rating (1500).</span>
-
-<span class="sd">        Raises:</span>
-<span class="sd">            InvalidParameterException: If the regularization or iteration parameters are invalid.</span>
+<span class="sd">            initial_rating (float, optional): The initial rating of this competitor. Default: 0.0.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>  <span class="c1"># Call base class constructor</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">initial_rating</span> <span class="k">if</span> <span class="n">initial_rating</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_anchor_rating</span>
-        <span class="c1"># Internal log-strength; derived so that rating == anchor + scale * beta.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_anchor_rating</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">initial_rating</span> <span class="k">if</span> <span class="n">initial_rating</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_initial_rating</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">&quot;BradleyTerryCompetitor&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Opponent -&gt; num games</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_head_to_head</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">&quot;BradleyTerryCompetitor&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Opponent -&gt; wins against</span>
+        <span class="c1"># Cumulative margin -- the right-hand side ``p`` of the Massey system. With unit</span>
+        <span class="c1"># margins this is simply wins minus losses, but it is tracked separately because it is</span>
+        <span class="c1"># the quantity the algorithm actually consumes.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_point_differential</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">&quot;MasseyCompetitor&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Opponent -&gt; num games</span>
         <span class="c1"># Unique ID for hashing (instances are used as dict keys in the match graph).</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-            <span class="s2">&quot;Initialized BradleyTerryCompetitor </span><span class="si">%d</span><span class="s2"> with initial rating </span><span class="si">%.3f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span>
-        <span class="p">)</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Initialized MasseyCompetitor </span><span class="si">%d</span><span class="s2"> with initial rating </span><span class="si">%.3f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">)</span></div>
 
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current rating of this competitor on the Elo-like reporting scale.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current rating of this competitor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            float: The current rating.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_anchor_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span>
 
     <span class="nd">@rating</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the current rating of this competitor on the Elo-like reporting scale.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the current rating of this competitor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            value (float): The new rating value.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidRatingValueException: If the rating value is below the minimum rating.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Setting rating for competitor </span><span class="si">%d</span><span class="s2"> to </span><span class="si">%.3f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">value</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_anchor_rating</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Attempted to set rating </span><span class="si">%.3f</span><span class="s2"> below minimum </span><span class="si">%.3f</span><span class="s2"> for </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span>
+            <span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">num_games</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -304,29 +313,38 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span>
 
-<div class="viewcode-block" id="BradleyTerryCompetitor.expected_score">
-<a class="viewcode-back" href="../../../competitors.html#elote.competitors.bradley_terry.BradleyTerryCompetitor.expected_score">[docs]</a>
+<div class="viewcode-block" id="MasseyCompetitor.expected_score">
+<a class="viewcode-back" href="../../../competitors.html#elote.competitors.massey.MasseyCompetitor.expected_score">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;BaseCompetitor&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the expected score against another competitor.</span>
+
+<span class="sd">        Massey ratings are on a margin scale rather than a probability scale, so the predicted</span>
+<span class="sd">        margin ``r_self - r_competitor`` is squashed through a logistic function to obtain a</span>
+<span class="sd">        win probability. Two competitors with equal ratings give exactly 0.5, and the two</span>
+<span class="sd">        argument orders are exactly complementary.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            competitor (BaseCompetitor): The competitor to compare against.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            float: The expected score (probability of winning).</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
-        <span class="n">other</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">BradleyTerryCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
-        <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_beta</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">_beta</span><span class="p">)))</span></div>
+        <span class="n">rating_diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">-</span> <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span>
+        <span class="c1"># tanh form: symmetric in the sign of rating_diff, so the two argument orders sum to</span>
+        <span class="c1"># exactly 1.0 in floating point.</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expected_score_scale</span> <span class="o">*</span> <span class="n">rating_diff</span><span class="p">)))</span></div>
 
 
-<div class="viewcode-block" id="BradleyTerryCompetitor.beat">
-<a class="viewcode-back" href="../../../competitors.html#elote.competitors.bradley_terry.BradleyTerryCompetitor.beat">[docs]</a>
+<div class="viewcode-block" id="MasseyCompetitor.beat">
+<a class="viewcode-back" href="../../../competitors.html#elote.competitors.massey.MasseyCompetitor.beat">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has won against the given competitor.</span>
 
-<span class="sd">        The result is recorded on both competitors and the strengths of the entire connected</span>
-<span class="sd">        component are re-fit by maximum likelihood.</span>
+<span class="sd">        The result is recorded in the match graph and the whole connected group is re-fit.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            competitor (BaseCompetitor): The opponent competitor that lost.</span>
@@ -336,26 +354,27 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Competitor </span><span class="si">%s</span><span class="s2"> beat </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
-        <span class="n">opponent</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">BradleyTerryCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+        <span class="n">opponent</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">MasseyCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_point_differential</span> <span class="o">+=</span> <span class="mf">1.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span><span class="p">[</span><span class="n">opponent</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">opponent</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_head_to_head</span><span class="p">[</span><span class="n">opponent</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_head_to_head</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">opponent</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
 
         <span class="n">opponent</span><span class="o">.</span><span class="n">_losses</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">opponent</span><span class="o">.</span><span class="n">_point_differential</span> <span class="o">-=</span> <span class="mf">1.0</span>
         <span class="n">opponent</span><span class="o">.</span><span class="n">_opponents</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="n">opponent</span><span class="o">.</span><span class="n">_opponents</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="n">opponent</span><span class="o">.</span><span class="n">_head_to_head</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Recorded win for </span><span class="si">%d</span><span class="s2">, loss for </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">opponent</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_recalculate_ratings</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="BradleyTerryCompetitor.tied">
-<a class="viewcode-back" href="../../../competitors.html#elote.competitors.bradley_terry.BradleyTerryCompetitor.tied">[docs]</a>
+<div class="viewcode-block" id="MasseyCompetitor.tied">
+<a class="viewcode-back" href="../../../competitors.html#elote.competitors.massey.MasseyCompetitor.tied">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has tied with the given competitor.</span>
 
-<span class="sd">        A tie is counted as half a win for each side.</span>
+<span class="sd">        A draw contributes nothing to either cumulative margin, but counts as a game played</span>
+<span class="sd">        for both competitors.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            competitor (BaseCompetitor): The opponent competitor that tied.</span>
@@ -365,22 +384,20 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Competitor </span><span class="si">%s</span><span class="s2"> tied with </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
-        <span class="n">opponent</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">BradleyTerryCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+        <span class="n">opponent</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">MasseyCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span><span class="p">[</span><span class="n">opponent</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">opponent</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_head_to_head</span><span class="p">[</span><span class="n">opponent</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_head_to_head</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">opponent</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span>
 
         <span class="n">opponent</span><span class="o">.</span><span class="n">_ties</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="n">opponent</span><span class="o">.</span><span class="n">_opponents</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="n">opponent</span><span class="o">.</span><span class="n">_opponents</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="n">opponent</span><span class="o">.</span><span class="n">_head_to_head</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="n">opponent</span><span class="o">.</span><span class="n">_head_to_head</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Recorded tie for </span><span class="si">%d</span><span class="s2"> and </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">opponent</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_recalculate_ratings</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="BradleyTerryCompetitor.lost_to">
-<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.bradley_terry.BradleyTerryCompetitor.lost_to">[docs]</a>
+<div class="viewcode-block" id="MasseyCompetitor.lost_to">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.massey.MasseyCompetitor.lost_to">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">lost_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has lost to the given competitor.</span>
 
@@ -395,14 +412,14 @@
         <span class="n">competitor</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_get_connected_competitors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;BradleyTerryCompetitor&quot;</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_connected_competitors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;MasseyCompetitor&quot;</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all competitors connected to this competitor in the match graph.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            List[BradleyTerryCompetitor]: A list of all connected competitors.</span>
+<span class="sd">            List[MasseyCompetitor]: A list of all connected competitors.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">visited</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="s2">&quot;BradleyTerryCompetitor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="n">to_visit</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;BradleyTerryCompetitor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span>
+        <span class="n">visited</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="s2">&quot;MasseyCompetitor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">to_visit</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;MasseyCompetitor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span>
         <span class="n">all_competitors</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">while</span> <span class="n">to_visit</span><span class="p">:</span>
@@ -419,12 +436,11 @@
         <span class="k">return</span> <span class="n">all_competitors</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_recalculate_ratings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Re-fit the Bradley-Terry strengths for all connected competitors.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Re-fit the Massey ratings for all connected competitors.</span>
 
-<span class="sd">        Uses the minorization-maximization (MM) update of Hunter (2004) with geometric-mean</span>
-<span class="sd">        normalization and a small regularization term (virtual results against an average phantom</span>
-<span class="sd">        opponent) so that the maximum-likelihood estimate exists and is unique even when a</span>
-<span class="sd">        competitor is undefeated or winless within its component.</span>
+<span class="sd">        Builds ``M = D - A`` and the cumulative-margin vector ``p``, replaces the last row of</span>
+<span class="sd">        ``M`` with all ones (and the last entry of ``p`` with zero) to remove the singularity,</span>
+<span class="sd">        and solves the resulting system. The constraint pins the ratings to zero mean.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">competitors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_connected_competitors</span><span class="p">()</span>
         <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">competitors</span><span class="p">)</span>
@@ -434,50 +450,52 @@
 
         <span class="n">idx</span> <span class="o">=</span> <span class="p">{</span><span class="n">comp</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">comp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">competitors</span><span class="p">)}</span>
 
-        <span class="c1"># Win counts: wins[i][j] = number of times i beat j (ties count as 0.5 to each side).</span>
-        <span class="n">wins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">comp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">competitors</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">opponent</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">comp</span><span class="o">.</span><span class="n">_head_to_head</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">M</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">num_games</span>
+            <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">_point_differential</span>
+            <span class="k">for</span> <span class="n">opponent</span><span class="p">,</span> <span class="n">games</span> <span class="ow">in</span> <span class="n">comp</span><span class="o">.</span><span class="n">_opponents</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">j</span> <span class="o">=</span> <span class="n">idx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">j</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">wins</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">w</span>
+                    <span class="n">M</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">games</span>
 
-        <span class="c1"># Total games between each pair (symmetric).</span>
-        <span class="n">games</span> <span class="o">=</span> <span class="n">wins</span> <span class="o">+</span> <span class="n">wins</span><span class="o">.</span><span class="n">T</span>
+        <span class="c1"># M is a graph Laplacian and therefore singular. Replacing one equation with the</span>
+        <span class="c1"># zero-sum constraint makes the system non-singular; the replaced equation is implied</span>
+        <span class="c1"># by the remaining ones, so the solution is unaffected by which row is chosen.</span>
+        <span class="n">M</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">p</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
 
-        <span class="c1"># Total wins per competitor (ties are already counted as half in the win matrix).</span>
-        <span class="n">total_wins</span> <span class="o">=</span> <span class="n">wins</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinAlgError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Massey matrix is singular (</span><span class="si">%s</span><span class="s2">). Falling back to average-margin ratings for </span><span class="si">%d</span><span class="s2"> competitors.&quot;</span><span class="p">,</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
+                <span class="n">n</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fallback_rating_calculation</span><span class="p">(</span><span class="n">competitors</span><span class="p">)</span>
+            <span class="k">return</span>
 
-        <span class="c1"># Strengths p_i = exp(beta_i). The Bradley-Terry log-likelihood is concave with a</span>
-        <span class="c1"># unique maximum, so we seed from a flat, well-conditioned starting point rather than</span>
-        <span class="c1"># warm-starting from the (possibly extreme) current strengths.</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="c1"># The solver&#39;s pivoting depends on the row order, which is the order competitors were</span>
+        <span class="c1"># discovered in, so two runs over the same results can differ in the last few bits.</span>
+        <span class="c1"># Canonicalizing to _round_decimals places makes mathematically identical records</span>
+        <span class="c1"># compare exactly equal and makes the fit order independent.</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_round_decimals</span><span class="p">)</span>
 
-        <span class="n">reg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reg</span>
-        <span class="c1"># Regularization: a virtual win and loss against a phantom opponent of unit strength,</span>
-        <span class="c1"># guaranteeing a finite, unique solution even for undefeated or winless competitors.</span>
-        <span class="n">numerator</span> <span class="o">=</span> <span class="n">total_wins</span> <span class="o">+</span> <span class="n">reg</span>
-        <span class="k">for</span> <span class="n">iteration</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_max_iter</span><span class="p">):</span>
-            <span class="c1"># games[i][i] is zero, so the diagonal contributes nothing and needs no masking.</span>
-            <span class="n">denominator</span> <span class="o">=</span> <span class="p">(</span><span class="n">games</span> <span class="o">/</span> <span class="p">(</span><span class="n">p</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]))</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">reg</span> <span class="o">/</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span>
-            <span class="n">new_p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">numerator</span><span class="p">,</span> <span class="n">denominator</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">where</span><span class="o">=</span><span class="n">denominator</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
-
-            <span class="c1"># Normalize by the geometric mean to fix the overall scale.</span>
-            <span class="n">geo_mean</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">new_p</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">geo_mean</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">new_p</span> <span class="o">=</span> <span class="n">new_p</span> <span class="o">/</span> <span class="n">geo_mean</span>
-
-            <span class="n">max_delta</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">new_p</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">p</span><span class="p">))))</span>
-            <span class="n">p</span> <span class="o">=</span> <span class="n">new_p</span>
-            <span class="k">if</span> <span class="n">max_delta</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tol</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Bradley-Terry fit converged in </span><span class="si">%d</span><span class="s2"> iterations&quot;</span><span class="p">,</span> <span class="n">iteration</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-                <span class="k">break</span>
-
-        <span class="c1"># Write back re-centered log-strengths (mean beta == 0).</span>
-        <span class="n">betas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
-        <span class="n">betas</span> <span class="o">=</span> <span class="n">betas</span> <span class="o">-</span> <span class="n">betas</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">comp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">competitors</span><span class="p">):</span>
-            <span class="n">comp</span><span class="o">.</span><span class="n">_beta</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">betas</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">comp</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fallback_rating_calculation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;MasseyCompetitor&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Assign average-margin ratings when the linear system cannot be solved.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            competitors: The connected group of competitors to rate.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ratings</span> <span class="o">=</span> <span class="p">[(</span><span class="n">comp</span><span class="o">.</span><span class="n">_point_differential</span> <span class="o">/</span> <span class="n">comp</span><span class="o">.</span><span class="n">num_games</span><span class="p">)</span> <span class="k">if</span> <span class="n">comp</span><span class="o">.</span><span class="n">num_games</span> <span class="k">else</span> <span class="mf">0.0</span> <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">competitors</span><span class="p">]</span>
+        <span class="n">mean_rating</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">ratings</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">ratings</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">comp</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">competitors</span><span class="p">,</span> <span class="n">ratings</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">comp</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">value</span> <span class="o">-</span> <span class="n">mean_rating</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_export_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the parameters used to initialize this competitor.</span>
@@ -496,11 +514,11 @@
 <span class="sd">            dict: A dictionary containing the current state variables.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span>
-            <span class="s2">&quot;beta&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span><span class="p">,</span>
+            <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="p">,</span>
             <span class="s2">&quot;wins&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span><span class="p">,</span>
             <span class="s2">&quot;losses&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="p">,</span>
             <span class="s2">&quot;ties&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span><span class="p">,</span>
+            <span class="s2">&quot;point_differential&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_point_differential</span><span class="p">,</span>
         <span class="p">}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_import_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -509,27 +527,24 @@
 <span class="sd">        Args:</span>
 <span class="sd">            parameters (dict): A dictionary containing parameters.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_anchor_rating</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_anchor_rating</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_initial_rating</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_import_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Import current state variables from a state dictionary.</span>
 
 <span class="sd">        Note: opponent references cannot be restored from serialization, so the match graph is</span>
-<span class="sd">        reset; the rating and aggregate win/loss/tie counts are preserved.</span>
+<span class="sd">        reset; the rating and aggregate counts are preserved.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            state (dict): A dictionary containing state variables.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="s2">&quot;beta&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;beta&quot;</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="s2">&quot;rating&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s2">&quot;rating&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_anchor_rating</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rating&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;wins&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;losses&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ties&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_point_differential</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;point_differential&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_head_to_head</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_from_parameters</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
@@ -539,58 +554,50 @@
 <span class="sd">            parameters (dict): A dictionary containing parameters.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            BradleyTerryCompetitor: A new competitor instance.</span>
+<span class="sd">            MasseyCompetitor: A new competitor instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_anchor_rating</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_initial_rating</span><span class="p">))</span>
 
-<div class="viewcode-block" id="BradleyTerryCompetitor.reset">
-<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.bradley_terry.BradleyTerryCompetitor.reset">[docs]</a>
+<div class="viewcode-block" id="MasseyCompetitor.reset">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.massey.MasseyCompetitor.reset">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset this competitor to its initial state.&quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Resetting BradleyTerryCompetitor </span><span class="si">%d</span><span class="s2"> to initial state.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_anchor_rating</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Resetting MasseyCompetitor </span><span class="si">%d</span><span class="s2"> to initial state.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_head_to_head</span> <span class="o">=</span> <span class="p">{}</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_point_differential</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span> <span class="o">=</span> <span class="p">{}</span></div>
 
 
-<div class="viewcode-block" id="BradleyTerryCompetitor.configure_class">
-<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.bradley_terry.BradleyTerryCompetitor.configure_class">[docs]</a>
+<div class="viewcode-block" id="MasseyCompetitor.configure_class">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.massey.MasseyCompetitor.configure_class">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">configure_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure class-level parameters for this rating system.</span>
 
-<span class="sd">        Overrides the base implementation to validate the regularization and iteration</span>
-<span class="sd">        parameters.</span>
+<span class="sd">        Overrides the base implementation to validate the expected-score scale.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidParameterException: If any parameter is invalid.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;reg&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;reg must be non-negative&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_iter&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;max_iter must be at least 1&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scale&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;scale must be positive&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;expected_score_scale&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;expected_score_scale&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;expected_score_scale must be positive&quot;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">configure_class</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of this competitor.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;&lt;BradleyTerryCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rating</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;W/L/T=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_wins</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ties</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;MasseyCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, W/L/T=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_wins</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ties</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of this competitor.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;BradleyTerryCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rating</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;MasseyCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if two competitors are the same object (by unique ID).&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BradleyTerryCompetitor</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">MasseyCompetitor</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_id</span>
 

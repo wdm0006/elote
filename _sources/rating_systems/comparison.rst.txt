@@ -58,6 +58,12 @@ Overview Comparison
      - No
      - Yes
      - Bias-free sports ranking
+   * - **Massey**
+     - Sports (1997)
+     - Medium
+     - No
+     - Yes
+     - Margin-scale sports ranking
    * - **Bradley-Terry**
      - Statistics (1952)
      - Medium
@@ -72,8 +78,8 @@ Overview Comparison
      - Complex domains
 
 Online systems (Elo, Glicko, Glicko-2, TrueSkill, ECF, DWZ) update ratings incrementally after each
-result. Global-fit systems (Colley Matrix and Bradley-Terry) re-solve the whole connected group of
-competitors from the full set of results, which makes them order independent.
+result. Global-fit systems (Colley Matrix, Massey and Bradley-Terry) re-solve the whole connected
+group of competitors from the full set of results, which makes them order independent.
 
 Mathematical Formulation
 -----------------------
@@ -98,6 +104,8 @@ Mathematical Formulation
      - :math:`W_e = \frac{1}{1 + 10^{-(R_A - R_B) / 400}}`
    * - **Colley Matrix**
      - Ratings solve :math:`C r = b`; :math:`E_A = \frac{1}{1 + e^{-4 (r_A - r_B)}}`
+   * - **Massey**
+     - Ratings solve :math:`M r = p` with :math:`M = D - A`; :math:`E_A = \frac{1}{1 + e^{-2 (r_A - r_B)}}`
    * - **Bradley-Terry**
      - :math:`P(A \text{ beats } B) = \frac{p_A}{p_A + p_B} = \frac{1}{1 + e^{-(\beta_A - \beta_B)}}`
    * - **Ensemble**
@@ -126,6 +134,8 @@ Key Parameters
      - Initial rating, Development coefficient (age-dependent)
    * - **Colley Matrix**
      - Initial rating (default 0.5)
+   * - **Massey**
+     - Initial rating (default 0.0), Expected-score scale
    * - **Bradley-Terry**
      - Initial rating, Scale, Regularization, Max iterations
    * - **Ensemble**
@@ -239,6 +249,21 @@ Colley Matrix
 - Ratings are on a [0, 1] scale, not the chess scale
 - Requires a connected schedule to compare competitors
 
+Massey
+^^^^^^
+
+**Strengths:**
+- Order independent: depends only on the set of results
+- Rating differences are directly interpretable as predicted margins
+- Clean least-squares interpretation with a unique zero-mean solution
+- Self-normalizing: the ratings of a connected group sum to zero
+
+**Weaknesses:**
+- Re-solves the whole connected group after each result
+- Unit margins only: the uniform API carries no score differential
+- Ratings are zero mean, so about half of them are negative
+- Requires a connected schedule to compare competitors
+
 Bradley-Terry
 ^^^^^^^^^^^^^
 
@@ -286,7 +311,7 @@ Consider the following factors when choosing a rating system:
    - General purpose: Elo or Glicko
 
 3. **Order Independence**: Do you need a ranking that ignores schedule order?
-   - Yes: Colley Matrix or Bradley-Terry
+   - Yes: Colley Matrix, Massey, or Bradley-Terry
    - No: any online system (Elo, Glicko, etc.)
 
 4. **Computational Resources**:
@@ -316,6 +341,7 @@ Here's a quick comparison of how to use each system in Elote:
         ECFCompetitor,
         DWZCompetitor,
         ColleyMatrixCompetitor,
+        MasseyCompetitor,
         BradleyTerryCompetitor,
         BlendedCompetitor,
     )
@@ -340,6 +366,9 @@ Here's a quick comparison of how to use each system in Elote:
 
     # Colley Matrix ([0, 1] scale)
     colley_player = ColleyMatrixCompetitor()
+
+    # Massey (zero-mean margin scale)
+    massey_player = MasseyCompetitor()
 
     # Bradley-Terry (Elo-compatible scale)
     bt_player = BradleyTerryCompetitor(initial_rating=1500)

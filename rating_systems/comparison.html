@@ -245,14 +245,21 @@
 <td><p>Yes</p></td>
 <td><p>Bias-free sports ranking</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Bradley-Terry</strong></p></td>
+<tr class="row-odd"><td><p><strong>Massey</strong></p></td>
+<td><p>Sports (1997)</p></td>
+<td><p>Medium</p></td>
+<td><p>No</p></td>
+<td><p>Yes</p></td>
+<td><p>Margin-scale sports ranking</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Bradley-Terry</strong></p></td>
 <td><p>Statistics (1952)</p></td>
 <td><p>Medium</p></td>
 <td><p>No</p></td>
 <td><p>Yes</p></td>
 <td><p>Maximum-likelihood ranking</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Ensemble</strong></p></td>
+<tr class="row-odd"><td><p><strong>Ensemble</strong></p></td>
 <td><p>Meta-system</p></td>
 <td><p>High</p></td>
 <td><p>Depends on components</p></td>
@@ -262,8 +269,8 @@
 </tbody>
 </table>
 <p>Online systems (Elo, Glicko, Glicko-2, TrueSkill, ECF, DWZ) update ratings incrementally after each
-result. Global-fit systems (Colley Matrix and Bradley-Terry) re-solve the whole connected group of
-competitors from the full set of results, which makes them order independent.</p>
+result. Global-fit systems (Colley Matrix, Massey and Bradley-Terry) re-solve the whole connected
+group of competitors from the full set of results, which makes them order independent.</p>
 </section>
 <section id="mathematical-formulation">
 <h2>Mathematical Formulation<a class="headerlink" href="#mathematical-formulation" title="Link to this heading">¶</a></h2>
@@ -299,10 +306,13 @@ competitors from the full set of results, which makes them order independent.</p
 <tr class="row-even"><td><p><strong>Colley Matrix</strong></p></td>
 <td><p>Ratings solve <span class="math notranslate nohighlight">\(C r = b\)</span>; <span class="math notranslate nohighlight">\(E_A = \frac{1}{1 + e^{-4 (r_A - r_B)}}\)</span></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Bradley-Terry</strong></p></td>
+<tr class="row-odd"><td><p><strong>Massey</strong></p></td>
+<td><p>Ratings solve <span class="math notranslate nohighlight">\(M r = p\)</span> with <span class="math notranslate nohighlight">\(M = D - A\)</span>; <span class="math notranslate nohighlight">\(E_A = \frac{1}{1 + e^{-2 (r_A - r_B)}}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Bradley-Terry</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(P(A \text{ beats } B) = \frac{p_A}{p_A + p_B} = \frac{1}{1 + e^{-(\beta_A - \beta_B)}}\)</span></p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Ensemble</strong></p></td>
+<tr class="row-odd"><td><p><strong>Ensemble</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(E_{ensemble} = \sum_{i=1}^{n} w_i \times E_i\)</span> where <span class="math notranslate nohighlight">\(w_i\)</span> are weights</p></td>
 </tr>
 </tbody>
@@ -342,10 +352,13 @@ competitors from the full set of results, which makes them order independent.</p
 <tr class="row-even"><td><p><strong>Colley Matrix</strong></p></td>
 <td><p>Initial rating (default 0.5)</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Bradley-Terry</strong></p></td>
+<tr class="row-odd"><td><p><strong>Massey</strong></p></td>
+<td><p>Initial rating (default 0.0), Expected-score scale</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Bradley-Terry</strong></p></td>
 <td><p>Initial rating, Scale, Regularization, Max iterations</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Ensemble</strong></p></td>
+<tr class="row-odd"><td><p><strong>Ensemble</strong></p></td>
 <td><p>Component systems, Weights</p></td>
 </tr>
 </tbody>
@@ -444,6 +457,19 @@ competitors from the full set of results, which makes them order independent.</p
 - Ratings are on a [0, 1] scale, not the chess scale
 - Requires a connected schedule to compare competitors</p>
 </section>
+<section id="massey">
+<h3>Massey<a class="headerlink" href="#massey" title="Link to this heading">¶</a></h3>
+<p><strong>Strengths:</strong>
+- Order independent: depends only on the set of results
+- Rating differences are directly interpretable as predicted margins
+- Clean least-squares interpretation with a unique zero-mean solution
+- Self-normalizing: the ratings of a connected group sum to zero</p>
+<p><strong>Weaknesses:</strong>
+- Re-solves the whole connected group after each result
+- Unit margins only: the uniform API carries no score differential
+- Ratings are zero mean, so about half of them are negative
+- Requires a connected schedule to compare competitors</p>
+</section>
 <section id="bradley-terry">
 <h3>Bradley-Terry<a class="headerlink" href="#bradley-terry" title="Link to this heading">¶</a></h3>
 <p><strong>Strengths:</strong>
@@ -485,7 +511,7 @@ competitors from the full set of results, which makes them order independent.</p
 - Team and multiplayer games: TrueSkill
 - General purpose: Elo or Glicko</p></li>
 <li><p><strong>Order Independence</strong>: Do you need a ranking that ignores schedule order?
-- Yes: Colley Matrix or Bradley-Terry
+- Yes: Colley Matrix, Massey, or Bradley-Terry
 - No: any online system (Elo, Glicko, etc.)</p></li>
 <li><p><strong>Computational Resources</strong>:
 - Limited resources: Elo or ECF
@@ -509,6 +535,7 @@ competitors from the full set of results, which makes them order independent.</p
     <span class="n">ECFCompetitor</span><span class="p">,</span>
     <span class="n">DWZCompetitor</span><span class="p">,</span>
     <span class="n">ColleyMatrixCompetitor</span><span class="p">,</span>
+    <span class="n">MasseyCompetitor</span><span class="p">,</span>
     <span class="n">BradleyTerryCompetitor</span><span class="p">,</span>
     <span class="n">BlendedCompetitor</span><span class="p">,</span>
 <span class="p">)</span>
@@ -533,6 +560,9 @@ competitors from the full set of results, which makes them order independent.</p
 
 <span class="c1"># Colley Matrix ([0, 1] scale)</span>
 <span class="n">colley_player</span> <span class="o">=</span> <span class="n">ColleyMatrixCompetitor</span><span class="p">()</span>
+
+<span class="c1"># Massey (zero-mean margin scale)</span>
+<span class="n">massey_player</span> <span class="o">=</span> <span class="n">MasseyCompetitor</span><span class="p">()</span>
 
 <span class="c1"># Bradley-Terry (Elo-compatible scale)</span>
 <span class="n">bt_player</span> <span class="o">=</span> <span class="n">BradleyTerryCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
@@ -596,6 +626,7 @@ competitors from the full set of results, which makes them order independent.</p
 <li class="toctree-l1"><a class="reference internal" href="ecf.html">ECF Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dwz.html">DWZ Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="colley.html">Colley Matrix Method</a></li>
+<li class="toctree-l1"><a class="reference internal" href="massey.html">Massey Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bradley_terry.html">Bradley-Terry Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Comparing Rating Systems</a></li>

@@ -15,7 +15,7 @@
         gtag('config', 'G-Z43R9PWW0B');
     </script>
     
-    <title>Bradley-Terry Model &#8212; elote 1.2.1 documentation</title>
+    <title>Massey Ratings &#8212; elote 1.2.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=30d13653" />
     <link rel="stylesheet" type="text/css" href="../_static/css/wabi.css?v=501c8ac3" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=71d92741" />
@@ -25,8 +25,8 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Ensemble Rating System" href="ensemble.html" />
-    <link rel="prev" title="Massey Ratings" href="massey.html" />
+    <link rel="next" title="Bradley-Terry Model" href="bradley_terry.html" />
+    <link rel="prev" title="Colley Matrix Method" href="colley.html" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,7 +34,7 @@
 
 
 
-<meta name="description" content="Bradley-Terry Model - elote documentation">
+<meta name="description" content="Massey Ratings - elote documentation">
 
 
 
@@ -44,19 +44,19 @@
 
 
 
-<meta property="og:title" content="Bradley-Terry Model">
-<meta property="og:description" content="Bradley-Terry Model - elote documentation">
+<meta property="og:title" content="Massey Ratings">
+<meta property="og:description" content="Massey Ratings - elote documentation">
 <meta property="og:type" content="website">
 
-<meta property="og:url" content="https://elote.mcginniscommawill.com/rating_systems/bradley_terry.html">
+<meta property="og:url" content="https://elote.mcginniscommawill.com/rating_systems/massey.html">
 
 
 <meta property="og:site_name" content="elote">
 
 
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Bradley-Terry Model">
-<meta name="twitter:description" content="Bradley-Terry Model - elote documentation">
+<meta name="twitter:title" content="Massey Ratings">
+<meta name="twitter:description" content="Massey Ratings - elote documentation">
 
 <meta name="twitter:site" content="@willmcginniser">
 
@@ -64,7 +64,7 @@
 
 
 
-<link rel="canonical" href="https://elote.mcginniscommawill.com/rating_systems/bradley_terry.html">
+<link rel="canonical" href="https://elote.mcginniscommawill.com/rating_systems/massey.html">
 
 
  
@@ -160,7 +160,7 @@
     
     
     <span class="breadcrumbs__separator">/</span>
-    <span>Bradley-Terry Model</span>
+    <span>Massey Ratings</span>
     
   </div>
 </nav>
@@ -172,117 +172,127 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="bradley-terry-model">
-<h1>Bradley-Terry Model<a class="headerlink" href="#bradley-terry-model" title="Link to this heading">¶</a></h1>
+  <section id="massey-ratings">
+<h1>Massey Ratings<a class="headerlink" href="#massey-ratings" title="Link to this heading">¶</a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
-<p>The Bradley-Terry model is a probabilistic model for paired comparisons, introduced by
-Ralph Bradley and Milton Terry in 1952. Each competitor is assigned a single latent
-<em>strength</em>, and the outcome of any head-to-head matchup is modeled as a function of the two
-competitors’ strengths. It is one of the most widely used models for analyzing paired
-comparison data across sports analytics, ranking systems, and preference learning.</p>
-<p>Unlike Elo, which nudges ratings incrementally after every game, Bradley-Terry estimates the
-strengths by <strong>maximum likelihood</strong> over the full set of observed comparisons. In Elote this
-is done the same way as the Colley Matrix method: results are recorded as they happen, and the
-strengths of the entire connected group of competitors are re-fit after each result.</p>
+<p>The Massey method is the least-squares counterpart to the <a class="reference internal" href="colley.html"><span class="doc">Colley Matrix Method</span></a>.
+Introduced by Kenneth Massey in 1997 and used as one of the computer rankings in the college-football
+Bowl Championship Series, it fits every competitor a rating such that the <em>difference</em> between two
+ratings is a least-squares estimate of the margin by which one would beat the other. Like Colley it
+solves a single linear system over the whole match history rather than nudging ratings after each
+game, so it is <strong>bias free</strong>: the ratings depend only on the set of results, not on the order they
+were played in.</p>
+<p>Where Colley produces win-percentage-like ratings bounded to [0, 1], Massey produces zero-mean
+ratings on a signed <em>margin</em> scale. Roughly half of them are negative, and <code class="docutils literal notranslate"><span class="pre">r_a</span> <span class="pre">-</span> <span class="pre">r_b</span></code> reads
+directly as a predicted margin.</p>
 </section>
 <section id="how-it-works">
 <h2>How It Works<a class="headerlink" href="#how-it-works" title="Link to this heading">¶</a></h2>
-<p>Each competitor <code class="docutils literal notranslate"><span class="pre">i</span></code> has a positive strength <code class="docutils literal notranslate"><span class="pre">p_i</span></code>. The probability that <code class="docutils literal notranslate"><span class="pre">i</span></code> beats <code class="docutils literal notranslate"><span class="pre">j</span></code> is</p>
+<p>Massey’s method builds the linear system</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}P(i \\text{ beats } j) = \\frac{p_i}{p_i + p_j}\end{split}\]</div>
-<p>Writing the strengths in the log domain as <code class="docutils literal notranslate"><span class="pre">p_i</span> <span class="pre">=</span> <span class="pre">e^{\\beta_i}</span></code> turns this into the logistic
-function</p>
+\[M\,r = p\]</div>
+<p>where <span class="math notranslate nohighlight">\(M = D - A\)</span> is the match graph’s Laplacian – <span class="math notranslate nohighlight">\(D_{ii}\)</span> is the number of games
+played by competitor <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(A_{ij}\)</span> is the number of games between <span class="math notranslate nohighlight">\(i\)</span> and
+<span class="math notranslate nohighlight">\(j\)</span> – and <span class="math notranslate nohighlight">\(p_i\)</span> is competitor <span class="math notranslate nohighlight">\(i\)</span>’s cumulative margin.</p>
+<p>Because every row of <span class="math notranslate nohighlight">\(M\)</span> sums to zero, the matrix is singular by construction: adding a
+constant to every rating leaves the system unchanged. The standard fix is applied here: the last row
+of <span class="math notranslate nohighlight">\(M\)</span> is replaced with all ones and the last entry of <span class="math notranslate nohighlight">\(p\)</span> with zero, which adds the
+constraint</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}P(i \\text{ beats } j) = \\frac{1}{1 + e^{-(\\beta_i - \\beta_j)}}\end{split}\]</div>
-<p>which is exactly the functional form of the Elo expected score. Elote reports Bradley-Terry
-ratings on an Elo-like scale, <code class="docutils literal notranslate"><span class="pre">rating</span> <span class="pre">=</span> <span class="pre">1500</span> <span class="pre">+</span> <span class="pre">s</span> <span class="pre">\\cdot</span> <span class="pre">\\beta</span></code> with <code class="docutils literal notranslate"><span class="pre">s</span> <span class="pre">=</span> <span class="pre">400</span> <span class="pre">/</span> <span class="pre">\\ln(10)</span></code>,
-so that the expected score is numerically identical to Elo’s and the ratings are directly
-comparable to Elo ratings.</p>
-<p>The strengths are fit with the minorization-maximization (MM) update of Hunter (2004). Writing
-<code class="docutils literal notranslate"><span class="pre">W_i</span></code> for the total number of wins by <code class="docutils literal notranslate"><span class="pre">i</span></code> and <code class="docutils literal notranslate"><span class="pre">n_{ij}</span></code> for the number of games between <code class="docutils literal notranslate"><span class="pre">i</span></code>
-and <code class="docutils literal notranslate"><span class="pre">j</span></code>, each iteration applies</p>
+\[\sum_i r_i = 0\]</div>
+<p>and makes the solution unique on a connected schedule. As with Colley, the fit is recomputed over the
+connected group of competitors after each recorded result, and the expected score between two
+competitors is a logistic function of their rating difference:</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}p_i' = \\frac{W_i}{\\sum_j n_{ij} / (p_i + p_j)}\end{split}\]</div>
-<p>followed by normalization by the geometric mean of the strengths. This update is guaranteed to
-increase the likelihood at every step and converges to the unique regularized maximum. Because the strengths are
-only identified up to an overall scale, Elote re-centers them so that the mean log-strength of
-a connected group is zero.</p>
-<p>A small amount of <strong>regularization</strong> (a virtual win and loss against an average phantom
-opponent) is added so that a unique, finite maximum-likelihood estimate exists even when a
-competitor is undefeated or winless within its group – a case where the unregularized estimate
-would diverge to infinity.</p>
-<p>Ties are counted as half a win for each side.</p>
+\[E_a = \frac{1}{1 + e^{-s\,(r_a - r_b)}}\]</div>
+<p>with a class-configurable scale <span class="math notranslate nohighlight">\(s\)</span> (default 2.0).</p>
+</section>
+<section id="unit-margins">
+<h2>Unit Margins<a class="headerlink" href="#unit-margins" title="Link to this heading">¶</a></h2>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Elote implements <strong>unit-margin</strong> Massey. The uniform <code class="docutils literal notranslate"><span class="pre">BaseCompetitor</span></code> API exposes only
+<code class="docutils literal notranslate"><span class="pre">beat</span></code> / <code class="docutils literal notranslate"><span class="pre">lost_to</span></code> / <code class="docutils literal notranslate"><span class="pre">tied</span></code> and has no channel for a score differential, so a win
+contributes <code class="docutils literal notranslate"><span class="pre">+1</span></code> to the winner’s cumulative margin and <code class="docutils literal notranslate"><span class="pre">-1</span></code> to the loser’s, and a draw
+contributes <code class="docutils literal notranslate"><span class="pre">0</span></code> to both while still counting as a game played for each.</p>
+</div>
+<p>Genuine margin-of-victory Massey – the form used in college-football rankings, where a 35-3 win
+counts for more than a 7-6 win – would require carrying a score through the result methods, and is
+not implemented. In practice, unit-margin Massey is a close relative of Colley on a signed scale:
+both use only who beat whom, and neither can be gamed by running up the score.</p>
 </section>
 <section id="advantages">
 <h2>Advantages<a class="headerlink" href="#advantages" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>Order independent</strong>: the fit depends only on the set of results, not the order they were
-played.</p></li>
-<li><p><strong>Statistically principled</strong>: produces the maximum-likelihood strengths given the data.</p></li>
-<li><p><strong>Elo-compatible scale</strong>: expected scores match Elo, so ratings are easy to interpret.</p></li>
+<li><p><strong>Order Independent</strong>: the ratings depend only on the set of results, not the schedule order.</p></li>
+<li><p><strong>Interpretable Differences</strong>: a rating difference is a predicted margin, not just an ordering.</p></li>
+<li><p><strong>Well Grounded</strong>: a clean least-squares interpretation with a unique zero-mean solution.</p></li>
+<li><p><strong>Self-Normalizing</strong>: the ratings of a connected group always sum to zero.</p></li>
 </ul>
 </section>
 <section id="limitations">
 <h2>Limitations<a class="headerlink" href="#limitations" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>Recomputes globally</strong>: like Colley, every result re-fits the whole connected group, which
-is more expensive than Elo’s constant-time update for very large populations.</p></li>
-<li><p><strong>No margin of victory</strong>: only win/loss/tie outcomes are used.</p></li>
-<li><p><strong>Serialization</strong>: the match graph (opponent references) cannot be serialized, so a
-competitor restored from state keeps its rating and aggregate win/loss/tie counts but not the
-live links to its opponents.</p></li>
+<li><p><strong>Recomputes Globally</strong>: like Colley and Bradley-Terry, each result re-solves the whole connected
+group, which is more expensive than Elo’s constant-time update for very large populations.</p></li>
+<li><p><strong>Unit Margins Only</strong>: see above; the margin channel the classical method uses is not available
+through the uniform API.</p></li>
+<li><p><strong>Negative Ratings</strong>: ratings are zero mean, which is unfamiliar next to a 1500-centered chess
+scale (<code class="docutils literal notranslate"><span class="pre">_minimum_rating</span></code> is therefore <code class="docutils literal notranslate"><span class="pre">-inf</span></code> for this system).</p></li>
+<li><p><strong>Connectivity Needed</strong>: groups of competitors that never play each other cannot be compared, and
+are rated independently of one another.</p></li>
 </ul>
 </section>
 <section id="implementation-in-elote">
 <h2>Implementation in Elote<a class="headerlink" href="#implementation-in-elote" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">BradleyTerryCompetitor</span>
+<p>Elote implements Massey Ratings through the <code class="docutils literal notranslate"><span class="pre">MasseyCompetitor</span></code> class:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">MasseyCompetitor</span>
 
-<span class="n">player_a</span> <span class="o">=</span> <span class="n">BradleyTerryCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
-<span class="n">player_b</span> <span class="o">=</span> <span class="n">BradleyTerryCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
+<span class="c1"># Every competitor starts at 0.0</span>
+<span class="n">team_a</span> <span class="o">=</span> <span class="n">MasseyCompetitor</span><span class="p">()</span>
+<span class="n">team_b</span> <span class="o">=</span> <span class="n">MasseyCompetitor</span><span class="p">()</span>
+<span class="n">team_c</span> <span class="o">=</span> <span class="n">MasseyCompetitor</span><span class="p">()</span>
 
-<span class="c1"># Record results; strengths are re-fit after each one.</span>
-<span class="n">player_a</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">player_b</span><span class="p">)</span>
-<span class="n">player_a</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">player_b</span><span class="p">)</span>
-<span class="n">player_b</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">player_a</span><span class="p">)</span>
+<span class="c1"># Get win probability</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Team A win probability: </span><span class="si">{</span><span class="n">team_a</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">team_b</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">player_a</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">player_b</span><span class="o">.</span><span class="n">rating</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">player_a</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player_b</span><span class="p">))</span>
-</pre></div>
-</div>
-<p>It also plugs directly into an arena:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">LambdaArena</span><span class="p">,</span> <span class="n">BradleyTerryCompetitor</span>
+<span class="c1"># Record results; the whole connected group is re-solved after each one</span>
+<span class="n">team_a</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">team_b</span><span class="p">)</span>
+<span class="n">team_a</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">team_c</span><span class="p">)</span>
+<span class="n">team_b</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">team_c</span><span class="p">)</span>
 
-<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">comparison_func</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">BradleyTerryCompetitor</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Team A: </span><span class="si">{</span><span class="n">team_a</span><span class="o">.</span><span class="n">rating</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>   <span class="c1"># 0.667</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Team B: </span><span class="si">{</span><span class="n">team_b</span><span class="o">.</span><span class="n">rating</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>   <span class="c1"># 0.000</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Team C: </span><span class="si">{</span><span class="n">team_c</span><span class="o">.</span><span class="n">rating</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>   <span class="c1"># -0.667</span>
 </pre></div>
 </div>
 </section>
 <section id="customization">
 <h2>Customization<a class="headerlink" href="#customization" title="Link to this heading">¶</a></h2>
-<p>Class-level parameters can be tuned with <code class="docutils literal notranslate"><span class="pre">configure_class</span></code>:</p>
+<p>Key parameters:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">anchor_rating</span></code> – the rating assigned to the mean log-strength (default <code class="docutils literal notranslate"><span class="pre">1500</span></code>).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">scale</span></code> – points per unit of log-strength (default <code class="docutils literal notranslate"><span class="pre">400</span> <span class="pre">/</span> <span class="pre">ln(10)</span></code>).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">reg</span></code> – regularization strength (default <code class="docutils literal notranslate"><span class="pre">0.1</span></code>).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">max_iter</span></code> / <code class="docutils literal notranslate"><span class="pre">tol</span></code> – iteration budget and convergence tolerance for the fit.</p></li>
+<li><p><strong>initial_rating</strong>: starting rating value (default: 0.0).</p></li>
+<li><p><strong>expected_score_scale</strong>: class-level logistic scale used by <code class="docutils literal notranslate"><span class="pre">expected_score</span></code> (default: 2.0),
+settable with <code class="docutils literal notranslate"><span class="pre">MasseyCompetitor.configure_class(expected_score_scale=...)</span></code>.</p></li>
 </ul>
 </section>
 <section id="real-world-applications">
 <h2>Real-World Applications<a class="headerlink" href="#real-world-applications" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Ranking sports teams or players from head-to-head results.</p></li>
-<li><p>Aggregating pairwise human preferences (e.g. A/B choices) into a single ranking.</p></li>
-<li><p>Any setting where you want a maximum-likelihood ranking rather than an online estimate.</p></li>
+<li><p><strong>College Football</strong>: one of the computer polls used in the BCS era.</p></li>
+<li><p><strong>Sports Rankings</strong>: any competition where a predicted margin is more useful than a bare ordering.</p></li>
+<li><p><strong>Tournament Seeding</strong>: producing an order-independent ranking from recorded results.</p></li>
 </ul>
 </section>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p>Bradley, R. A., &amp; Terry, M. E. (1952). Rank Analysis of Incomplete Block Designs: I. The
-Method of Paired Comparisons. <em>Biometrika</em>, 39(3/4), 324-345.</p></li>
-<li><p>Hunter, D. R. (2004). MM Algorithms for Generalized Bradley-Terry Models. <em>The Annals of
-Statistics</em>, 32(1), 384-406.</p></li>
-</ul>
+<ol class="arabic simple">
+<li><p>Massey, K. (1997). “Statistical Models Applied to the Rating of Sports Teams”.
+Bluefield College undergraduate honors thesis. <a class="reference external" href="https://masseyratings.com/theory/massey97.pdf">https://masseyratings.com/theory/massey97.pdf</a></p></li>
+<li><p>Langville, A. N., &amp; Meyer, C. D. (2012). <em>Who’s #1? The Science of Rating and Ranking</em>,
+chapter 2. Princeton University Press.</p></li>
+</ol>
 </section>
 </section>
 
@@ -315,8 +325,8 @@ Statistics</em>, 32(1), 384-406.</p></li>
 <li class="toctree-l1"><a class="reference internal" href="ecf.html">ECF Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dwz.html">DWZ Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="colley.html">Colley Matrix Method</a></li>
-<li class="toctree-l1"><a class="reference internal" href="massey.html">Massey Ratings</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Bradley-Terry Model</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Massey Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bradley_terry.html">Bradley-Terry Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="comparison.html">Comparing Rating Systems</a></li>
 </ul>
