@@ -43,6 +43,12 @@ Colley Matrix Competitor
 .. autoclass:: elote.competitors.colley.ColleyMatrixCompetitor
     :members: export_state,expected_score,beat,tied,rating,to_json,from_json
 
+Massey Competitor
+-----------------
+
+.. autoclass:: elote.competitors.massey.MasseyCompetitor
+    :members: export_state,expected_score,beat,tied,rating,to_json,from_json
+
 Bradley-Terry Competitor
 ------------------------
 
