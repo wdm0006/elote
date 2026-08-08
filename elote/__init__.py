@@ -25,6 +25,7 @@ Available rating systems:
 - ECF: The English Chess Federation rating system
 - DWZ: The Deutsche Wertungszahl (German evaluation number) system
 - Colley Matrix: A least-squares rating system that solves a system of linear equations
+- Massey: A least-squares rating system whose ratings live on a signed margin scale
 - Bradley-Terry: A maximum-likelihood paired-comparison model
 - Ensemble: A meta-rating system that combines multiple rating systems
 
@@ -46,6 +47,7 @@ from elote.competitors.trueskill import TrueSkillCompetitor
 from elote.competitors.ecf import ECFCompetitor
 from elote.competitors.dwz import DWZCompetitor
 from elote.competitors.colley import ColleyMatrixCompetitor
+from elote.competitors.massey import MasseyCompetitor
 from elote.competitors.bradley_terry import BradleyTerryCompetitor
 from elote.competitors.ensemble import BlendedCompetitor
 
@@ -81,6 +83,7 @@ __all__ = [
     "ECFCompetitor",
     "DWZCompetitor",
     "ColleyMatrixCompetitor",
+    "MasseyCompetitor",
     "BradleyTerryCompetitor",
     "BlendedCompetitor",
     # Arenas

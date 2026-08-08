@@ -12,6 +12,7 @@ from elote import (
     Glicko2Competitor,
     GlickoCompetitor,
     LambdaArena,
+    MasseyCompetitor,
     TrueSkillCompetitor,
 )
 
@@ -297,9 +298,10 @@ class TestArenaStateRoundTrip(unittest.TestCase):
         DWZCompetitor,
         ColleyMatrixCompetitor,
         BradleyTerryCompetitor,
+        MasseyCompetitor,
     )
 
-    # Colley and Bradley-Terry reset their opponent match graph on import by design
+    # Colley, Massey and Bradley-Terry reset their opponent match graph on import by design
     # (documented in their own docstrings), so only the incremental systems can be
     # expected to keep rating identically after a restore.
     INCREMENTAL_COMPETITORS = (

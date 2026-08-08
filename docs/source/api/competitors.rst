@@ -75,6 +75,15 @@ Colley Matrix Competitor
    :show-inheritance:
    :special-members: __init__
 
+Massey Competitor
+-----------------
+
+.. automodule:: elote.competitors.massey
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :special-members: __init__
+
 Bradley-Terry Competitor
 -----------------------
 

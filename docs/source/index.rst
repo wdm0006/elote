@@ -45,6 +45,7 @@ Elote makes implementing these systems simple and intuitive, with a clean API th
    rating_systems/ecf
    rating_systems/dwz
    rating_systems/colley
+   rating_systems/massey
    rating_systems/bradley_terry
    rating_systems/ensemble
    rating_systems/comparison
