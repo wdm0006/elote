@@ -896,11 +896,13 @@
 <span class="sd">        and prepares them for calibration curve plotting.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            n_bins (int): Number of bins to use for calibration curve.</span>
+<span class="sd">            n_bins (int): Retained for backward compatibility but unused. Binning is</span>
+<span class="sd">                performed by ``visualization.compute_calibration_data``.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            tuple: (y_true, y_prob) where:</span>
-<span class="sd">                - y_true: List of actual outcomes (1.0 for wins, 0.0 for losses)</span>
+<span class="sd">                - y_true: List of actual scores (1.0 for wins, 0.5 for draws,</span>
+<span class="sd">                  0.0 for losses)</span>
 <span class="sd">                - y_prob: List of predicted probabilities</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Extract predicted probabilities and actual outcomes</span>
@@ -910,12 +912,12 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Extracting calibration data for </span><span class="si">%d</span><span class="s2"> bouts.&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">))</span>
 
         <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">bout</span><span class="o">.</span><span class="n">outcome</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">_normalized_outcome</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">skipped_bouts</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">continue</span>
             <span class="n">y_prob</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span><span class="p">)</span>
-            <span class="c1"># Convert outcomes to binary format (1.0 for wins, 0.0 for losses/draws)</span>
-            <span class="n">y_true</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">1.0</span> <span class="k">if</span> <span class="n">bout</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="mf">1.0</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">)</span>
+            <span class="n">y_true</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;draw&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">}[</span><span class="n">label</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="n">skipped_bouts</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Skipped </span><span class="si">%d</span><span class="s2"> bouts while extracting calibration data due to missing values.&quot;</span><span class="p">,</span> <span class="n">skipped_bouts</span><span class="p">)</span>

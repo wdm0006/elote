@@ -451,11 +451,15 @@ upper_threshold: The upper threshold for prediction (above this is a prediction 
 <p>This method extracts predicted probabilities and actual outcomes from the bout history
 and prepares them for calibration curve plotting.</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>n_bins (int): Number of bins to use for calibration curve.</p>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>n_bins (int): Retained for backward compatibility but unused. Binning is</dt><dd><p>performed by <code class="docutils literal notranslate"><span class="pre">visualization.compute_calibration_data</span></code>.</p>
+</dd>
+</dl>
 </dd>
 <dt>Returns:</dt><dd><dl class="simple">
 <dt>tuple: (y_true, y_prob) where:</dt><dd><ul class="simple">
-<li><p>y_true: List of actual outcomes (1.0 for wins, 0.0 for losses)</p></li>
+<li><p>y_true: List of actual scores (1.0 for wins, 0.5 for draws,
+0.0 for losses)</p></li>
 <li><p>y_prob: List of predicted probabilities</p></li>
 </ul>
 </dd>
