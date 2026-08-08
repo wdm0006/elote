@@ -671,11 +671,13 @@ class History:
         and prepares them for calibration curve plotting.
 
         Args:
-            n_bins (int): Number of bins to use for calibration curve.
+            n_bins (int): Retained for backward compatibility but unused. Binning is
+                performed by ``visualization.compute_calibration_data``.
 
         Returns:
             tuple: (y_true, y_prob) where:
-                - y_true: List of actual outcomes (1.0 for wins, 0.0 for losses)
+                - y_true: List of actual scores (1.0 for wins, 0.5 for draws,
+                  0.0 for losses)
                 - y_prob: List of predicted probabilities
         """
         # Extract predicted probabilities and actual outcomes
@@ -685,12 +687,12 @@ class History:
         logger.info("Extracting calibration data for %d bouts.", len(self.bouts))
 
         for bout in self.bouts:
-            if bout.predicted_outcome is None or bout.outcome is None:
+            label = bout._normalized_outcome()
+            if bout.predicted_outcome is None or label is None:
                 skipped_bouts += 1
                 continue
             y_prob.append(bout.predicted_outcome)
-            # Convert outcomes to binary format (1.0 for wins, 0.0 for losses/draws)
-            y_true.append(1.0 if bout.outcome == 1.0 else 0.0)
+            y_true.append({"a": 1.0, "draw": 0.5, "b": 0.0}[label])
 
         if skipped_bouts > 0:
             logger.warning("Skipped %d bouts while extracting calibration data due to missing values.", skipped_bouts)

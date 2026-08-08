@@ -1,8 +1,11 @@
 import unittest
 import os
 import tempfile
+
 import matplotlib.pyplot as plt
 import numpy as np
+
+from elote import LambdaArena
 from elote.arenas.base import History, Bout
 from elote.visualization import (
     compute_calibration_data,
@@ -100,11 +103,58 @@ class TestCalibration(unittest.TestCase):
             self.assertEqual(len(y_true), len(history.bouts))
             self.assertEqual(len(y_prob), len(history.bouts))
 
-            # Check that y_true contains only 0s and 1s
-            self.assertTrue(all(y in [0.0, 1.0] for y in y_true))
+            # Check that y_true contains only valid outcome scores
+            self.assertTrue(all(y in [0.0, 0.5, 1.0] for y in y_true))
 
             # Check that y_prob contains values between 0 and 1
             self.assertTrue(all(0 <= p <= 1 for p in y_prob))
+
+    def test_arena_history_calibration_uses_string_outcomes(self):
+        """Test calibration for the string outcomes produced by a real arena."""
+        arena = LambdaArena(lambda a, b: a > b, base_competitor_kwargs={"initial_rating": 1500})
+
+        for _ in range(20):
+            for a in range(10):
+                for b in range(10):
+                    if a != b:
+                        arena.matchup(a, b)
+
+        y_true, _ = arena.history.get_calibration_data()
+        prob_true, prob_pred = compute_calibration_data(arena.history, n_bins=5)
+
+        self.assertGreater(sum(y_true), 0)
+        self.assertGreater(len(prob_true), 1)
+        self.assertTrue(
+            all(
+                current_true <= next_true for current_true, next_true in zip(prob_true[:-1], prob_true[1:], strict=True)
+            )
+        )
+        self.assertLess(prob_true[0], prob_true[-1])
+        self.assertTrue(
+            all(current_pred < next_pred for current_pred, next_pred in zip(prob_pred[:-1], prob_pred[1:], strict=True))
+        )
+
+    def test_draw_is_scored_as_half(self):
+        """Test that a draw contributes half a point to calibration."""
+        history = History()
+        history.add_bout(Bout("a", "b", 0.5, 0.5))
+
+        y_true, y_prob = history.get_calibration_data()
+
+        self.assertEqual(y_true, [0.5])
+        self.assertEqual(y_prob, [0.5])
+
+    def test_unrecognized_outcome_is_skipped(self):
+        """Test that outcomes which cannot be normalized are omitted."""
+        history = History()
+        history.add_bout(Bout("a", "b", 0.6, "???"))
+        history.add_bout(Bout("c", "d", 0.7, "win"))
+
+        y_true, y_prob = history.get_calibration_data()
+
+        self.assertEqual(y_true, [1.0])
+        self.assertEqual(y_prob, [0.7])
+        self.assertEqual(len(y_true), len(y_prob))
 
     def test_compute_calibration_data(self):
         """Test that compute_calibration_data returns the expected data format."""
