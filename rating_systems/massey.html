@@ -25,7 +25,7 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Bradley-Terry Model" href="bradley_terry.html" />
+    <link rel="next" title="Keener Ratings" href="keener.html" />
     <link rel="prev" title="Colley Matrix Method" href="colley.html" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -208,19 +208,37 @@ competitors is a logistic function of their rating difference:</p>
 \[E_a = \frac{1}{1 + e^{-s\,(r_a - r_b)}}\]</div>
 <p>with a class-configurable scale <span class="math notranslate nohighlight">\(s\)</span> (default 2.0).</p>
 </section>
-<section id="unit-margins">
-<h2>Unit Margins<a class="headerlink" href="#unit-margins" title="Link to this heading">¶</a></h2>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>Elote implements <strong>unit-margin</strong> Massey. The uniform <code class="docutils literal notranslate"><span class="pre">BaseCompetitor</span></code> API exposes only
-<code class="docutils literal notranslate"><span class="pre">beat</span></code> / <code class="docutils literal notranslate"><span class="pre">lost_to</span></code> / <code class="docutils literal notranslate"><span class="pre">tied</span></code> and has no channel for a score differential, so a win
-contributes <code class="docutils literal notranslate"><span class="pre">+1</span></code> to the winner’s cumulative margin and <code class="docutils literal notranslate"><span class="pre">-1</span></code> to the loser’s, and a draw
-contributes <code class="docutils literal notranslate"><span class="pre">0</span></code> to both while still counting as a game played for each.</p>
+<section id="margins">
+<h2>Margins<a class="headerlink" href="#margins" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">beat</span></code> / <code class="docutils literal notranslate"><span class="pre">lost_to</span></code> / <code class="docutils literal notranslate"><span class="pre">tied</span></code> accept the common optional <code class="docutils literal notranslate"><span class="pre">scores</span></code> payload – the two
+competitors’ scores <strong>in the argument order of the call</strong>. When it is supplied, this is genuine
+margin-of-victory Massey, the form used in college-football rankings, where a 35-3 win counts for
+more than a 7-6 win: the margin a game contributes is <code class="docutils literal notranslate"><span class="pre">self_score</span> <span class="pre">-</span> <span class="pre">competitor_score</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">MasseyCompetitor</span>
+
+<span class="n">team_a</span><span class="p">,</span> <span class="n">team_b</span> <span class="o">=</span> <span class="n">MasseyCompetitor</span><span class="p">(),</span> <span class="n">MasseyCompetitor</span><span class="p">()</span>
+
+<span class="n">team_a</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">team_b</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>          <span class="c1"># +32 for A, -32 for B</span>
+<span class="c1"># The same game recorded from the loser&#39;s side -- scores stay in caller order:</span>
+<span class="c1"># team_b.lost_to(team_a, scores=(3, 35))</span>
+</pre></div>
 </div>
-<p>Genuine margin-of-victory Massey – the form used in college-football rankings, where a 35-3 win
-counts for more than a 7-6 win – would require carrying a score through the result methods, and is
-not implemented. In practice, unit-margin Massey is a close relative of Colley on a signed scale:
-both use only who beat whom, and neither can be gamed by running up the score.</p>
+<p>Through an arena the pair is always given in <code class="docutils literal notranslate"><span class="pre">(a,</span> <span class="pre">b)</span></code> order, whichever competitor won, together
+with an explicit <code class="docutils literal notranslate"><span class="pre">outcome</span></code> so the two can be checked for agreement:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">LambdaArena</span><span class="p">,</span> <span class="n">MasseyCompetitor</span>
+
+<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">MasseyCompetitor</span><span class="p">)</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">matchup</span><span class="p">(</span><span class="s2">&quot;Team A&quot;</span><span class="p">,</span> <span class="s2">&quot;Team B&quot;</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">matchup</span><span class="p">(</span><span class="s2">&quot;Team A&quot;</span><span class="p">,</span> <span class="s2">&quot;Team C&quot;</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">24</span><span class="p">))</span>   <span class="c1"># C won, order unchanged</span>
+</pre></div>
+</div>
+<p>When <code class="docutils literal notranslate"><span class="pre">scores</span></code> is omitted the implementation falls back to <strong>unit margins</strong>: a win contributes
+<code class="docutils literal notranslate"><span class="pre">+1</span></code> to the winner’s cumulative margin and <code class="docutils literal notranslate"><span class="pre">-1</span></code> to the loser’s. A draw contributes <code class="docutils literal notranslate"><span class="pre">0</span></code> either
+way – the payload for a draw must have two equal scores – while still counting as a game played
+for both. Unit-margin Massey is a close relative of Colley on a signed scale: both use only who
+beat whom, and neither can be gamed by running up the score.</p>
+<p>Scores must be non-negative and finite, and must agree with the result being recorded; anything
+else raises <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> before either competitor is touched.</p>
 </section>
 <section id="advantages">
 <h2>Advantages<a class="headerlink" href="#advantages" title="Link to this heading">¶</a></h2>
@@ -236,8 +254,9 @@ both use only who beat whom, and neither can be gamed by running up the score.</
 <ul class="simple">
 <li><p><strong>Recomputes Globally</strong>: like Colley and Bradley-Terry, each result re-solves the whole connected
 group, which is more expensive than Elo’s constant-time update for very large populations.</p></li>
-<li><p><strong>Unit Margins Only</strong>: see above; the margin channel the classical method uses is not available
-through the uniform API.</p></li>
+<li><p><strong>Scores Are Optional</strong>: margin-of-victory Massey needs a score for every game. Where scores are
+unavailable the fit falls back to unit margins, which discards exactly the information the
+classical method is built on.</p></li>
 <li><p><strong>Negative Ratings</strong>: ratings are zero mean, which is unfamiliar next to a 1500-centered chess
 scale (<code class="docutils literal notranslate"><span class="pre">_minimum_rating</span></code> is therefore <code class="docutils literal notranslate"><span class="pre">-inf</span></code> for this system).</p></li>
 <li><p><strong>Connectivity Needed</strong>: groups of competitors that never play each other cannot be compared, and
@@ -326,6 +345,7 @@ chapter 2. Princeton University Press.</p></li>
 <li class="toctree-l1"><a class="reference internal" href="dwz.html">DWZ Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="colley.html">Colley Matrix Method</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Massey Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bradley_terry.html">Bradley-Terry Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="comparison.html">Comparing Rating Systems</a></li>

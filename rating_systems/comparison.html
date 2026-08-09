@@ -252,14 +252,21 @@
 <td><p>Yes</p></td>
 <td><p>Margin-scale sports ranking</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Bradley-Terry</strong></p></td>
+<tr class="row-even"><td><p><strong>Keener</strong></p></td>
+<td><p>Sports (1993)</p></td>
+<td><p>Medium</p></td>
+<td><p>No</p></td>
+<td><p>Yes</p></td>
+<td><p>Score-based eigenvector ranking</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Bradley-Terry</strong></p></td>
 <td><p>Statistics (1952)</p></td>
 <td><p>Medium</p></td>
 <td><p>No</p></td>
 <td><p>Yes</p></td>
 <td><p>Maximum-likelihood ranking</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Ensemble</strong></p></td>
+<tr class="row-even"><td><p><strong>Ensemble</strong></p></td>
 <td><p>Meta-system</p></td>
 <td><p>High</p></td>
 <td><p>Depends on components</p></td>
@@ -269,8 +276,10 @@
 </tbody>
 </table>
 <p>Online systems (Elo, Glicko, Glicko-2, TrueSkill, ECF, DWZ) update ratings incrementally after each
-result. Global-fit systems (Colley Matrix, Massey and Bradley-Terry) re-solve the whole connected
-group of competitors from the full set of results, which makes them order independent.</p>
+result. Global-fit systems (Colley Matrix, Massey, Keener and Bradley-Terry) re-solve the whole
+connected group of competitors from the full set of results, which makes them order independent.
+Massey and Keener are the two that read the optional score payload; the rest use only who beat
+whom.</p>
 </section>
 <section id="mathematical-formulation">
 <h2>Mathematical Formulation<a class="headerlink" href="#mathematical-formulation" title="Link to this heading">¶</a></h2>
@@ -309,10 +318,13 @@ group of competitors from the full set of results, which makes them order indepe
 <tr class="row-odd"><td><p><strong>Massey</strong></p></td>
 <td><p>Ratings solve <span class="math notranslate nohighlight">\(M r = p\)</span> with <span class="math notranslate nohighlight">\(M = D - A\)</span>; <span class="math notranslate nohighlight">\(E_A = \frac{1}{1 + e^{-2 (r_A - r_B)}}\)</span></p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Bradley-Terry</strong></p></td>
+<tr class="row-even"><td><p><strong>Keener</strong></p></td>
+<td><p>Ratings are the dominant eigenvector of <span class="math notranslate nohighlight">\(H_{ij} = h(a_{ij}) / g_i + \varepsilon\)</span> with <span class="math notranslate nohighlight">\(a_{ij} = \frac{S_{ij} + 1}{S_{ij} + S_{ji} + 2}\)</span> and <span class="math notranslate nohighlight">\(h(x) = \frac{1}{2} + \frac{1}{2}\mathrm{sgn}(x - \frac{1}{2})\sqrt{|2x - 1|}\)</span>; <span class="math notranslate nohighlight">\(E_A = \frac{r_A}{r_A + r_B}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Bradley-Terry</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(P(A \text{ beats } B) = \frac{p_A}{p_A + p_B} = \frac{1}{1 + e^{-(\beta_A - \beta_B)}}\)</span></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Ensemble</strong></p></td>
+<tr class="row-even"><td><p><strong>Ensemble</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(E_{ensemble} = \sum_{i=1}^{n} w_i \times E_i\)</span> where <span class="math notranslate nohighlight">\(w_i\)</span> are weights</p></td>
 </tr>
 </tbody>
@@ -355,10 +367,13 @@ group of competitors from the full set of results, which makes them order indepe
 <tr class="row-odd"><td><p><strong>Massey</strong></p></td>
 <td><p>Initial rating (default 0.0), Expected-score scale</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Bradley-Terry</strong></p></td>
+<tr class="row-even"><td><p><strong>Keener</strong></p></td>
+<td><p>Initial rating (default 1.0), Perturbation, Expected-score scale</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Bradley-Terry</strong></p></td>
 <td><p>Initial rating, Scale, Regularization, Max iterations</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Ensemble</strong></p></td>
+<tr class="row-even"><td><p><strong>Ensemble</strong></p></td>
 <td><p>Component systems, Weights</p></td>
 </tr>
 </tbody>
@@ -461,13 +476,28 @@ group of competitors from the full set of results, which makes them order indepe
 <h3>Massey<a class="headerlink" href="#massey" title="Link to this heading">¶</a></h3>
 <p><strong>Strengths:</strong>
 - Order independent: depends only on the set of results
+- Consumes the optional <code class="docutils literal notranslate"><span class="pre">scores</span></code> payload, so real margins of victory are used when available
 - Rating differences are directly interpretable as predicted margins
 - Clean least-squares interpretation with a unique zero-mean solution
 - Self-normalizing: the ratings of a connected group sum to zero</p>
 <p><strong>Weaknesses:</strong>
 - Re-solves the whole connected group after each result
-- Unit margins only: the uniform API carries no score differential
+- Needs real scores to be at its best; falls back to unit margins when they are omitted
 - Ratings are zero mean, so about half of them are negative
+- Requires a connected schedule to compare competitors</p>
+</section>
+<section id="keener">
+<h3>Keener<a class="headerlink" href="#keener" title="Link to this heading">¶</a></h3>
+<p><strong>Strengths:</strong>
+- Reads real scores through a bounded, concave transform, so blowouts inform without dominating
+- Order independent: depends only on the set of results
+- The eigenvector recursion values a win in proportion to the opponent’s own rating
+- Perron-Frobenius guarantees a unique positive solution on any connected schedule
+- Ratings are strictly positive and average exactly 1.0</p>
+<p><strong>Weaknesses:</strong>
+- Re-solves the whole connected group after each result
+- Much weaker on outcome-only data, where the unit-score fallback discards its main input
+- The stabilizing perturbation is an extra knob that quietly couples competitors who never met
 - Requires a connected schedule to compare competitors</p>
 </section>
 <section id="bradley-terry">
@@ -511,7 +541,8 @@ group of competitors from the full set of results, which makes them order indepe
 - Team and multiplayer games: TrueSkill
 - General purpose: Elo or Glicko</p></li>
 <li><p><strong>Order Independence</strong>: Do you need a ranking that ignores schedule order?
-- Yes: Colley Matrix, Massey, or Bradley-Terry
+- Yes: Colley Matrix, Massey, Keener, or Bradley-Terry
+- Yes, and you have real scores: Massey (linear margin) or Keener (bounded score share)
 - No: any online system (Elo, Glicko, etc.)</p></li>
 <li><p><strong>Computational Resources</strong>:
 - Limited resources: Elo or ECF
@@ -536,6 +567,7 @@ group of competitors from the full set of results, which makes them order indepe
     <span class="n">DWZCompetitor</span><span class="p">,</span>
     <span class="n">ColleyMatrixCompetitor</span><span class="p">,</span>
     <span class="n">MasseyCompetitor</span><span class="p">,</span>
+    <span class="n">KeenerCompetitor</span><span class="p">,</span>
     <span class="n">BradleyTerryCompetitor</span><span class="p">,</span>
     <span class="n">BlendedCompetitor</span><span class="p">,</span>
 <span class="p">)</span>
@@ -564,6 +596,9 @@ group of competitors from the full set of results, which makes them order indepe
 <span class="c1"># Massey (zero-mean margin scale)</span>
 <span class="n">massey_player</span> <span class="o">=</span> <span class="n">MasseyCompetitor</span><span class="p">()</span>
 
+<span class="c1"># Keener (strictly positive, mean 1.0; reads real scores)</span>
+<span class="n">keener_player</span> <span class="o">=</span> <span class="n">KeenerCompetitor</span><span class="p">()</span>
+
 <span class="c1"># Bradley-Terry (Elo-compatible scale)</span>
 <span class="n">bt_player</span> <span class="o">=</span> <span class="n">BradleyTerryCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
 
@@ -580,6 +615,10 @@ group of competitors from the full set of results, which makes them order indepe
 <span class="n">opponent</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1400</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected score: </span><span class="si">{</span><span class="n">player</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="n">player</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span>  <span class="c1"># record a win</span>
+
+<span class="c1"># Score-based systems additionally accept the optional scores payload</span>
+<span class="n">home</span><span class="p">,</span> <span class="n">away</span> <span class="o">=</span> <span class="n">KeenerCompetitor</span><span class="p">(),</span> <span class="n">KeenerCompetitor</span><span class="p">()</span>
+<span class="n">home</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">away</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
 </pre></div>
 </div>
 </section>
@@ -627,6 +666,7 @@ group of competitors from the full set of results, which makes them order indepe
 <li class="toctree-l1"><a class="reference internal" href="dwz.html">DWZ Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="colley.html">Colley Matrix Method</a></li>
 <li class="toctree-l1"><a class="reference internal" href="massey.html">Massey Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bradley_terry.html">Bradley-Terry Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Comparing Rating Systems</a></li>

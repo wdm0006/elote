@@ -202,7 +202,7 @@
 <span class="sd">  Princeton University Press, chapter 2.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">cast</span><span class="p">,</span> <span class="n">Set</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">cast</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Sequence</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
@@ -223,13 +223,13 @@
 <span class="sd">    result; the whole connected group is re-fit from the complete match history, which makes</span>
 <span class="sd">    the method order independent.</span>
 
-<span class="sd">    **Unit margins.** The uniform ``BaseCompetitor`` API exposes only ``beat`` / ``lost_to`` /</span>
-<span class="sd">    ``tied`` and has no channel for a score differential, so this implementation is</span>
-<span class="sd">    *unit-margin* Massey: a win contributes ``+1`` to the winner&#39;s cumulative margin and</span>
-<span class="sd">    ``-1`` to the loser&#39;s, and a draw contributes ``0`` to both while still counting as a game</span>
-<span class="sd">    played for each. Genuine margin-of-victory Massey -- the form used in college football</span>
-<span class="sd">    rankings -- would require a base-class level decision about how to carry a score, and is</span>
-<span class="sd">    not implemented here.</span>
+<span class="sd">    **Margins.** ``beat`` / ``lost_to`` / ``tied`` accept the common optional ``scores``</span>
+<span class="sd">    payload, the two competitors&#39; scores in caller order. When it is supplied this is genuine</span>
+<span class="sd">    margin-of-victory Massey -- the form used in college football rankings -- and the margin</span>
+<span class="sd">    contributed by a game is ``self_score - competitor_score``. When it is omitted the</span>
+<span class="sd">    implementation falls back to *unit margins*: a win contributes ``+1`` to the winner&#39;s</span>
+<span class="sd">    cumulative margin and ``-1`` to the loser&#39;s. A draw contributes ``0`` either way, while</span>
+<span class="sd">    still counting as a game played for both.</span>
 
 <span class="sd">    Key characteristics:</span>
 <span class="sd">    - Global least-squares fit (does not depend on the order of results)</span>
@@ -269,8 +269,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="c1"># Cumulative margin -- the right-hand side ``p`` of the Massey system. With unit</span>
-        <span class="c1"># margins this is simply wins minus losses, but it is tracked separately because it is</span>
-        <span class="c1"># the quantity the algorithm actually consumes.</span>
+        <span class="c1"># margins this is simply wins minus losses; with real scores it is the sum of</span>
+        <span class="c1"># ``self_score - opponent_score`` over every game played.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_point_differential</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">&quot;MasseyCompetitor&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Opponent -&gt; num games</span>
         <span class="c1"># Unique ID for hashing (instances are used as dict keys in the match graph).</span>
@@ -341,27 +341,33 @@
 
 <div class="viewcode-block" id="MasseyCompetitor.beat">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.massey.MasseyCompetitor.beat">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has won against the given competitor.</span>
 
 <span class="sd">        The result is recorded in the match graph and the whole connected group is re-fit.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            competitor (BaseCompetitor): The opponent competitor that lost.</span>
+<span class="sd">            scores (sequence of float, optional): The two scores in caller order,</span>
+<span class="sd">                ``(self_score, competitor_score)``. When supplied, the margin contributed to</span>
+<span class="sd">                the Massey system is the real ``self_score - competitor_score``; when</span>
+<span class="sd">                omitted the unit margin ``+1 / -1`` is used.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Competitor </span><span class="si">%s</span><span class="s2"> beat </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">validated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
         <span class="n">opponent</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">MasseyCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+        <span class="n">margin</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="k">if</span> <span class="n">validated</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">validated</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">validated</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_point_differential</span> <span class="o">+=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_point_differential</span> <span class="o">+=</span> <span class="n">margin</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span><span class="p">[</span><span class="n">opponent</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">opponent</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
 
         <span class="n">opponent</span><span class="o">.</span><span class="n">_losses</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="n">opponent</span><span class="o">.</span><span class="n">_point_differential</span> <span class="o">-=</span> <span class="mf">1.0</span>
+        <span class="n">opponent</span><span class="o">.</span><span class="n">_point_differential</span> <span class="o">-=</span> <span class="n">margin</span>
         <span class="n">opponent</span><span class="o">.</span><span class="n">_opponents</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="n">opponent</span><span class="o">.</span><span class="n">_opponents</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Recorded win for </span><span class="si">%d</span><span class="s2">, loss for </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">opponent</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
@@ -370,7 +376,7 @@
 
 <div class="viewcode-block" id="MasseyCompetitor.tied">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.massey.MasseyCompetitor.tied">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has tied with the given competitor.</span>
 
 <span class="sd">        A draw contributes nothing to either cumulative margin, but counts as a game played</span>
@@ -378,12 +384,16 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            competitor (BaseCompetitor): The opponent competitor that tied.</span>
+<span class="sd">            scores (sequence of float, optional): The two scores in caller order,</span>
+<span class="sd">                ``(self_score, competitor_score)``. They must be equal, so a drawn game</span>
+<span class="sd">                contributes a zero margin whether or not scores are supplied.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Competitor </span><span class="si">%s</span><span class="s2"> tied with </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
         <span class="n">opponent</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">MasseyCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -398,18 +408,22 @@
 
 <div class="viewcode-block" id="MasseyCompetitor.lost_to">
 <a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.massey.MasseyCompetitor.lost_to">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">lost_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">lost_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has lost to the given competitor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            competitor (BaseCompetitor): The opponent competitor that won.</span>
+<span class="sd">            scores (sequence of float, optional): The two scores in caller order,</span>
+<span class="sd">                ``(self_score, competitor_score)``. Reversed before being passed to the</span>
+<span class="sd">                winner&#39;s :meth:`beat`.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Competitor </span><span class="si">%s</span><span class="s2"> lost to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
-        <span class="n">competitor</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+        <span class="n">validated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">competitor</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">validated</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="n">validated</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">validated</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_connected_competitors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;MasseyCompetitor&quot;</span><span class="p">]:</span>
@@ -636,6 +650,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/dwz.html">DWZ Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/colley.html">Colley Matrix Method</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/massey.html">Massey Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/comparison.html">Comparing Rating Systems</a></li>

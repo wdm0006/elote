@@ -84,6 +84,15 @@ Massey Competitor
    :show-inheritance:
    :special-members: __init__
 
+Keener Competitor
+-----------------
+
+.. automodule:: elote.competitors.keener
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :special-members: __init__
+
 Bradley-Terry Competitor
 -----------------------
 

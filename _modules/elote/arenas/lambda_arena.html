@@ -175,7 +175,7 @@
             
   <h1>Source code for elote.arenas.lambda_arena</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span>
@@ -266,14 +266,17 @@
 
 <div class="viewcode-block" id="LambdaArena.tournament">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.lambda_arena.LambdaArena.tournament">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">tournament</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matchups</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tournament</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matchups</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a tournament with the given matchups.</span>
 
 <span class="sd">        Process multiple matchups between competitors, updating ratings</span>
 <span class="sd">        after each matchup.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            matchups (list): A list of (competitor_a, competitor_b) tuples.</span>
+<span class="sd">            matchups (list): A list of tuples, each unpacked into :meth:`matchup`. The</span>
+<span class="sd">                first two entries are the competitors; further entries follow that</span>
+<span class="sd">                method&#39;s signature, so a tuple may carry</span>
+<span class="sd">                ``(a, b, attributes, match_time, outcome, scores)``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">matchups</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">matchup</span><span class="p">(</span><span class="o">*</span><span class="n">data</span><span class="p">)</span></div>
@@ -288,6 +291,7 @@
         <span class="n">attributes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">match_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">outcome</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Process a single matchup between two competitors.</span>
 
@@ -303,12 +307,24 @@
 <span class="sd">            outcome (float, optional): A known result for this matchup, expressed from</span>
 <span class="sd">                a&#39;s perspective as ``1.0`` (a wins), ``0.0`` (b wins) or ``0.5`` (draw).</span>
 <span class="sd">                When supplied, the comparison function is not called.</span>
+<span class="sd">            scores (sequence of float, optional): The two scores as ``(a_score, b_score)`` --</span>
+<span class="sd">                always in the argument order of this call, regardless of who won. They are</span>
+<span class="sd">                forwarded to the competitors&#39; result methods in whatever order those methods</span>
+<span class="sd">                require. Requires ``outcome`` to be supplied, since the scores must be checked</span>
+<span class="sd">                against a known result.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            ValueError: If ``outcome`` is supplied and is not one of 1.0, 0.0 or 0.5.</span>
+<span class="sd">            ValueError: If ``outcome`` is supplied and is not one of 1.0, 0.0 or 0.5, if</span>
+<span class="sd">                ``scores`` is supplied without ``outcome``, or if ``scores`` is malformed,</span>
+<span class="sd">                negative, non-finite, or disagrees with ``outcome``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">outcome</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">outcome</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;outcome must be one of 1.0, 0.0 or 0.5, got </span><span class="si">{</span><span class="n">outcome</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">scores</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">outcome</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;scores requires an explicit outcome so the two can be checked for agreement&quot;</span><span class="p">)</span>
+        <span class="c1"># Validated before any competitor is created or any history is recorded, so a bad</span>
+        <span class="c1"># score payload leaves the arena completely unchanged.</span>
+        <span class="n">validated_scores</span> <span class="o">=</span> <span class="n">BaseCompetitor</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">outcome</span><span class="p">)</span> <span class="k">if</span> <span class="n">outcome</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="n">a</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_competitor</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">base_competitor_kwargs</span><span class="p">)</span>
@@ -333,26 +349,31 @@
         <span class="c1"># Check if the competitor supports time-based ratings</span>
         <span class="n">supports_time</span> <span class="o">=</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">],</span> <span class="s2">&quot;_last_activity&quot;</span><span class="p">)</span>
 
+        <span class="c1"># Scores are supplied in (a, b) order. The draw and a-wins branches call through</span>
+        <span class="c1"># competitor a, so they keep that order; the b-wins branch reverses the call, so the</span>
+        <span class="c1"># score pair has to be reversed with it.</span>
+        <span class="n">reversed_scores</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">validated_scores</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="n">validated_scores</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">validated_scores</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
         <span class="k">if</span> <span class="n">res</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">supports_time</span><span class="p">:</span>
                 <span class="c1"># type: ignore[call-arg]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">.</span><span class="n">tied</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">],</span> <span class="n">match_time</span><span class="o">=</span><span class="n">match_time</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">.</span><span class="n">tied</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">],</span> <span class="n">match_time</span><span class="o">=</span><span class="n">match_time</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="n">validated_scores</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">.</span><span class="n">tied</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">.</span><span class="n">tied</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">],</span> <span class="n">scores</span><span class="o">=</span><span class="n">validated_scores</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">add_bout</span><span class="p">(</span><span class="n">Bout</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">predicted_outcome</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="s2">&quot;tie&quot;</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="n">attributes</span><span class="p">))</span>
         <span class="k">elif</span> <span class="n">res</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">supports_time</span><span class="p">:</span>
                 <span class="c1"># type: ignore[call-arg]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">],</span> <span class="n">match_time</span><span class="o">=</span><span class="n">match_time</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">],</span> <span class="n">match_time</span><span class="o">=</span><span class="n">match_time</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="n">validated_scores</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">],</span> <span class="n">scores</span><span class="o">=</span><span class="n">validated_scores</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">add_bout</span><span class="p">(</span><span class="n">Bout</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">predicted_outcome</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="s2">&quot;win&quot;</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="n">attributes</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">supports_time</span><span class="p">:</span>
                 <span class="c1"># type: ignore[call-arg]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">],</span> <span class="n">match_time</span><span class="o">=</span><span class="n">match_time</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">],</span> <span class="n">match_time</span><span class="o">=</span><span class="n">match_time</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="n">reversed_scores</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">],</span> <span class="n">scores</span><span class="o">=</span><span class="n">reversed_scores</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">add_bout</span><span class="p">(</span><span class="n">Bout</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">predicted_outcome</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="n">attributes</span><span class="p">))</span></div>
 
 
@@ -609,6 +630,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/dwz.html">DWZ Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/colley.html">Colley Matrix Method</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/massey.html">Massey Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/comparison.html">Comparing Rating Systems</a></li>

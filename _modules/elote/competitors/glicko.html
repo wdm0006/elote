@@ -175,7 +175,7 @@
             
   <h1>Source code for elote.competitors.glicko</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Optional</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote.competitors.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="n">InvalidRatingValueException</span><span class="p">,</span> <span class="n">InvalidParameterException</span>
@@ -502,7 +502,13 @@
 
 <div class="viewcode-block" id="GlickoCompetitor.beat">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.glicko.GlickoCompetitor.beat">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;GlickoCompetitor&quot;</span><span class="p">,</span> <span class="n">match_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;GlickoCompetitor&quot;</span><span class="p">,</span>
+        <span class="n">match_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has won against the given competitor.</span>
 
 <span class="sd">        This method updates the ratings of both this competitor and the opponent</span>
@@ -510,19 +516,29 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            competitor (GlickoCompetitor): The opponent competitor that lost.</span>
+<span class="sd">            scores (sequence of float, optional): The two scores in caller order,</span>
+<span class="sd">                ``(self_score, competitor_score)``. Validated but not otherwise used by</span>
+<span class="sd">                this rating system.</span>
 <span class="sd">            match_time (datetime, optional): The time when the match occurred. Default: current time.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> beat </span><span class="si">%s</span><span class="s2"> (time=</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">,</span> <span class="n">match_time</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_compute_match_result</span><span class="p">(</span><span class="n">competitor</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">match_time</span><span class="o">=</span><span class="n">match_time</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="GlickoCompetitor.tied">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.glicko.GlickoCompetitor.tied">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;GlickoCompetitor&quot;</span><span class="p">,</span> <span class="n">match_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tied</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;GlickoCompetitor&quot;</span><span class="p">,</span>
+        <span class="n">match_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has tied with the given competitor.</span>
 
 <span class="sd">        This method updates the ratings of both this competitor and the opponent</span>
@@ -530,12 +546,16 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            competitor (GlickoCompetitor): The opponent competitor that tied.</span>
+<span class="sd">            scores (sequence of float, optional): The two scores in caller order,</span>
+<span class="sd">                ``(self_score, competitor_score)``. Must be equal. Validated but not</span>
+<span class="sd">                otherwise used by this rating system.</span>
 <span class="sd">            match_time (datetime, optional): The time when the match occurred. Default: current time.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> tied with </span><span class="si">%s</span><span class="s2"> (time=</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">,</span> <span class="n">match_time</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_compute_match_result</span><span class="p">(</span><span class="n">competitor</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">match_time</span><span class="o">=</span><span class="n">match_time</span><span class="p">)</span></div>
 
@@ -687,6 +707,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/dwz.html">DWZ Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/colley.html">Colley Matrix Method</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/massey.html">Massey Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/comparison.html">Comparing Rating Systems</a></li>

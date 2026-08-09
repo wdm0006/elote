@@ -223,6 +223,33 @@
 </pre></div>
 </div>
 </section>
+<section id="recording-scores">
+<h2>Recording Scores<a class="headerlink" href="#recording-scores" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">beat</span></code>, <code class="docutils literal notranslate"><span class="pre">lost_to</span></code> and <code class="docutils literal notranslate"><span class="pre">tied</span></code> all take an optional <code class="docutils literal notranslate"><span class="pre">scores</span></code> keyword: the two
+competitors’ scores <strong>in the argument order of the call</strong>, whichever of them won.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">MasseyCompetitor</span>
+
+<span class="n">team_a</span><span class="p">,</span> <span class="n">team_b</span> <span class="o">=</span> <span class="n">MasseyCompetitor</span><span class="p">(),</span> <span class="n">MasseyCompetitor</span><span class="p">()</span>
+
+<span class="n">team_a</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">team_b</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="c1"># The same game from the loser&#39;s side -- the pair is not reordered:</span>
+<span class="c1"># team_b.lost_to(team_a, scores=(3, 35))</span>
+</pre></div>
+</div>
+<p>Through an arena, pass the pair in <code class="docutils literal notranslate"><span class="pre">(a,</span> <span class="pre">b)</span></code> order along with an explicit <code class="docutils literal notranslate"><span class="pre">outcome</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">LambdaArena</span><span class="p">,</span> <span class="n">MasseyCompetitor</span>
+
+<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">MasseyCompetitor</span><span class="p">)</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">matchup</span><span class="p">(</span><span class="s2">&quot;Team A&quot;</span><span class="p">,</span> <span class="s2">&quot;Team B&quot;</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">matchup</span><span class="p">(</span><span class="s2">&quot;Team A&quot;</span><span class="p">,</span> <span class="s2">&quot;Team C&quot;</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">24</span><span class="p">))</span>   <span class="c1"># C won; order unchanged</span>
+</pre></div>
+</div>
+<p>Scores must be non-negative, finite, and consistent with the result being recorded –
+anything else raises <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> before any rating or history changes. Rating systems
+that model margin of victory (currently <a class="reference internal" href="rating_systems/massey.html"><span class="doc">Massey</span></a>) consume the
+payload; the rest validate and ignore it. Omitting <code class="docutils literal notranslate"><span class="pre">scores</span></code> leaves every system on its
+existing unit-score behaviour, so the argument is fully backward compatible.</p>
+</section>
 <section id="using-different-rating-systems">
 <h2>Using Different Rating Systems<a class="headerlink" href="#using-different-rating-systems" title="Link to this heading">¶</a></h2>
 <p>Elote supports multiple rating systems. Here’s how to use Glicko instead of Elo:</p>
@@ -410,6 +437,7 @@
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/dwz.html">DWZ Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/colley.html">Colley Matrix Method</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/massey.html">Massey Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/comparison.html">Comparing Rating Systems</a></li>

@@ -204,14 +204,25 @@ unreasonably low.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.base.BaseCompetitor.beat">
-<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/base.html#BaseCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.base.BaseCompetitor.beat" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/base.html#BaseCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.base.BaseCompetitor.beat" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has won against the given competitor.</p>
 <p>This method updates the ratings of both this competitor and the opponent
 based on the match outcome where this competitor won.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.
+scores (sequence of float, optional): The two non-negative, finite scores in</p>
+<blockquote>
+<div><p>caller order – <code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Rating systems that model
+margin of victory (such as <a class="reference internal" href="../competitors.html#elote.competitors.massey.MasseyCompetitor" title="elote.competitors.massey.MasseyCompetitor"><code class="xref py py-class docutils literal notranslate"><span class="pre">MasseyCompetitor</span></code></a>)
+consume it; the rest validate and ignore it. When omitted, every system falls
+back to its documented unit-score behaviour.</p>
+</div></blockquote>
 </dd>
-<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.
+ValueError: If <code class="docutils literal notranslate"><span class="pre">scores</span></code> is malformed, negative, non-finite, or does not describe</p>
+<blockquote>
+<div><p>a win for this competitor.</p>
+</div></blockquote>
 </dd>
 </dl>
 </dd></dl>
@@ -349,13 +360,22 @@ InvalidParameterException: If any parameter in the state is invalid.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.base.BaseCompetitor.lost_to">
-<span class="sig-name descname"><span class="pre">lost_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/base.html#BaseCompetitor.lost_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.base.BaseCompetitor.lost_to" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">lost_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/base.html#BaseCompetitor.lost_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.base.BaseCompetitor.lost_to" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has lost to the given competitor.</p>
 <p>This is a convenience method that calls beat() on the winning competitor.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that won.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that won.
+scores (sequence of float, optional): The two scores in caller order –</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. They are reversed before being handed to
+the winner’s <a class="reference internal" href="#elote.competitors.base.BaseCompetitor.beat" title="elote.competitors.base.BaseCompetitor.beat"><code class="xref py py-meth docutils literal notranslate"><span class="pre">beat()</span></code></a>, so the caller never reorders them.</p>
+</div></blockquote>
 </dd>
-<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.
+ValueError: If <code class="docutils literal notranslate"><span class="pre">scores</span></code> is malformed, negative, non-finite, or does not describe</p>
+<blockquote>
+<div><p>a loss for this competitor.</p>
+</div></blockquote>
 </dd>
 </dl>
 </dd></dl>
@@ -381,14 +401,20 @@ Note: Actual implementation might be needed depending on how initial state is st
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.base.BaseCompetitor.tied">
-<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/base.html#BaseCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.base.BaseCompetitor.tied" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/base.html#BaseCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.base.BaseCompetitor.tied" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has tied with the given competitor.</p>
 <p>This method updates the ratings of both this competitor and the opponent
 based on a drawn match outcome.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.
+scores (sequence of float, optional): The two scores in caller order –</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. They must be equal, since the result is
+declared a draw.</p>
+</div></blockquote>
 </dd>
-<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.
+ValueError: If <code class="docutils literal notranslate"><span class="pre">scores</span></code> is malformed, negative, non-finite, or is not a draw.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -453,6 +479,32 @@ or contains invalid values.</p>
 that use different rating systems, which would lead to invalid results.</p>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="elote.competitors.base.validate_scores">
+<span class="sig-prename descclassname"><span class="pre">elote.competitors.base.</span></span><span class="sig-name descname"><span class="pre">validate_scores</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outcome</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/base.html#validate_scores"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.base.validate_scores" title="Link to this definition">¶</a></dt>
+<dd><p>Validate an optional score payload against the outcome it is supposed to describe.</p>
+<p>The score payload is always the two competitors’ scores <strong>in caller order</strong>: for
+<code class="docutils literal notranslate"><span class="pre">a.beat(b,</span> <span class="pre">scores=(x,</span> <span class="pre">y))</span></code> <code class="docutils literal notranslate"><span class="pre">x</span></code> is <code class="docutils literal notranslate"><span class="pre">a</span></code>’s score and <code class="docutils literal notranslate"><span class="pre">y</span></code> is <code class="docutils literal notranslate"><span class="pre">b</span></code>’s. The same
+ordering holds for <code class="docutils literal notranslate"><span class="pre">lost_to</span></code>, <code class="docutils literal notranslate"><span class="pre">tied</span></code> and <code class="xref py py-meth docutils literal notranslate"><span class="pre">elote.LambdaArena.matchup()</span></code>, so a
+caller never has to reorder a score pair to match the method it is calling.</p>
+<dl>
+<dt>Args:</dt><dd><p>scores (sequence of float, optional): The two scores in caller order, or <code class="docutils literal notranslate"><span class="pre">None</span></code>.
+outcome (float): The declared result from the first score’s perspective –</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">1.0</span></code> (first competitor won), <code class="docutils literal notranslate"><span class="pre">0.0</span></code> (first competitor lost) or <code class="docutils literal notranslate"><span class="pre">0.5</span></code> (draw).</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>tuple of float, or None: The validated scores as floats, or <code class="docutils literal notranslate"><span class="pre">None</span></code> when no score
+payload was supplied.</p>
+</dd>
+<dt>Raises:</dt><dd><dl class="simple">
+<dt>ValueError: If the payload is malformed, contains a negative or non-finite value, or</dt><dd><p>disagrees with the declared outcome.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="elo-competitor">
 <h2>Elo Competitor<a class="headerlink" href="#elo-competitor" title="Link to this heading">¶</a></h2>
@@ -503,12 +555,17 @@ InvalidParameterException: If the k_factor is negative.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.elo.EloCompetitor.beat">
-<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/elo.html#EloCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.elo.EloCompetitor.beat" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/elo.html#EloCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.elo.EloCompetitor.beat" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has won against the given competitor.</p>
 <p>This method updates the ratings of both this competitor and the opponent
 based on the match outcome where this competitor won.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Validated but not otherwise used by
+this rating system.</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
@@ -576,12 +633,17 @@ based on the match outcome where this competitor won.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.elo.EloCompetitor.tied">
-<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/elo.html#EloCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.elo.EloCompetitor.tied" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/elo.html#EloCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.elo.EloCompetitor.tied" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has tied with the given competitor.</p>
 <p>This method updates the ratings of both this competitor and the opponent
 based on a drawn match outcome.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Must be equal. Validated but not
+otherwise used by this rating system.</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
@@ -653,13 +715,18 @@ InvalidParameterException: If the initial RD is not positive.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.glicko.GlickoCompetitor.beat">
-<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../competitors.html#elote.competitors.glicko.GlickoCompetitor" title="elote.competitors.glicko.GlickoCompetitor"><span class="pre">GlickoCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko.html#GlickoCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.beat" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../competitors.html#elote.competitors.glicko.GlickoCompetitor" title="elote.competitors.glicko.GlickoCompetitor"><span class="pre">GlickoCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko.html#GlickoCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.beat" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has won against the given competitor.</p>
 <p>This method updates the ratings of both this competitor and the opponent
 based on the match outcome where this competitor won.</p>
-<dl class="simple">
+<dl>
 <dt>Args:</dt><dd><p>competitor (GlickoCompetitor): The opponent competitor that lost.
-match_time (datetime, optional): The time when the match occurred. Default: current time.</p>
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Validated but not otherwise used by
+this rating system.</p>
+</div></blockquote>
+<p>match_time (datetime, optional): The time when the match occurred. Default: current time.</p>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
@@ -729,13 +796,18 @@ match_time (datetime, optional): The time when the match occurred. Default: curr
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.glicko.GlickoCompetitor.tied">
-<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../competitors.html#elote.competitors.glicko.GlickoCompetitor" title="elote.competitors.glicko.GlickoCompetitor"><span class="pre">GlickoCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko.html#GlickoCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.tied" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../competitors.html#elote.competitors.glicko.GlickoCompetitor" title="elote.competitors.glicko.GlickoCompetitor"><span class="pre">GlickoCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko.html#GlickoCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.tied" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has tied with the given competitor.</p>
 <p>This method updates the ratings of both this competitor and the opponent
 based on a drawn match outcome.</p>
-<dl class="simple">
+<dl>
 <dt>Args:</dt><dd><p>competitor (GlickoCompetitor): The opponent competitor that tied.
-match_time (datetime, optional): The time when the match occurred. Default: current time.</p>
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Must be equal. Validated but not
+otherwise used by this rating system.</p>
+</div></blockquote>
+<p>match_time (datetime, optional): The time when the match occurred. Default: current time.</p>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
@@ -839,13 +911,18 @@ InvalidParameterException: If the initial RD is not positive or if the initial v
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.glicko2.Glicko2Competitor.beat">
-<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko2.html#Glicko2Competitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko2.Glicko2Competitor.beat" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko2.html#Glicko2Competitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko2.Glicko2Competitor.beat" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has won against the given competitor.</p>
 <p>This method records the match result for later processing during the rating period update.
 The actual rating update happens when update_ratings() is called.</p>
-<dl class="simple">
+<dl>
 <dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.
-match_time (datetime, optional): The time when the match occurred. Default: current time.</p>
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Validated but not otherwise used by
+this rating system.</p>
+</div></blockquote>
+<p>match_time (datetime, optional): The time when the match occurred. Default: current time.</p>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.
 InvalidParameterException: If the match time is before either competitor’s last activity.</p>
@@ -926,13 +1003,18 @@ InvalidParameterException: If the match time is before either competitor’s las
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.glicko2.Glicko2Competitor.tied">
-<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko2.html#Glicko2Competitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko2.Glicko2Competitor.tied" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko2.html#Glicko2Competitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko2.Glicko2Competitor.tied" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has tied with the given competitor.</p>
 <p>This method records the match result for later processing during the rating period update.
 The actual rating update happens when update_ratings() is called.</p>
-<dl class="simple">
+<dl>
 <dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.
-match_time (datetime, optional): The time when the match occurred. Default: current time.</p>
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Must be equal. Validated but not
+otherwise used by this rating system.</p>
+</div></blockquote>
+<p>match_time (datetime, optional): The time when the match occurred. Default: current time.</p>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.
 InvalidParameterException: If the match time is before either competitor’s last activity.</p>
@@ -1032,10 +1114,15 @@ initial_sigma (float, optional): The initial standard deviation. Default: _defau
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.trueskill.TrueSkillCompetitor.beat">
-<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/trueskill.html#TrueSkillCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.trueskill.TrueSkillCompetitor.beat" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/trueskill.html#TrueSkillCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.trueskill.TrueSkillCompetitor.beat" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has won against the given competitor.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Validated but not otherwise used by
+this rating system.</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
@@ -1160,10 +1247,15 @@ uncertainty and increase their displayed rating.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.trueskill.TrueSkillCompetitor.tied">
-<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/trueskill.html#TrueSkillCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.trueskill.TrueSkillCompetitor.tied" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/trueskill.html#TrueSkillCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.trueskill.TrueSkillCompetitor.tied" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has tied with the given competitor.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Must be equal. Validated but not
+otherwise used by this rating system.</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
@@ -1222,14 +1314,19 @@ based on player age and performance.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.dwz.DWZCompetitor.beat">
-<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">age</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/dwz.html#DWZCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.dwz.DWZCompetitor.beat" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">age</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/dwz.html#DWZCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.dwz.DWZCompetitor.beat" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor wins against another.</p>
 <dl>
 <dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor.
-age (Optional[int]): The age of this competitor at the time of the match.</p>
+scores (sequence of float, optional): The two scores in caller order,</p>
 <blockquote>
-<div><p>Used for DWZ calculation. Defaults to 26 (adult).</p>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Validated but not otherwise used by
+this rating system.</p>
 </div></blockquote>
+<dl class="simple">
+<dt>age (Optional[int]): The age of this competitor at the time of the match.</dt><dd><p>Used for DWZ calculation. Defaults to 26 (adult).</p>
+</dd>
+</dl>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
@@ -1299,14 +1396,19 @@ age (Optional[int]): The age of this competitor at the time of the match.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.dwz.DWZCompetitor.tied">
-<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">age</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/dwz.html#DWZCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.dwz.DWZCompetitor.tied" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">age</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/dwz.html#DWZCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.dwz.DWZCompetitor.tied" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor ties with another.</p>
 <dl>
 <dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor.
-age (Optional[int]): The age of this competitor at the time of the match.</p>
+scores (sequence of float, optional): The two scores in caller order,</p>
 <blockquote>
-<div><p>Used for DWZ calculation. Defaults to 26 (adult).</p>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Must be equal. Validated but not
+otherwise used by this rating system.</p>
 </div></blockquote>
+<dl class="simple">
+<dt>age (Optional[int]): The age of this competitor at the time of the match.</dt><dd><p>Used for DWZ calculation. Defaults to 26 (adult).</p>
+</dd>
+</dl>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
@@ -1351,12 +1453,17 @@ _n_periods (int): Number of periods to consider for the moving average. Default:
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.ecf.ECFCompetitor.beat">
-<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/ecf.html#ECFCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.ecf.ECFCompetitor.beat" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/ecf.html#ECFCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.ecf.ECFCompetitor.beat" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has won against the given competitor.</p>
 <p>This method updates the ratings of both this competitor and the opponent
 based on the match outcome where this competitor won.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Validated but not otherwise used by
+this rating system.</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
@@ -1437,12 +1544,17 @@ based on the match outcome where this competitor won.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.ecf.ECFCompetitor.tied">
-<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/ecf.html#ECFCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.ecf.ECFCompetitor.tied" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/ecf.html#ECFCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.ecf.ECFCompetitor.tied" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has tied with the given competitor.</p>
 <p>This method updates the ratings of both this competitor and the opponent
 based on a drawn match outcome.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Must be equal. Validated but not
+otherwise used by this rating system.</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
@@ -1514,12 +1626,17 @@ _default_initial_rating (float): Default initial rating for all competitors. Def
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.colley.ColleyMatrixCompetitor.beat">
-<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/colley.html#ColleyMatrixCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.colley.ColleyMatrixCompetitor.beat" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/colley.html#ColleyMatrixCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.colley.ColleyMatrixCompetitor.beat" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has won against the given competitor.</p>
 <p>In Colley Matrix Method, we store the match result and recalculate ratings for all
 related competitors.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Validated but not otherwise used by
+this rating system.</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
@@ -1572,10 +1689,15 @@ used to recreate the competitor with the same state.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.colley.ColleyMatrixCompetitor.lost_to">
-<span class="sig-name descname"><span class="pre">lost_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/colley.html#ColleyMatrixCompetitor.lost_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.colley.ColleyMatrixCompetitor.lost_to" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">lost_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/colley.html#ColleyMatrixCompetitor.lost_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.colley.ColleyMatrixCompetitor.lost_to" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has lost to the given competitor.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that won.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that won.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Reversed before being passed to the
+winner’s <a class="reference internal" href="../competitors.html#elote.competitors.colley.ColleyMatrixCompetitor.beat" title="elote.competitors.colley.ColleyMatrixCompetitor.beat"><code class="xref py py-meth docutils literal notranslate"><span class="pre">beat()</span></code></a>.</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
@@ -1610,10 +1732,15 @@ used to recreate the competitor with the same state.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.colley.ColleyMatrixCompetitor.tied">
-<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/colley.html#ColleyMatrixCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.colley.ColleyMatrixCompetitor.tied" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/colley.html#ColleyMatrixCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.colley.ColleyMatrixCompetitor.tied" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has tied with the given competitor.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Must be equal. Validated but not
+otherwise used by this rating system.</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
@@ -1658,13 +1785,13 @@ ratings is a least-squares estimate of the margin by which one would beat the ot
 Like Colley and Bradley-Terry – and unlike Elo – ratings are not nudged after each
 result; the whole connected group is re-fit from the complete match history, which makes
 the method order independent.</p>
-<p><strong>Unit margins.</strong> The uniform <code class="docutils literal notranslate"><span class="pre">BaseCompetitor</span></code> API exposes only <code class="docutils literal notranslate"><span class="pre">beat</span></code> / <code class="docutils literal notranslate"><span class="pre">lost_to</span></code> /
-<code class="docutils literal notranslate"><span class="pre">tied</span></code> and has no channel for a score differential, so this implementation is
-<em>unit-margin</em> Massey: a win contributes <code class="docutils literal notranslate"><span class="pre">+1</span></code> to the winner’s cumulative margin and
-<code class="docutils literal notranslate"><span class="pre">-1</span></code> to the loser’s, and a draw contributes <code class="docutils literal notranslate"><span class="pre">0</span></code> to both while still counting as a game
-played for each. Genuine margin-of-victory Massey – the form used in college football
-rankings – would require a base-class level decision about how to carry a score, and is
-not implemented here.</p>
+<p><strong>Margins.</strong> <code class="docutils literal notranslate"><span class="pre">beat</span></code> / <code class="docutils literal notranslate"><span class="pre">lost_to</span></code> / <code class="docutils literal notranslate"><span class="pre">tied</span></code> accept the common optional <code class="docutils literal notranslate"><span class="pre">scores</span></code>
+payload, the two competitors’ scores in caller order. When it is supplied this is genuine
+margin-of-victory Massey – the form used in college football rankings – and the margin
+contributed by a game is <code class="docutils literal notranslate"><span class="pre">self_score</span> <span class="pre">-</span> <span class="pre">competitor_score</span></code>. When it is omitted the
+implementation falls back to <em>unit margins</em>: a win contributes <code class="docutils literal notranslate"><span class="pre">+1</span></code> to the winner’s
+cumulative margin and <code class="docutils literal notranslate"><span class="pre">-1</span></code> to the loser’s. A draw contributes <code class="docutils literal notranslate"><span class="pre">0</span></code> either way, while
+still counting as a game played for both.</p>
 <p>Key characteristics:
 - Global least-squares fit (does not depend on the order of results)
 - Ratings are zero mean within a connected group, so roughly half of them are negative
@@ -1704,11 +1831,17 @@ under Colley’s <code class="docutils literal notranslate"><span class="pre">1<
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.massey.MasseyCompetitor.beat">
-<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/massey.html#MasseyCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.massey.MasseyCompetitor.beat" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/massey.html#MasseyCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.massey.MasseyCompetitor.beat" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has won against the given competitor.</p>
 <p>The result is recorded in the match graph and the whole connected group is re-fit.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. When supplied, the margin contributed to
+the Massey system is the real <code class="docutils literal notranslate"><span class="pre">self_score</span> <span class="pre">-</span> <span class="pre">competitor_score</span></code>; when
+omitted the unit margin <code class="docutils literal notranslate"><span class="pre">+1</span> <span class="pre">/</span> <span class="pre">-1</span></code> is used.</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
@@ -1746,10 +1879,15 @@ argument orders are exactly complementary.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.massey.MasseyCompetitor.lost_to">
-<span class="sig-name descname"><span class="pre">lost_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/massey.html#MasseyCompetitor.lost_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.massey.MasseyCompetitor.lost_to" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">lost_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/massey.html#MasseyCompetitor.lost_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.massey.MasseyCompetitor.lost_to" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has lost to the given competitor.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that won.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that won.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Reversed before being passed to the
+winner’s <a class="reference internal" href="../competitors.html#elote.competitors.massey.MasseyCompetitor.beat" title="elote.competitors.massey.MasseyCompetitor.beat"><code class="xref py py-meth docutils literal notranslate"><span class="pre">beat()</span></code></a>.</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
@@ -1784,14 +1922,241 @@ argument orders are exactly complementary.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.massey.MasseyCompetitor.tied">
-<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/massey.html#MasseyCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.massey.MasseyCompetitor.tied" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/massey.html#MasseyCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.massey.MasseyCompetitor.tied" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has tied with the given competitor.</p>
 <p>A draw contributes nothing to either cumulative margin, but counts as a game played
 for both competitors.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. They must be equal, so a drawn game
+contributes a zero margin whether or not scores are supplied.</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-elote.competitors.keener">
+<span id="keener-competitor"></span><h2>Keener Competitor<a class="headerlink" href="#module-elote.competitors.keener" title="Link to this heading">¶</a></h2>
+<p>Keener Ratings implementation for the Elote library.</p>
+<p>Keener’s method is the score-based member of the classical global-fit family. Where
+<a class="reference internal" href="../competitors.html#elote.competitors.colley.ColleyMatrixCompetitor" title="elote.competitors.colley.ColleyMatrixCompetitor"><code class="xref py py-class docutils literal notranslate"><span class="pre">ColleyMatrixCompetitor</span></code></a> and
+<a class="reference internal" href="../competitors.html#elote.competitors.massey.MasseyCompetitor" title="elote.competitors.massey.MasseyCompetitor"><code class="xref py py-class docutils literal notranslate"><span class="pre">MasseyCompetitor</span></code></a> solve a linear system, Keener builds a
+square <em>preference matrix</em> from the points competitors have scored on one another and reads
+the ratings off that matrix’s dominant eigenvector.</p>
+<p>The construction has four steps. Let <code class="docutils literal notranslate"><span class="pre">S_ij</span></code> be the total number of points <code class="docutils literal notranslate"><span class="pre">i</span></code> has scored
+against <code class="docutils literal notranslate"><span class="pre">j</span></code> across all their meetings.</p>
+<ol class="arabic">
+<li><p><strong>Smoothed preference.</strong> Raw score shares are unstable for lopsided or barely-played
+pairs, so Keener applies Laplace smoothing:</p>
+<div class="math notranslate nohighlight">
+\[a_{ij} = \frac{S_{ij} + 1}{S_{ij} + S_{ji} + 2}\]</div>
+<p>A pair that has never met gives <code class="docutils literal notranslate"><span class="pre">a_ij</span> <span class="pre">=</span> <span class="pre">1/2</span></code> – no evidence either way.</p>
+</li>
+<li><p><strong>Skew transform.</strong> <code class="docutils literal notranslate"><span class="pre">a_ij</span></code> is pushed away from the middle by Keener’s skew function</p>
+<div class="math notranslate nohighlight">
+\[h(x) = \frac{1}{2} + \frac{1}{2}\,\mathrm{sgn}\!\left(x - \frac{1}{2}\right)
+       \sqrt{\left|2x - 1\right|}\]</div>
+<p>which is monotone, fixes <code class="docutils literal notranslate"><span class="pre">0</span></code>, <code class="docutils literal notranslate"><span class="pre">1/2</span></code> and <code class="docutils literal notranslate"><span class="pre">1</span></code>, and satisfies <code class="docutils literal notranslate"><span class="pre">h(x)</span> <span class="pre">+</span> <span class="pre">h(1</span> <span class="pre">-</span> <span class="pre">x)</span> <span class="pre">=</span> <span class="pre">1</span></code>,
+so the matrix stays antisymmetric about <code class="docutils literal notranslate"><span class="pre">1/2</span></code>. Its square root damps the influence of
+very large margins, which is what stops the method rewarding running up the score without
+limit.</p>
+</li>
+<li><p><strong>Games-played normalization.</strong> Row <code class="docutils literal notranslate"><span class="pre">i</span></code> is divided by the number of games <code class="docutils literal notranslate"><span class="pre">i</span></code> played,
+so a competitor cannot accumulate rating merely by playing more often.</p></li>
+<li><p><strong>Stabilization.</strong> A small positive constant is added to every entry. Keener’s own
+<code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">+</span> <span class="pre">eps</span> <span class="pre">*</span> <span class="pre">E</span></code> perturbation makes the matrix strictly positive, so Perron-Frobenius
+applies: the dominant eigenvalue is real and simple and its eigenvector is strictly
+positive and unique up to scale. Without it a schedule whose graph is bipartite or
+otherwise imprimitive has no single dominant eigenvector to read.</p></li>
+</ol>
+<p>The ratings of a connected group are then that dominant eigenvector, scaled so they average
+exactly <code class="docutils literal notranslate"><span class="pre">1.0</span></code>.</p>
+<p>References:
+- Keener, J. P. (1993). The Perron-Frobenius Theorem and the Ranking of Football Teams.</p>
+<blockquote>
+<div><p>SIAM Review, 35(1), 80-93.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>Langville, A. N., &amp; Meyer, C. D. (2012). Who’s #1? The Science of Rating and Ranking.
+Princeton University Press, chapter 4.</p></li>
+</ul>
+<dl class="py class">
+<dt class="sig sig-object py" id="elote.competitors.keener.KeenerCompetitor">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">elote.competitors.keener.</span></span><span class="sig-name descname"><span class="pre">KeenerCompetitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/competitors/keener.html#KeenerCompetitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.keener.KeenerCompetitor" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCompetitor</span></code></a></p>
+<p>Keener Ratings competitor.</p>
+<p>Keener rates a connected population from the dominant eigenvector of a pairwise
+preference matrix built from points scored. Like Colley, Massey and Bradley-Terry – and
+unlike Elo – ratings are not nudged after each result; the whole connected group is
+re-fit from the complete match history, which makes the method order independent.</p>
+<p><strong>Scores.</strong> <code class="docutils literal notranslate"><span class="pre">beat</span></code> / <code class="docutils literal notranslate"><span class="pre">lost_to</span></code> / <code class="docutils literal notranslate"><span class="pre">tied</span></code> accept the common optional <code class="docutils literal notranslate"><span class="pre">scores</span></code>
+payload, the two competitors’ scores in caller order. Keener is a score-based method, so
+supplying real scores is what it is built for. When they are omitted the implementation
+falls back to the same unit scores the rest of the library uses: the winner is credited
+<code class="docutils literal notranslate"><span class="pre">1</span></code> and the loser <code class="docutils literal notranslate"><span class="pre">0</span></code>, and a draw credits each side <code class="docutils literal notranslate"><span class="pre">0.5</span></code>. Unit-score Keener still
+produces a sensible ranking, but it only sees who beat whom.</p>
+<p>Key characteristics:
+- Global eigenvector fit (does not depend on the order of results)
+- Ratings are strictly positive and average exactly 1.0 within a connected group
+- Large margins have a damped, not linear, influence thanks to the skew transform</p>
+<dl class="simple">
+<dt>Class Attributes:</dt><dd><dl class="simple">
+<dt>_minimum_rating (float): The minimum allowed rating value. Default: 0.0. Keener</dt><dd><p>ratings are strictly positive, so no Elo-style floor applies.</p>
+</dd>
+<dt>_default_initial_rating (float): Default initial rating. Default: 1.0, which is the</dt><dd><p>mean the fitted ratings are normalized to, so an unplayed competitor sits exactly
+at the population average.</p>
+</dd>
+<dt>_perturbation (float): Keener’s <code class="docutils literal notranslate"><span class="pre">eps</span></code>, added to every matrix entry so the matrix is</dt><dd><p>strictly positive and Perron-Frobenius applies. Default: 1e-4.</p>
+</dd>
+<dt>_expected_score_scale (float): Logistic scale applied to the log rating ratio by</dt><dd><p><a class="reference internal" href="../competitors.html#elote.competitors.keener.KeenerCompetitor.expected_score" title="elote.competitors.keener.KeenerCompetitor.expected_score"><code class="xref py py-meth docutils literal notranslate"><span class="pre">expected_score()</span></code></a>. Default: 1.0, which is the plain Keener share
+<code class="docutils literal notranslate"><span class="pre">r_a</span> <span class="pre">/</span> <span class="pre">(r_a</span> <span class="pre">+</span> <span class="pre">r_b)</span></code>.</p>
+</dd>
+<dt>_round_decimals (int): Number of decimal places fitted ratings are canonicalized to,</dt><dd><p>so that solver noise cannot make mathematically identical records differ.
+Default: 10, chosen because the eigen-solve’s row-order noise is around 5e-15 –
+five orders of magnitude below the rounding grid.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>Initialize a new Keener competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>initial_rating (float, optional): The initial rating of this competitor.</dt><dd><p>Default: 1.0.</p>
+</dd>
+</dl>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidRatingValueException: If the initial rating is not positive.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.keener.KeenerCompetitor.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/competitors/keener.html#KeenerCompetitor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.keener.KeenerCompetitor.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialize a new Keener competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>initial_rating (float, optional): The initial rating of this competitor.</dt><dd><p>Default: 1.0.</p>
+</dd>
+</dl>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidRatingValueException: If the initial rating is not positive.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.keener.KeenerCompetitor.beat">
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/keener.html#KeenerCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.keener.KeenerCompetitor.beat" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this competitor has won against the given competitor.</p>
+<p>The scores are recorded in the match graph and the whole connected group is re-fit.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. When omitted the unit scores <code class="docutils literal notranslate"><span class="pre">1</span></code> and
+<code class="docutils literal notranslate"><span class="pre">0</span></code> are recorded.</p>
+</div></blockquote>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.
+ValueError: If <code class="docutils literal notranslate"><span class="pre">scores</span></code> does not describe a win for this competitor.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.keener.KeenerCompetitor.configure_class">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">configure_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/keener.html#KeenerCompetitor.configure_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.keener.KeenerCompetitor.configure_class" title="Link to this definition">¶</a></dt>
+<dd><p>Configure class-level parameters for this rating system.</p>
+<p>Overrides the base implementation to validate the Keener-specific parameters.</p>
+<dl class="simple">
+<dt>Raises:</dt><dd><p>InvalidParameterException: If any parameter is invalid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.keener.KeenerCompetitor.expected_score">
+<span class="sig-name descname"><span class="pre">expected_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/elote/competitors/keener.html#KeenerCompetitor.expected_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.keener.KeenerCompetitor.expected_score" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the expected score against another competitor.</p>
+<p>Keener ratings are positive strengths rather than probabilities, so the natural
+mapping is the share <code class="docutils literal notranslate"><span class="pre">r_self</span> <span class="pre">/</span> <span class="pre">(r_self</span> <span class="pre">+</span> <span class="pre">r_competitor)</span></code>. That share is computed
+here as a logistic of the log rating ratio, which is the same quantity written in a
+form that is exactly complementary in floating point: two equal ratings give exactly
+0.5, and the two argument orders sum to exactly 1.0.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The competitor to compare against.</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: The expected score (probability of winning).</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.keener.KeenerCompetitor.lost_to">
+<span class="sig-name descname"><span class="pre">lost_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/keener.html#KeenerCompetitor.lost_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.keener.KeenerCompetitor.lost_to" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this competitor has lost to the given competitor.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that won.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Reversed before being passed to the
+winner’s <a class="reference internal" href="../competitors.html#elote.competitors.keener.KeenerCompetitor.beat" title="elote.competitors.keener.KeenerCompetitor.beat"><code class="xref py py-meth docutils literal notranslate"><span class="pre">beat()</span></code></a>.</p>
+</div></blockquote>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.
+ValueError: If <code class="docutils literal notranslate"><span class="pre">scores</span></code> does not describe a loss for this competitor.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="elote.competitors.keener.KeenerCompetitor.num_games">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">num_games</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#elote.competitors.keener.KeenerCompetitor.num_games" title="Link to this definition">¶</a></dt>
+<dd><p>Get the total number of games played by this competitor.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int: The total number of games played.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="elote.competitors.keener.KeenerCompetitor.rating">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rating</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#elote.competitors.keener.KeenerCompetitor.rating" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current rating of this competitor.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>float: The current rating.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.keener.KeenerCompetitor.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/keener.html#KeenerCompetitor.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.keener.KeenerCompetitor.reset" title="Link to this definition">¶</a></dt>
+<dd><p>Reset this competitor to its initial state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.keener.KeenerCompetitor.tied">
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/keener.html#KeenerCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.keener.KeenerCompetitor.tied" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this competitor has tied with the given competitor.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. They must be equal. When omitted each
+side is credited the unit draw score <code class="docutils literal notranslate"><span class="pre">0.5</span></code>.</p>
+</div></blockquote>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.
+ValueError: If <code class="docutils literal notranslate"><span class="pre">scores</span></code> does not describe a draw.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1880,12 +2245,17 @@ _tol (float): Convergence tolerance on the max change in log-strength. Default: 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.bradley_terry.BradleyTerryCompetitor.beat">
-<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/bradley_terry.html#BradleyTerryCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.bradley_terry.BradleyTerryCompetitor.beat" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/bradley_terry.html#BradleyTerryCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.bradley_terry.BradleyTerryCompetitor.beat" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has won against the given competitor.</p>
 <p>The result is recorded on both competitors and the strengths of the entire connected
 component are re-fit by maximum likelihood.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Validated but not otherwise used by
+this rating system.</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
@@ -1918,10 +2288,15 @@ parameters.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.bradley_terry.BradleyTerryCompetitor.lost_to">
-<span class="sig-name descname"><span class="pre">lost_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/bradley_terry.html#BradleyTerryCompetitor.lost_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.bradley_terry.BradleyTerryCompetitor.lost_to" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">lost_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/bradley_terry.html#BradleyTerryCompetitor.lost_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.bradley_terry.BradleyTerryCompetitor.lost_to" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has lost to the given competitor.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that won.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that won.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Reversed before being passed to the
+winner’s <a class="reference internal" href="../competitors.html#elote.competitors.bradley_terry.BradleyTerryCompetitor.beat" title="elote.competitors.bradley_terry.BradleyTerryCompetitor.beat"><code class="xref py py-meth docutils literal notranslate"><span class="pre">beat()</span></code></a>.</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
@@ -1956,11 +2331,16 @@ parameters.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.bradley_terry.BradleyTerryCompetitor.tied">
-<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/bradley_terry.html#BradleyTerryCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.bradley_terry.BradleyTerryCompetitor.tied" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/bradley_terry.html#BradleyTerryCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.bradley_terry.BradleyTerryCompetitor.tied" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has tied with the given competitor.</p>
 <p>A tie is counted as half a win for each side.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Must be equal. Validated but not
+otherwise used by this rating system.</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
@@ -2032,11 +2412,16 @@ arguments to pass to the constructor.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.ensemble.BlendedCompetitor.beat">
-<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/ensemble.html#BlendedCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.ensemble.BlendedCompetitor.beat" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/ensemble.html#BlendedCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.ensemble.BlendedCompetitor.beat" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has won against the given competitor.</p>
 <p>This method updates the ratings of all sub-competitors based on the match outcome.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Forwarded unchanged to every
+sub-competitor.</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
@@ -2113,11 +2498,16 @@ method provides a more accurate way to compare competitors.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.ensemble.BlendedCompetitor.tied">
-<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/ensemble.html#BlendedCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.ensemble.BlendedCompetitor.tied" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/ensemble.html#BlendedCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.ensemble.BlendedCompetitor.tied" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has tied with the given competitor.</p>
 <p>This method updates the ratings of all sub-competitors based on the drawn match outcome.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Must be equal. Forwarded unchanged
+to every sub-competitor.</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
@@ -2165,6 +2555,7 @@ method provides a more accurate way to compare competitors.</p>
 <li class="toctree-l1"><a class="reference internal" href="../rating_systems/dwz.html">DWZ Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rating_systems/colley.html">Colley Matrix Method</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rating_systems/massey.html">Massey Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rating_systems/ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rating_systems/comparison.html">Comparing Rating Systems</a></li>
