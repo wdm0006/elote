@@ -6,6 +6,8 @@ from elote.competitors.elo import EloCompetitor
 from elote.competitors.dwz import DWZCompetitor
 from elote.competitors.glicko import GlickoCompetitor
 from elote.competitors.trueskill import TrueSkillCompetitor
+from elote.competitors.colley import ColleyMatrixCompetitor
+from elote.competitors.keener import KeenerCompetitor
 from elote.arenas.base import History, Bout
 from elote.datasets.base import DataSplit
 from elote.datasets.synthetic import SyntheticDataset
@@ -408,6 +410,46 @@ class TestBenchmarkEndToEnd(unittest.TestCase):
         ratings = [team["rating"] for team in result["top_teams"]]
         self.assertEqual(ratings, sorted(ratings, reverse=True))
         self.assertGreater(ratings[0], ratings[-1])
+
+    def test_keener_runs_end_to_end_through_the_benchmark(self):
+        """Keener is a global-fit system, so the benchmark must not force an initial rating.
+
+        evaluate_competitor detects global-fit classes by the presence of
+        _recalculate_ratings and skips the common start for them; forcing 1500 on a system
+        whose ratings average 1.0 would give degenerate first-bout predictions.
+        """
+        result = evaluate_competitor(
+            competitor_class=KeenerCompetitor,
+            data_split=self.data_split,
+            comparison_function=_always_true,
+            optimize_thresholds=True,
+        )
+
+        competitors = list(result["arena"].competitors.values())
+        self.assertGreater(len(competitors), 0)
+        for competitor in competitors:
+            self.assertEqual(competitor._initial_rating, KeenerCompetitor._default_initial_rating)
+            self.assertGreater(competitor.rating, 0.0)
+
+        self.assertGreater(result["accuracy"], 0.5)
+        self.assertGreaterEqual(result["accuracy_opt"], result["accuracy"])
+
+    def test_keener_can_be_compared_against_another_global_fit_system(self):
+        """benchmark_competitors must accept Keener alongside its siblings."""
+        results = benchmark_competitors(
+            [
+                {"class": KeenerCompetitor, "name": "Keener", "params": {}},
+                {"class": ColleyMatrixCompetitor, "name": "Colley", "params": {}},
+            ],
+            self.data_split,
+            _always_true,
+            optimize_thresholds=False,
+        )
+
+        self.assertEqual([entry["name"] for entry in results], ["Keener", "Colley"])
+        for entry in results:
+            with self.subTest(system=entry["name"]):
+                self.assertGreater(entry["accuracy"], 0.5)
 
 
 if __name__ == "__main__":
