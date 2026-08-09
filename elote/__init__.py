@@ -26,6 +26,7 @@ Available rating systems:
 - DWZ: The Deutsche Wertungszahl (German evaluation number) system
 - Colley Matrix: A least-squares rating system that solves a system of linear equations
 - Massey: A least-squares rating system whose ratings live on a signed margin scale
+- Keener: A score-based rating system built on the dominant eigenvector of a preference matrix
 - Bradley-Terry: A maximum-likelihood paired-comparison model
 - Ensemble: A meta-rating system that combines multiple rating systems
 
@@ -48,6 +49,7 @@ from elote.competitors.ecf import ECFCompetitor
 from elote.competitors.dwz import DWZCompetitor
 from elote.competitors.colley import ColleyMatrixCompetitor
 from elote.competitors.massey import MasseyCompetitor
+from elote.competitors.keener import KeenerCompetitor
 from elote.competitors.bradley_terry import BradleyTerryCompetitor
 from elote.competitors.ensemble import BlendedCompetitor
 
@@ -84,6 +86,7 @@ __all__ = [
     "DWZCompetitor",
     "ColleyMatrixCompetitor",
     "MasseyCompetitor",
+    "KeenerCompetitor",
     "BradleyTerryCompetitor",
     "BlendedCompetitor",
     # Arenas

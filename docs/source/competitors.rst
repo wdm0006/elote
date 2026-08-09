@@ -49,6 +49,12 @@ Massey Competitor
 .. autoclass:: elote.competitors.massey.MasseyCompetitor
     :members: export_state,expected_score,beat,tied,rating,to_json,from_json
 
+Keener Competitor
+-----------------
+
+.. autoclass:: elote.competitors.keener.KeenerCompetitor
+    :members: export_state,expected_score,beat,tied,rating,to_json,from_json
+
 Bradley-Terry Competitor
 ------------------------
 

@@ -2,7 +2,7 @@
 
 The score channel is cross-cutting: every competitor class must accept it, malformed
 payloads must be rejected before anything mutates, and the arena must forward the pair in
-the right competitor order. Systems that actually consume a score (currently Massey) are
+the right competitor order. Systems that actually consume a score (Massey and Keener) are
 covered here for the plumbing and in their own known-value file for the numbers.
 """
 
@@ -16,6 +16,7 @@ from elote import (
     EloCompetitor,
     Glicko2Competitor,
     GlickoCompetitor,
+    KeenerCompetitor,
     LambdaArena,
     MasseyCompetitor,
     TrueSkillCompetitor,
@@ -37,6 +38,7 @@ COMPETITOR_CLASSES = (
     ColleyMatrixCompetitor,
     BradleyTerryCompetitor,
     MasseyCompetitor,
+    KeenerCompetitor,
 )
 
 # A win, a draw and a loss, with the unit scores each result implies.

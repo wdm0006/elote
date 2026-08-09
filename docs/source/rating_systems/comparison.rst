@@ -64,6 +64,12 @@ Overview Comparison
      - No
      - Yes
      - Margin-scale sports ranking
+   * - **Keener**
+     - Sports (1993)
+     - Medium
+     - No
+     - Yes
+     - Score-based eigenvector ranking
    * - **Bradley-Terry**
      - Statistics (1952)
      - Medium
@@ -78,8 +84,10 @@ Overview Comparison
      - Complex domains
 
 Online systems (Elo, Glicko, Glicko-2, TrueSkill, ECF, DWZ) update ratings incrementally after each
-result. Global-fit systems (Colley Matrix, Massey and Bradley-Terry) re-solve the whole connected
-group of competitors from the full set of results, which makes them order independent.
+result. Global-fit systems (Colley Matrix, Massey, Keener and Bradley-Terry) re-solve the whole
+connected group of competitors from the full set of results, which makes them order independent.
+Massey and Keener are the two that read the optional score payload; the rest use only who beat
+whom.
 
 Mathematical Formulation
 -----------------------
@@ -106,6 +114,8 @@ Mathematical Formulation
      - Ratings solve :math:`C r = b`; :math:`E_A = \frac{1}{1 + e^{-4 (r_A - r_B)}}`
    * - **Massey**
      - Ratings solve :math:`M r = p` with :math:`M = D - A`; :math:`E_A = \frac{1}{1 + e^{-2 (r_A - r_B)}}`
+   * - **Keener**
+     - Ratings are the dominant eigenvector of :math:`H_{ij} = h(a_{ij}) / g_i + \varepsilon` with :math:`a_{ij} = \frac{S_{ij} + 1}{S_{ij} + S_{ji} + 2}` and :math:`h(x) = \frac{1}{2} + \frac{1}{2}\mathrm{sgn}(x - \frac{1}{2})\sqrt{|2x - 1|}`; :math:`E_A = \frac{r_A}{r_A + r_B}`
    * - **Bradley-Terry**
      - :math:`P(A \text{ beats } B) = \frac{p_A}{p_A + p_B} = \frac{1}{1 + e^{-(\beta_A - \beta_B)}}`
    * - **Ensemble**
@@ -136,6 +146,8 @@ Key Parameters
      - Initial rating (default 0.5)
    * - **Massey**
      - Initial rating (default 0.0), Expected-score scale
+   * - **Keener**
+     - Initial rating (default 1.0), Perturbation, Expected-score scale
    * - **Bradley-Terry**
      - Initial rating, Scale, Regularization, Max iterations
    * - **Ensemble**
@@ -265,6 +277,22 @@ Massey
 - Ratings are zero mean, so about half of them are negative
 - Requires a connected schedule to compare competitors
 
+Keener
+^^^^^^
+
+**Strengths:**
+- Reads real scores through a bounded, concave transform, so blowouts inform without dominating
+- Order independent: depends only on the set of results
+- The eigenvector recursion values a win in proportion to the opponent's own rating
+- Perron-Frobenius guarantees a unique positive solution on any connected schedule
+- Ratings are strictly positive and average exactly 1.0
+
+**Weaknesses:**
+- Re-solves the whole connected group after each result
+- Much weaker on outcome-only data, where the unit-score fallback discards its main input
+- The stabilizing perturbation is an extra knob that quietly couples competitors who never met
+- Requires a connected schedule to compare competitors
+
 Bradley-Terry
 ^^^^^^^^^^^^^
 
@@ -312,7 +340,8 @@ Consider the following factors when choosing a rating system:
    - General purpose: Elo or Glicko
 
 3. **Order Independence**: Do you need a ranking that ignores schedule order?
-   - Yes: Colley Matrix, Massey, or Bradley-Terry
+   - Yes: Colley Matrix, Massey, Keener, or Bradley-Terry
+   - Yes, and you have real scores: Massey (linear margin) or Keener (bounded score share)
    - No: any online system (Elo, Glicko, etc.)
 
 4. **Computational Resources**:
@@ -343,6 +372,7 @@ Here's a quick comparison of how to use each system in Elote:
         DWZCompetitor,
         ColleyMatrixCompetitor,
         MasseyCompetitor,
+        KeenerCompetitor,
         BradleyTerryCompetitor,
         BlendedCompetitor,
     )
@@ -371,6 +401,9 @@ Here's a quick comparison of how to use each system in Elote:
     # Massey (zero-mean margin scale)
     massey_player = MasseyCompetitor()
 
+    # Keener (strictly positive, mean 1.0; reads real scores)
+    keener_player = KeenerCompetitor()
+
     # Bradley-Terry (Elo-compatible scale)
     bt_player = BradleyTerryCompetitor(initial_rating=1500)
 
@@ -387,6 +420,10 @@ Here's a quick comparison of how to use each system in Elote:
     opponent = EloCompetitor(initial_rating=1400)
     print(f"Expected score: {player.expected_score(opponent):.2%}")
     player.beat(opponent)  # record a win
+
+    # Score-based systems additionally accept the optional scores payload
+    home, away = KeenerCompetitor(), KeenerCompetitor()
+    home.beat(away, scores=(35, 3))
 
 Empirical Comparison
 -------------------
