@@ -120,8 +120,10 @@ def evaluate_competitor(
     mutated_class_vars = ["_minimum_rating"] + [f"_{param}" for param in competitor_params]
 
     with _restored_class_vars(competitor_class, mutated_class_vars):
-        # Set common parameters
-        arena.set_competitor_class_var("_minimum_rating", 0)
+        # Preserve the native scale of global-fit systems, whose fitted ratings may be
+        # signed. Incremental systems retain the benchmark's common zero floor.
+        if not hasattr(competitor_class, "_recalculate_ratings"):
+            arena.set_competitor_class_var("_minimum_rating", 0)
 
         # Set any additional parameters
         for param, value in competitor_params.items():

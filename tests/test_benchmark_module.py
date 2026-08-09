@@ -7,6 +7,7 @@ from elote.competitors.dwz import DWZCompetitor
 from elote.competitors.glicko import GlickoCompetitor
 from elote.competitors.trueskill import TrueSkillCompetitor
 from elote.competitors.colley import ColleyMatrixCompetitor
+from elote.competitors.massey import MasseyCompetitor
 from elote.competitors.keener import KeenerCompetitor
 from elote.arenas.base import History, Bout
 from elote.datasets.base import DataSplit
@@ -433,6 +434,33 @@ class TestBenchmarkEndToEnd(unittest.TestCase):
 
         self.assertGreater(result["accuracy"], 0.5)
         self.assertGreaterEqual(result["accuracy_opt"], result["accuracy"])
+
+    def test_massey_preserves_signed_ratings_through_benchmark_paths(self):
+        """Massey's zero-mean scale must survive both public benchmark entry points."""
+        result = evaluate_competitor(
+            competitor_class=MasseyCompetitor,
+            data_split=self.data_split,
+            comparison_function=_always_true,
+            optimize_thresholds=False,
+        )
+
+        ratings = [competitor.rating for competitor in result["arena"].competitors.values()]
+        self.assertLess(min(ratings), 0.0)
+        self.assertGreater(max(ratings), 0.0)
+        self.assertEqual(len(result["history"].bouts), 60)
+        self.assertEqual(result["confusion_matrix"], {"tp": 28, "fp": 1, "tn": 29, "fn": 2})
+        self.assertEqual(result["accuracy"], 0.95)
+
+        results = benchmark_competitors(
+            [{"class": MasseyCompetitor, "name": "Massey", "params": {}}],
+            self.data_split,
+            _always_true,
+            optimize_thresholds=False,
+        )
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["name"], "Massey")
+        self.assertEqual(results[0]["accuracy"], result["accuracy"])
 
     def test_keener_can_be_compared_against_another_global_fit_system(self):
         """benchmark_competitors must accept Keener alongside its siblings."""
