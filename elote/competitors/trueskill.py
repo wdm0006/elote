@@ -1,6 +1,6 @@
 import math
 from scipy import special
-from typing import Dict, Any, ClassVar, Tuple, Type, TypeVar, List
+from typing import Dict, Any, ClassVar, Optional, Sequence, Tuple, Type, TypeVar, List
 
 from elote.competitors.base import BaseCompetitor, InvalidParameterException
 from elote.logging import logger  # Import directly from the logging submodule
@@ -474,16 +474,20 @@ class TrueSkillCompetitor(BaseCompetitor):
         )
         return expected
 
-    def beat(self, competitor: BaseCompetitor) -> None:
+    def beat(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has won against the given competitor.
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that lost.
+            scores (sequence of float, optional): The two scores in caller order,
+                ``(self_score, competitor_score)``. Validated but not otherwise used by
+                this rating system.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        self._validate_scores(scores, 1.0)
         logger.debug("%s beat %s", self, competitor)
         competitor_ts = competitor  # type: TrueSkillCompetitor
 
@@ -519,16 +523,20 @@ class TrueSkillCompetitor(BaseCompetitor):
             "Loser update (%s): new_mu=%.2f, new_sigma=%.2f", competitor_ts, competitor_ts._mu, competitor_ts._sigma
         )
 
-    def tied(self, competitor: BaseCompetitor) -> None:
+    def tied(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has tied with the given competitor.
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that tied.
+            scores (sequence of float, optional): The two scores in caller order,
+                ``(self_score, competitor_score)``. Must be equal. Validated but not
+                otherwise used by this rating system.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        self._validate_scores(scores, 0.5)
         logger.debug("%s tied with %s", self, competitor)
         competitor_ts = competitor  # type: TrueSkillCompetitor
 

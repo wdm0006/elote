@@ -26,7 +26,7 @@ References:
   Princeton University Press, chapter 2.
 """
 
-from typing import Dict, Any, ClassVar, Type, TypeVar, List, Optional, cast, Set
+from typing import Dict, Any, ClassVar, Type, TypeVar, List, Optional, cast, Set, Sequence
 
 import numpy as np
 
@@ -45,13 +45,13 @@ class MasseyCompetitor(BaseCompetitor):
     result; the whole connected group is re-fit from the complete match history, which makes
     the method order independent.
 
-    **Unit margins.** The uniform ``BaseCompetitor`` API exposes only ``beat`` / ``lost_to`` /
-    ``tied`` and has no channel for a score differential, so this implementation is
-    *unit-margin* Massey: a win contributes ``+1`` to the winner's cumulative margin and
-    ``-1`` to the loser's, and a draw contributes ``0`` to both while still counting as a game
-    played for each. Genuine margin-of-victory Massey -- the form used in college football
-    rankings -- would require a base-class level decision about how to carry a score, and is
-    not implemented here.
+    **Margins.** ``beat`` / ``lost_to`` / ``tied`` accept the common optional ``scores``
+    payload, the two competitors' scores in caller order. When it is supplied this is genuine
+    margin-of-victory Massey -- the form used in college football rankings -- and the margin
+    contributed by a game is ``self_score - competitor_score``. When it is omitted the
+    implementation falls back to *unit margins*: a win contributes ``+1`` to the winner's
+    cumulative margin and ``-1`` to the loser's. A draw contributes ``0`` either way, while
+    still counting as a game played for both.
 
     Key characteristics:
     - Global least-squares fit (does not depend on the order of results)
@@ -89,8 +89,8 @@ class MasseyCompetitor(BaseCompetitor):
         self._losses = 0
         self._ties = 0
         # Cumulative margin -- the right-hand side ``p`` of the Massey system. With unit
-        # margins this is simply wins minus losses, but it is tracked separately because it is
-        # the quantity the algorithm actually consumes.
+        # margins this is simply wins minus losses; with real scores it is the sum of
+        # ``self_score - opponent_score`` over every game played.
         self._point_differential = 0.0
         self._opponents: Dict["MasseyCompetitor", int] = {}  # Opponent -> num games
         # Unique ID for hashing (instances are used as dict keys in the match graph).
@@ -155,33 +155,39 @@ class MasseyCompetitor(BaseCompetitor):
         # exactly 1.0 in floating point.
         return float(0.5 * (1.0 + np.tanh(0.5 * self._expected_score_scale * rating_diff)))
 
-    def beat(self, competitor: BaseCompetitor) -> None:
+    def beat(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has won against the given competitor.
 
         The result is recorded in the match graph and the whole connected group is re-fit.
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that lost.
+            scores (sequence of float, optional): The two scores in caller order,
+                ``(self_score, competitor_score)``. When supplied, the margin contributed to
+                the Massey system is the real ``self_score - competitor_score``; when
+                omitted the unit margin ``+1 / -1`` is used.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         logger.debug("Competitor %s beat %s", self, competitor)
         self.verify_competitor_types(competitor)
+        validated = self._validate_scores(scores, 1.0)
         opponent = cast(MasseyCompetitor, competitor)
+        margin = 1.0 if validated is None else validated[0] - validated[1]
 
         self._wins += 1
-        self._point_differential += 1.0
+        self._point_differential += margin
         self._opponents[opponent] = self._opponents.get(opponent, 0) + 1
 
         opponent._losses += 1
-        opponent._point_differential -= 1.0
+        opponent._point_differential -= margin
         opponent._opponents[self] = opponent._opponents.get(self, 0) + 1
 
         logger.debug("Recorded win for %d, loss for %d", self._id, opponent._id)
         self._recalculate_ratings()
 
-    def tied(self, competitor: BaseCompetitor) -> None:
+    def tied(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has tied with the given competitor.
 
         A draw contributes nothing to either cumulative margin, but counts as a game played
@@ -189,12 +195,16 @@ class MasseyCompetitor(BaseCompetitor):
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that tied.
+            scores (sequence of float, optional): The two scores in caller order,
+                ``(self_score, competitor_score)``. They must be equal, so a drawn game
+                contributes a zero margin whether or not scores are supplied.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         logger.debug("Competitor %s tied with %s", self, competitor)
         self.verify_competitor_types(competitor)
+        self._validate_scores(scores, 0.5)
         opponent = cast(MasseyCompetitor, competitor)
 
         self._ties += 1
@@ -206,18 +216,22 @@ class MasseyCompetitor(BaseCompetitor):
         logger.debug("Recorded tie for %d and %d", self._id, opponent._id)
         self._recalculate_ratings()
 
-    def lost_to(self, competitor: BaseCompetitor) -> None:
+    def lost_to(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has lost to the given competitor.
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that won.
+            scores (sequence of float, optional): The two scores in caller order,
+                ``(self_score, competitor_score)``. Reversed before being passed to the
+                winner's :meth:`beat`.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         logger.debug("Competitor %s lost to %s", self, competitor)
         self.verify_competitor_types(competitor)
-        competitor.beat(self)
+        validated = self._validate_scores(scores, 0.0)
+        competitor.beat(self, scores=None if validated is None else (validated[1], validated[0]))
 
     def _get_connected_competitors(self) -> List["MasseyCompetitor"]:
         """Get all competitors connected to this competitor in the match graph.

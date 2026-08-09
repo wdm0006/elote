@@ -56,6 +56,38 @@ Elote also supports recording draws between competitors:
     print(f"Player 1 new rating: {player1.rating}")
     print(f"Player 2 new rating: {player2.rating}")
 
+Recording Scores
+---------------
+
+``beat``, ``lost_to`` and ``tied`` all take an optional ``scores`` keyword: the two
+competitors' scores **in the argument order of the call**, whichever of them won.
+
+.. code-block:: python
+
+    from elote import MasseyCompetitor
+
+    team_a, team_b = MasseyCompetitor(), MasseyCompetitor()
+
+    team_a.beat(team_b, scores=(35, 3))
+    # The same game from the loser's side -- the pair is not reordered:
+    # team_b.lost_to(team_a, scores=(3, 35))
+
+Through an arena, pass the pair in ``(a, b)`` order along with an explicit ``outcome``:
+
+.. code-block:: python
+
+    from elote import LambdaArena, MasseyCompetitor
+
+    arena = LambdaArena(lambda a, b: True, base_competitor=MasseyCompetitor)
+    arena.matchup("Team A", "Team B", outcome=1.0, scores=(35, 3))
+    arena.matchup("Team A", "Team C", outcome=0.0, scores=(7, 24))   # C won; order unchanged
+
+Scores must be non-negative, finite, and consistent with the result being recorded --
+anything else raises ``ValueError`` before any rating or history changes. Rating systems
+that model margin of victory (currently :doc:`Massey <rating_systems/massey>`) consume the
+payload; the rest validate and ignore it. Omitting ``scores`` leaves every system on its
+existing unit-score behaviour, so the argument is fully backward compatible.
+
 Using Different Rating Systems
 ----------------------------
 

@@ -11,7 +11,7 @@ References:
 """
 
 import numpy as np
-from typing import Dict, Any, ClassVar, Type, TypeVar, List, Optional, cast, Set
+from typing import Dict, Any, ClassVar, Type, TypeVar, List, Optional, cast, Set, Sequence
 from elote.competitors.base import BaseCompetitor, InvalidRatingValueException
 import datetime
 
@@ -115,7 +115,7 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         rating_diff = self.rating - competitor.rating
         return float(1 / (1 + np.exp(-4 * rating_diff)))
 
-    def beat(self, competitor: BaseCompetitor) -> None:
+    def beat(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has won against the given competitor.
 
         In Colley Matrix Method, we store the match result and recalculate ratings for all
@@ -123,12 +123,16 @@ class ColleyMatrixCompetitor(BaseCompetitor):
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that lost.
+            scores (sequence of float, optional): The two scores in caller order,
+                ``(self_score, competitor_score)``. Validated but not otherwise used by
+                this rating system.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         logger.debug("Competitor %s beat %s", self, competitor)
         self.verify_competitor_types(competitor)
+        self._validate_scores(scores, 1.0)
         competitor_colley = cast(ColleyMatrixCompetitor, competitor)
 
         # Record the win for this competitor
@@ -147,17 +151,21 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         # Recalculate ratings for all connected competitors
         self._recalculate_ratings()
 
-    def tied(self, competitor: BaseCompetitor) -> None:
+    def tied(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has tied with the given competitor.
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that tied.
+            scores (sequence of float, optional): The two scores in caller order,
+                ``(self_score, competitor_score)``. Must be equal. Validated but not
+                otherwise used by this rating system.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         logger.debug("Competitor %s tied with %s", self, competitor)
         self.verify_competitor_types(competitor)
+        self._validate_scores(scores, 0.5)
         competitor_colley = cast(ColleyMatrixCompetitor, competitor)
 
         # Record the tie for this competitor
@@ -173,17 +181,21 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         # Recalculate ratings for all connected competitors
         self._recalculate_ratings()
 
-    def lost_to(self, competitor: BaseCompetitor) -> None:
+    def lost_to(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has lost to the given competitor.
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that won.
+            scores (sequence of float, optional): The two scores in caller order,
+                ``(self_score, competitor_score)``. Reversed before being passed to the
+                winner's :meth:`beat`.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         logger.debug("Competitor %s lost to %s", self, competitor)
-        competitor.beat(self)
+        validated = self._validate_scores(scores, 0.0)
+        competitor.beat(self, scores=None if validated is None else (validated[1], validated[0]))
 
     def _get_connected_competitors(self) -> List["ColleyMatrixCompetitor"]:
         """Get all competitors connected to this competitor in the match graph.

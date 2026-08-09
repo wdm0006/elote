@@ -1,5 +1,5 @@
 import math
-from typing import Dict, Any, ClassVar, Optional, Type, TypeVar, cast
+from typing import Dict, Any, ClassVar, Optional, Sequence, Type, TypeVar, cast
 
 from elote.competitors.base import BaseCompetitor, InvalidRatingValueException, InvalidParameterException
 from elote.logging import logger  # Import directly from the logging submodule
@@ -325,11 +325,16 @@ class DWZCompetitor(BaseCompetitor):
         logger.debug("New rating calculated: %.1f (Clamped: %.1f)", new_rating, new_rating_clamped)
         return new_rating_clamped
 
-    def beat(self, competitor: BaseCompetitor, age: Optional[int] = None) -> None:
+    def beat(
+        self, competitor: BaseCompetitor, age: Optional[int] = None, *, scores: Optional[Sequence[float]] = None
+    ) -> None:
         """Update ratings after this competitor wins against another.
 
         Args:
             competitor (BaseCompetitor): The opponent competitor.
+            scores (sequence of float, optional): The two scores in caller order,
+                ``(self_score, competitor_score)``. Validated but not otherwise used by
+                this rating system.
             age (Optional[int]): The age of this competitor at the time of the match.
                                  Used for DWZ calculation. Defaults to 26 (adult).
 
@@ -337,6 +342,7 @@ class DWZCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        self._validate_scores(scores, 1.0)
         competitor_dwz = cast(DWZCompetitor, competitor)
         logger.debug("%s beat %s (age=%s)", self, competitor_dwz, age)
 
@@ -350,11 +356,16 @@ class DWZCompetitor(BaseCompetitor):
         self._count += 1
         competitor_dwz._count += 1
 
-    def tied(self, competitor: BaseCompetitor, age: Optional[int] = None) -> None:
+    def tied(
+        self, competitor: BaseCompetitor, age: Optional[int] = None, *, scores: Optional[Sequence[float]] = None
+    ) -> None:
         """Update ratings after this competitor ties with another.
 
         Args:
             competitor (BaseCompetitor): The opponent competitor.
+            scores (sequence of float, optional): The two scores in caller order,
+                ``(self_score, competitor_score)``. Must be equal. Validated but not
+                otherwise used by this rating system.
             age (Optional[int]): The age of this competitor at the time of the match.
                                  Used for DWZ calculation. Defaults to 26 (adult).
 
@@ -362,6 +373,7 @@ class DWZCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        self._validate_scores(scores, 0.5)
         competitor_dwz = cast(DWZCompetitor, competitor)
         logger.debug("%s tied with %s (age=%s)", self, competitor_dwz, age)
 

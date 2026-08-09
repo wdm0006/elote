@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, Type, TypeVar
+from typing import Dict, Any, List, Optional, Sequence, Type, TypeVar
 
 from elote.competitors.base import (
     BaseCompetitor,
@@ -361,38 +361,46 @@ class BlendedCompetitor(BaseCompetitor):
             logger.error("Unsupported blend mode used in expected_score: %s", self.blend_mode)
             raise NotImplementedError(f"Blend mode {self.blend_mode} not supported")
 
-    def beat(self, competitor: BaseCompetitor) -> None:
+    def beat(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has won against the given competitor.
 
         This method updates the ratings of all sub-competitors based on the match outcome.
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that lost.
+            scores (sequence of float, optional): The two scores in caller order,
+                ``(self_score, competitor_score)``. Forwarded unchanged to every
+                sub-competitor.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        validated = self._validate_scores(scores, 1.0)
         logger.debug("%s beat %s. Updating %d sub-competitors.", self, competitor, len(self.sub_competitors))
 
         for c, other_c in zip(self.sub_competitors, competitor.sub_competitors, strict=True):
             logger.debug("Updating sub-competitors via beat: %s vs %s", c, other_c)
-            c.beat(other_c)
+            c.beat(other_c, scores=validated)
 
-    def tied(self, competitor: BaseCompetitor) -> None:
+    def tied(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has tied with the given competitor.
 
         This method updates the ratings of all sub-competitors based on the drawn match outcome.
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that tied.
+            scores (sequence of float, optional): The two scores in caller order,
+                ``(self_score, competitor_score)``. Must be equal. Forwarded unchanged
+                to every sub-competitor.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        validated = self._validate_scores(scores, 0.5)
         logger.debug("%s tied with %s. Updating %d sub-competitors.", self, competitor, len(self.sub_competitors))
 
         for c, other_c in zip(self.sub_competitors, competitor.sub_competitors, strict=True):
             logger.debug("Updating sub-competitors via tied: %s vs %s", c, other_c)
-            c.tied(other_c)  # Fixed: was using beat() instead of tied()
+            c.tied(other_c, scores=validated)  # Fixed: was using beat() instead of tied()

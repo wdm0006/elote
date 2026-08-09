@@ -254,13 +254,14 @@ Massey
 
 **Strengths:**
 - Order independent: depends only on the set of results
+- Consumes the optional ``scores`` payload, so real margins of victory are used when available
 - Rating differences are directly interpretable as predicted margins
 - Clean least-squares interpretation with a unique zero-mean solution
 - Self-normalizing: the ratings of a connected group sum to zero
 
 **Weaknesses:**
 - Re-solves the whole connected group after each result
-- Unit margins only: the uniform API carries no score differential
+- Needs real scores to be at its best; falls back to unit margins when they are omitted
 - Ratings are zero mean, so about half of them are negative
 - Requires a connected schedule to compare competitors
 
