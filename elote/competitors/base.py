@@ -1,7 +1,8 @@
 import abc
 import json
+import math
 import uuid
-from typing import Dict, Any, TypeVar, Type, ClassVar, List, cast
+from typing import Dict, Any, Optional, Sequence, Tuple, TypeVar, Type, ClassVar, List, cast
 
 from elote.logging import logger
 
@@ -51,6 +52,56 @@ T = TypeVar("T", bound="BaseCompetitor")
 
 # Registry to store competitor types
 _competitor_registry: Dict[str, Type["BaseCompetitor"]] = {}
+
+
+def validate_scores(scores: Optional[Sequence[float]], outcome: float) -> Optional[Tuple[float, float]]:
+    """Validate an optional score payload against the outcome it is supposed to describe.
+
+    The score payload is always the two competitors' scores **in caller order**: for
+    ``a.beat(b, scores=(x, y))`` ``x`` is ``a``'s score and ``y`` is ``b``'s. The same
+    ordering holds for ``lost_to``, ``tied`` and :meth:`elote.LambdaArena.matchup`, so a
+    caller never has to reorder a score pair to match the method it is calling.
+
+    Args:
+        scores (sequence of float, optional): The two scores in caller order, or ``None``.
+        outcome (float): The declared result from the first score's perspective --
+            ``1.0`` (first competitor won), ``0.0`` (first competitor lost) or ``0.5`` (draw).
+
+    Returns:
+        tuple of float, or None: The validated scores as floats, or ``None`` when no score
+        payload was supplied.
+
+    Raises:
+        ValueError: If the payload is malformed, contains a negative or non-finite value, or
+            disagrees with the declared outcome.
+    """
+    if scores is None:
+        return None
+
+    if isinstance(scores, (str, bytes)) or not isinstance(scores, Sequence):
+        raise ValueError(f"scores must be a sequence of two numbers, got {scores!r}")
+    if len(scores) != 2:
+        raise ValueError(f"scores must contain exactly two values, got {len(scores)}")
+
+    validated: List[float] = []
+    for value in scores:
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            raise ValueError(f"scores must contain only numbers, got {value!r}")
+        if not math.isfinite(value):
+            raise ValueError(f"scores must be finite, got {value!r}")
+        if value < 0:
+            raise ValueError(f"scores must be non-negative, got {value!r}")
+        validated.append(float(value))
+
+    first, second = validated
+    if outcome == 1.0 and not first > second:
+        raise ValueError(f"scores {tuple(validated)} do not describe a win for the first competitor")
+    if outcome == 0.0 and not first < second:
+        raise ValueError(f"scores {tuple(validated)} do not describe a loss for the first competitor")
+    if outcome == 0.5 and first != second:
+        raise ValueError(f"scores {tuple(validated)} do not describe a draw")
+
+    return first, second
 
 
 class BaseCompetitor(abc.ABC):
@@ -154,8 +205,10 @@ class BaseCompetitor(abc.ABC):
         """
         pass
 
+    _validate_scores = staticmethod(validate_scores)
+
     @abc.abstractmethod
-    def beat(self, competitor: "BaseCompetitor") -> None:
+    def beat(self, competitor: "BaseCompetitor", *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has won against the given competitor.
 
         This method updates the ratings of both this competitor and the opponent
@@ -163,29 +216,42 @@ class BaseCompetitor(abc.ABC):
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that lost.
+            scores (sequence of float, optional): The two non-negative, finite scores in
+                caller order -- ``(self_score, competitor_score)``. Rating systems that model
+                margin of victory (such as :class:`~elote.competitors.massey.MasseyCompetitor`)
+                consume it; the rest validate and ignore it. When omitted, every system falls
+                back to its documented unit-score behaviour.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
+            ValueError: If ``scores`` is malformed, negative, non-finite, or does not describe
+                a win for this competitor.
         """
         pass
 
-    def lost_to(self, competitor: "BaseCompetitor") -> None:
+    def lost_to(self, competitor: "BaseCompetitor", *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has lost to the given competitor.
 
         This is a convenience method that calls beat() on the winning competitor.
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that won.
+            scores (sequence of float, optional): The two scores in caller order --
+                ``(self_score, competitor_score)``. They are reversed before being handed to
+                the winner's :meth:`beat`, so the caller never reorders them.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
+            ValueError: If ``scores`` is malformed, negative, non-finite, or does not describe
+                a loss for this competitor.
         """
         logger.debug("Competitor %s lost to %s. Calling beat() on winner.", self, competitor)
         self.verify_competitor_types(competitor)
-        competitor.beat(self)
+        validated = self._validate_scores(scores, 0.0)
+        competitor.beat(self, scores=None if validated is None else (validated[1], validated[0]))
 
     @abc.abstractmethod
-    def tied(self, competitor: "BaseCompetitor") -> None:
+    def tied(self, competitor: "BaseCompetitor", *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has tied with the given competitor.
 
         This method updates the ratings of both this competitor and the opponent
@@ -193,9 +259,13 @@ class BaseCompetitor(abc.ABC):
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that tied.
+            scores (sequence of float, optional): The two scores in caller order --
+                ``(self_score, competitor_score)``. They must be equal, since the result is
+                declared a draw.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
+            ValueError: If ``scores`` is malformed, negative, non-finite, or is not a draw.
         """
         pass
 

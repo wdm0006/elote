@@ -10,6 +10,7 @@ from elote import (
     ColleyMatrixCompetitor,
     BradleyTerryCompetitor,
     MasseyCompetitor,
+    KeenerCompetitor,
 )
 from elote.competitors.base import (
     MissMatchedCompetitorTypesException,
@@ -435,6 +436,7 @@ class TestExpectedScoreBounds(unittest.TestCase):
         ColleyMatrixCompetitor,
         BradleyTerryCompetitor,
         MasseyCompetitor,
+        KeenerCompetitor,
     )
 
     # A lopsided run: long enough that a one-sided rating gap opens up, with

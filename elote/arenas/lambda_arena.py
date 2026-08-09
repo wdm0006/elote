@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Type
 
 from tqdm import tqdm
 from elote import EloCompetitor
@@ -77,14 +77,17 @@ class LambdaArena(BaseArena):
         """
         setattr(self.base_competitor, name, value)
 
-    def tournament(self, matchups: List[Tuple[Any, Any]]) -> None:
+    def tournament(self, matchups: List[Tuple[Any, ...]]) -> None:
         """Run a tournament with the given matchups.
 
         Process multiple matchups between competitors, updating ratings
         after each matchup.
 
         Args:
-            matchups (list): A list of (competitor_a, competitor_b) tuples.
+            matchups (list): A list of tuples, each unpacked into :meth:`matchup`. The
+                first two entries are the competitors; further entries follow that
+                method's signature, so a tuple may carry
+                ``(a, b, attributes, match_time, outcome, scores)``.
         """
         for data in tqdm(matchups):
             self.matchup(*data)
@@ -96,6 +99,7 @@ class LambdaArena(BaseArena):
         attributes: Optional[Dict[str, Any]] = None,
         match_time: Optional[datetime.datetime] = None,
         outcome: Optional[float] = None,
+        scores: Optional[Sequence[float]] = None,
     ) -> None:
         """Process a single matchup between two competitors.
 
@@ -111,12 +115,24 @@ class LambdaArena(BaseArena):
             outcome (float, optional): A known result for this matchup, expressed from
                 a's perspective as ``1.0`` (a wins), ``0.0`` (b wins) or ``0.5`` (draw).
                 When supplied, the comparison function is not called.
+            scores (sequence of float, optional): The two scores as ``(a_score, b_score)`` --
+                always in the argument order of this call, regardless of who won. They are
+                forwarded to the competitors' result methods in whatever order those methods
+                require. Requires ``outcome`` to be supplied, since the scores must be checked
+                against a known result.
 
         Raises:
-            ValueError: If ``outcome`` is supplied and is not one of 1.0, 0.0 or 0.5.
+            ValueError: If ``outcome`` is supplied and is not one of 1.0, 0.0 or 0.5, if
+                ``scores`` is supplied without ``outcome``, or if ``scores`` is malformed,
+                negative, non-finite, or disagrees with ``outcome``.
         """
         if outcome is not None and outcome not in (1.0, 0.0, 0.5):
             raise ValueError(f"outcome must be one of 1.0, 0.0 or 0.5, got {outcome!r}")
+        if scores is not None and outcome is None:
+            raise ValueError("scores requires an explicit outcome so the two can be checked for agreement")
+        # Validated before any competitor is created or any history is recorded, so a bad
+        # score payload leaves the arena completely unchanged.
+        validated_scores = BaseCompetitor._validate_scores(scores, outcome) if outcome is not None else None
 
         if a not in self.competitors:
             self.competitors[a] = self.base_competitor(**self.base_competitor_kwargs)
@@ -141,26 +157,31 @@ class LambdaArena(BaseArena):
         # Check if the competitor supports time-based ratings
         supports_time = hasattr(self.competitors[a], "_last_activity")
 
+        # Scores are supplied in (a, b) order. The draw and a-wins branches call through
+        # competitor a, so they keep that order; the b-wins branch reverses the call, so the
+        # score pair has to be reversed with it.
+        reversed_scores = None if validated_scores is None else (validated_scores[1], validated_scores[0])
+
         if res is None:
             if supports_time:
                 # type: ignore[call-arg]
-                self.competitors[a].tied(self.competitors[b], match_time=match_time)
+                self.competitors[a].tied(self.competitors[b], match_time=match_time, scores=validated_scores)
             else:
-                self.competitors[a].tied(self.competitors[b])
+                self.competitors[a].tied(self.competitors[b], scores=validated_scores)
             self.history.add_bout(Bout(a, b, predicted_outcome, outcome="tie", attributes=attributes))
         elif res is True:
             if supports_time:
                 # type: ignore[call-arg]
-                self.competitors[a].beat(self.competitors[b], match_time=match_time)
+                self.competitors[a].beat(self.competitors[b], match_time=match_time, scores=validated_scores)
             else:
-                self.competitors[a].beat(self.competitors[b])
+                self.competitors[a].beat(self.competitors[b], scores=validated_scores)
             self.history.add_bout(Bout(a, b, predicted_outcome, outcome="win", attributes=attributes))
         else:
             if supports_time:
                 # type: ignore[call-arg]
-                self.competitors[b].beat(self.competitors[a], match_time=match_time)
+                self.competitors[b].beat(self.competitors[a], match_time=match_time, scores=reversed_scores)
             else:
-                self.competitors[b].beat(self.competitors[a])
+                self.competitors[b].beat(self.competitors[a], scores=reversed_scores)
             self.history.add_bout(Bout(a, b, predicted_outcome, outcome="loss", attributes=attributes))
 
     def expected_score(self, a: Any, b: Any) -> float:

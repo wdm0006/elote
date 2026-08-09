@@ -121,6 +121,41 @@ class TestMasseyKnownValues(unittest.TestCase):
         self.assertAlmostEqual(a.rating, 0.5, places=9)
         self.assertAlmostEqual(b.rating, -0.5, places=9)
 
+    def test_single_game_splits_a_real_margin(self):
+        """With scores supplied, one 35-3 game gives ratings of +16 and -16.
+
+        The structure is identical to the unit-margin case above, only p = (+32, -32)
+        instead of (+1, -1), so a - b = 32 and a + b = 0.
+        """
+        a, b = MasseyCompetitor(), MasseyCompetitor()
+        a.beat(b, scores=(35.0, 3.0))
+
+        self.assertAlmostEqual(a.rating, 16.0, places=9)
+        self.assertAlmostEqual(b.rating, -16.0, places=9)
+
+    def test_three_team_schedule_with_real_margins(self):
+        """A beats B by 21, B beats C by 7.
+
+        Games played: A one, B two, C one; A meets B once and B meets C once:
+
+            M = D - A = [[ 1, -1,  0],
+                         [-1,  2, -1],
+                         [ 0, -1,  1]]
+
+        and p = (+21, -21 + 7, -7) = (+21, -14, -7).  With a + b + c = 0:
+
+            row 1:  a - b = 21
+            row 2:  -a + 2b - c = -14, and c = -a - b, so -a + 2b + a + b = 3b = -14
+                    ->  b = -14/3, a = 21 - 14/3 = 49/3, c = -a - b = -35/3
+        """
+        a, b, c = MasseyCompetitor(), MasseyCompetitor(), MasseyCompetitor()
+        a.beat(b, scores=(28.0, 7.0))
+        b.beat(c, scores=(14.0, 7.0))
+
+        self.assertAlmostEqual(a.rating, 49.0 / 3.0, places=9)
+        self.assertAlmostEqual(b.rating, -14.0 / 3.0, places=9)
+        self.assertAlmostEqual(c.rating, -35.0 / 3.0, places=9)
+
 
 if __name__ == "__main__":
     unittest.main()

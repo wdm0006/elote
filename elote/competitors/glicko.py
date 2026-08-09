@@ -1,5 +1,5 @@
 import math
-from typing import Dict, Any, ClassVar, Tuple, Type, TypeVar, Optional
+from typing import Dict, Any, ClassVar, Sequence, Tuple, Type, TypeVar, Optional
 from datetime import datetime
 
 from elote.competitors.base import BaseCompetitor, InvalidRatingValueException, InvalidParameterException
@@ -307,7 +307,13 @@ class GlickoCompetitor(BaseCompetitor):
         E = 1 / (1 + 10 ** ((-1 * g_term * (self._rating - competitor.rating)) / 400))
         return E
 
-    def beat(self, competitor: "GlickoCompetitor", match_time: Optional[datetime] = None) -> None:
+    def beat(
+        self,
+        competitor: "GlickoCompetitor",
+        match_time: Optional[datetime] = None,
+        *,
+        scores: Optional[Sequence[float]] = None,
+    ) -> None:
         """Update ratings after this competitor has won against the given competitor.
 
         This method updates the ratings of both this competitor and the opponent
@@ -315,16 +321,26 @@ class GlickoCompetitor(BaseCompetitor):
 
         Args:
             competitor (GlickoCompetitor): The opponent competitor that lost.
+            scores (sequence of float, optional): The two scores in caller order,
+                ``(self_score, competitor_score)``. Validated but not otherwise used by
+                this rating system.
             match_time (datetime, optional): The time when the match occurred. Default: current time.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        self._validate_scores(scores, 1.0)
         logger.debug("%s beat %s (time=%s)", self, competitor, match_time)
         self._compute_match_result(competitor, s=1, match_time=match_time)
 
-    def tied(self, competitor: "GlickoCompetitor", match_time: Optional[datetime] = None) -> None:
+    def tied(
+        self,
+        competitor: "GlickoCompetitor",
+        match_time: Optional[datetime] = None,
+        *,
+        scores: Optional[Sequence[float]] = None,
+    ) -> None:
         """Update ratings after this competitor has tied with the given competitor.
 
         This method updates the ratings of both this competitor and the opponent
@@ -332,12 +348,16 @@ class GlickoCompetitor(BaseCompetitor):
 
         Args:
             competitor (GlickoCompetitor): The opponent competitor that tied.
+            scores (sequence of float, optional): The two scores in caller order,
+                ``(self_score, competitor_score)``. Must be equal. Validated but not
+                otherwise used by this rating system.
             match_time (datetime, optional): The time when the match occurred. Default: current time.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        self._validate_scores(scores, 0.5)
         logger.debug("%s tied with %s (time=%s)", self, competitor, match_time)
         self._compute_match_result(competitor, s=0.5, match_time=match_time)
 

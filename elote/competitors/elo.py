@@ -1,4 +1,4 @@
-from typing import Dict, Any, ClassVar, Optional, Type, TypeVar, cast
+from typing import Dict, Any, ClassVar, Optional, Sequence, Type, TypeVar, cast
 
 from elote.competitors.base import BaseCompetitor, InvalidRatingValueException, InvalidParameterException
 from elote.logging import logger  # Import directly from the logging submodule
@@ -267,7 +267,7 @@ class EloCompetitor(BaseCompetitor):
         self.verify_competitor_types(competitor)
         return float(self.transformed_rating / (self.transformed_rating + competitor.transformed_rating))
 
-    def beat(self, competitor: BaseCompetitor) -> None:
+    def beat(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has won against the given competitor.
 
         This method updates the ratings of both this competitor and the opponent
@@ -275,11 +275,15 @@ class EloCompetitor(BaseCompetitor):
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that lost.
+            scores (sequence of float, optional): The two scores in caller order,
+                ``(self_score, competitor_score)``. Validated but not otherwise used by
+                this rating system.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        self._validate_scores(scores, 1.0)
         competitor_elo = cast(EloCompetitor, competitor)
         logger.debug("%s beat %s", self, competitor_elo)
 
@@ -292,7 +296,7 @@ class EloCompetitor(BaseCompetitor):
         self.rating = my_new_rating
         competitor_elo.rating = opponent_new_rating
 
-    def tied(self, competitor: BaseCompetitor) -> None:
+    def tied(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has tied with the given competitor.
 
         This method updates the ratings of both this competitor and the opponent
@@ -300,11 +304,15 @@ class EloCompetitor(BaseCompetitor):
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that tied.
+            scores (sequence of float, optional): The two scores in caller order,
+                ``(self_score, competitor_score)``. Must be equal. Validated but not
+                otherwise used by this rating system.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        self._validate_scores(scores, 0.5)
         competitor_elo = cast(EloCompetitor, competitor)
         logger.debug("%s tied with %s", self, competitor_elo)
 

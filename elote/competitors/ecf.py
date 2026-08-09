@@ -1,4 +1,4 @@
-from typing import Dict, Any, ClassVar, Optional, Type, TypeVar, cast, Deque
+from typing import Dict, Any, ClassVar, Optional, Sequence, Type, TypeVar, cast, Deque
 from collections import deque
 import statistics
 
@@ -338,7 +338,7 @@ class ECFCompetitor(BaseCompetitor):
     def _clamp_opponent_rating(self, own_rating: float, opponent_rating: float) -> float:
         return max(own_rating - self._delta, min(own_rating + self._delta, opponent_rating))
 
-    def beat(self, competitor: BaseCompetitor) -> None:
+    def beat(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has won against the given competitor.
 
         This method updates the ratings of both this competitor and the opponent
@@ -346,11 +346,15 @@ class ECFCompetitor(BaseCompetitor):
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that lost.
+            scores (sequence of float, optional): The two scores in caller order,
+                ``(self_score, competitor_score)``. Validated but not otherwise used by
+                this rating system.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        self._validate_scores(scores, 1.0)
         competitor_ecf = cast(ECFCompetitor, competitor)
         logger.debug("%s beat %s", self, competitor_ecf)
 
@@ -371,7 +375,7 @@ class ECFCompetitor(BaseCompetitor):
         self._update(performance_rating_self)
         competitor_ecf._update(performance_rating_competitor)
 
-    def tied(self, competitor: BaseCompetitor) -> None:
+    def tied(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has tied with the given competitor.
 
         This method updates the ratings of both this competitor and the opponent
@@ -379,11 +383,15 @@ class ECFCompetitor(BaseCompetitor):
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that tied.
+            scores (sequence of float, optional): The two scores in caller order,
+                ``(self_score, competitor_score)``. Must be equal. Validated but not
+                otherwise used by this rating system.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
+        self._validate_scores(scores, 0.5)
         competitor_ecf = cast(ECFCompetitor, competitor)
         logger.debug("%s tied with %s", self, competitor_ecf)
 

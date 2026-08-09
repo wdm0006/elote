@@ -48,20 +48,43 @@ competitors is a logistic function of their rating difference:
 
 with a class-configurable scale :math:`s` (default 2.0).
 
-Unit Margins
------------
+Margins
+-------
 
-.. important::
+``beat`` / ``lost_to`` / ``tied`` accept the common optional ``scores`` payload -- the two
+competitors' scores **in the argument order of the call**. When it is supplied, this is genuine
+margin-of-victory Massey, the form used in college-football rankings, where a 35-3 win counts for
+more than a 7-6 win: the margin a game contributes is ``self_score - competitor_score``.
 
-   Elote implements **unit-margin** Massey. The uniform ``BaseCompetitor`` API exposes only
-   ``beat`` / ``lost_to`` / ``tied`` and has no channel for a score differential, so a win
-   contributes ``+1`` to the winner's cumulative margin and ``-1`` to the loser's, and a draw
-   contributes ``0`` to both while still counting as a game played for each.
+.. code-block:: python
 
-Genuine margin-of-victory Massey -- the form used in college-football rankings, where a 35-3 win
-counts for more than a 7-6 win -- would require carrying a score through the result methods, and is
-not implemented. In practice, unit-margin Massey is a close relative of Colley on a signed scale:
-both use only who beat whom, and neither can be gamed by running up the score.
+    from elote import MasseyCompetitor
+
+    team_a, team_b = MasseyCompetitor(), MasseyCompetitor()
+
+    team_a.beat(team_b, scores=(35, 3))          # +32 for A, -32 for B
+    # The same game recorded from the loser's side -- scores stay in caller order:
+    # team_b.lost_to(team_a, scores=(3, 35))
+
+Through an arena the pair is always given in ``(a, b)`` order, whichever competitor won, together
+with an explicit ``outcome`` so the two can be checked for agreement:
+
+.. code-block:: python
+
+    from elote import LambdaArena, MasseyCompetitor
+
+    arena = LambdaArena(lambda a, b: True, base_competitor=MasseyCompetitor)
+    arena.matchup("Team A", "Team B", outcome=1.0, scores=(35, 3))
+    arena.matchup("Team A", "Team C", outcome=0.0, scores=(7, 24))   # C won, order unchanged
+
+When ``scores`` is omitted the implementation falls back to **unit margins**: a win contributes
+``+1`` to the winner's cumulative margin and ``-1`` to the loser's. A draw contributes ``0`` either
+way -- the payload for a draw must have two equal scores -- while still counting as a game played
+for both. Unit-margin Massey is a close relative of Colley on a signed scale: both use only who
+beat whom, and neither can be gamed by running up the score.
+
+Scores must be non-negative and finite, and must agree with the result being recorded; anything
+else raises ``ValueError`` before either competitor is touched.
 
 Advantages
 ---------
@@ -76,8 +99,9 @@ Limitations
 
 - **Recomputes Globally**: like Colley and Bradley-Terry, each result re-solves the whole connected
   group, which is more expensive than Elo's constant-time update for very large populations.
-- **Unit Margins Only**: see above; the margin channel the classical method uses is not available
-  through the uniform API.
+- **Scores Are Optional**: margin-of-victory Massey needs a score for every game. Where scores are
+  unavailable the fit falls back to unit margins, which discards exactly the information the
+  classical method is built on.
 - **Negative Ratings**: ratings are zero mean, which is unfamiliar next to a 1500-centered chess
   scale (``_minimum_rating`` is therefore ``-inf`` for this system).
 - **Connectivity Needed**: groups of competitors that never play each other cannot be compared, and

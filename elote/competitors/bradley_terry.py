@@ -24,7 +24,7 @@ References:
 """
 
 import math
-from typing import Dict, Any, ClassVar, Type, TypeVar, List, Optional, cast, Set
+from typing import Dict, Any, ClassVar, Type, TypeVar, List, Optional, cast, Set, Sequence
 
 import numpy as np
 
@@ -136,7 +136,7 @@ class BradleyTerryCompetitor(BaseCompetitor):
         other = cast(BradleyTerryCompetitor, competitor)
         return 1.0 / (1.0 + math.exp(-(self._beta - other._beta)))
 
-    def beat(self, competitor: BaseCompetitor) -> None:
+    def beat(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has won against the given competitor.
 
         The result is recorded on both competitors and the strengths of the entire connected
@@ -144,12 +144,16 @@ class BradleyTerryCompetitor(BaseCompetitor):
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that lost.
+            scores (sequence of float, optional): The two scores in caller order,
+                ``(self_score, competitor_score)``. Validated but not otherwise used by
+                this rating system.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         logger.debug("Competitor %s beat %s", self, competitor)
         self.verify_competitor_types(competitor)
+        self._validate_scores(scores, 1.0)
         opponent = cast(BradleyTerryCompetitor, competitor)
 
         self._wins += 1
@@ -163,19 +167,23 @@ class BradleyTerryCompetitor(BaseCompetitor):
         logger.debug("Recorded win for %d, loss for %d", self._id, opponent._id)
         self._recalculate_ratings()
 
-    def tied(self, competitor: BaseCompetitor) -> None:
+    def tied(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has tied with the given competitor.
 
         A tie is counted as half a win for each side.
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that tied.
+            scores (sequence of float, optional): The two scores in caller order,
+                ``(self_score, competitor_score)``. Must be equal. Validated but not
+                otherwise used by this rating system.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         logger.debug("Competitor %s tied with %s", self, competitor)
         self.verify_competitor_types(competitor)
+        self._validate_scores(scores, 0.5)
         opponent = cast(BradleyTerryCompetitor, competitor)
 
         self._ties += 1
@@ -189,18 +197,22 @@ class BradleyTerryCompetitor(BaseCompetitor):
         logger.debug("Recorded tie for %d and %d", self._id, opponent._id)
         self._recalculate_ratings()
 
-    def lost_to(self, competitor: BaseCompetitor) -> None:
+    def lost_to(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has lost to the given competitor.
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that won.
+            scores (sequence of float, optional): The two scores in caller order,
+                ``(self_score, competitor_score)``. Reversed before being passed to the
+                winner's :meth:`beat`.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         logger.debug("Competitor %s lost to %s", self, competitor)
         self.verify_competitor_types(competitor)
-        competitor.beat(self)
+        validated = self._validate_scores(scores, 0.0)
+        competitor.beat(self, scores=None if validated is None else (validated[1], validated[0]))
 
     def _get_connected_competitors(self) -> List["BradleyTerryCompetitor"]:
         """Get all competitors connected to this competitor in the match graph.
