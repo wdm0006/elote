@@ -58,7 +58,9 @@ class Glicko2Competitor(BaseCompetitor):
             initial_rating (float, optional): The initial rating of this competitor. Default: 1500.
             initial_rd (float, optional): The initial rating deviation of this competitor. Default: 350.
             initial_volatility (float, optional): The initial volatility of this competitor. Default: _default_volatility.
-            initial_time (datetime, optional): The initial timestamp for this competitor. Default: current time.
+            initial_time (datetime, optional): The initial timestamp for this competitor. When omitted the
+                competitor has no recorded activity and adopts the time of its first match, so a stream of
+                historical results can be replayed through it.
 
         Raises:
             InvalidRatingValueException: If the initial rating is below the minimum rating.
@@ -93,7 +95,7 @@ class Glicko2Competitor(BaseCompetitor):
 
         # Store match results for rating period and track last activity
         self._match_results: List[_MatchResult] = []
-        self._last_activity = initial_time if initial_time is not None else datetime.now()
+        self._last_activity: Optional[datetime] = initial_time
 
         logger.debug(
             "Initialized Glicko2Competitor: rating=%.1f, rd=%.1f, volatility=%.3f, mu=%.3f, phi=%.3f, time=%s",
@@ -102,7 +104,7 @@ class Glicko2Competitor(BaseCompetitor):
             self._sigma,
             self._mu,
             self._phi,
-            self._last_activity.isoformat(),
+            self._last_activity,
         )
 
     def __repr__(self) -> str:
@@ -145,7 +147,7 @@ class Glicko2Competitor(BaseCompetitor):
             "volatility": self._sigma,
             "mu": self._mu,
             "phi": self._phi,
-            "last_activity": self._last_activity.isoformat(),
+            "last_activity": self._last_activity.isoformat() if self._last_activity is not None else None,
         }
 
     def _import_parameters(self, parameters: Dict[str, Any]) -> None:
@@ -212,9 +214,11 @@ class Glicko2Competitor(BaseCompetitor):
         self._mu = state.get("mu", self._rating_to_mu(rating))
         self._phi = state.get("phi", self._rd_to_phi(rd))
 
-        # Set last activity time
+        # Set last activity time. An explicit null means the competitor has never been active,
+        # while a missing key belongs to a state document written before that was representable.
         if "last_activity" in state:
-            self._last_activity = datetime.fromisoformat(state["last_activity"])
+            last_activity = state["last_activity"]
+            self._last_activity = datetime.fromisoformat(last_activity) if last_activity is not None else None
         else:
             self._last_activity = datetime.now()
             logger.warning(
@@ -322,7 +326,7 @@ class Glicko2Competitor(BaseCompetitor):
         self._mu = self._rating_to_mu(self._initial_rating)
         self._phi = self._rd_to_phi(self._initial_rd)
         self._match_results = []
-        self._last_activity = datetime.now()
+        self._last_activity = None
 
     @property
     def rating(self) -> float:
@@ -503,6 +507,14 @@ class Glicko2Competitor(BaseCompetitor):
             current_time (datetime, optional): The current time to calculate inactivity against.
                 If None, uses the current system time.
         """
+        # A competitor with no recorded activity has nothing to be inactive since. It adopts an
+        # explicitly supplied time as its first activity, and stays inactive otherwise so that a
+        # historical replay is still possible afterwards.
+        if self._last_activity is None:
+            if current_time is not None:
+                self._last_activity = current_time
+            return
+
         if current_time is None:
             current_time = datetime.now()  # type: ignore[unreachable]
 
@@ -735,11 +747,12 @@ class Glicko2Competitor(BaseCompetitor):
         """
         current_time = match_time if match_time is not None else datetime.now()
 
-        # Validate match time is not before last activity
-        if current_time < self._last_activity:
+        # Validate match time is not before last activity. A competitor with no recorded
+        # activity adopts this match's time rather than being compared against it.
+        if self._last_activity is not None and current_time < self._last_activity:
             logger.error("Match time %s is before self last activity %s", current_time, self._last_activity)
             raise InvalidParameterException("Match time cannot be before competitor's last activity time")
-        if current_time < competitor._last_activity:
+        if competitor._last_activity is not None and current_time < competitor._last_activity:
             logger.error("Match time %s is before opponent last activity %s", current_time, competitor._last_activity)
             raise InvalidParameterException("Match time cannot be before opponent's last activity time")
 
