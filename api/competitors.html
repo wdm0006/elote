@@ -689,10 +689,14 @@ _rating_period_days (float): Number of days that constitute one rating period.</
 </dd>
 </dl>
 <p>Initialize a Glicko competitor.</p>
-<dl class="simple">
+<dl>
 <dt>Args:</dt><dd><p>initial_rating (float, optional): The initial rating of this competitor. Default: 1500.
 initial_rd (float, optional): The initial rating deviation of this competitor. Default: 350.
-initial_time (datetime, optional): The initial timestamp for this competitor. Default: current time.</p>
+initial_time (datetime, optional): The initial timestamp for this competitor. When omitted the</p>
+<blockquote>
+<div><p>competitor has no recorded activity and adopts the time of its first match, so a stream of
+historical results can be replayed through it.</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>InvalidRatingValueException: If the initial rating is below the minimum rating.
 InvalidParameterException: If the initial RD is not positive.</p>
@@ -702,10 +706,14 @@ InvalidParameterException: If the initial RD is not positive.</p>
 <dt class="sig sig-object py" id="elote.competitors.glicko.GlickoCompetitor.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_rd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">350</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/competitors/glicko.html#GlickoCompetitor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.__init__" title="Link to this definition">¶</a></dt>
 <dd><p>Initialize a Glicko competitor.</p>
-<dl class="simple">
+<dl>
 <dt>Args:</dt><dd><p>initial_rating (float, optional): The initial rating of this competitor. Default: 1500.
 initial_rd (float, optional): The initial rating deviation of this competitor. Default: 350.
-initial_time (datetime, optional): The initial timestamp for this competitor. Default: current time.</p>
+initial_time (datetime, optional): The initial timestamp for this competitor. When omitted the</p>
+<blockquote>
+<div><p>competitor has no recorded activity and adopts the time of its first match, so a stream of
+historical results can be replayed through it.</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>InvalidRatingValueException: If the initial rating is below the minimum rating.
 InvalidParameterException: If the initial RD is not positive.</p>
@@ -840,7 +848,7 @@ s (float): The score of this competitor (1 for win, 0.5 for draw, 0 for loss).</
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.glicko.GlickoCompetitor.update_rd_for_inactivity">
-<span class="sig-name descname"><span class="pre">update_rd_for_inactivity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko.html#GlickoCompetitor.update_rd_for_inactivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.update_rd_for_inactivity" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">update_rd_for_inactivity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko.html#GlickoCompetitor.update_rd_for_inactivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.update_rd_for_inactivity" title="Link to this definition">¶</a></dt>
 <dd><p>Update the rating deviation based on time elapsed since last activity.</p>
 <p>This implements Glickman’s formula for increasing uncertainty in ratings
 over time when a player is inactive. The RD increase is controlled by the _c parameter
@@ -883,11 +891,15 @@ _rating_period_days (float): Number of days that constitute one rating period. D
 </dd>
 </dl>
 <p>Initialize a Glicko-2 competitor.</p>
-<dl class="simple">
+<dl>
 <dt>Args:</dt><dd><p>initial_rating (float, optional): The initial rating of this competitor. Default: 1500.
 initial_rd (float, optional): The initial rating deviation of this competitor. Default: 350.
 initial_volatility (float, optional): The initial volatility of this competitor. Default: _default_volatility.
-initial_time (datetime, optional): The initial timestamp for this competitor. Default: current time.</p>
+initial_time (datetime, optional): The initial timestamp for this competitor. When omitted the</p>
+<blockquote>
+<div><p>competitor has no recorded activity and adopts the time of its first match, so a stream of
+historical results can be replayed through it.</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>InvalidRatingValueException: If the initial rating is below the minimum rating.
 InvalidParameterException: If the initial RD is not positive or if the initial volatility is not positive.</p>
@@ -897,11 +909,15 @@ InvalidParameterException: If the initial RD is not positive or if the initial v
 <dt class="sig sig-object py" id="elote.competitors.glicko2.Glicko2Competitor.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_rd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">350</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_volatility</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/competitors/glicko2.html#Glicko2Competitor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko2.Glicko2Competitor.__init__" title="Link to this definition">¶</a></dt>
 <dd><p>Initialize a Glicko-2 competitor.</p>
-<dl class="simple">
+<dl>
 <dt>Args:</dt><dd><p>initial_rating (float, optional): The initial rating of this competitor. Default: 1500.
 initial_rd (float, optional): The initial rating deviation of this competitor. Default: 350.
 initial_volatility (float, optional): The initial volatility of this competitor. Default: _default_volatility.
-initial_time (datetime, optional): The initial timestamp for this competitor. Default: current time.</p>
+initial_time (datetime, optional): The initial timestamp for this competitor. When omitted the</p>
+<blockquote>
+<div><p>competitor has no recorded activity and adopts the time of its first match, so a stream of
+historical results can be replayed through it.</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>InvalidRatingValueException: If the initial rating is below the minimum rating.
 InvalidParameterException: If the initial RD is not positive or if the initial volatility is not positive.</p>

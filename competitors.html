@@ -328,10 +328,14 @@ _rating_period_days (float): Number of days that constitute one rating period.</
 </dd>
 </dl>
 <p>Initialize a Glicko competitor.</p>
-<dl class="simple">
+<dl>
 <dt>Args:</dt><dd><p>initial_rating (float, optional): The initial rating of this competitor. Default: 1500.
 initial_rd (float, optional): The initial rating deviation of this competitor. Default: 350.
-initial_time (datetime, optional): The initial timestamp for this competitor. Default: current time.</p>
+initial_time (datetime, optional): The initial timestamp for this competitor. When omitted the</p>
+<blockquote>
+<div><p>competitor has no recorded activity and adopts the time of its first match, so a stream of
+historical results can be replayed through it.</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>InvalidRatingValueException: If the initial rating is below the minimum rating.
 InvalidParameterException: If the initial RD is not positive.</p>
@@ -467,11 +471,15 @@ _rating_period_days (float): Number of days that constitute one rating period. D
 </dd>
 </dl>
 <p>Initialize a Glicko-2 competitor.</p>
-<dl class="simple">
+<dl>
 <dt>Args:</dt><dd><p>initial_rating (float, optional): The initial rating of this competitor. Default: 1500.
 initial_rd (float, optional): The initial rating deviation of this competitor. Default: 350.
 initial_volatility (float, optional): The initial volatility of this competitor. Default: _default_volatility.
-initial_time (datetime, optional): The initial timestamp for this competitor. Default: current time.</p>
+initial_time (datetime, optional): The initial timestamp for this competitor. When omitted the</p>
+<blockquote>
+<div><p>competitor has no recorded activity and adopts the time of its first match, so a stream of
+historical results can be replayed through it.</p>
+</div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>InvalidRatingValueException: If the initial rating is below the minimum rating.
 InvalidParameterException: If the initial RD is not positive or if the initial volatility is not positive.</p>

@@ -238,7 +238,9 @@
 <span class="sd">            initial_rating (float, optional): The initial rating of this competitor. Default: 1500.</span>
 <span class="sd">            initial_rd (float, optional): The initial rating deviation of this competitor. Default: 350.</span>
 <span class="sd">            initial_volatility (float, optional): The initial volatility of this competitor. Default: _default_volatility.</span>
-<span class="sd">            initial_time (datetime, optional): The initial timestamp for this competitor. Default: current time.</span>
+<span class="sd">            initial_time (datetime, optional): The initial timestamp for this competitor. When omitted the</span>
+<span class="sd">                competitor has no recorded activity and adopts the time of its first match, so a stream of</span>
+<span class="sd">                historical results can be replayed through it.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidRatingValueException: If the initial rating is below the minimum rating.</span>
@@ -273,7 +275,7 @@
 
         <span class="c1"># Store match results for rating period and track last activity</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_match_results</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">_MatchResult</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="n">initial_time</span> <span class="k">if</span> <span class="n">initial_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_time</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
             <span class="s2">&quot;Initialized Glicko2Competitor: rating=</span><span class="si">%.1f</span><span class="s2">, rd=</span><span class="si">%.1f</span><span class="s2">, volatility=</span><span class="si">%.3f</span><span class="s2">, mu=</span><span class="si">%.3f</span><span class="s2">, phi=</span><span class="si">%.3f</span><span class="s2">, time=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
@@ -282,7 +284,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_phi</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
@@ -326,7 +328,7 @@
             <span class="s2">&quot;volatility&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="p">,</span>
             <span class="s2">&quot;mu&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span>
             <span class="s2">&quot;phi&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phi</span><span class="p">,</span>
-            <span class="s2">&quot;last_activity&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+            <span class="s2">&quot;last_activity&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_import_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -393,9 +395,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mu&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating_to_mu</span><span class="p">(</span><span class="n">rating</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_phi</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;phi&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rd_to_phi</span><span class="p">(</span><span class="n">rd</span><span class="p">))</span>
 
-        <span class="c1"># Set last activity time</span>
+        <span class="c1"># Set last activity time. An explicit null means the competitor has never been active,</span>
+        <span class="c1"># while a missing key belongs to a state document written before that was representable.</span>
         <span class="k">if</span> <span class="s2">&quot;last_activity&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s2">&quot;last_activity&quot;</span><span class="p">])</span>
+            <span class="n">last_activity</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;last_activity&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">last_activity</span><span class="p">)</span> <span class="k">if</span> <span class="n">last_activity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
@@ -511,7 +515,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating_to_mu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_phi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rd_to_phi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_initial_rd</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_match_results</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 
     <span class="nd">@property</span>
@@ -698,6 +702,14 @@
 <span class="sd">            current_time (datetime, optional): The current time to calculate inactivity against.</span>
 <span class="sd">                If None, uses the current system time.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># A competitor with no recorded activity has nothing to be inactive since. It adopts an</span>
+        <span class="c1"># explicitly supplied time as its first activity, and stays inactive otherwise so that a</span>
+        <span class="c1"># historical replay is still possible afterwards.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">current_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="n">current_time</span>
+            <span class="k">return</span>
+
         <span class="k">if</span> <span class="n">current_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">current_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>  <span class="c1"># type: ignore[unreachable]</span>
 
@@ -940,11 +952,12 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">current_time</span> <span class="o">=</span> <span class="n">match_time</span> <span class="k">if</span> <span class="n">match_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
 
-        <span class="c1"># Validate match time is not before last activity</span>
-        <span class="k">if</span> <span class="n">current_time</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">:</span>
+        <span class="c1"># Validate match time is not before last activity. A competitor with no recorded</span>
+        <span class="c1"># activity adopts this match&#39;s time rather than being compared against it.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">current_time</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Match time </span><span class="si">%s</span><span class="s2"> is before self last activity </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">current_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Match time cannot be before competitor&#39;s last activity time&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">current_time</span> <span class="o">&lt;</span> <span class="n">competitor</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">competitor</span><span class="o">.</span><span class="n">_last_activity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">current_time</span> <span class="o">&lt;</span> <span class="n">competitor</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Match time </span><span class="si">%s</span><span class="s2"> is before opponent last activity </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">current_time</span><span class="p">,</span> <span class="n">competitor</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Match time cannot be before opponent&#39;s last activity time&quot;</span><span class="p">)</span>
 
