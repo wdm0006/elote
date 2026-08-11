@@ -1,4 +1,6 @@
 import unittest
+from datetime import datetime, timedelta
+
 from elote import Glicko2Competitor
 from elote.competitors.base import (
     MissMatchedCompetitorTypesException,
@@ -152,8 +154,14 @@ class TestGlicko2(unittest.TestCase):
         # Check that the ratings have changed
         self.assertNotEqual(player1.rating, pre_match_rating1)
 
-        # Test that update_ratings with no matches increases RD
-        player3 = Glicko2Competitor(initial_rating=1800, initial_rd=100, initial_volatility=0.06)
+        # Test that update_ratings with no matches increases RD over the elapsed time. The
+        # competitor needs a recorded prior activity for there to be an elapsed period at all.
+        player3 = Glicko2Competitor(
+            initial_rating=1800,
+            initial_rd=100,
+            initial_volatility=0.06,
+            initial_time=datetime.now() - timedelta(days=10),
+        )
         initial_rd = player3.rd
         player3.update_ratings()  # No matches, should increase RD
         self.assertGreater(player3.rd, initial_rd)

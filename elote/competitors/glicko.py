@@ -37,7 +37,9 @@ class GlickoCompetitor(BaseCompetitor):
         Args:
             initial_rating (float, optional): The initial rating of this competitor. Default: 1500.
             initial_rd (float, optional): The initial rating deviation of this competitor. Default: 350.
-            initial_time (datetime, optional): The initial timestamp for this competitor. Default: current time.
+            initial_time (datetime, optional): The initial timestamp for this competitor. When omitted the
+                competitor has no recorded activity and adopts the time of its first match, so a stream of
+                historical results can be replayed through it.
 
         Raises:
             InvalidRatingValueException: If the initial rating is below the minimum rating.
@@ -56,12 +58,12 @@ class GlickoCompetitor(BaseCompetitor):
         self._initial_rd = initial_rd
         self._rating = initial_rating
         self.rd = initial_rd
-        self._last_activity = initial_time if initial_time is not None else datetime.now()
+        self._last_activity: Optional[datetime] = initial_time
         logger.debug(
             "Initialized GlickoCompetitor with rating=%.1f, rd=%.1f, time=%s",
             self._initial_rating,
             self._initial_rd,
-            self._last_activity.isoformat(),
+            self._last_activity,
         )
 
     def __repr__(self) -> str:
@@ -100,7 +102,7 @@ class GlickoCompetitor(BaseCompetitor):
         return {
             "rating": self._rating,
             "rd": self.rd,
-            "last_activity": self._last_activity.isoformat(),
+            "last_activity": self._last_activity.isoformat() if self._last_activity is not None else None,
         }
 
     def _import_parameters(self, parameters: Dict[str, Any]) -> None:
@@ -151,9 +153,11 @@ class GlickoCompetitor(BaseCompetitor):
             raise InvalidParameterException("RD must be positive")
         self.rd = rd
 
-        # Set last activity time
+        # Set last activity time. An explicit null means the competitor has never been active,
+        # while a missing key belongs to a state document written before that was representable.
         if "last_activity" in state:
-            self._last_activity = datetime.fromisoformat(state["last_activity"])
+            last_activity = state["last_activity"]
+            self._last_activity = datetime.fromisoformat(last_activity) if last_activity is not None else None
         else:
             self._last_activity = datetime.now()
             logger.warning(
@@ -238,7 +242,7 @@ class GlickoCompetitor(BaseCompetitor):
         )
         self._rating = self._initial_rating
         self.rd = self._initial_rd
-        self._last_activity = datetime.now()
+        self._last_activity = None
 
     @property
     def rating(self) -> float:
@@ -379,11 +383,12 @@ class GlickoCompetitor(BaseCompetitor):
         current_time = match_time if match_time is not None else datetime.now()
 
         logger.debug("Computing match result for %s vs %s (score=%.1f, time=%s)", self, competitor, s, current_time)
-        # Validate match time is not before last activity
-        if current_time < self._last_activity:
+        # Validate match time is not before last activity. A competitor with no recorded
+        # activity adopts this match's time rather than being compared against it.
+        if self._last_activity is not None and current_time < self._last_activity:
             logger.error("Match time %s is before self last activity %s", current_time, self._last_activity)
             raise InvalidParameterException("Match time cannot be before competitor's last activity time")
-        if current_time < competitor._last_activity:
+        if competitor._last_activity is not None and current_time < competitor._last_activity:
             logger.error("Match time %s is before opponent last activity %s", current_time, competitor._last_activity)
             raise InvalidParameterException("Match time cannot be before opponent's last activity time")
 
@@ -444,7 +449,7 @@ class GlickoCompetitor(BaseCompetitor):
         logger.debug("Calculated new RD for %s: %.1f", self, s_new_rd)
         return s_new_r, s_new_rd
 
-    def update_rd_for_inactivity(self, current_time: datetime = None) -> None:
+    def update_rd_for_inactivity(self, current_time: Optional[datetime] = None) -> None:
         """Update the rating deviation based on time elapsed since last activity.
 
         This implements Glickman's formula for increasing uncertainty in ratings
@@ -455,6 +460,14 @@ class GlickoCompetitor(BaseCompetitor):
             current_time (datetime, optional): The current time to calculate inactivity against.
                 If None, uses the current system time.
         """
+        # A competitor with no recorded activity has nothing to be inactive since. It adopts an
+        # explicitly supplied time as its first activity, and stays inactive otherwise so that a
+        # historical replay is still possible afterwards.
+        if self._last_activity is None:
+            if current_time is not None:
+                self._last_activity = current_time
+            return
+
         if current_time is None:
             current_time = datetime.now()
 
