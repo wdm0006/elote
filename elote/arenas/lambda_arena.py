@@ -188,6 +188,8 @@ class LambdaArena(BaseArena):
         """Calculate the expected score for a matchup between two competitors.
 
         This method returns the probability that competitor a will beat competitor b.
+        It is a read: an identifier the arena has not seen is scored as an unrated
+        competitor without being added to the population.
 
         Args:
             a: The first competitor or competitor identifier.
@@ -196,12 +198,18 @@ class LambdaArena(BaseArena):
         Returns:
             float: The probability that a will beat b (between 0 and 1).
         """
-        if a not in self.competitors:
-            self.competitors[a] = self.base_competitor(**self.base_competitor_kwargs)
-        if b not in self.competitors:
-            self.competitors[b] = self.base_competitor(**self.base_competitor_kwargs)
+        return self._competitor_for_prediction(a).expected_score(self._competitor_for_prediction(b))
 
-        return self.competitors[a].expected_score(self.competitors[b])
+    def _competitor_for_prediction(self, id_val: Any) -> BaseCompetitor:
+        """Return the competitor for an identifier without adding it to the population."""
+        if id_val in self.competitors:
+            return self.competitors[id_val]
+        logger.warning(
+            "Competitor '%s' is not in this arena; predicting with an unrated competitor "
+            "without adding it to the population.",
+            id_val,
+        )
+        return self.base_competitor(**self.base_competitor_kwargs)
 
     def export_state(self) -> Dict[Any, Dict[str, Any]]:
         """Export the current state of this arena for serialization.
