@@ -388,6 +388,50 @@ class TestArenaStateRoundTrip(unittest.TestCase):
 
                 self.assertEqual(self._ratings(arena), self._ratings(restored))
 
+    def test_global_fit_ratings_remain_valid_after_restored_play(self):
+        """Restored graph-based fits must use only results in the rebuilt graph."""
+        for competitor_cls in (ColleyMatrixCompetitor, MasseyCompetitor):
+            with self.subTest(competitor=competitor_cls.__name__):
+                arena = self._trained_arena(competitor_cls)
+                state = json.loads(json.dumps(arena.export_state()))
+                restored = LambdaArena(lambda a, b: a > b, base_competitor=competitor_cls, initial_state=state)
+                fresh = LambdaArena(lambda a, b: a > b, base_competitor=competitor_cls)
+
+                for a, b in self._matchups(seed=2, count=30):
+                    restored.matchup(a, b)
+                    fresh.matchup(a, b)
+
+                restored_ratings = self._ratings(restored)
+                fresh_ratings = self._ratings(fresh)
+                self.assertEqual(restored_ratings, fresh_ratings)
+
+                ratings = list(restored_ratings.values())
+                if competitor_cls is ColleyMatrixCompetitor:
+                    self.assertTrue(all(0.0 <= rating <= 1.0 for rating in ratings))
+                    self.assertAlmostEqual(sum(ratings), len(ratings) / 2, places=12)
+                else:
+                    self.assertAlmostEqual(sum(ratings) / len(ratings), 0.0, places=12)
+
+    def test_colley_restore_paths_rebuild_fit_from_new_results(self):
+        """Both Colley restore APIs must discard the old graph's fit inputs."""
+        first, second = ColleyMatrixCompetitor(), ColleyMatrixCompetitor()
+        for _ in range(10):
+            first.beat(second)
+        states = [json.loads(json.dumps(comp.export_state())) for comp in (first, second)]
+
+        for restore_method in ("from_state", "import_state"):
+            with self.subTest(restore_method=restore_method):
+                if restore_method == "from_state":
+                    restored = [ColleyMatrixCompetitor.from_state(state) for state in states]
+                else:
+                    restored = [ColleyMatrixCompetitor(), ColleyMatrixCompetitor()]
+                    for comp, state in zip(restored, states, strict=True):
+                        comp.import_state(state)
+
+                restored[0].beat(restored[1])
+                self.assertAlmostEqual(restored[0].rating, 0.625)
+                self.assertAlmostEqual(restored[1].rating, 0.375)
+
     def test_plain_constructor_kwargs_are_still_supported(self):
         """The pre-existing kwargs form of initial_state must keep working."""
         arena = LambdaArena(

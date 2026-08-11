@@ -93,6 +93,7 @@ class MasseyCompetitor(BaseCompetitor):
         # ``self_score - opponent_score`` over every game played.
         self._point_differential = 0.0
         self._opponents: Dict["MasseyCompetitor", int] = {}  # Opponent -> num games
+        self._margins_for: Dict["MasseyCompetitor", float] = {}
         # Unique ID for hashing (instances are used as dict keys in the match graph).
         self._id = id(self)
         logger.debug("Initialized MasseyCompetitor %d with initial rating %.3f", self._id, self._initial_rating)
@@ -179,10 +180,12 @@ class MasseyCompetitor(BaseCompetitor):
         self._wins += 1
         self._point_differential += margin
         self._opponents[opponent] = self._opponents.get(opponent, 0) + 1
+        self._margins_for[opponent] = self._margins_for.get(opponent, 0.0) + margin
 
         opponent._losses += 1
         opponent._point_differential -= margin
         opponent._opponents[self] = opponent._opponents.get(self, 0) + 1
+        opponent._margins_for[self] = opponent._margins_for.get(self, 0.0) - margin
 
         logger.debug("Recorded win for %d, loss for %d", self._id, opponent._id)
         self._recalculate_ratings()
@@ -209,9 +212,11 @@ class MasseyCompetitor(BaseCompetitor):
 
         self._ties += 1
         self._opponents[opponent] = self._opponents.get(opponent, 0) + 1
+        self._margins_for.setdefault(opponent, 0.0)
 
         opponent._ties += 1
         opponent._opponents[self] = opponent._opponents.get(self, 0) + 1
+        opponent._margins_for.setdefault(self, 0.0)
 
         logger.debug("Recorded tie for %d and %d", self._id, opponent._id)
         self._recalculate_ratings()
@@ -274,8 +279,8 @@ class MasseyCompetitor(BaseCompetitor):
         M = np.zeros((n, n), dtype=np.float64)
         p = np.zeros(n, dtype=np.float64)
         for i, comp in enumerate(competitors):
-            M[i, i] = comp.num_games
-            p[i] = comp._point_differential
+            M[i, i] = sum(comp._opponents.values())
+            p[i] = sum(comp._margins_for.values())
             for opponent, games in comp._opponents.items():
                 j = idx.get(opponent)
                 if j is not None:
@@ -366,6 +371,7 @@ class MasseyCompetitor(BaseCompetitor):
         self._ties = state.get("ties", 0)
         self._point_differential = state.get("point_differential", float(self._wins - self._losses))
         self._opponents = {}
+        self._margins_for = {}
 
     @classmethod
     def _create_from_parameters(cls: Type[T], parameters: Dict[str, Any]) -> T:
@@ -388,6 +394,7 @@ class MasseyCompetitor(BaseCompetitor):
         self._ties = 0
         self._point_differential = 0.0
         self._opponents = {}
+        self._margins_for = {}
 
     @classmethod
     def configure_class(cls, **kwargs: Any) -> None:
