@@ -61,7 +61,7 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         self._losses = 0
         self._ties = 0
         self._opponents: Dict["ColleyMatrixCompetitor", int] = {}  # Opponent -> num games
-        self._head_to_head: Dict["ColleyMatrixCompetitor", int] = {}  # Opponent -> wins against
+        self._head_to_head: Dict["ColleyMatrixCompetitor", float] = {}  # Opponent -> wins against
         # Add a unique ID for hashing
         self._id = id(self)
         logger.debug("Initialized ColleyMatrixCompetitor %d with initial rating %.3f", self._id, self._initial_rating)
@@ -171,11 +171,13 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         # Record the tie for this competitor
         self._ties += 1
         self._opponents[competitor] = self._opponents.get(competitor, 0) + 1
+        self._head_to_head[competitor] = self._head_to_head.get(competitor, 0) + 0.5
 
         # Record the tie for the opponent
         competitor_typed = competitor_colley
         competitor_typed._ties += 1
         competitor_typed._opponents[self] = competitor_typed._opponents.get(self, 0) + 1
+        competitor_typed._head_to_head[self] = competitor_typed._head_to_head.get(self, 0) + 0.5
 
         logger.debug("Recorded tie for %d and %d", self._id, competitor_typed._id)
         # Recalculate ratings for all connected competitors
@@ -253,15 +255,14 @@ class ColleyMatrixCompetitor(BaseCompetitor):
 
         # Fill the matrix and vector more efficiently
         for i, comp_i in enumerate(competitors):
-            total_games_i = comp_i.num_games
+            total_games_i = sum(comp_i._opponents.values())
             
             # Set diagonal element: 2 + total_games
             C[i, i] = 2 + total_games_i
             
             # Set off-diagonal elements and calculate b[i] in one pass
-            wins_i = comp_i._wins
-            losses_i = comp_i._losses
-            b[i] = 1 + (wins_i - losses_i) / 2
+            head_to_head_wins_i = sum(comp_i._head_to_head.values())
+            b[i] = 1 + (2 * head_to_head_wins_i - total_games_i) / 2
 
             # Fill off-diagonal elements for opponents
             for opponent, games_vs_opponent in comp_i._opponents.items():
@@ -432,6 +433,7 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         self._losses = state.get("losses", 0)
         self._ties = state.get("ties", 0)
         self._opponents = {}  # Cannot restore opponent references from serialization
+        self._head_to_head = {}
 
     @classmethod
     def from_state(cls: Type[T], state: Dict[str, Any]) -> T:
@@ -479,6 +481,8 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         competitor._wins = state.get("wins", 0)
         competitor._losses = state.get("losses", 0)
         competitor._ties = state.get("ties", 0)
+        competitor._opponents = {}
+        competitor._head_to_head = {}
 
         # Note: We can't restore the opponent list from state
         # This would require reconstructing the entire match history
