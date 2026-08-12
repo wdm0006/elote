@@ -241,7 +241,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">&quot;ColleyMatrixCompetitor&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Opponent -&gt; num games</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_head_to_head</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">&quot;ColleyMatrixCompetitor&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Opponent -&gt; wins against</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_head_to_head</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">&quot;ColleyMatrixCompetitor&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Opponent -&gt; wins against</span>
         <span class="c1"># Add a unique ID for hashing</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Initialized ColleyMatrixCompetitor </span><span class="si">%d</span><span class="s2"> with initial rating </span><span class="si">%.3f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">)</span></div>
@@ -360,11 +360,13 @@
         <span class="c1"># Record the tie for this competitor</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span><span class="p">[</span><span class="n">competitor</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">competitor</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_head_to_head</span><span class="p">[</span><span class="n">competitor</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_head_to_head</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">competitor</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span>
 
         <span class="c1"># Record the tie for the opponent</span>
         <span class="n">competitor_typed</span> <span class="o">=</span> <span class="n">competitor_colley</span>
         <span class="n">competitor_typed</span><span class="o">.</span><span class="n">_ties</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="n">competitor_typed</span><span class="o">.</span><span class="n">_opponents</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="n">competitor_typed</span><span class="o">.</span><span class="n">_opponents</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">competitor_typed</span><span class="o">.</span><span class="n">_head_to_head</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="n">competitor_typed</span><span class="o">.</span><span class="n">_head_to_head</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Recorded tie for </span><span class="si">%d</span><span class="s2"> and </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">competitor_typed</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
         <span class="c1"># Recalculate ratings for all connected competitors</span>
@@ -446,15 +448,14 @@
 
         <span class="c1"># Fill the matrix and vector more efficiently</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">comp_i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">competitors</span><span class="p">):</span>
-            <span class="n">total_games_i</span> <span class="o">=</span> <span class="n">comp_i</span><span class="o">.</span><span class="n">num_games</span>
+            <span class="n">total_games_i</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">comp_i</span><span class="o">.</span><span class="n">_opponents</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
             
             <span class="c1"># Set diagonal element: 2 + total_games</span>
             <span class="n">C</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">total_games_i</span>
             
             <span class="c1"># Set off-diagonal elements and calculate b[i] in one pass</span>
-            <span class="n">wins_i</span> <span class="o">=</span> <span class="n">comp_i</span><span class="o">.</span><span class="n">_wins</span>
-            <span class="n">losses_i</span> <span class="o">=</span> <span class="n">comp_i</span><span class="o">.</span><span class="n">_losses</span>
-            <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">wins_i</span> <span class="o">-</span> <span class="n">losses_i</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="n">head_to_head_wins_i</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">comp_i</span><span class="o">.</span><span class="n">_head_to_head</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+            <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">head_to_head_wins_i</span> <span class="o">-</span> <span class="n">total_games_i</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
 
             <span class="c1"># Fill off-diagonal elements for opponents</span>
             <span class="k">for</span> <span class="n">opponent</span><span class="p">,</span> <span class="n">games_vs_opponent</span> <span class="ow">in</span> <span class="n">comp_i</span><span class="o">.</span><span class="n">_opponents</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -628,6 +629,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;losses&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ties&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Cannot restore opponent references from serialization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_head_to_head</span> <span class="o">=</span> <span class="p">{}</span>
 
 <div class="viewcode-block" id="ColleyMatrixCompetitor.from_state">
 <a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.colley.ColleyMatrixCompetitor.from_state">[docs]</a>
@@ -677,6 +679,8 @@
         <span class="n">competitor</span><span class="o">.</span><span class="n">_wins</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;wins&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">competitor</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;losses&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">competitor</span><span class="o">.</span><span class="n">_ties</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ties&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">competitor</span><span class="o">.</span><span class="n">_opponents</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">competitor</span><span class="o">.</span><span class="n">_head_to_head</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="c1"># Note: We can&#39;t restore the opponent list from state</span>
         <span class="c1"># This would require reconstructing the entire match history</span>
