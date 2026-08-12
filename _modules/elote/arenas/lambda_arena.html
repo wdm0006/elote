@@ -485,6 +485,9 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate the performance of the competitors based on a list of evaluation bouts.</span>
 
+<span class="sd">        Bouts naming a competitor the arena has not seen are skipped: evaluation never</span>
+<span class="sd">        adds to the population, so unknown identifiers contribute no prediction.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            eval_bouts (list): A list of (competitor_a, competitor_b, outcome) tuples.</span>
 <span class="sd">            progress_bar (bool, optional): Whether to display a progress bar.</span>
@@ -494,20 +497,22 @@
         <span class="n">skipped_bouts</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Evaluating performance using </span><span class="si">%d</span><span class="s2"> bouts&quot;</span><span class="p">,</span> <span class="n">total_bouts</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">outcome</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">iterator</span><span class="p">):</span>
-            <span class="c1"># Get or create competitors</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">c_a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_competitor</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-                <span class="n">c_b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_competitor</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="c1"># If a competitor is not found, skip this bout</span>
+            <span class="c1"># Evaluation is a read: an identifier the arena never trained on has no</span>
+            <span class="c1"># rating to evaluate, so the bout is skipped rather than scored against a</span>
+            <span class="c1"># freshly defaulted competitor.</span>
+            <span class="n">unknown</span> <span class="o">=</span> <span class="n">a</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span> <span class="k">else</span> <span class="p">(</span><span class="n">b</span> <span class="k">if</span> <span class="n">b</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">unknown</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">skipped_bouts</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                     <span class="s2">&quot;Skipping evaluation bout </span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">: Competitor &#39;</span><span class="si">%s</span><span class="s2">&#39; not found in training history.&quot;</span><span class="p">,</span>
                     <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
                     <span class="n">total_bouts</span><span class="p">,</span>
-                    <span class="n">e</span><span class="p">,</span>
+                    <span class="n">unknown</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="k">continue</span>
+
+            <span class="n">c_a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">]</span>
+            <span class="n">c_b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">]</span>
 
             <span class="c1"># Skip bouts where the actual outcome is None</span>
             <span class="k">if</span> <span class="n">outcome</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -533,6 +538,9 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validation_bouts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]]],</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a validation set through the arena without updating ratings, only recording predictions.</span>
 
+<span class="sd">        Bouts naming a competitor the arena has not seen are skipped: validation never</span>
+<span class="sd">        adds to the population, so unknown identifiers contribute no prediction.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            validation_bouts (list): A list of (competitor_a, competitor_b, outcome) tuples.</span>
 <span class="sd">            progress_bar (bool, optional): Whether to display a progress bar.</span>
@@ -542,20 +550,22 @@
         <span class="n">skipped_bouts</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Validating model using </span><span class="si">%d</span><span class="s2"> bouts&quot;</span><span class="p">,</span> <span class="n">total_bouts</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">outcome</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">iterator</span><span class="p">):</span>
-            <span class="c1"># Get or create competitors</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">c_a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_competitor</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-                <span class="n">c_b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_competitor</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="c1"># If a competitor is not found, skip this bout</span>
+            <span class="c1"># Validation is a read: an identifier the arena never trained on has no</span>
+            <span class="c1"># rating to validate, so the bout is skipped rather than scored against a</span>
+            <span class="c1"># freshly defaulted competitor.</span>
+            <span class="n">unknown</span> <span class="o">=</span> <span class="n">a</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span> <span class="k">else</span> <span class="p">(</span><span class="n">b</span> <span class="k">if</span> <span class="n">b</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">unknown</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">skipped_bouts</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                     <span class="s2">&quot;Skipping validation bout </span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">: Competitor &#39;</span><span class="si">%s</span><span class="s2">&#39; not found in training history.&quot;</span><span class="p">,</span>
                     <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
                     <span class="n">total_bouts</span><span class="p">,</span>
-                    <span class="n">e</span><span class="p">,</span>
+                    <span class="n">unknown</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="k">continue</span>
+
+            <span class="n">c_a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">]</span>
+            <span class="n">c_b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">]</span>
 
             <span class="c1"># Skip bouts where the actual outcome is None</span>
             <span class="k">if</span> <span class="n">outcome</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
