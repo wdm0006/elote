@@ -278,6 +278,9 @@ class LambdaArena(BaseArena):
     ) -> None:
         """Evaluate the performance of the competitors based on a list of evaluation bouts.
 
+        Bouts naming a competitor the arena has not seen are skipped: evaluation never
+        adds to the population, so unknown identifiers contribute no prediction.
+
         Args:
             eval_bouts (list): A list of (competitor_a, competitor_b, outcome) tuples.
             progress_bar (bool, optional): Whether to display a progress bar.
@@ -287,20 +290,22 @@ class LambdaArena(BaseArena):
         skipped_bouts = 0
         logger.info("Evaluating performance using %d bouts", total_bouts)
         for i, (a, b, outcome) in enumerate(iterator):
-            # Get or create competitors
-            try:
-                c_a = self._get_or_create_competitor(a)
-                c_b = self._get_or_create_competitor(b)
-            except KeyError as e:
-                # If a competitor is not found, skip this bout
+            # Evaluation is a read: an identifier the arena never trained on has no
+            # rating to evaluate, so the bout is skipped rather than scored against a
+            # freshly defaulted competitor.
+            unknown = a if a not in self.competitors else (b if b not in self.competitors else None)
+            if unknown is not None:
                 skipped_bouts += 1
                 logger.warning(
                     "Skipping evaluation bout %d/%d: Competitor '%s' not found in training history.",
                     i + 1,
                     total_bouts,
-                    e,
+                    unknown,
                 )
                 continue
+
+            c_a = self.competitors[a]
+            c_b = self.competitors[b]
 
             # Skip bouts where the actual outcome is None
             if outcome is None:
@@ -323,6 +328,9 @@ class LambdaArena(BaseArena):
     def validate(self, validation_bouts: List[Tuple[str, str, Optional[float]]], progress_bar: bool = True) -> None:
         """Run a validation set through the arena without updating ratings, only recording predictions.
 
+        Bouts naming a competitor the arena has not seen are skipped: validation never
+        adds to the population, so unknown identifiers contribute no prediction.
+
         Args:
             validation_bouts (list): A list of (competitor_a, competitor_b, outcome) tuples.
             progress_bar (bool, optional): Whether to display a progress bar.
@@ -332,20 +340,22 @@ class LambdaArena(BaseArena):
         skipped_bouts = 0
         logger.info("Validating model using %d bouts", total_bouts)
         for i, (a, b, outcome) in enumerate(iterator):
-            # Get or create competitors
-            try:
-                c_a = self._get_or_create_competitor(a)
-                c_b = self._get_or_create_competitor(b)
-            except KeyError as e:
-                # If a competitor is not found, skip this bout
+            # Validation is a read: an identifier the arena never trained on has no
+            # rating to validate, so the bout is skipped rather than scored against a
+            # freshly defaulted competitor.
+            unknown = a if a not in self.competitors else (b if b not in self.competitors else None)
+            if unknown is not None:
                 skipped_bouts += 1
                 logger.warning(
                     "Skipping validation bout %d/%d: Competitor '%s' not found in training history.",
                     i + 1,
                     total_bouts,
-                    e,
+                    unknown,
                 )
                 continue
+
+            c_a = self.competitors[a]
+            c_b = self.competitors[b]
 
             # Skip bouts where the actual outcome is None
             if outcome is None:
