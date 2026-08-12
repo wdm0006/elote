@@ -249,6 +249,32 @@ anything else raises <code class="docutils literal notranslate"><span class="pre
 that model margin of victory (currently <a class="reference internal" href="rating_systems/massey.html"><span class="doc">Massey</span></a>) consume the
 payload; the rest validate and ignore it. Omitting <code class="docutils literal notranslate"><span class="pre">scores</span></code> leaves every system on its
 existing unit-score behaviour, so the argument is fully backward compatible.</p>
+<section id="scores-from-a-dataset">
+<h3>Scores from a dataset<a class="headerlink" href="#scores-from-a-dataset" title="Link to this heading">¶</a></h3>
+<p>Dataset rows carry their scores in the <code class="docutils literal notranslate"><span class="pre">attributes</span></code> mapping, so the training and
+benchmarking helpers take a <code class="docutils literal notranslate"><span class="pre">score_keys</span></code> pair naming the two keys, in
+<code class="docutils literal notranslate"><span class="pre">(a_score_key,</span> <span class="pre">b_score_key)</span></code> order. <code class="docutils literal notranslate"><span class="pre">CollegeFootballDataset</span></code> writes <code class="docutils literal notranslate"><span class="pre">home_score</span></code>
+and <code class="docutils literal notranslate"><span class="pre">away_score</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">CollegeFootballDataset</span><span class="p">,</span> <span class="n">benchmark_competitors</span><span class="p">,</span> <span class="n">MasseyCompetitor</span><span class="p">,</span> <span class="n">KeenerCompetitor</span>
+
+<span class="n">split</span> <span class="o">=</span> <span class="n">CollegeFootballDataset</span><span class="p">(</span><span class="n">start_year</span><span class="o">=</span><span class="mi">2020</span><span class="p">,</span> <span class="n">end_year</span><span class="o">=</span><span class="mi">2021</span><span class="p">)</span><span class="o">.</span><span class="n">time_split</span><span class="p">(</span><span class="n">test_ratio</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">benchmark_competitors</span><span class="p">(</span>
+    <span class="p">[{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="n">MasseyCompetitor</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Massey&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="n">KeenerCompetitor</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Keener&quot;</span><span class="p">}],</span>
+    <span class="n">split</span><span class="p">,</span>
+    <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">score_keys</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;home_score&quot;</span><span class="p">,</span> <span class="s2">&quot;away_score&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">score_keys</span></code> is also accepted by <code class="docutils literal notranslate"><span class="pre">train_arena_with_dataset</span></code>,
+<code class="docutils literal notranslate"><span class="pre">train_and_evaluate_arena</span></code> and <code class="docutils literal notranslate"><span class="pre">evaluate_competitor</span></code>. It defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>, which
+trains on unit margins exactly as before. Rows whose attributes are missing, lack either
+key, or carry a non-numeric value are trained without scores rather than raising, since
+real feeds have gaps; a score pair that is present but inconsistent with the row’s
+outcome is still a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>. Evaluation only reads expected scores, so
+<code class="docutils literal notranslate"><span class="pre">score_keys</span></code> has no effect on the held-out half of a split.</p>
+</section>
 </section>
 <section id="using-different-rating-systems">
 <h2>Using Different Rating Systems<a class="headerlink" href="#using-different-rating-systems" title="Link to this heading">¶</a></h2>

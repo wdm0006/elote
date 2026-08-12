@@ -88,6 +88,35 @@ that model margin of victory (currently :doc:`Massey <rating_systems/massey>`) c
 payload; the rest validate and ignore it. Omitting ``scores`` leaves every system on its
 existing unit-score behaviour, so the argument is fully backward compatible.
 
+Scores from a dataset
+~~~~~~~~~~~~~~~~~~~~~
+
+Dataset rows carry their scores in the ``attributes`` mapping, so the training and
+benchmarking helpers take a ``score_keys`` pair naming the two keys, in
+``(a_score_key, b_score_key)`` order. ``CollegeFootballDataset`` writes ``home_score``
+and ``away_score``:
+
+.. code-block:: python
+
+    from elote import CollegeFootballDataset, benchmark_competitors, MasseyCompetitor, KeenerCompetitor
+
+    split = CollegeFootballDataset(start_year=2020, end_year=2021).time_split(test_ratio=0.2)
+
+    results = benchmark_competitors(
+        [{"class": MasseyCompetitor, "name": "Massey"}, {"class": KeenerCompetitor, "name": "Keener"}],
+        split,
+        lambda a, b, attributes=None: True,
+        score_keys=("home_score", "away_score"),
+    )
+
+``score_keys`` is also accepted by ``train_arena_with_dataset``,
+``train_and_evaluate_arena`` and ``evaluate_competitor``. It defaults to ``None``, which
+trains on unit margins exactly as before. Rows whose attributes are missing, lack either
+key, or carry a non-numeric value are trained without scores rather than raising, since
+real feeds have gaps; a score pair that is present but inconsistent with the row's
+outcome is still a ``ValueError``. Evaluation only reads expected scores, so
+``score_keys`` has no effect on the held-out half of a split.
+
 Using Different Rating Systems
 ----------------------------
 
