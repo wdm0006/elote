@@ -8,7 +8,7 @@ using consistent evaluation metrics and visualization.
 import contextlib
 import inspect
 import logging
-from typing import Dict, Iterator, List, Type, Optional, Any, Callable
+from typing import Dict, Iterator, List, Tuple, Type, Optional, Any, Callable
 import time
 
 from elote.arenas.lambda_arena import LambdaArena
@@ -79,6 +79,8 @@ def evaluate_competitor(
     batch_size: Optional[int] = None,
     progress_callback: Optional[Callable[[str, int, int], None]] = None,
     optimize_thresholds: bool = True,
+    *,
+    score_keys: Optional[Tuple[str, str]] = None,
 ) -> Dict[str, Any]:
     """
     Train and evaluate a specific competitor type.
@@ -93,6 +95,10 @@ def evaluate_competitor(
         batch_size: Number of matchups to process in each batch
         progress_callback: Callback function for reporting progress
         optimize_thresholds: Whether to optimize prediction thresholds
+        score_keys: Optional pair of attribute keys naming each training row's two point
+            scores, in ``(a_score_key, b_score_key)`` order, forwarded to
+            :func:`~elote.datasets.utils.train_arena_with_dataset`. Required to benchmark
+            margin-aware systems (Massey, Keener) on real margins rather than unit ones.
 
     Returns:
         Dictionary containing evaluation results
@@ -139,7 +145,13 @@ def evaluate_competitor(
         else:
             train_progress = None
 
-        train_arena_with_dataset(arena, data_split.train, batch_size=batch_size, progress_callback=train_progress)
+        train_arena_with_dataset(
+            arena,
+            data_split.train,
+            batch_size=batch_size,
+            progress_callback=train_progress,
+            score_keys=score_keys,
+        )
 
         train_time = time.time() - start_time
         logger.info(f"Training completed in {train_time:.2f} seconds")
@@ -211,6 +223,8 @@ def benchmark_competitors(
     batch_size: Optional[int] = None,
     progress_callback: Optional[Callable[[str, int, int], None]] = None,
     optimize_thresholds: bool = True,
+    *,
+    score_keys: Optional[Tuple[str, str]] = None,
 ) -> List[Dict[str, Any]]:
     """
     Benchmark multiple competitor types against each other.
@@ -222,6 +236,8 @@ def benchmark_competitors(
         batch_size: Number of matchups to process in each batch
         progress_callback: Callback function for reporting progress
         optimize_thresholds: Whether to optimize prediction thresholds
+        score_keys: Optional pair of attribute keys naming each training row's two point
+            scores, forwarded to :func:`evaluate_competitor` for every configuration
 
     Returns:
         List of dictionaries containing evaluation results for each competitor
@@ -242,6 +258,7 @@ def benchmark_competitors(
             batch_size=batch_size,
             progress_callback=progress_callback,
             optimize_thresholds=optimize_thresholds,
+            score_keys=score_keys,
         )
 
         results.append(result)

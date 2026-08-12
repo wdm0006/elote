@@ -6,9 +6,45 @@ This module provides utility functions for using datasets with arenas for evalua
 
 from typing import Any, Callable, Dict, List, Optional, Tuple
 import datetime
+import math
+import numbers
 
 from elote.arenas.base import BaseArena, Bout, History
 from elote.datasets.base import DataSplit
+
+
+def _scores_from_attributes(
+    attributes: Optional[Dict[str, Any]], score_keys: Tuple[str, str]
+) -> Optional[Tuple[float, float]]:
+    """Read a row's two point scores out of its attributes, in ``(a, b)`` order.
+
+    Real feeds have gaps, so anything short of two usable numbers means "no scores for this
+    row" rather than an error: a missing attributes mapping, a missing key, or a value that
+    is not a finite real number. Payloads that are well-formed but wrong -- negative, or
+    disagreeing with the recorded outcome -- are still rejected downstream by
+    :func:`elote.competitors.base.validate_scores`.
+
+    Args:
+        attributes: The row's attributes mapping, which may be None.
+        score_keys: The attribute keys holding the two scores, as ``(a_key, b_key)``.
+
+    Returns:
+        tuple of float, or None: The two scores in ``(a, b)`` order, or None.
+    """
+    if not attributes:
+        return None
+
+    values: List[float] = []
+    for key in score_keys:
+        value = attributes.get(key)
+        if isinstance(value, bool) or not isinstance(value, numbers.Real):
+            return None
+        as_float = float(value)
+        if not math.isfinite(as_float):
+            return None
+        values.append(as_float)
+
+    return values[0], values[1]
 
 
 def train_arena_with_dataset(
@@ -16,6 +52,8 @@ def train_arena_with_dataset(
     train_data: List[Tuple[Any, Any, float, Optional[datetime.datetime], Optional[Dict[str, Any]]]],
     batch_size: Optional[int] = None,
     progress_callback: Optional[Callable[[int, int], None]] = None,
+    *,
+    score_keys: Optional[Tuple[str, str]] = None,
 ) -> BaseArena:
     """
     Train an arena with a dataset.
@@ -25,6 +63,14 @@ def train_arena_with_dataset(
         train_data: List of matchup tuples (competitor_a, competitor_b, outcome, timestamp, attributes)
         batch_size: Number of matchups to process in each batch (for progress reporting)
         progress_callback: Callback function for reporting progress (current, total)
+        score_keys: Optional pair of attribute keys naming each row's two point scores, in
+            ``(a_score_key, b_score_key)`` order -- for example
+            ``("home_score", "away_score")`` for
+            :class:`~elote.datasets.football.CollegeFootballDataset`. When supplied, rows
+            carrying both scores are trained with an explicit outcome and the score payload,
+            so margin-aware systems (Massey, Keener) see the real margins instead of unit
+            ones. Rows without usable scores are trained exactly as they are with the
+            default of None, which leaves behaviour unchanged.
 
     Returns:
         The trained arena
@@ -60,15 +106,24 @@ def train_arena_with_dataset(
 
         # Process each matchup
         for a, b, outcome, _, attributes in batch:
+            scores = None if score_keys is None else _scores_from_attributes(attributes, score_keys)
+
             if outcome == 1.0:
                 # A wins
-                arena.matchup(a, b, attributes=attributes)
+                if scores is None:
+                    arena.matchup(a, b, attributes=attributes)
+                else:
+                    arena.matchup(a, b, attributes=attributes, outcome=1.0, scores=scores)
             elif outcome == 0.0:
-                # B wins
-                arena.matchup(b, a, attributes=attributes)
+                # B wins. The call is reversed so b is the winner, so the score pair has to
+                # be reversed with it to stay in the arena's caller order.
+                if scores is None:
+                    arena.matchup(b, a, attributes=attributes)
+                else:
+                    arena.matchup(b, a, attributes=attributes, outcome=1.0, scores=(scores[1], scores[0]))
             else:
                 # Draw
-                arena.matchup(a, b, attributes=attributes, outcome=0.5)
+                arena.matchup(a, b, attributes=attributes, outcome=0.5, scores=scores)
 
         # Report progress
         if progress_callback is not None:
@@ -154,6 +209,8 @@ def train_and_evaluate_arena(
     data_split: DataSplit,
     batch_size: Optional[int] = None,
     progress_callback: Optional[Callable[[str, int, int], None]] = None,
+    *,
+    score_keys: Optional[Tuple[str, str]] = None,
 ) -> Tuple[BaseArena, History]:
     """
     Train and evaluate an arena with a dataset split.
@@ -163,6 +220,9 @@ def train_and_evaluate_arena(
         data_split: DataSplit object containing train and test sets
         batch_size: Number of matchups to process in each batch (for progress reporting)
         progress_callback: Callback function for reporting progress (phase, current, total)
+        score_keys: Optional pair of attribute keys naming each row's two point scores,
+            forwarded to :func:`train_arena_with_dataset`. Evaluation only reads expected
+            scores, so it has no use for them.
 
     Returns:
         Tuple of (trained_arena, history)
@@ -176,7 +236,7 @@ def train_and_evaluate_arena(
         train_progress = None
 
     trained_arena = train_arena_with_dataset(
-        arena, data_split.train, batch_size=batch_size, progress_callback=train_progress
+        arena, data_split.train, batch_size=batch_size, progress_callback=train_progress, score_keys=score_keys
     )
 
     # Evaluate the arena
