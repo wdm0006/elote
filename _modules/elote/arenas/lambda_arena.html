@@ -383,6 +383,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the expected score for a matchup between two competitors.</span>
 
 <span class="sd">        This method returns the probability that competitor a will beat competitor b.</span>
+<span class="sd">        It is a read: an identifier the arena has not seen is scored as an unrated</span>
+<span class="sd">        competitor without being added to the population.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            a: The first competitor or competitor identifier.</span>
@@ -391,13 +393,19 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            float: The probability that a will beat b (between 0 and 1).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">a</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_competitor</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">base_competitor_kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">b</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_competitor</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">base_competitor_kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_competitor_for_prediction</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_competitor_for_prediction</span><span class="p">(</span><span class="n">b</span><span class="p">))</span></div>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">])</span></div>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_competitor_for_prediction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_val</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BaseCompetitor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the competitor for an identifier without adding it to the population.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">id_val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">id_val</span><span class="p">]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;Competitor &#39;</span><span class="si">%s</span><span class="s2">&#39; is not in this arena; predicting with an unrated competitor &quot;</span>
+            <span class="s2">&quot;without adding it to the population.&quot;</span><span class="p">,</span>
+            <span class="n">id_val</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_competitor</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">base_competitor_kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="LambdaArena.export_state">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.lambda_arena.LambdaArena.export_state">[docs]</a>
