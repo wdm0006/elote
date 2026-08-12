@@ -143,9 +143,37 @@ class TestArenas(unittest.TestCase):
         score_c_d = arena.expected_score("C", "D")
         self.assertAlmostEqual(score_c_d, 0.5, places=2)
 
-        # Now they should be in the arena with default ratings
-        self.assertIn("C", arena.competitors)
-        self.assertIn("D", arena.competitors)
+        # Predicting for them does not add them to the population
+        self.assertNotIn("C", arena.competitors)
+        self.assertNotIn("D", arena.competitors)
+
+    def test_expected_score_does_not_add_unseen_competitors(self):
+        """expected_score is a read: unseen identifiers stay out of the population."""
+        arena = LambdaArena(lambda a, b: True)
+        arena.matchup("x", "y")
+
+        population_before = {k: v.rating for k, v in arena.competitors.items()}
+        self.assertEqual(population_before, {"x": 416.0, "y": 384.0})
+
+        # Two unseen identifiers score as two unrated competitors.
+        self.assertEqual(arena.expected_score("ghost1", "ghost2"), 0.5)
+
+        # A seen-vs-unseen pair scores against a transient default competitor, matching
+        # what an explicit pair of competitors at those ratings would give.
+        default_rating = EloCompetitor().rating
+        seen, unseen = EloCompetitor(initial_rating=416.0), EloCompetitor(initial_rating=default_rating)
+        self.assertEqual(arena.expected_score("x", "ghost1"), seen.expected_score(unseen))
+        self.assertEqual(arena.expected_score("ghost1", "x"), unseen.expected_score(seen))
+
+        # None of those calls touched the population, the leaderboard or the export.
+        self.assertEqual({k: v.rating for k, v in arena.competitors.items()}, population_before)
+        self.assertEqual(len(arena.leaderboard()), 2)
+        self.assertEqual(sorted(arena.export_state()), ["x", "y"])
+
+        # A later matchup still creates and rates the identifier normally.
+        arena.matchup("ghost1", "x")
+        self.assertEqual(sorted(arena.competitors), ["ghost1", "x", "y"])
+        self.assertGreater(arena.competitors["ghost1"].rating, default_rating)
 
     def test_lambda_arena_export_state(self):
         """Test that the arena state can be exported correctly."""
