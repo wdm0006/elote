@@ -314,6 +314,94 @@ class TestArenas(unittest.TestCase):
                 self.assertEqual(ratings_before, ratings_after)
 
 
+class TestArenaEvaluationSkipsUnknownCompetitors(unittest.TestCase):
+    """evaluate_performance and validate must never invent competitors.
+
+    Both are reads over held-out data: an identifier the arena never trained on has
+    no rating, so the bout is skipped rather than scored against a default rating and
+    silently added to the population.
+    """
+
+    # ("x", "y") are trained; every other identifier is unknown to the arena.
+    ROWS = [
+        ("x", "y", 1.0),  # both known -> exactly one bout
+        ("ghost", "x", 0.0),  # first unknown -> no bout
+        ("y", "ghost", 1.0),  # second unknown -> no bout
+        ("g2", "g3", 1.0),  # both unknown -> no bout
+    ]
+
+    def _trained_arena(self):
+        arena = LambdaArena(func=lambda a, b: True)
+        arena.process_history([("x", "y", 1.0), ("x", "y", 1.0)], progress_bar=False)
+        return arena
+
+    def _run(self, method_name):
+        arena = self._trained_arena()
+        population_before = {cid: c.rating for cid, c in arena.competitors.items()}
+        getattr(arena, method_name)(self.ROWS, progress_bar=False)
+        return arena, population_before
+
+    def test_evaluate_performance_records_only_known_bouts(self):
+        arena, population_before = self._run("evaluate_performance")
+
+        # Only the single all-known row is scored; the three unknown rows record nothing.
+        self.assertEqual(len(arena.eval_history.bouts), 1)
+        bout = arena.eval_history.bouts[0]
+        self.assertEqual((bout.a, bout.b), ("x", "y"))
+
+        # The population is untouched, in membership and in ratings.
+        self.assertEqual(sorted(arena.competitors), ["x", "y"])
+        self.assertEqual({cid: c.rating for cid, c in arena.competitors.items()}, population_before)
+
+    def test_validate_records_only_known_bouts(self):
+        arena, population_before = self._run("validate")
+
+        self.assertEqual(len(arena.validation_history.bouts), 1)
+        bout = arena.validation_history.bouts[0]
+        self.assertEqual((bout.a, bout.b), ("x", "y"))
+
+        self.assertEqual(sorted(arena.competitors), ["x", "y"])
+        self.assertEqual({cid: c.rating for cid, c in arena.competitors.items()}, population_before)
+
+    def test_leaderboard_and_export_state_exclude_evaluation_only_identifiers(self):
+        for method_name in ("evaluate_performance", "validate"):
+            with self.subTest(method=method_name):
+                arena, _ = self._run(method_name)
+
+                self.assertEqual(sorted(entry["competitor"] for entry in arena.leaderboard()), ["x", "y"])
+                self.assertEqual(sorted(arena.export_state()), ["x", "y"])
+
+    def test_unknown_competitor_warning_is_emitted(self):
+        for method_name, label in (("evaluate_performance", "evaluation"), ("validate", "validation")):
+            with self.subTest(method=method_name):
+                arena = self._trained_arena()
+                with self.assertLogs("elote", level="WARNING") as captured:
+                    getattr(arena, method_name)(self.ROWS, progress_bar=False)
+
+                messages = [record.getMessage() for record in captured.records]
+                self.assertEqual(len(messages), 3)
+                self.assertIn(
+                    "Skipping %s bout 2/4: Competitor 'ghost' not found in training history." % label,
+                    messages,
+                )
+                self.assertIn(
+                    "Skipping %s bout 3/4: Competitor 'ghost' not found in training history." % label,
+                    messages,
+                )
+                self.assertIn(
+                    "Skipping %s bout 4/4: Competitor 'g2' not found in training history." % label,
+                    messages,
+                )
+
+    def test_process_history_still_creates_competitors_on_demand(self):
+        """Training is unchanged: unseen identifiers are created and the bout is recorded."""
+        arena = LambdaArena(func=lambda a, b: True)
+        arena.process_history([("new_a", "new_b", 1.0)], progress_bar=False)
+
+        self.assertEqual(sorted(arena.competitors), ["new_a", "new_b"])
+        self.assertEqual(len(arena.history.bouts), 1)
+
+
 class TestArenaStateRoundTrip(unittest.TestCase):
     """LambdaArena must be restorable from its own export_state() output."""
 
