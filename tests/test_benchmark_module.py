@@ -9,6 +9,7 @@ from elote.competitors.trueskill import TrueSkillCompetitor
 from elote.competitors.colley import ColleyMatrixCompetitor
 from elote.competitors.massey import MasseyCompetitor
 from elote.competitors.keener import KeenerCompetitor
+from elote.competitors.pythagorean import PythagoreanCompetitor
 from elote.arenas.base import History, Bout
 from elote.datasets.base import DataSplit
 from elote.datasets.synthetic import SyntheticDataset
@@ -475,6 +476,48 @@ class TestBenchmarkEndToEnd(unittest.TestCase):
         )
 
         self.assertEqual([entry["name"] for entry in results], ["Keener", "Colley"])
+        for entry in results:
+            with self.subTest(system=entry["name"]):
+                self.assertGreater(entry["accuracy"], 0.5)
+
+    def test_pythagorean_runs_end_to_end_without_being_handed_an_initial_rating(self):
+        """Pythagorean is incremental, so only its constructor keeps it off the 1500 path.
+
+        evaluate_competitor forces initial_rating=1500 on any incremental class whose
+        __init__ accepts one, and 1500 is meaningless on a [0, 1] win-expectation scale.
+        Asserted by running the real thing rather than by reading the signature check.
+        """
+        result = evaluate_competitor(
+            competitor_class=PythagoreanCompetitor,
+            data_split=self.data_split,
+            comparison_function=_always_true,
+            optimize_thresholds=True,
+        )
+
+        competitors = list(result["arena"].competitors.values())
+        self.assertGreater(len(competitors), 0)
+        for competitor in competitors:
+            self.assertFalse(hasattr(competitor, "_initial_rating"))
+            self.assertGreaterEqual(competitor.rating, 0.0)
+            self.assertLessEqual(competitor.rating, 1.0)
+            self.assertGreater(competitor.num_games, 0)
+
+        self.assertGreater(result["accuracy"], 0.5)
+        self.assertGreaterEqual(result["accuracy_opt"], result["accuracy"])
+
+    def test_pythagorean_can_be_compared_against_an_incremental_system(self):
+        """benchmark_competitors must accept Pythagorean alongside its siblings."""
+        results = benchmark_competitors(
+            [
+                {"class": PythagoreanCompetitor, "name": "Pythagorean", "params": {}},
+                {"class": EloCompetitor, "name": "Elo", "params": {}},
+            ],
+            self.data_split,
+            _always_true,
+            optimize_thresholds=False,
+        )
+
+        self.assertEqual([entry["name"] for entry in results], ["Pythagorean", "Elo"])
         for entry in results:
             with self.subTest(system=entry["name"]):
                 self.assertGreater(entry["accuracy"], 0.5)

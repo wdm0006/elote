@@ -14,6 +14,7 @@ from elote import (
     KeenerCompetitor,
     LambdaArena,
     MasseyCompetitor,
+    PythagoreanCompetitor,
     TrueSkillCompetitor,
 )
 
@@ -417,6 +418,7 @@ class TestArenaStateRoundTrip(unittest.TestCase):
         BradleyTerryCompetitor,
         MasseyCompetitor,
         KeenerCompetitor,
+        PythagoreanCompetitor,
     )
 
     # Colley, Massey, Bradley-Terry and Keener reset their opponent match graph on import by design
@@ -429,6 +431,7 @@ class TestArenaStateRoundTrip(unittest.TestCase):
         TrueSkillCompetitor,
         ECFCompetitor,
         DWZCompetitor,
+        PythagoreanCompetitor,
     )
 
     # Elo aborts on its rating floor when a competitor loses repeatedly from the
