@@ -594,10 +594,21 @@ class History:
         logger.info("Calculating accuracy by prior bouts for %d evaluation bouts.", len(self.bouts))
 
         # Process each bout in the evaluation history
+        skipped_bouts = 0
         for bout in self.bouts:
             # Get the current bout count for each competitor
             a_count = competitor_bout_counts.get(bout.a, 0)
             b_count = competitor_bout_counts.get(bout.b, 0)
+
+            # Update bout counts for both competitors for subsequent bouts in evaluation
+            competitor_bout_counts[bout.a] = a_count + 1
+            competitor_bout_counts[bout.b] = b_count + 1
+
+            # Outcomes are heterogeneous (arena strings or caller floats); normalize before comparing
+            actual = bout._normalized_outcome()
+            if actual is None:
+                skipped_bouts += 1
+                continue
 
             # Determine the minimum bout count between the two competitors
             min_bout_count = min(a_count, b_count)
@@ -608,20 +619,18 @@ class History:
 
             # Check if prediction is correct, properly handling draws
             is_predicted_draw = lower_threshold <= bout.predicted_outcome <= upper_threshold
-            is_actual_draw = bout.outcome == 0.5
 
             if (
-                (is_predicted_draw and is_actual_draw)
-                or (bout.predicted_outcome > upper_threshold and bout.outcome == 1.0)
-                or (bout.predicted_outcome < lower_threshold and bout.outcome == 0.0)
+                (is_predicted_draw and actual == "draw")
+                or (bout.predicted_outcome > upper_threshold and actual == "a")
+                or (bout.predicted_outcome < lower_threshold and actual == "b")
             ):
                 accuracy_by_min_bouts[min_bout_count]["correct"] += 1
 
             accuracy_by_min_bouts[min_bout_count]["total"] += 1
 
-            # Update bout counts for both competitors for subsequent bouts in evaluation
-            competitor_bout_counts[bout.a] = a_count + 1
-            competitor_bout_counts[bout.b] = b_count + 1
+        if skipped_bouts > 0:
+            logger.warning("Skipped %d bouts with unrecognized outcomes while calculating accuracy.", skipped_bouts)
 
         # Calculate accuracy for each bucket
         for _bout_count, metrics in accuracy_by_min_bouts.items():
