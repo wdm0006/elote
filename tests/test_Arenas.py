@@ -282,6 +282,18 @@ class TestArenas(unittest.TestCase):
         arena.process_history(bouts, progress_bar=False)
         self.assertEqual(len(arena.history.bouts), 1)
 
+    def test_process_history_rejects_invalid_outcome_without_side_effects(self):
+        arena = LambdaArena(func=lambda x, y: True)
+
+        with self.assertRaisesRegex(
+            ValueError,
+            r"^outcome must be one of 1\.0, 0\.0 or 0\.5, got 0\.25$",
+        ):
+            arena.process_history([("x", "y", 0.25)], progress_bar=False)
+
+        self.assertEqual(arena.competitors, {})
+        self.assertEqual(arena.history.bouts, [])
+
     def test_evaluate_performance_non_colley_competitors(self):
         """evaluate_performance should run end-to-end for non-Colley competitors."""
         for competitor_cls in (EloCompetitor, GlickoCompetitor):
@@ -313,6 +325,27 @@ class TestArenas(unittest.TestCase):
                 # validate only records predictions; it must not update ratings.
                 ratings_after = {cid: c.rating for cid, c in arena.competitors.items()}
                 self.assertEqual(ratings_before, ratings_after)
+
+    def test_evaluation_and_validation_reject_invalid_outcomes_without_side_effects(self):
+        for method_name, invalid_outcome, history_name in (
+            ("evaluate_performance", 7.0, "eval_history"),
+            ("validate", -1.0, "validation_history"),
+        ):
+            with self.subTest(method=method_name):
+                arena = LambdaArena(func=lambda x, y: True)
+                arena.process_history([("x", "y", 1.0)], progress_bar=False)
+                population_before = {cid: c.rating for cid, c in arena.competitors.items()}
+                training_history_before = list(arena.history.bouts)
+
+                with self.assertRaisesRegex(
+                    ValueError,
+                    rf"^outcome must be one of 1\.0, 0\.0 or 0\.5, got {invalid_outcome}$",
+                ):
+                    getattr(arena, method_name)([("x", "y", invalid_outcome)], progress_bar=False)
+
+                self.assertEqual({cid: c.rating for cid, c in arena.competitors.items()}, population_before)
+                self.assertEqual(arena.history.bouts, training_history_before)
+                self.assertEqual(getattr(arena, history_name).bouts, [])
 
 
 class TestArenaEvaluationSkipsUnknownCompetitors(unittest.TestCase):

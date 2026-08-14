@@ -9,6 +9,11 @@ from elote.logging import logger
 
 
 class LambdaArena(BaseArena):
+    @staticmethod
+    def _validate_outcome(outcome: Optional[float]) -> None:
+        if outcome is not None and outcome not in (1.0, 0.0, 0.5):
+            raise ValueError(f"outcome must be one of 1.0, 0.0 or 0.5, got {outcome!r}")
+
     def __init__(
         self,
         func: Callable[..., Optional[bool]],
@@ -126,8 +131,7 @@ class LambdaArena(BaseArena):
                 ``scores`` is supplied without ``outcome``, or if ``scores`` is malformed,
                 negative, non-finite, or disagrees with ``outcome``.
         """
-        if outcome is not None and outcome not in (1.0, 0.0, 0.5):
-            raise ValueError(f"outcome must be one of 1.0, 0.0 or 0.5, got {outcome!r}")
+        self._validate_outcome(outcome)
         if scores is not None and outcome is None:
             raise ValueError("scores requires an explicit outcome so the two can be checked for agreement")
         # Validated before any competitor is created or any history is recorded, so a bad
@@ -249,6 +253,7 @@ class LambdaArena(BaseArena):
         skipped_bouts = 0
         logger.info("Processing %d bouts for training history", total_bouts)
         for i, (a, b, outcome) in enumerate(iterator):
+            self._validate_outcome(outcome)
             # Get or create competitors
             c_a = self._get_or_create_competitor(a)
             c_b = self._get_or_create_competitor(b)
@@ -290,6 +295,7 @@ class LambdaArena(BaseArena):
         skipped_bouts = 0
         logger.info("Evaluating performance using %d bouts", total_bouts)
         for i, (a, b, outcome) in enumerate(iterator):
+            self._validate_outcome(outcome)
             # Evaluation is a read: an identifier the arena never trained on has no
             # rating to evaluate, so the bout is skipped rather than scored against a
             # freshly defaulted competitor.
@@ -340,6 +346,7 @@ class LambdaArena(BaseArena):
         skipped_bouts = 0
         logger.info("Validating model using %d bouts", total_bouts)
         for i, (a, b, outcome) in enumerate(iterator):
+            self._validate_outcome(outcome)
             # Validation is a read: an identifier the arena never trained on has no
             # rating to validate, so the bout is skipped rather than scored against a
             # freshly defaulted competitor.
