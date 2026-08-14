@@ -70,6 +70,12 @@ Overview Comparison
      - No
      - Yes
      - Score-based eigenvector ranking
+   * - **Pythagorean**
+     - Baseball (1980s)
+     - Low
+     - No
+     - Yes
+     - Points-based win expectation
    * - **Bradley-Terry**
      - Statistics (1952)
      - Medium
@@ -83,11 +89,12 @@ Overview Comparison
      - Depends on components
      - Complex domains
 
-Online systems (Elo, Glicko, Glicko-2, TrueSkill, ECF, DWZ) update ratings incrementally after each
-result. Global-fit systems (Colley Matrix, Massey, Keener and Bradley-Terry) re-solve the whole
-connected group of competitors from the full set of results, which makes them order independent.
-Massey and Keener are the two that read the optional score payload; the rest use only who beat
-whom.
+Online systems (Elo, Glicko, Glicko-2, TrueSkill, ECF, DWZ, Pythagorean) update ratings
+incrementally after each result. Global-fit systems (Colley Matrix, Massey, Keener and
+Bradley-Terry) re-solve the whole connected group of competitors from the full set of results,
+which makes them order independent. Pythagorean is order independent too, for a different reason:
+its state is a running sum of points that ignores the opponent graph entirely. Massey, Keener and
+Pythagorean are the three that read the optional score payload; the rest use only who beat whom.
 
 Mathematical Formulation
 -----------------------
@@ -116,6 +123,8 @@ Mathematical Formulation
      - Ratings solve :math:`M r = p` with :math:`M = D - A`; :math:`E_A = \frac{1}{1 + e^{-2 (r_A - r_B)}}`
    * - **Keener**
      - Ratings are the dominant eigenvector of :math:`H_{ij} = h(a_{ij}) / g_i + \varepsilon` with :math:`a_{ij} = \frac{S_{ij} + 1}{S_{ij} + S_{ji} + 2}` and :math:`h(x) = \frac{1}{2} + \frac{1}{2}\mathrm{sgn}(x - \frac{1}{2})\sqrt{|2x - 1|}`; :math:`E_A = \frac{r_A}{r_A + r_B}`
+   * - **Pythagorean**
+     - :math:`w = \frac{PF^{k}}{PF^{k} + PA^{k}}` on prior-adjusted point totals; :math:`E_A = \frac{w_A - w_A w_B}{w_A + w_B - 2 w_A w_B}` (log5)
    * - **Bradley-Terry**
      - :math:`P(A \text{ beats } B) = \frac{p_A}{p_A + p_B} = \frac{1}{1 + e^{-(\beta_A - \beta_B)}}`
    * - **Ensemble**
@@ -148,6 +157,8 @@ Key Parameters
      - Initial rating (default 0.0), Expected-score scale
    * - **Keener**
      - Initial rating (default 1.0), Perturbation, Expected-score scale
+   * - **Pythagorean**
+     - Exponent (default 2.37), Prior points (default 1.0); no initial rating
    * - **Bradley-Terry**
      - Initial rating, Scale, Regularization, Max iterations
    * - **Ensemble**
@@ -293,6 +304,22 @@ Keener
 - The stabilizing perturbation is an extra knob that quietly couples competitors who never met
 - Requires a connected schedule to compare competitors
 
+Pythagorean
+^^^^^^^^^^^
+
+**Strengths:**
+- The rating is already a win expectation in [0, 1], with no scale to translate
+- The cheapest system here: constant-time updates, no population fit
+- Order independent, since the state is a running sum of points
+- No opponent graph to lose, so serialized state restores exactly, continued play included
+- A strong points-only baseline that decades of sports analytics have found hard to beat
+
+**Weaknesses:**
+- No strength-of-schedule adjustment at all: who supplied the points is ignored
+- Reduces to a smoothed win percentage on outcome-only data
+- The exponent is sport-specific; the default is an American-football fit
+- No uncertainty measure attached to the rating
+
 Bradley-Terry
 ^^^^^^^^^^^^^
 
@@ -340,9 +367,10 @@ Consider the following factors when choosing a rating system:
    - General purpose: Elo or Glicko
 
 3. **Order Independence**: Do you need a ranking that ignores schedule order?
-   - Yes: Colley Matrix, Massey, Keener, or Bradley-Terry
-   - Yes, and you have real scores: Massey (linear margin) or Keener (bounded score share)
-   - No: any online system (Elo, Glicko, etc.)
+   - Yes: Colley Matrix, Massey, Keener, Bradley-Terry, or Pythagorean
+   - Yes, and you have real scores: Massey (linear margin), Keener (bounded score share), or
+     Pythagorean (points ratio, no strength of schedule)
+   - No: any other online system (Elo, Glicko, etc.)
 
 4. **Computational Resources**:
    - Limited resources: Elo or ECF
@@ -373,6 +401,7 @@ Here's a quick comparison of how to use each system in Elote:
         ColleyMatrixCompetitor,
         MasseyCompetitor,
         KeenerCompetitor,
+        PythagoreanCompetitor,
         BradleyTerryCompetitor,
         BlendedCompetitor,
     )
@@ -404,6 +433,9 @@ Here's a quick comparison of how to use each system in Elote:
     # Keener (strictly positive, mean 1.0; reads real scores)
     keener_player = KeenerCompetitor()
 
+    # Pythagorean (win expectation in [0, 1]; reads real scores, no initial rating)
+    pythagorean_player = PythagoreanCompetitor(exponent=2.37)
+
     # Bradley-Terry (Elo-compatible scale)
     bt_player = BradleyTerryCompetitor(initial_rating=1500)
 
@@ -424,6 +456,9 @@ Here's a quick comparison of how to use each system in Elote:
     # Score-based systems additionally accept the optional scores payload
     home, away = KeenerCompetitor(), KeenerCompetitor()
     home.beat(away, scores=(35, 3))
+
+    scorers = PythagoreanCompetitor(), PythagoreanCompetitor()
+    scorers[0].beat(scorers[1], scores=(28, 14))
 
 Empirical Comparison
 -------------------

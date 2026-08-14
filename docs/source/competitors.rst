@@ -55,6 +55,12 @@ Keener Competitor
 .. autoclass:: elote.competitors.keener.KeenerCompetitor
     :members: export_state,expected_score,beat,tied,rating,to_json,from_json
 
+Pythagorean Competitor
+----------------------
+
+.. autoclass:: elote.competitors.pythagorean.PythagoreanCompetitor
+    :members: export_state,expected_score,beat,tied,rating,to_json,from_json
+
 Bradley-Terry Competitor
 ------------------------
 

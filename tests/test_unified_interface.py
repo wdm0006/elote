@@ -11,6 +11,7 @@ from elote import (
     BradleyTerryCompetitor,
     MasseyCompetitor,
     KeenerCompetitor,
+    PythagoreanCompetitor,
 )
 from elote.competitors.base import (
     MissMatchedCompetitorTypesException,
@@ -437,6 +438,7 @@ class TestExpectedScoreBounds(unittest.TestCase):
         BradleyTerryCompetitor,
         MasseyCompetitor,
         KeenerCompetitor,
+        PythagoreanCompetitor,
     )
 
     # A lopsided run: long enough that a one-sided rating gap opens up, with
