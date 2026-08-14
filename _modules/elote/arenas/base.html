@@ -816,10 +816,21 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Calculating accuracy by prior bouts for </span><span class="si">%d</span><span class="s2"> evaluation bouts.&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">))</span>
 
         <span class="c1"># Process each bout in the evaluation history</span>
+        <span class="n">skipped_bouts</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">:</span>
             <span class="c1"># Get the current bout count for each competitor</span>
             <span class="n">a_count</span> <span class="o">=</span> <span class="n">competitor_bout_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bout</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
             <span class="n">b_count</span> <span class="o">=</span> <span class="n">competitor_bout_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bout</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="c1"># Update bout counts for both competitors for subsequent bouts in evaluation</span>
+            <span class="n">competitor_bout_counts</span><span class="p">[</span><span class="n">bout</span><span class="o">.</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">a_count</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">competitor_bout_counts</span><span class="p">[</span><span class="n">bout</span><span class="o">.</span><span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="n">b_count</span> <span class="o">+</span> <span class="mi">1</span>
+
+            <span class="c1"># Outcomes are heterogeneous (arena strings or caller floats); normalize before comparing</span>
+            <span class="n">actual</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">_normalized_outcome</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">actual</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">skipped_bouts</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">continue</span>
 
             <span class="c1"># Determine the minimum bout count between the two competitors</span>
             <span class="n">min_bout_count</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">a_count</span><span class="p">,</span> <span class="n">b_count</span><span class="p">)</span>
@@ -830,20 +841,18 @@
 
             <span class="c1"># Check if prediction is correct, properly handling draws</span>
             <span class="n">is_predicted_draw</span> <span class="o">=</span> <span class="n">lower_threshold</span> <span class="o">&lt;=</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&lt;=</span> <span class="n">upper_threshold</span>
-            <span class="n">is_actual_draw</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="mf">0.5</span>
 
             <span class="k">if</span> <span class="p">(</span>
-                <span class="p">(</span><span class="n">is_predicted_draw</span> <span class="ow">and</span> <span class="n">is_actual_draw</span><span class="p">)</span>
-                <span class="ow">or</span> <span class="p">(</span><span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&gt;</span> <span class="n">upper_threshold</span> <span class="ow">and</span> <span class="n">bout</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">)</span>
-                <span class="ow">or</span> <span class="p">(</span><span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&lt;</span> <span class="n">lower_threshold</span> <span class="ow">and</span> <span class="n">bout</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">)</span>
+                <span class="p">(</span><span class="n">is_predicted_draw</span> <span class="ow">and</span> <span class="n">actual</span> <span class="o">==</span> <span class="s2">&quot;draw&quot;</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="p">(</span><span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&gt;</span> <span class="n">upper_threshold</span> <span class="ow">and</span> <span class="n">actual</span> <span class="o">==</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="p">(</span><span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&lt;</span> <span class="n">lower_threshold</span> <span class="ow">and</span> <span class="n">actual</span> <span class="o">==</span> <span class="s2">&quot;b&quot;</span><span class="p">)</span>
             <span class="p">):</span>
                 <span class="n">accuracy_by_min_bouts</span><span class="p">[</span><span class="n">min_bout_count</span><span class="p">][</span><span class="s2">&quot;correct&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
             <span class="n">accuracy_by_min_bouts</span><span class="p">[</span><span class="n">min_bout_count</span><span class="p">][</span><span class="s2">&quot;total&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
-            <span class="c1"># Update bout counts for both competitors for subsequent bouts in evaluation</span>
-            <span class="n">competitor_bout_counts</span><span class="p">[</span><span class="n">bout</span><span class="o">.</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">a_count</span> <span class="o">+</span> <span class="mi">1</span>
-            <span class="n">competitor_bout_counts</span><span class="p">[</span><span class="n">bout</span><span class="o">.</span><span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="n">b_count</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">skipped_bouts</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Skipped </span><span class="si">%d</span><span class="s2"> bouts with unrecognized outcomes while calculating accuracy.&quot;</span><span class="p">,</span> <span class="n">skipped_bouts</span><span class="p">)</span>
 
         <span class="c1"># Calculate accuracy for each bucket</span>
         <span class="k">for</span> <span class="n">_bout_count</span><span class="p">,</span> <span class="n">metrics</span> <span class="ow">in</span> <span class="n">accuracy_by_min_bouts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
