@@ -1,5 +1,6 @@
 import abc
 import math
+import numbers
 import random
 from typing import Dict, Any, List, Tuple, Optional
 
@@ -560,11 +561,19 @@ class History:
         Args:
             arena (BaseArena): The arena containing the competitors and their history
             thresholds (tuple, optional): Tuple of (lower_threshold, upper_threshold) for predictions
-            bin_size (int): Size of bins for grouping bout counts
+            bin_size (int): Size of bins for grouping bout counts. Must be a positive integer.
 
         Returns:
-            dict: A dictionary with 'binned' key containing binned accuracy data
+            dict: A dictionary with 'binned' key containing binned accuracy data. Every
+            non-empty bin reports its observed ``correct / total`` accuracy, however few
+            bouts it holds.
+
+        Raises:
+            ValueError: If ``bin_size`` is not a positive integer.
         """
+        if isinstance(bin_size, bool) or not isinstance(bin_size, numbers.Integral) or bin_size <= 0:
+            raise ValueError(f"bin_size must be a positive integer, got {bin_size!r}")
+
         # Default thresholds if not provided
         if thresholds is None:
             lower_threshold, upper_threshold = 0.5, 0.5
@@ -658,12 +667,11 @@ class History:
 
         # Calculate average accuracy for each bin
         for bin_idx, bin_data in binned_data.items():
-            if bin_data["total"] > 10:
+            if bin_data["total"] > 0:
                 bin_data["accuracy"] = bin_data["accuracy_sum"] / bin_data["total"]
-                del bin_data["accuracy_sum"]
             else:
                 bin_data["accuracy"] = None
-                del bin_data["accuracy_sum"]
+            del bin_data["accuracy_sum"]
 
             # Add bin range information
             bin_data["min_bouts"] = bin_idx * bin_size

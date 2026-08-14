@@ -2,6 +2,7 @@ import unittest
 import os
 import tempfile
 import matplotlib.pyplot as plt
+from elote.arenas.base import Bout, History
 from elote.visualization import (
     plot_rating_system_comparison,
     plot_optimized_accuracy_comparison,
@@ -122,6 +123,25 @@ class TestVisualization(unittest.TestCase):
         self.assertEqual(fig.get_figwidth(), 12)
         self.assertEqual(fig.get_figheight(), 8)
         self.assertEqual(fig.axes[0].get_title(), "Custom Title")
+
+    def test_plot_accuracy_by_prior_bouts_plots_small_bins(self):
+        """A bin holding only a handful of bouts is plotted, not dropped as missing."""
+
+        class _EmptyArena:
+            history = History()
+
+        history = History()
+        for index in range(5):
+            history.add_bout(Bout("a", "b", 0.9, "loss" if index == 0 else "win"))
+
+        binned = history.accuracy_by_prior_bouts(_EmptyArena(), bin_size=100)["binned"]
+        self.assertEqual(binned[0]["total"], 5)
+        self.assertAlmostEqual(binned[0]["accuracy"], 0.8)
+
+        fig = plot_accuracy_by_prior_bouts({"System A": {"binned": binned}})
+
+        (line,) = fig.axes[0].lines
+        self.assertEqual(list(line.get_ydata()), [0.8])
 
     def test_plot_accuracy_by_prior_bouts_with_empty_data(self):
         """Test that plot_accuracy_by_prior_bouts handles empty data gracefully."""
