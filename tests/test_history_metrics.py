@@ -1,3 +1,4 @@
+import random
 import unittest
 from elote.arenas.base import History, Bout
 from elote.competitors.elo import EloCompetitor
@@ -448,6 +449,116 @@ class TestOptimizeThresholds(unittest.TestCase):
 
         self.assertEqual(first, second)
         self.assertLessEqual(first[1][0], first[1][1])
+
+
+def _repeated_history(outcome, predicted_outcome=0.9, count=20):
+    """Build a history of identical bouts, so every bin lands in one bucket."""
+    history = History()
+    for _ in range(count):
+        history.add_bout(Bout("a", "b", predicted_outcome, outcome))
+    return history
+
+
+def _arena_with_online_eval_history(training_matchups=200, eval_matchups=160, seed=11):
+    """Train an arena, then record further ``matchup`` calls as an online evaluation history.
+
+    ``LambdaArena.matchup`` records the strings ``"win"``/``"loss"``/``"tie"`` as the bout
+    outcome, which is the path the float-only dataset helpers never exercise.
+    """
+    rng = random.Random(seed)
+    strengths = {"c%d" % i: rng.gauss(0, 200) for i in range(12)}
+
+    def comparison(a, b, attributes=None):
+        return strengths[a] + rng.gauss(0, 100) > strengths[b] + rng.gauss(0, 100)
+
+    arena = LambdaArena(comparison, base_competitor=EloCompetitor)
+    ids = list(strengths)
+    for _ in range(training_matchups):
+        a, b = rng.sample(ids, 2)
+        arena.matchup(a, b)
+
+    training_history = arena.history
+    arena.history = History()
+    for _ in range(eval_matchups):
+        a, b = rng.sample(ids, 2)
+        arena.matchup(a, b)
+    eval_history = arena.history
+    arena.history = training_history
+
+    return arena, eval_history
+
+
+class TestAccuracyByPriorBouts(unittest.TestCase):
+    """``accuracy_by_prior_bouts`` must read outcomes the way every other metric does."""
+
+    def test_string_outcomes_score_identically_to_float_outcomes(self):
+        """A history of arena-recorded "win" bouts reports the same accuracy as 1.0 bouts."""
+        arena = MockArena()
+
+        string_binned = _repeated_history("win").accuracy_by_prior_bouts(arena, bin_size=100)["binned"]
+        float_binned = _repeated_history(1.0).accuracy_by_prior_bouts(arena, bin_size=100)["binned"]
+
+        self.assertEqual(float_binned[0]["accuracy"], 1.0)
+        self.assertEqual(string_binned[0]["accuracy"], 1.0)
+        self.assertEqual(string_binned, float_binned)
+
+    def test_string_losses_score_identically_to_float_outcomes(self):
+        """The "loss" spelling must be scored against the lower threshold, not dropped."""
+        arena = MockArena()
+
+        string_binned = _repeated_history("loss", predicted_outcome=0.1).accuracy_by_prior_bouts(arena, bin_size=100)
+        float_binned = _repeated_history(0.0, predicted_outcome=0.1).accuracy_by_prior_bouts(arena, bin_size=100)
+
+        self.assertEqual(string_binned["binned"][0]["accuracy"], 1.0)
+        self.assertEqual(string_binned, float_binned)
+
+    def test_tie_outcomes_are_counted_inside_the_draw_band(self):
+        """Drawn bouts recorded as "tie" count as correct when the prediction is in the band."""
+        arena = MockArena()
+        history = History()
+        for _ in range(12):
+            history.add_bout(Bout("a", "b", 0.5, "tie"))
+        for _ in range(8):
+            history.add_bout(Bout("a", "b", 0.5, "win"))
+
+        binned = history.accuracy_by_prior_bouts(arena, thresholds=(0.4, 0.6), bin_size=100)["binned"]
+
+        self.assertEqual(binned[0]["total"], 20)
+        self.assertAlmostEqual(binned[0]["accuracy"], 12 / 20)
+
+    def test_unrecognized_outcomes_are_skipped_not_counted_wrong(self):
+        """A bout whose outcome does not normalize is skipped rather than scored as incorrect."""
+        arena = MockArena()
+        history = _repeated_history("win")
+        for _ in range(5):
+            history.add_bout(Bout("a", "b", 0.9, "nonsense"))
+
+        binned = history.accuracy_by_prior_bouts(arena, bin_size=100)["binned"]
+
+        self.assertEqual(binned[0]["total"], 20)
+        self.assertEqual(binned[0]["accuracy"], 1.0)
+
+    def test_arena_driven_bins_agree_with_calculate_metrics(self):
+        """The bout-weighted mean of the bins equals the accuracy of the same history."""
+        arena, eval_history = _arena_with_online_eval_history()
+
+        # Every bout carries an arena string outcome, so the pre-fix code scored zero of them.
+        self.assertTrue(all(isinstance(bout.outcome, str) for bout in eval_history.bouts))
+
+        expected = eval_history.calculate_metrics()["accuracy"]
+        self.assertGreater(expected, 0.5)
+
+        # bin_size=25 keeps every bin above the method's own reporting floor of 10 bouts,
+        # so the weighted mean covers the whole history.
+        binned = eval_history.accuracy_by_prior_bouts(arena, bin_size=25)["binned"]
+        self.assertGreater(len(binned), 1)
+        self.assertTrue(all(bin_data["accuracy"] is not None for bin_data in binned.values()))
+
+        total = sum(bin_data["total"] for bin_data in binned.values())
+        weighted = sum(bin_data["accuracy"] * bin_data["total"] for bin_data in binned.values())
+
+        self.assertEqual(total, len(eval_history.bouts))
+        self.assertAlmostEqual(weighted / total, expected)
 
 
 if __name__ == "__main__":
