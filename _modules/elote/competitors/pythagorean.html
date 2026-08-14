@@ -1,0 +1,698 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z43R9PWW0B"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-Z43R9PWW0B');
+    </script>
+    
+    <title>elote.competitors.pythagorean &#8212; elote 1.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=30d13653" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/wabi.css?v=501c8ac3" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=71d92741" />
+    <script src="../../../_static/documentation_options.js?v=ca842793"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+
+
+
+<meta name="description" content="elote.competitors.pythagorean - elote documentation">
+
+
+
+
+
+
+
+
+
+<meta property="og:title" content="elote.competitors.pythagorean">
+<meta property="og:description" content="elote.competitors.pythagorean - elote documentation">
+<meta property="og:type" content="website">
+
+<meta property="og:url" content="https://elote.mcginniscommawill.com/_modules/elote/competitors/pythagorean.html">
+
+
+<meta property="og:site_name" content="elote">
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="elote.competitors.pythagorean">
+<meta name="twitter:description" content="elote.competitors.pythagorean - elote documentation">
+
+<meta name="twitter:site" content="@willmcginniser">
+
+
+
+
+
+<link rel="canonical" href="https://elote.mcginniscommawill.com/_modules/elote/competitors/pythagorean.html">
+
+
+ 
+
+  </head><body>
+<header class="header">
+  <div class="header__inner">
+    
+    <a href="https://mcginniscommawill.com" class="header__logo">
+      McGinnis, Will
+    </a>
+
+    
+    <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+      </svg>
+    </button>
+
+    
+    <nav class="nav" role="navigation">
+      
+      
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/guides/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Guides
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/topics/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Topics
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/posts/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Blog
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/about/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            About
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/coffee/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Free Coffee
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/oss/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            OSS
+          </a>
+        
+      
+
+      
+      
+      <a href="../../../index.html" class="nav__link nav__link--active">
+        Docs
+      </a>
+      
+    </nav>
+  </div>
+</header>
+
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <div class="breadcrumbs__inner">
+    
+    <a href="https://mcginniscommawill.com">Home</a>
+    <span class="breadcrumbs__separator">/</span>
+    
+    <a href="../../../index.html">Docs</a>
+    
+      
+      <span class="breadcrumbs__separator">/</span>
+      <a href="../../index.html">Module code</a>
+      
+    
+    
+    <span class="breadcrumbs__separator">/</span>
+    <span>elote.competitors.pythagorean</span>
+    
+  </div>
+</nav>
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for elote.competitors.pythagorean</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Pythagorean expectation implementation for the Elote library.</span>
+
+<span class="sd">Pythagorean expectation is the oldest points-based rating in the sports canon. Bill James</span>
+<span class="sd">introduced it for baseball in the early 1980s, observing that a team&#39;s winning percentage is</span>
+<span class="sd">predicted remarkably well by the runs it scored and the runs it allowed:</span>
+
+<span class="sd">.. math::</span>
+
+<span class="sd">   w = \\frac{PF^{k}}{PF^{k} + PA^{k}}</span>
+
+<span class="sd">The name comes from the resemblance to the Pythagorean theorem in the original ``k = 2``</span>
+<span class="sd">form. The exponent is the one free parameter, and it is fitted per sport: 2 for baseball</span>
+<span class="sd">(James&#39; original), around 2.37 for American football, and around 14 for basketball, where</span>
+<span class="sd">scores are much larger and a point is worth correspondingly less.</span>
+
+<span class="sd">Two properties make it unusual in this library.</span>
+
+<span class="sd">1. **The rating is already a win expectation.** Every other shipped system produces a</span>
+<span class="sd">   strength score that has to be mapped through a logistic, a normal CDF or a share before it</span>
+<span class="sd">   can be read as a probability. A Pythagorean rating is a number in ``[0, 1]`` that reads</span>
+<span class="sd">   directly as &quot;the fraction of games this competitor should win against the field it has</span>
+<span class="sd">   played&quot;.</span>
+<span class="sd">2. **It ignores the opponent graph entirely.** A competitor&#39;s rating depends only on its own</span>
+<span class="sd">   accumulated points for and points against, never on who supplied them. That makes it the</span>
+<span class="sd">   cheapest system here -- a constant-time update with no graph, no matrix and no refit --</span>
+<span class="sd">   and also its main limitation: it makes no strength-of-schedule adjustment at all.</span>
+
+<span class="sd">Two competitors are compared through the standard log5 combination of their two win</span>
+<span class="sd">expectations,</span>
+
+<span class="sd">.. math::</span>
+
+<span class="sd">   E_a = \\frac{w_a - w_a w_b}{w_a + w_b - 2 w_a w_b}</span>
+
+<span class="sd">which is Bill James&#39; formula for the probability that ``a`` beats ``b`` given the rate at</span>
+<span class="sd">which each of them beats the field.</span>
+
+<span class="sd">References:</span>
+<span class="sd">- James, B. (1981). *The Bill James Baseball Abstract*. The original ``k = 2`` formulation.</span>
+<span class="sd">- Schatz, A. (2003). &quot;Pythagoras on the Gridiron&quot;, Football Outsiders. The ``k = 2.37`` fit</span>
+<span class="sd">  for American football used as the default here.</span>
+<span class="sd">- Miller, S. J. (2007). &quot;A Derivation of the Pythagorean Won-Loss Formula in Baseball&quot;.</span>
+<span class="sd">  *Chance*, 20(1), 40-48. Derives the formula from a Weibull model of scoring.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">cast</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote.competitors.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="n">InvalidParameterException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;PythagoreanCompetitor&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="PythagoreanCompetitor">
+<a class="viewcode-back" href="../../../competitors.html#elote.competitors.pythagorean.PythagoreanCompetitor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PythagoreanCompetitor</span><span class="p">(</span><span class="n">BaseCompetitor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pythagorean expectation competitor.</span>
+
+<span class="sd">    Rates a competitor from the points it has scored and the points it has allowed. Unlike</span>
+<span class="sd">    Colley, Massey, Keener and Bradley-Terry, nothing is fitted across a population: each</span>
+<span class="sd">    result adds to two running totals, and the rating is read straight off them. Unlike Elo</span>
+<span class="sd">    and the other incremental systems, the update does not depend on the opponent at all.</span>
+
+<span class="sd">    **Scores.** ``beat`` / ``lost_to`` / ``tied`` accept the common optional ``scores``</span>
+<span class="sd">    payload, the two competitors&#39; scores in caller order. Points are what this system is</span>
+<span class="sd">    built on, so supplying real ones is the intended use. When they are omitted the same</span>
+<span class="sd">    unit-score fallback the rest of the library uses applies: the winner is credited ``1``</span>
+<span class="sd">    and the loser ``0``, and a draw credits each side ``0.5``. On unit scores the rating</span>
+<span class="sd">    degenerates into a smoothed winning percentage, which is still a usable baseline.</span>
+
+<span class="sd">    **Degenerate inputs.** A fresh competitor has ``PF = PA = 0`` and an unbeaten one has</span>
+<span class="sd">    ``PA = 0``; the first makes the rating ``0/0`` and the second makes it exactly ``1``,</span>
+<span class="sd">    which in turn makes log5 ``0/0``. Both are handled by a small symmetric prior added to</span>
+<span class="sd">    each accumulator rather than by clamping the output: the rating stays a continuous,</span>
+<span class="sd">    strictly monotone function of the real totals, a fresh competitor is exactly ``0.5``, and</span>
+<span class="sd">    every rating is strictly inside ``(0, 1)``, so log5 is always defined.</span>
+
+<span class="sd">    Key characteristics:</span>
+<span class="sd">    - The rating is a win expectation in [0, 1], not a strength score</span>
+<span class="sd">    - Constant-time update: no opponent graph, no refit, no order dependence</span>
+<span class="sd">    - Reads real scores; falls back to unit scores when they are omitted</span>
+<span class="sd">    - Makes no strength-of-schedule adjustment whatsoever</span>
+
+<span class="sd">    Class Attributes:</span>
+<span class="sd">        _minimum_rating (float): The minimum allowed rating value. Default: 0.0. The rating</span>
+<span class="sd">            is a probability, so the inherited Elo-style floor of 100 would saturate it.</span>
+<span class="sd">        _default_initial_rating (float): The rating of a competitor that has not played.</span>
+<span class="sd">            Default: 0.5, which the symmetric prior produces exactly.</span>
+<span class="sd">        _exponent (float): Pythagorean ``k``. Default: 2.37, the standard fit for American</span>
+<span class="sd">            football (Football Outsiders). Use 2 for baseball, or a much larger value for a</span>
+<span class="sd">            high-scoring sport such as basketball.</span>
+<span class="sd">        _prior_points (float): The symmetric prior added to both accumulators, in points.</span>
+<span class="sd">            Default: 1.0 -- comparable to the unit scores, negligible against real ones.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_minimum_rating</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">_default_initial_rating</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">_exponent</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.37</span>
+    <span class="n">_prior_points</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+<div class="viewcode-block" id="PythagoreanCompetitor.__init__">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.pythagorean.PythagoreanCompetitor.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exponent</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a Pythagorean competitor.</span>
+
+<span class="sd">        There is deliberately no ``initial_rating`` argument: the rating is derived from the</span>
+<span class="sd">        points totals rather than stored, and a caller-supplied starting rating on a ``[0, 1]``</span>
+<span class="sd">        scale has no points totals that would produce it.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            exponent (float, optional): The Pythagorean exponent for this competitor. If</span>
+<span class="sd">                None, the class exponent is used. Default: None.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidParameterException: If the exponent is not positive.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">exponent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">exponent</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Pythagorean exponent must be positive&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exponent</span> <span class="o">=</span> <span class="n">exponent</span> <span class="k">if</span> <span class="n">exponent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">PythagoreanCompetitor</span><span class="o">.</span><span class="n">_exponent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_points_for</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_points_against</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_games</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Initialized PythagoreanCompetitor with exponent </span><span class="si">%.4f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exponent</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of this competitor.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;&lt;PythagoreanCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rating</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;points=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_points_for</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_points_against</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">, games=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_games</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of this competitor.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;PythagoreanCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rating</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current rating of this competitor.</span>
+
+<span class="sd">        The rating is the Pythagorean win expectation ``PF^k / (PF^k + PA^k)``, computed on</span>
+<span class="sd">        the prior-adjusted totals. It is evaluated in the equivalent ratio form</span>
+<span class="sd">        ``1 / (1 + (PA/PF)^k)``, which cannot overflow for large totals and returns exactly</span>
+<span class="sd">        0.5 whenever the two totals are equal.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The current rating, strictly inside (0, 1).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">scored</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_points_for</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prior_points</span>
+        <span class="n">allowed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_points_against</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prior_points</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">powered</span> <span class="o">=</span> <span class="p">(</span><span class="n">allowed</span> <span class="o">/</span> <span class="n">scored</span><span class="p">)</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exponent</span>
+        <span class="k">except</span> <span class="ne">OverflowError</span><span class="p">:</span>
+            <span class="c1"># Needs a points ratio around 1e130, so this is a guard rather than a case:</span>
+            <span class="c1"># such a competitor has been outscored beyond anything the float scale can</span>
+            <span class="c1"># express, and its expectation is zero to every digit available.</span>
+            <span class="n">powered</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">powered</span><span class="p">))</span>
+
+    <span class="nd">@rating</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the current rating of this competitor.</span>
+
+<span class="sd">        Not supported: the rating is derived from the points totals, so there is no single</span>
+<span class="sd">        pair of totals that a given rating corresponds to.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (float): The new rating value.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NotImplementedError: Always.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Attempted to set rating directly on PythagoreanCompetitor, which is not supported.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s2">&quot;Cannot directly set the rating of a PythagoreanCompetitor. It is derived from points for and against.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_games</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the total number of games played by this competitor.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The total number of games played.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_games</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_log5</span><span class="p">(</span><span class="n">higher</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">lower</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Combine two win expectations with log5, given in descending order.</span>
+
+<span class="sd">        The denominator is formed as the sum of the two numerators rather than as the</span>
+<span class="sd">        textbook ``w_a + w_b - 2 w_a w_b``. The two are the same expression, but summing the</span>
+<span class="sd">        already-rounded numerators keeps the quotient inside ``[0.5, 1]`` in floating point:</span>
+<span class="sd">        both numerators are non-negative and the larger one is at least the smaller, so the</span>
+<span class="sd">        denominator is at least the numerator and at most twice it. Written the textbook way,</span>
+<span class="sd">        a heavily lopsided pair rounds to 1.0000000000000002.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            higher: The larger of the two win expectations.</span>
+<span class="sd">            lower: The smaller of the two win expectations.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The probability that the ``higher`` competitor wins, in [0.5, 1].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">product</span> <span class="o">=</span> <span class="n">higher</span> <span class="o">*</span> <span class="n">lower</span>
+        <span class="n">higher_edge</span> <span class="o">=</span> <span class="n">higher</span> <span class="o">-</span> <span class="n">product</span>
+        <span class="n">lower_edge</span> <span class="o">=</span> <span class="n">lower</span> <span class="o">-</span> <span class="n">product</span>
+        <span class="n">denominator</span> <span class="o">=</span> <span class="n">higher_edge</span> <span class="o">+</span> <span class="n">lower_edge</span>
+        <span class="k">if</span> <span class="n">denominator</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="c1"># Only reachable when both expectations are exactly 0 or exactly 1, which the</span>
+            <span class="c1"># prior rules out for ratings this class produces. Two competitors that agree</span>
+            <span class="c1"># completely are an even matchup.</span>
+            <span class="k">return</span> <span class="mf">0.5</span>
+        <span class="k">return</span> <span class="n">higher_edge</span> <span class="o">/</span> <span class="n">denominator</span>
+
+<div class="viewcode-block" id="PythagoreanCompetitor.expected_score">
+<a class="viewcode-back" href="../../../competitors.html#elote.competitors.pythagorean.PythagoreanCompetitor.expected_score">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;BaseCompetitor&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the expected score against another competitor.</span>
+
+<span class="sd">        Both ratings are already win expectations, so they are combined with the standard</span>
+<span class="sd">        log5 formula. The direction with the larger rating is the one actually computed and</span>
+<span class="sd">        the other is taken as its complement, which makes the two argument orders sum to</span>
+<span class="sd">        exactly 1.0 and makes two equal ratings give exactly 0.5.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            competitor (BaseCompetitor): The competitor to compare against.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The expected score (probability of winning).</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">mine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rating</span>
+        <span class="n">theirs</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span>
+        <span class="k">if</span> <span class="n">mine</span> <span class="o">&gt;=</span> <span class="n">theirs</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log5</span><span class="p">(</span><span class="n">mine</span><span class="p">,</span> <span class="n">theirs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log5</span><span class="p">(</span><span class="n">theirs</span><span class="p">,</span> <span class="n">mine</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_record_game</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scored</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">allowed</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add one game&#39;s points to this competitor&#39;s running totals.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            scored: The points this competitor scored.</span>
+<span class="sd">            allowed: The points this competitor conceded.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_points_for</span> <span class="o">+=</span> <span class="n">scored</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_points_against</span> <span class="o">+=</span> <span class="n">allowed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_games</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="PythagoreanCompetitor.beat">
+<a class="viewcode-back" href="../../../competitors.html#elote.competitors.pythagorean.PythagoreanCompetitor.beat">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has won against the given competitor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            competitor (BaseCompetitor): The opponent competitor that lost.</span>
+<span class="sd">            scores (sequence of float, optional): The two scores in caller order,</span>
+<span class="sd">                ``(self_score, competitor_score)``. When omitted the unit scores ``1`` and</span>
+<span class="sd">                ``0`` are recorded.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
+<span class="sd">            ValueError: If ``scores`` does not describe a win for this competitor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">validated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">opponent</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">PythagoreanCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+        <span class="n">mine</span><span class="p">,</span> <span class="n">theirs</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="k">if</span> <span class="n">validated</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">validated</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_record_game</span><span class="p">(</span><span class="n">mine</span><span class="p">,</span> <span class="n">theirs</span><span class="p">)</span>
+        <span class="n">opponent</span><span class="o">.</span><span class="n">_record_game</span><span class="p">(</span><span class="n">theirs</span><span class="p">,</span> <span class="n">mine</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Recorded win </span><span class="si">%.3f</span><span class="s2">-</span><span class="si">%.3f</span><span class="s2"> for </span><span class="si">%s</span><span class="s2"> over </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">mine</span><span class="p">,</span> <span class="n">theirs</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">opponent</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PythagoreanCompetitor.tied">
+<a class="viewcode-back" href="../../../competitors.html#elote.competitors.pythagorean.PythagoreanCompetitor.tied">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has tied with the given competitor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            competitor (BaseCompetitor): The opponent competitor that tied.</span>
+<span class="sd">            scores (sequence of float, optional): The two scores in caller order,</span>
+<span class="sd">                ``(self_score, competitor_score)``. They must be equal. When omitted each</span>
+<span class="sd">                side is credited the unit draw score ``0.5``.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
+<span class="sd">            ValueError: If ``scores`` does not describe a draw.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">validated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">opponent</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">PythagoreanCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+        <span class="n">mine</span><span class="p">,</span> <span class="n">theirs</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span> <span class="k">if</span> <span class="n">validated</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">validated</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_record_game</span><span class="p">(</span><span class="n">mine</span><span class="p">,</span> <span class="n">theirs</span><span class="p">)</span>
+        <span class="n">opponent</span><span class="o">.</span><span class="n">_record_game</span><span class="p">(</span><span class="n">theirs</span><span class="p">,</span> <span class="n">mine</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Recorded draw </span><span class="si">%.3f</span><span class="s2">-</span><span class="si">%.3f</span><span class="s2"> between </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">mine</span><span class="p">,</span> <span class="n">theirs</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">opponent</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_export_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the parameters used to initialize this competitor.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: A dictionary containing the initialization parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;exponent&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exponent</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exponent</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">_exponent</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_export_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the current state variables of this competitor.</span>
+
+<span class="sd">        The rating itself is not exported: it is a pure function of the two totals and the</span>
+<span class="sd">        exponent, so restoring the totals restores the rating exactly.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: A dictionary containing the current state variables.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;points_for&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_points_for</span><span class="p">,</span>
+            <span class="s2">&quot;points_against&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_points_against</span><span class="p">,</span>
+            <span class="s2">&quot;num_games&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_games</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_import_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Import parameters from a state dictionary.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            parameters (dict): A dictionary containing parameters.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidParameterException: If any parameter is invalid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">exponent</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;exponent&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">exponent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">exponent</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Pythagorean exponent must be positive&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exponent</span> <span class="o">=</span> <span class="n">exponent</span> <span class="k">if</span> <span class="n">exponent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">PythagoreanCompetitor</span><span class="o">.</span><span class="n">_exponent</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_import_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Import current state variables from a state dictionary.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            state (dict): A dictionary containing state variables.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidParameterException: If any state variable is invalid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">points_for</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;points_for&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">points_against</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;points_against&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">points_for</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">points_against</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Point totals cannot be negative&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_points_for</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">points_for</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_points_against</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">points_against</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_games</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;num_games&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_from_parameters</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new competitor instance from parameters.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            parameters (dict): A dictionary containing parameters.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            PythagoreanCompetitor: A new competitor instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">exponent</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;exponent&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+
+<div class="viewcode-block" id="PythagoreanCompetitor.reset">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.pythagorean.PythagoreanCompetitor.reset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset this competitor to its initial state.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Resetting PythagoreanCompetitor to initial state.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_points_for</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_points_against</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_games</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="PythagoreanCompetitor.configure_class">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.pythagorean.PythagoreanCompetitor.configure_class">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">configure_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure class-level parameters for this rating system.</span>
+
+<span class="sd">        Overrides the base implementation to validate the Pythagorean-specific parameters.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidParameterException: If any parameter is invalid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;exponent&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;exponent&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;Pythagorean exponent must be positive&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;prior_points&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;prior_points&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;prior_points must be positive&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">configure_class</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../competitors.html">Competitors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../arenas.html">Arenas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../serialization.html">Serialization</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/elo.html">Elo Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/glicko2.html">Glicko-2 Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/trueskill.html">TrueSkill Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/ecf.html">ECF Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/dwz.html">DWZ Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/colley.html">Colley Matrix Method</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/massey.html">Massey Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/keener.html">Keener Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/pythagorean.html">Pythagorean Expectation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/ensemble.html">Ensemble Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/comparison.html">Comparing Rating Systems</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advance_example.html">Advanced Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../use_cases/product_ranking.html">Product Ranking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../use_cases/matchmaking.html">Matchmaking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../use_cases/feature_prioritization.html">Feature Prioritization with Elote</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/competitors.html">Competitors API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/arenas.html">Arenas API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../blog_posts.html">Blog Posts</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to Elote</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <div class="footer__inner">
+    
+    
+    <div class="footer__links">
+      
+        <a href="https://github.com/wdm0006" class="footer__link" target="_blank" rel="noopener noreferrer">
+          GitHub
+        </a>
+      
+        <a href="https://www.linkedin.com/in/wmcginnis/" class="footer__link" target="_blank" rel="noopener noreferrer">
+          LinkedIn
+        </a>
+      
+        <a href="https://x.com/willmcginniser" class="footer__link" target="_blank" rel="noopener noreferrer">
+          Twitter
+        </a>
+      
+    </div>
+    
+
+    
+    <p class="footer__copy">
+      
+        &copy; 2020, Will McGinnis
+      
+    </p>
+  </div>
+</footer>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggle = document.querySelector('.nav-toggle');
+    const nav = document.querySelector('.nav');
+    if (toggle && nav) {
+      toggle.addEventListener('click', function() {
+        nav.classList.toggle('is-open');
+        const isOpen = nav.classList.contains('is-open');
+        toggle.setAttribute('aria-expanded', isOpen);
+      });
+    }
+  });
+</script>
+
+  </body>
+</html>

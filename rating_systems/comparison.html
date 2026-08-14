@@ -259,14 +259,21 @@
 <td><p>Yes</p></td>
 <td><p>Score-based eigenvector ranking</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Bradley-Terry</strong></p></td>
+<tr class="row-odd"><td><p><strong>Pythagorean</strong></p></td>
+<td><p>Baseball (1980s)</p></td>
+<td><p>Low</p></td>
+<td><p>No</p></td>
+<td><p>Yes</p></td>
+<td><p>Points-based win expectation</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Bradley-Terry</strong></p></td>
 <td><p>Statistics (1952)</p></td>
 <td><p>Medium</p></td>
 <td><p>No</p></td>
 <td><p>Yes</p></td>
 <td><p>Maximum-likelihood ranking</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Ensemble</strong></p></td>
+<tr class="row-odd"><td><p><strong>Ensemble</strong></p></td>
 <td><p>Meta-system</p></td>
 <td><p>High</p></td>
 <td><p>Depends on components</p></td>
@@ -275,11 +282,12 @@
 </tr>
 </tbody>
 </table>
-<p>Online systems (Elo, Glicko, Glicko-2, TrueSkill, ECF, DWZ) update ratings incrementally after each
-result. Global-fit systems (Colley Matrix, Massey, Keener and Bradley-Terry) re-solve the whole
-connected group of competitors from the full set of results, which makes them order independent.
-Massey and Keener are the two that read the optional score payload; the rest use only who beat
-whom.</p>
+<p>Online systems (Elo, Glicko, Glicko-2, TrueSkill, ECF, DWZ, Pythagorean) update ratings
+incrementally after each result. Global-fit systems (Colley Matrix, Massey, Keener and
+Bradley-Terry) re-solve the whole connected group of competitors from the full set of results,
+which makes them order independent. Pythagorean is order independent too, for a different reason:
+its state is a running sum of points that ignores the opponent graph entirely. Massey, Keener and
+Pythagorean are the three that read the optional score payload; the rest use only who beat whom.</p>
 </section>
 <section id="mathematical-formulation">
 <h2>Mathematical Formulation<a class="headerlink" href="#mathematical-formulation" title="Link to this heading">¶</a></h2>
@@ -321,10 +329,13 @@ whom.</p>
 <tr class="row-even"><td><p><strong>Keener</strong></p></td>
 <td><p>Ratings are the dominant eigenvector of <span class="math notranslate nohighlight">\(H_{ij} = h(a_{ij}) / g_i + \varepsilon\)</span> with <span class="math notranslate nohighlight">\(a_{ij} = \frac{S_{ij} + 1}{S_{ij} + S_{ji} + 2}\)</span> and <span class="math notranslate nohighlight">\(h(x) = \frac{1}{2} + \frac{1}{2}\mathrm{sgn}(x - \frac{1}{2})\sqrt{|2x - 1|}\)</span>; <span class="math notranslate nohighlight">\(E_A = \frac{r_A}{r_A + r_B}\)</span></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Bradley-Terry</strong></p></td>
+<tr class="row-odd"><td><p><strong>Pythagorean</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(w = \frac{PF^{k}}{PF^{k} + PA^{k}}\)</span> on prior-adjusted point totals; <span class="math notranslate nohighlight">\(E_A = \frac{w_A - w_A w_B}{w_A + w_B - 2 w_A w_B}\)</span> (log5)</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Bradley-Terry</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(P(A \text{ beats } B) = \frac{p_A}{p_A + p_B} = \frac{1}{1 + e^{-(\beta_A - \beta_B)}}\)</span></p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Ensemble</strong></p></td>
+<tr class="row-odd"><td><p><strong>Ensemble</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(E_{ensemble} = \sum_{i=1}^{n} w_i \times E_i\)</span> where <span class="math notranslate nohighlight">\(w_i\)</span> are weights</p></td>
 </tr>
 </tbody>
@@ -370,10 +381,13 @@ whom.</p>
 <tr class="row-even"><td><p><strong>Keener</strong></p></td>
 <td><p>Initial rating (default 1.0), Perturbation, Expected-score scale</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Bradley-Terry</strong></p></td>
+<tr class="row-odd"><td><p><strong>Pythagorean</strong></p></td>
+<td><p>Exponent (default 2.37), Prior points (default 1.0); no initial rating</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Bradley-Terry</strong></p></td>
 <td><p>Initial rating, Scale, Regularization, Max iterations</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Ensemble</strong></p></td>
+<tr class="row-odd"><td><p><strong>Ensemble</strong></p></td>
 <td><p>Component systems, Weights</p></td>
 </tr>
 </tbody>
@@ -500,6 +514,20 @@ whom.</p>
 - The stabilizing perturbation is an extra knob that quietly couples competitors who never met
 - Requires a connected schedule to compare competitors</p>
 </section>
+<section id="pythagorean">
+<h3>Pythagorean<a class="headerlink" href="#pythagorean" title="Link to this heading">¶</a></h3>
+<p><strong>Strengths:</strong>
+- The rating is already a win expectation in [0, 1], with no scale to translate
+- The cheapest system here: constant-time updates, no population fit
+- Order independent, since the state is a running sum of points
+- No opponent graph to lose, so serialized state restores exactly, continued play included
+- A strong points-only baseline that decades of sports analytics have found hard to beat</p>
+<p><strong>Weaknesses:</strong>
+- No strength-of-schedule adjustment at all: who supplied the points is ignored
+- Reduces to a smoothed win percentage on outcome-only data
+- The exponent is sport-specific; the default is an American-football fit
+- No uncertainty measure attached to the rating</p>
+</section>
 <section id="bradley-terry">
 <h3>Bradley-Terry<a class="headerlink" href="#bradley-terry" title="Link to this heading">¶</a></h3>
 <p><strong>Strengths:</strong>
@@ -530,7 +558,7 @@ whom.</p>
 <section id="choosing-the-right-system">
 <h2>Choosing the Right System<a class="headerlink" href="#choosing-the-right-system" title="Link to this heading">¶</a></h2>
 <p>Consider the following factors when choosing a rating system:</p>
-<ol class="arabic simple">
+<ol class="arabic">
 <li><p><strong>Data Density</strong>: How frequently do competitors face each other?
 - Sparse data: Consider Glicko or Glicko-2
 - Dense data: Elo may be sufficient</p></li>
@@ -541,9 +569,15 @@ whom.</p>
 - Team and multiplayer games: TrueSkill
 - General purpose: Elo or Glicko</p></li>
 <li><p><strong>Order Independence</strong>: Do you need a ranking that ignores schedule order?
-- Yes: Colley Matrix, Massey, Keener, or Bradley-Terry
-- Yes, and you have real scores: Massey (linear margin) or Keener (bounded score share)
-- No: any online system (Elo, Glicko, etc.)</p></li>
+- Yes: Colley Matrix, Massey, Keener, Bradley-Terry, or Pythagorean
+- Yes, and you have real scores: Massey (linear margin), Keener (bounded score share), or</p>
+<blockquote>
+<div><p>Pythagorean (points ratio, no strength of schedule)</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>No: any other online system (Elo, Glicko, etc.)</p></li>
+</ul>
+</li>
 <li><p><strong>Computational Resources</strong>:
 - Limited resources: Elo or ECF
 - Sufficient resources: Glicko, Glicko-2, TrueSkill, or Ensemble</p></li>
@@ -568,6 +602,7 @@ whom.</p>
     <span class="n">ColleyMatrixCompetitor</span><span class="p">,</span>
     <span class="n">MasseyCompetitor</span><span class="p">,</span>
     <span class="n">KeenerCompetitor</span><span class="p">,</span>
+    <span class="n">PythagoreanCompetitor</span><span class="p">,</span>
     <span class="n">BradleyTerryCompetitor</span><span class="p">,</span>
     <span class="n">BlendedCompetitor</span><span class="p">,</span>
 <span class="p">)</span>
@@ -599,6 +634,9 @@ whom.</p>
 <span class="c1"># Keener (strictly positive, mean 1.0; reads real scores)</span>
 <span class="n">keener_player</span> <span class="o">=</span> <span class="n">KeenerCompetitor</span><span class="p">()</span>
 
+<span class="c1"># Pythagorean (win expectation in [0, 1]; reads real scores, no initial rating)</span>
+<span class="n">pythagorean_player</span> <span class="o">=</span> <span class="n">PythagoreanCompetitor</span><span class="p">(</span><span class="n">exponent</span><span class="o">=</span><span class="mf">2.37</span><span class="p">)</span>
+
 <span class="c1"># Bradley-Terry (Elo-compatible scale)</span>
 <span class="n">bt_player</span> <span class="o">=</span> <span class="n">BradleyTerryCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
 
@@ -619,6 +657,9 @@ whom.</p>
 <span class="c1"># Score-based systems additionally accept the optional scores payload</span>
 <span class="n">home</span><span class="p">,</span> <span class="n">away</span> <span class="o">=</span> <span class="n">KeenerCompetitor</span><span class="p">(),</span> <span class="n">KeenerCompetitor</span><span class="p">()</span>
 <span class="n">home</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">away</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+<span class="n">scorers</span> <span class="o">=</span> <span class="n">PythagoreanCompetitor</span><span class="p">(),</span> <span class="n">PythagoreanCompetitor</span><span class="p">()</span>
+<span class="n">scorers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">scorers</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">scores</span><span class="o">=</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span> <span class="mi">14</span><span class="p">))</span>
 </pre></div>
 </div>
 </section>
@@ -667,6 +708,7 @@ whom.</p>
 <li class="toctree-l1"><a class="reference internal" href="colley.html">Colley Matrix Method</a></li>
 <li class="toctree-l1"><a class="reference internal" href="massey.html">Massey Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="keener.html">Keener Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pythagorean.html">Pythagorean Expectation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bradley_terry.html">Bradley-Terry Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Comparing Rating Systems</a></li>

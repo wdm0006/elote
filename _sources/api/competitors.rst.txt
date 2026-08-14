@@ -93,6 +93,15 @@ Keener Competitor
    :show-inheritance:
    :special-members: __init__
 
+Pythagorean Competitor
+----------------------
+
+.. automodule:: elote.competitors.pythagorean
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :special-members: __init__
+
 Bradley-Terry Competitor
 -----------------------
 
