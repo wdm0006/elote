@@ -187,6 +187,11 @@
 <div class="viewcode-block" id="LambdaArena">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.lambda_arena.LambdaArena">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">LambdaArena</span><span class="p">(</span><span class="n">BaseArena</span><span class="p">):</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_outcome</span><span class="p">(</span><span class="n">outcome</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">outcome</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">outcome</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;outcome must be one of 1.0, 0.0 or 0.5, got </span><span class="si">{</span><span class="n">outcome</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+
 <div class="viewcode-block" id="LambdaArena.__init__">
 <a class="viewcode-back" href="../../../api/arenas.html#elote.arenas.lambda_arena.LambdaArena.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -318,8 +323,7 @@
 <span class="sd">                ``scores`` is supplied without ``outcome``, or if ``scores`` is malformed,</span>
 <span class="sd">                negative, non-finite, or disagrees with ``outcome``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">outcome</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">outcome</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;outcome must be one of 1.0, 0.0 or 0.5, got </span><span class="si">{</span><span class="n">outcome</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_outcome</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">scores</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">outcome</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;scores requires an explicit outcome so the two can be checked for agreement&quot;</span><span class="p">)</span>
         <span class="c1"># Validated before any competitor is created or any history is recorded, so a bad</span>
@@ -453,6 +457,7 @@
         <span class="n">skipped_bouts</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Processing </span><span class="si">%d</span><span class="s2"> bouts for training history&quot;</span><span class="p">,</span> <span class="n">total_bouts</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">outcome</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">iterator</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_outcome</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span>
             <span class="c1"># Get or create competitors</span>
             <span class="n">c_a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_competitor</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
             <span class="n">c_b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_competitor</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
@@ -497,6 +502,7 @@
         <span class="n">skipped_bouts</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Evaluating performance using </span><span class="si">%d</span><span class="s2"> bouts&quot;</span><span class="p">,</span> <span class="n">total_bouts</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">outcome</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">iterator</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_outcome</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span>
             <span class="c1"># Evaluation is a read: an identifier the arena never trained on has no</span>
             <span class="c1"># rating to evaluate, so the bout is skipped rather than scored against a</span>
             <span class="c1"># freshly defaulted competitor.</span>
@@ -550,6 +556,7 @@
         <span class="n">skipped_bouts</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Validating model using </span><span class="si">%d</span><span class="s2"> bouts&quot;</span><span class="p">,</span> <span class="n">total_bouts</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">outcome</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">iterator</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_outcome</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span>
             <span class="c1"># Validation is a read: an identifier the arena never trained on has no</span>
             <span class="c1"># rating to validate, so the bout is skipped rather than scored against a</span>
             <span class="c1"># freshly defaulted competitor.</span>
