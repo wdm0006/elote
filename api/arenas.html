@@ -387,9 +387,13 @@ properly accounting for draws as a third outcome category.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>arena (BaseArena): The arena containing the competitors and their history
 thresholds (tuple, optional): Tuple of (lower_threshold, upper_threshold) for predictions
-bin_size (int): Size of bins for grouping bout counts</p>
+bin_size (int): Size of bins for grouping bout counts. Must be a positive integer.</p>
 </dd>
-<dt>Returns:</dt><dd><p>dict: A dictionary with ‘binned’ key containing binned accuracy data</p>
+<dt>Returns:</dt><dd><p>dict: A dictionary with ‘binned’ key containing binned accuracy data. Every
+non-empty bin reports its observed <code class="docutils literal notranslate"><span class="pre">correct</span> <span class="pre">/</span> <span class="pre">total</span></code> accuracy, however few
+bouts it holds.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If <code class="docutils literal notranslate"><span class="pre">bin_size</span></code> is not a positive integer.</p>
 </dd>
 </dl>
 </dd></dl>
