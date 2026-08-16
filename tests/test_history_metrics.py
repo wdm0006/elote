@@ -548,8 +548,6 @@ class TestAccuracyByPriorBouts(unittest.TestCase):
         expected = eval_history.calculate_metrics()["accuracy"]
         self.assertGreater(expected, 0.5)
 
-        # bin_size=25 keeps every bin above the method's own reporting floor of 10 bouts,
-        # so the weighted mean covers the whole history.
         binned = eval_history.accuracy_by_prior_bouts(arena, bin_size=25)["binned"]
         self.assertGreater(len(binned), 1)
         self.assertTrue(all(bin_data["accuracy"] is not None for bin_data in binned.values()))
@@ -559,6 +557,103 @@ class TestAccuracyByPriorBouts(unittest.TestCase):
 
         self.assertEqual(total, len(eval_history.bouts))
         self.assertAlmostEqual(weighted / total, expected)
+
+
+class _ExplodingArena:
+    """An arena whose history must never be read, so eager validation is provable."""
+
+    @property
+    def history(self):
+        raise AssertionError("bin_size must be validated before any bout is processed")
+
+
+def _history_with_leading_misses(count, misses):
+    """``count`` bouts between one pair, the first ``misses`` of them predicted wrong."""
+    history = History()
+    for index in range(count):
+        history.add_bout(Bout("a", "b", 0.9, "loss" if index < misses else "win"))
+    return history
+
+
+class TestAccuracyByPriorBoutsSmallBins(unittest.TestCase):
+    """Every non-empty bin reports its observed accuracy, however few bouts it holds."""
+
+    def test_single_bout_bin_reports_its_observed_accuracy(self):
+        """One bout is enough to report ``correct / total``."""
+        arena = MockArena()
+
+        hit = _history_with_leading_misses(1, 0).accuracy_by_prior_bouts(arena, bin_size=100)["binned"]
+        miss = _history_with_leading_misses(1, 1).accuracy_by_prior_bouts(arena, bin_size=100)["binned"]
+
+        self.assertEqual(hit[0]["total"], 1)
+        self.assertEqual(hit[0]["accuracy"], 1.0)
+        self.assertEqual(miss[0]["total"], 1)
+        self.assertEqual(miss[0]["accuracy"], 0.0)
+
+    def test_accuracy_is_continuous_across_the_former_eleven_bout_floor(self):
+        """Bins of 1 through 11 bouts all report the exact observed ratio.
+
+        The old code returned ``None`` for every total of 10 or fewer, so a bin jumped
+        from missing to rated on the eleventh bout.
+        """
+        arena = MockArena()
+
+        for count in range(1, 12):
+            with self.subTest(count=count):
+                binned = _history_with_leading_misses(count, 1).accuracy_by_prior_bouts(arena, bin_size=100)["binned"]
+
+                self.assertEqual(binned[0]["total"], count)
+                self.assertAlmostEqual(binned[0]["accuracy"], (count - 1) / count)
+
+    def test_weighted_bins_aggregate_across_prior_bout_counts(self):
+        """A bin spanning several prior-bout counts reports their combined ratio."""
+        arena = MockArena()
+
+        # Ten bouts between one pair, so each prior-bout count 0-9 holds exactly one bout.
+        # bin_size=5 groups counts 0-4 and 5-9 into two five-bout bins.
+        binned = _history_with_leading_misses(10, 2).accuracy_by_prior_bouts(arena, bin_size=5)["binned"]
+
+        self.assertEqual(sorted(binned), [0, 1])
+        self.assertEqual((binned[0]["min_bouts"], binned[0]["max_bouts"]), (0, 4))
+        self.assertEqual((binned[1]["min_bouts"], binned[1]["max_bouts"]), (5, 9))
+        self.assertEqual(binned[0]["total"], 5)
+        self.assertEqual(binned[1]["total"], 5)
+        self.assertAlmostEqual(binned[0]["accuracy"], 3 / 5)
+        self.assertAlmostEqual(binned[1]["accuracy"], 1.0)
+
+        total = sum(bin_data["total"] for bin_data in binned.values())
+        weighted = sum(bin_data["accuracy"] * bin_data["total"] for bin_data in binned.values())
+        self.assertAlmostEqual(weighted / total, 8 / 10)
+
+    def test_bins_weight_prior_bout_counts_by_their_bout_totals(self):
+        """A bin is the combined ``correct / total``, not the mean of its counts' accuracies.
+
+        The four fresh pairs land on prior-bout count 0 and the repeat lands on count 1,
+        so an unweighted mean over the two counts would report 0.625 instead of 0.4.
+        """
+        arena = MockArena()
+        history = History()
+        history.add_bout(Bout("p0", "q0", 0.9, "win"))
+        for index in range(1, 4):
+            history.add_bout(Bout("p%d" % index, "q%d" % index, 0.9, "loss"))
+        history.add_bout(Bout("p0", "q0", 0.9, "win"))
+
+        binned = history.accuracy_by_prior_bouts(arena, bin_size=5)["binned"]
+
+        self.assertEqual(sorted(binned), [0])
+        self.assertEqual(binned[0]["total"], 5)
+        self.assertAlmostEqual(binned[0]["accuracy"], 2 / 5)
+
+    def test_invalid_bin_sizes_are_rejected_before_any_bout_is_read(self):
+        """Zero, negative, non-integral and boolean bin sizes raise eagerly."""
+        history = _history_with_leading_misses(4, 1)
+
+        for bin_size in (0, -1, -5, 2.5, 5.0, True, False, "5", None):
+            with self.subTest(bin_size=bin_size):
+                with self.assertRaises(ValueError) as caught:
+                    history.accuracy_by_prior_bouts(_ExplodingArena(), bin_size=bin_size)
+
+                self.assertIn("bin_size must be a positive integer", str(caught.exception))
 
 
 if __name__ == "__main__":
