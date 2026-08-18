@@ -730,10 +730,56 @@ class TestDatasetUtils(unittest.TestCase):
         arena = LambdaArena(lambda a, b, attributes=None: True)
         progress_callback = MagicMock()
 
-        history = evaluate_arena_with_dataset(arena, [], progress_callback=progress_callback)
+        with self.assertNoLogs("elote", level="WARNING"):
+            history = evaluate_arena_with_dataset(arena, [], progress_callback=progress_callback)
 
         self.assertEqual(history.bouts, [])
         progress_callback.assert_not_called()
+
+    def test_evaluate_arena_warns_once_for_skipped_unseen_competitors(self):
+        arena = LambdaArena(lambda a, b, attributes=None: True)
+        train_arena_with_dataset(arena, [("A", "B", 1.0, None, None)])
+        test_data = [
+            ("A", "B", 1.0, None, None),
+            ("A", "C", 1.0, None, None),
+            ("D", "B", 0.0, None, None),
+            ("C", "D", 0.5, None, None),
+        ]
+
+        with self.assertLogs("elote", level="WARNING") as captured:
+            history = evaluate_arena_with_dataset(arena, test_data)
+
+        self.assertEqual(len(history.bouts), 1)
+        self.assertEqual(
+            captured.output,
+            ["WARNING:elote:Skipped 3/4 evaluation bouts: competitor not found in training history."],
+        )
+
+    def test_evaluate_arena_warns_when_nonempty_test_set_yields_no_bouts(self):
+        arena = LambdaArena(lambda a, b, attributes=None: True)
+        train_arena_with_dataset(arena, [("A", "B", 1.0, None, None)])
+
+        with self.assertLogs("elote", level="WARNING") as captured:
+            history = evaluate_arena_with_dataset(arena, [("A", "C", 1.0, None, None)])
+
+        self.assertEqual(history.bouts, [])
+        self.assertEqual(
+            captured.output,
+            [
+                "WARNING:elote:Skipped 1/1 evaluation bouts: competitor not found in training history.",
+                "WARNING:elote:Evaluation history is empty after evaluating 1 test bouts; metrics are not meaningful.",
+            ],
+        )
+
+    def test_evaluate_arena_does_not_warn_when_every_row_is_evaluable(self):
+        arena = LambdaArena(lambda a, b, attributes=None: True)
+        rows = [("A", "B", 1.0, None, None)]
+        train_arena_with_dataset(arena, rows)
+
+        with self.assertNoLogs("elote", level="WARNING"):
+            history = evaluate_arena_with_dataset(arena, rows)
+
+        self.assertEqual(len(history.bouts), 1)
 
     def test_dataset_helpers_reject_non_positive_batch_sizes(self):
         arena = LambdaArena(lambda a, b, attributes=None: True)
@@ -894,6 +940,21 @@ class TestDatasetUtils(unittest.TestCase):
 
         # Check that evaluation history was recorded
         self.assertGreater(len(evaluation_history.bouts), 0)
+
+    def test_competitor_split_warns_for_every_unevaluable_test_row(self):
+        dataset = SyntheticDataset(num_competitors=30, num_matchups=600, seed=7)
+        data_split = dataset.competitor_split(test_ratio=0.2, seed=7)
+        arena = LambdaArena(lambda a, b, attributes=None: True, base_competitor=EloCompetitor)
+
+        with self.assertLogs("elote", level="WARNING") as captured:
+            _, history = train_and_evaluate_arena(arena, data_split)
+
+        skipped_message = (
+            f"WARNING:elote:Skipped {len(data_split.test)}/{len(data_split.test)} evaluation bouts: "
+            "competitor not found in training history."
+        )
+        self.assertEqual(history.bouts, [])
+        self.assertIn(skipped_message, captured.output)
 
 
 if __name__ == "__main__":
