@@ -1,6 +1,11 @@
 v1.2.1
 ======
 
+New rating systems
+
+ * Added Whole-History Rating (`WholeHistoryRatingCompetitor`), a lazy, bounded time-aware
+   Bradley-Terry MAP system with a queryable per-playing-day rating curve.
+
 A correctness release. Every shipped rating system except Elo, DWZ, Colley and Bradley-Terry had at
 least one numeric defect, and the prediction-quality metrics silently discarded drawn bouts. Ratings
 and predicted probabilities produced by this version differ from v1.2.0; state exported by v1.2.0

@@ -111,6 +111,15 @@ Bradley-Terry Competitor
    :show-inheritance:
    :special-members: __init__
 
+Whole-History Rating Competitor
+-------------------------------
+
+.. automodule:: elote.competitors.whr
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :special-members: __init__
+
 Blended Competitor
 -----------------
 
@@ -118,4 +127,4 @@ Blended Competitor
    :members:
    :undoc-members:
    :show-inheritance:
-   :special-members: __init__ 
+   :special-members: __init__

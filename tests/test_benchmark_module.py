@@ -10,6 +10,8 @@ from elote.competitors.colley import ColleyMatrixCompetitor
 from elote.competitors.massey import MasseyCompetitor
 from elote.competitors.keener import KeenerCompetitor
 from elote.competitors.pythagorean import PythagoreanCompetitor
+from elote.competitors.whr import WholeHistoryRatingCompetitor
+from elote.competitors.bradley_terry import BradleyTerryCompetitor
 from elote.arenas.base import History, Bout
 from elote.datasets.base import DataSplit
 from elote.datasets.synthetic import SyntheticDataset
@@ -521,6 +523,26 @@ class TestBenchmarkEndToEnd(unittest.TestCase):
         for entry in results:
             with self.subTest(system=entry["name"]):
                 self.assertGreater(entry["accuracy"], 0.5)
+
+    def test_whr_runs_end_to_end_and_can_be_compared(self):
+        result = evaluate_competitor(
+            competitor_class=WholeHistoryRatingCompetitor,
+            data_split=self.data_split,
+            comparison_function=_always_true,
+            optimize_thresholds=False,
+        )
+        self.assertGreater(result["accuracy"], 0.5)
+
+        results = benchmark_competitors(
+            [
+                {"class": WholeHistoryRatingCompetitor, "name": "WHR", "params": {}},
+                {"class": BradleyTerryCompetitor, "name": "Bradley-Terry", "params": {}},
+            ],
+            self.data_split,
+            _always_true,
+            optimize_thresholds=False,
+        )
+        self.assertEqual([entry["name"] for entry in results], ["WHR", "Bradley-Terry"])
 
 
 if __name__ == "__main__":

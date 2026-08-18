@@ -23,6 +23,7 @@ from elote import (
     LambdaArena,
     MasseyCompetitor,
     PythagoreanCompetitor,
+    WholeHistoryRatingCompetitor,
     TrueSkillCompetitor,
     benchmark_competitors,
     train_arena_with_dataset,
@@ -46,6 +47,7 @@ COMPETITOR_CLASSES = (
     MasseyCompetitor,
     KeenerCompetitor,
     PythagoreanCompetitor,
+    WholeHistoryRatingCompetitor,
 )
 
 # A win, a draw and a loss, with the unit scores each result implies.
