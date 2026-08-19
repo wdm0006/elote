@@ -331,7 +331,7 @@ Pythagorean are the three that read the optional score payload; the rest use onl
 <td><p>Ratings solve <span class="math notranslate nohighlight">\(C r = b\)</span>; <span class="math notranslate nohighlight">\(E_A = \frac{1}{1 + e^{-4 (r_A - r_B)}}\)</span></p></td>
 </tr>
 <tr class="row-odd"><td><p><strong>Massey</strong></p></td>
-<td><p>Ratings solve <span class="math notranslate nohighlight">\(M r = p\)</span> with <span class="math notranslate nohighlight">\(M = D - A\)</span>; <span class="math notranslate nohighlight">\(E_A = \frac{1}{1 + e^{-2 (r_A - r_B)}}\)</span></p></td>
+<td><p>Ratings solve <span class="math notranslate nohighlight">\(M r = p\)</span> with <span class="math notranslate nohighlight">\(M = D - A\)</span>; <span class="math notranslate nohighlight">\(E_A = \frac{1}{1 + e^{-2 (r_A - r_B) / \sigma}}\)</span>, where <span class="math notranslate nohighlight">\(\sigma\)</span> is the fitted rating spread</p></td>
 </tr>
 <tr class="row-even"><td><p><strong>Keener</strong></p></td>
 <td><p>Ratings are the dominant eigenvector of <span class="math notranslate nohighlight">\(H_{ij} = h(a_{ij}) / g_i + \varepsilon\)</span> with <span class="math notranslate nohighlight">\(a_{ij} = \frac{S_{ij} + 1}{S_{ij} + S_{ji} + 2}\)</span> and <span class="math notranslate nohighlight">\(h(x) = \frac{1}{2} + \frac{1}{2}\mathrm{sgn}(x - \frac{1}{2})\sqrt{|2x - 1|}\)</span>; <span class="math notranslate nohighlight">\(E_A = \frac{r_A}{r_A + r_B}\)</span></p></td>

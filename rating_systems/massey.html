@@ -205,8 +205,28 @@ constraint</p>
 connected group of competitors after each recorded result, and the expected score between two
 competitors is a logistic function of their rating difference:</p>
 <div class="math notranslate nohighlight">
-\[E_a = \frac{1}{1 + e^{-s\,(r_a - r_b)}}\]</div>
-<p>with a class-configurable scale <span class="math notranslate nohighlight">\(s\)</span> (default 2.0).</p>
+\[E_a = \frac{1}{1 + e^{-s\,(r_a - r_b) / \sigma}}\]</div>
+<p>with a class-configurable sharpness <span class="math notranslate nohighlight">\(s\)</span> (default 2.0).</p>
+</section>
+<section id="normalized-rating-difference">
+<h2>Normalized rating difference<a class="headerlink" href="#normalized-rating-difference" title="Link to this heading">¶</a></h2>
+<p>The divisor <span class="math notranslate nohighlight">\(\sigma\)</span> is the <strong>fitted rating scale</strong>: the root-mean-square rating difference
+between two members of the connected group, recorded on every competitor alongside the fit. For a
+zero-mean group that is <span class="math notranslate nohighlight">\(\sqrt{2}\)</span> times the population standard deviation of the ratings.</p>
+<p>This matters because a Massey rating carries the caller’s own units. With unit margins the ratings
+sit within roughly <span class="math notranslate nohighlight">\(\pm 1\)</span>, but with real point scores they are <strong>points per game</strong>, so
+<span class="math notranslate nohighlight">\(r_a - r_b\)</span> is routinely 10-30 rather than 0.1-1. Dividing by <span class="math notranslate nohighlight">\(\sigma\)</span> makes the
+logistic argument dimensionless, so:</p>
+<ul class="simple">
+<li><p>probabilities do not saturate to exactly <code class="docutils literal notranslate"><span class="pre">0.0</span></code> / <code class="docutils literal notranslate"><span class="pre">1.0</span></code> once real point margins are supplied
+(which would make log loss unbounded and flatten the calibration curve);</p></li>
+<li><p>the same schedule expressed in different point units gives the same probabilities;</p></li>
+<li><p><span class="math notranslate nohighlight">\(s\)</span> stays a pure sharpness knob rather than a unit-dependent constant.</p></li>
+</ul>
+<p>The normalization is monotone, so it changes no ordering, no rating and no leaderboard – only the
+probabilities <code class="docutils literal notranslate"><span class="pre">expected_score</span></code> reports. The scale is <code class="docutils literal notranslate"><span class="pre">1.0</span></code> for a competitor that has never been
+fitted, so a directly constructed competitor divides by one, and it is carried through
+<code class="docutils literal notranslate"><span class="pre">export_state()</span></code> / <code class="docutils literal notranslate"><span class="pre">from_state()</span></code> as <code class="docutils literal notranslate"><span class="pre">rating_scale</span></code>.</p>
 </section>
 <section id="margins">
 <h2>Margins<a class="headerlink" href="#margins" title="Link to this heading">¶</a></h2>
@@ -292,8 +312,17 @@ are rated independently of one another.</p></li>
 <p>Key parameters:</p>
 <ul class="simple">
 <li><p><strong>initial_rating</strong>: starting rating value (default: 0.0).</p></li>
-<li><p><strong>expected_score_scale</strong>: class-level logistic scale used by <code class="docutils literal notranslate"><span class="pre">expected_score</span></code> (default: 2.0),
-settable with <code class="docutils literal notranslate"><span class="pre">MasseyCompetitor.configure_class(expected_score_scale=...)</span></code>.</p></li>
+<li><p><strong>expected_score_scale</strong>: class-level sharpness multiplier used by <code class="docutils literal notranslate"><span class="pre">expected_score</span></code>
+(default: 2.0), settable with <code class="docutils literal notranslate"><span class="pre">MasseyCompetitor.configure_class(expected_score_scale=...)</span></code>. It
+multiplies the <em>normalized</em> rating difference, so it does not depend on the units of the scores
+fed in.</p></li>
+</ul>
+<p>State recorded alongside the fit:</p>
+<ul class="simple">
+<li><p><strong>rating_scale</strong>: the fitted rating spread <code class="docutils literal notranslate"><span class="pre">expected_score</span></code> divides by (see
+<a class="reference internal" href="#normalized-rating-difference">Normalized rating difference</a>). It is <code class="docutils literal notranslate"><span class="pre">1.0</span></code> until the competitor is first fitted, is
+recomputed for the whole connected group on every result, and round-trips through
+<code class="docutils literal notranslate"><span class="pre">export_state()</span></code>.</p></li>
 </ul>
 </section>
 <section id="real-world-applications">

@@ -236,12 +236,21 @@
 <span class="sd">    - Ratings are zero mean within a connected group, so roughly half of them are negative</span>
 <span class="sd">    - The rating difference is directly interpretable as a predicted margin</span>
 
+<span class="sd">    **Rating scale.** Because the rating difference carries the caller's own units, every fit</span>
+<span class="sd">    also records ``_rating_scale``, the spread of the connected group's ratings.</span>
+<span class="sd">    :meth:`expected_score` divides by it, so the win probabilities do not change when the same</span>
+<span class="sd">    schedule is expressed in different point units, and do not saturate to 0.0/1.0 when real</span>
+<span class="sd">    point margins put the ratings on a points-per-game scale. It is ``1.0`` for a competitor</span>
+<span class="sd">    that has never been fitted, and it survives :meth:`export_state` / :meth:`from_state`.</span>
+
 <span class="sd">    Class Attributes:</span>
 <span class="sd">        _minimum_rating (float): The minimum allowed rating value. Default: ``-inf``. Massey</span>
 <span class="sd">            ratings are zero mean and routinely negative, so no floor is imposed.</span>
 <span class="sd">        _default_initial_rating (float): Default initial rating. Default: 0.0.</span>
-<span class="sd">        _expected_score_scale (float): Logistic scale used by :meth:`expected_score` to turn a</span>
-<span class="sd">            rating difference into a win probability. Default: 2.0, chosen so that the widest</span>
+<span class="sd">        _expected_score_scale (float): Dimensionless sharpness multiplier used by</span>
+<span class="sd">            :meth:`expected_score`. The rating difference is divided by the fitted rating</span>
+<span class="sd">            spread before it reaches the logistic, so this constant does not depend on the</span>
+<span class="sd">            units the caller's scores are in. Default: 2.0, chosen so that the widest</span>
 <span class="sd">            plausible unit-margin gap maps to roughly the same probability as the widest gap</span>
 <span class="sd">            under Colley's ``1 / (1 + exp(-4 * diff))``.</span>
 <span class="sd">        _round_decimals (int): Number of decimal places fitted ratings are canonicalized to, so</span>
@@ -252,6 +261,8 @@
     <span class="n">_default_initial_rating</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="n">_expected_score_scale</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span>
     <span class="n">_round_decimals</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">13</span>
+    <span class="c1"># Floor for the fitted rating spread, so a degenerate all-equal group cannot divide by zero.</span>
+    <span class="n">_minimum_rating_scale</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-9</span>
 
 <div class="viewcode-block" id="MasseyCompetitor.__init__">
 <a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.massey.MasseyCompetitor.__init__">[docs]</a>
@@ -272,6 +283,10 @@
         <span class="c1"># margins this is simply wins minus losses; with real scores it is the sum of</span>
         <span class="c1"># ``self_score - opponent_score`` over every game played.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_point_differential</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="c1"># Spread of the connected group's fitted ratings, used to make the argument of the</span>
+        <span class="c1"># expected-score logistic dimensionless. 1.0 until this competitor is fitted, so a</span>
+        <span class="c1"># directly constructed competitor keeps the raw rating difference.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rating_scale</span> <span class="o">=</span> <span class="mf">1.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">"MasseyCompetitor"</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Opponent -&gt; num games</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_margins_for</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">"MasseyCompetitor"</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="c1"># Unique ID for hashing (instances are used as dict keys in the match graph).</span>
@@ -321,7 +336,12 @@
 
 <span class="sd">        Massey ratings are on a margin scale rather than a probability scale, so the predicted</span>
 <span class="sd">        margin ``r_self - r_competitor`` is squashed through a logistic function to obtain a</span>
-<span class="sd">        win probability. Two competitors with equal ratings give exactly 0.5, and the two</span>
+<span class="sd">        win probability. Because that margin is in whatever units the caller's scores are in --</span>
+<span class="sd">        unit margins when ``scores`` is omitted, points per game when it is supplied -- the</span>
+<span class="sd">        difference is first divided by the fitted rating spread (the root-mean-square rating</span>
+<span class="sd">        difference within the connected group, see :meth:`_update_rating_scale`). That makes</span>
+<span class="sd">        the logistic argument dimensionless and leaves ``_expected_score_scale`` a pure</span>
+<span class="sd">        sharpness knob. Two competitors with equal ratings give exactly 0.5, and the two</span>
 <span class="sd">        argument orders are exactly complementary.</span>
 
 <span class="sd">        Args:</span>
@@ -334,10 +354,14 @@
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don't match.</span>
 <span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
-        <span class="n">rating_diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">-</span> <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span>
+        <span class="n">opponent</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">MasseyCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+        <span class="n">rating_diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">-</span> <span class="n">opponent</span><span class="o">.</span><span class="n">rating</span>
+        <span class="c1"># Symmetric in the two competitors, so the exact complementarity of the tanh form below</span>
+        <span class="c1"># is preserved: both argument orders divide by the same number.</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating_scale</span><span class="p">,</span> <span class="n">opponent</span><span class="o">.</span><span class="n">_rating_scale</span><span class="p">)</span>
         <span class="c1"># tanh form: symmetric in the sign of rating_diff, so the two argument orders sum to</span>
         <span class="c1"># exactly 1.0 in floating point.</span>
-        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expected_score_scale</span> <span class="o">*</span> <span class="n">rating_diff</span><span class="p">)))</span></div>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expected_score_scale</span> <span class="o">*</span> <span class="p">(</span><span class="n">rating_diff</span> <span class="o">/</span> <span class="n">scale</span><span class="p">))))</span></div>
 
 
 <div class="viewcode-block" id="MasseyCompetitor.beat">
@@ -459,7 +483,9 @@
 
 <span class="sd">        Builds ``M = D - A`` and the cumulative-margin vector ``p``, replaces the last row of</span>
 <span class="sd">        ``M`` with all ones (and the last entry of ``p`` with zero) to remove the singularity,</span>
-<span class="sd">        and solves the resulting system. The constraint pins the ratings to zero mean.</span>
+<span class="sd">        and solves the resulting system. The constraint pins the ratings to zero mean. The</span>
+<span class="sd">        spread of the fitted ratings is recorded on every member of the group so that</span>
+<span class="sd">        :meth:`expected_score` can normalize by it.</span>
 <span class="sd">        """</span>
         <span class="n">competitors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_connected_competitors</span><span class="p">()</span>
         <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">competitors</span><span class="p">)</span>
@@ -494,6 +520,7 @@
                 <span class="n">n</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_fallback_rating_calculation</span><span class="p">(</span><span class="n">competitors</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_rating_scale</span><span class="p">(</span><span class="n">competitors</span><span class="p">)</span>
             <span class="k">return</span>
 
         <span class="c1"># The solver's pivoting depends on the row order, which is the order competitors were</span>
@@ -504,6 +531,28 @@
 
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">comp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">competitors</span><span class="p">):</span>
             <span class="n">comp</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_rating_scale</span><span class="p">(</span><span class="n">competitors</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_rating_scale</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">competitors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">"MasseyCompetitor"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Record the fitted group's rating spread on every member of the group.</span>
+
+<span class="sd">        The spread is the root-mean-square rating difference between two members of the group</span>
+<span class="sd">        -- the natural scale for the *difference* :meth:`expected_score` normalizes. For a</span>
+<span class="sd">        zero-mean group that is exactly ``sqrt(2)`` times the population standard deviation of</span>
+<span class="sd">        the ratings. It is canonicalized to ``_round_decimals`` places like the ratings</span>
+<span class="sd">        themselves, so that the group's discovery order cannot change it in the last bits, and</span>
+<span class="sd">        floored at ``_minimum_rating_scale`` so a degenerate all-equal group cannot divide by</span>
+<span class="sd">        zero.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            competitors: The connected group that was just fitted.</span>
+<span class="sd">        """</span>
+        <span class="n">spread</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">([</span><span class="n">comp</span><span class="o">.</span><span class="n">rating</span> <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">competitors</span><span class="p">])</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">spread</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">_round_decimals</span><span class="p">)),</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_minimum_rating_scale</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">competitors</span><span class="p">:</span>
+            <span class="n">comp</span><span class="o">.</span><span class="n">_rating_scale</span> <span class="o">=</span> <span class="n">scale</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_fallback_rating_calculation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">"MasseyCompetitor"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Assign average-margin ratings when the linear system cannot be solved.</span>
@@ -538,6 +587,7 @@
             <span class="s2">"losses"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="p">,</span>
             <span class="s2">"ties"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span><span class="p">,</span>
             <span class="s2">"point_differential"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_point_differential</span><span class="p">,</span>
+            <span class="s2">"rating_scale"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating_scale</span><span class="p">,</span>
         <span class="p">}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_import_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -563,6 +613,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"losses"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ties"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_point_differential</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"point_differential"</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rating_scale</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"rating_scale"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_margins_for</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -588,6 +639,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_point_differential</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rating_scale</span> <span class="o">=</span> <span class="mf">1.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_margins_for</span> <span class="o">=</span> <span class="p">{}</span></div>
 

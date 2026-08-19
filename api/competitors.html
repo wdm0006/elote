@@ -1812,15 +1812,23 @@ still counting as a game played for both.</p>
 - Global least-squares fit (does not depend on the order of results)
 - Ratings are zero mean within a connected group, so roughly half of them are negative
 - The rating difference is directly interpretable as a predicted margin</p>
+<p><strong>Rating scale.</strong> Because the rating difference carries the caller’s own units, every fit
+also records <code class="docutils literal notranslate"><span class="pre">_rating_scale</span></code>, the spread of the connected group’s ratings.
+<a class="reference internal" href="../competitors.html#elote.competitors.massey.MasseyCompetitor.expected_score" title="elote.competitors.massey.MasseyCompetitor.expected_score"><code class="xref py py-meth docutils literal notranslate"><span class="pre">expected_score()</span></code></a> divides by it, so the win probabilities do not change when the same
+schedule is expressed in different point units, and do not saturate to 0.0/1.0 when real
+point margins put the ratings on a points-per-game scale. It is <code class="docutils literal notranslate"><span class="pre">1.0</span></code> for a competitor
+that has never been fitted, and it survives <a class="reference internal" href="../competitors.html#elote.competitors.massey.MasseyCompetitor.export_state" title="elote.competitors.massey.MasseyCompetitor.export_state"><code class="xref py py-meth docutils literal notranslate"><span class="pre">export_state()</span></code></a> / <code class="xref py py-meth docutils literal notranslate"><span class="pre">from_state()</span></code>.</p>
 <dl>
 <dt>Class Attributes:</dt><dd><dl class="simple">
 <dt>_minimum_rating (float): The minimum allowed rating value. Default: <code class="docutils literal notranslate"><span class="pre">-inf</span></code>. Massey</dt><dd><p>ratings are zero mean and routinely negative, so no floor is imposed.</p>
 </dd>
 </dl>
 <p>_default_initial_rating (float): Default initial rating. Default: 0.0.
-_expected_score_scale (float): Logistic scale used by <a class="reference internal" href="../competitors.html#elote.competitors.massey.MasseyCompetitor.expected_score" title="elote.competitors.massey.MasseyCompetitor.expected_score"><code class="xref py py-meth docutils literal notranslate"><span class="pre">expected_score()</span></code></a> to turn a</p>
+_expected_score_scale (float): Dimensionless sharpness multiplier used by</p>
 <blockquote>
-<div><p>rating difference into a win probability. Default: 2.0, chosen so that the widest
+<div><p><a class="reference internal" href="../competitors.html#elote.competitors.massey.MasseyCompetitor.expected_score" title="elote.competitors.massey.MasseyCompetitor.expected_score"><code class="xref py py-meth docutils literal notranslate"><span class="pre">expected_score()</span></code></a>. The rating difference is divided by the fitted rating
+spread before it reaches the logistic, so this constant does not depend on the
+units the caller’s scores are in. Default: 2.0, chosen so that the widest
 plausible unit-margin gap maps to roughly the same probability as the widest gap
 under Colley’s <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">/</span> <span class="pre">(1</span> <span class="pre">+</span> <span class="pre">exp(-4</span> <span class="pre">*</span> <span class="pre">diff))</span></code>.</p>
 </div></blockquote>
@@ -1881,7 +1889,12 @@ omitted the unit margin <code class="docutils literal notranslate"><span class="
 <dd><p>Calculate the expected score against another competitor.</p>
 <p>Massey ratings are on a margin scale rather than a probability scale, so the predicted
 margin <code class="docutils literal notranslate"><span class="pre">r_self</span> <span class="pre">-</span> <span class="pre">r_competitor</span></code> is squashed through a logistic function to obtain a
-win probability. Two competitors with equal ratings give exactly 0.5, and the two
+win probability. Because that margin is in whatever units the caller’s scores are in –
+unit margins when <code class="docutils literal notranslate"><span class="pre">scores</span></code> is omitted, points per game when it is supplied – the
+difference is first divided by the fitted rating spread (the root-mean-square rating
+difference within the connected group, see <code class="xref py py-meth docutils literal notranslate"><span class="pre">_update_rating_scale()</span></code>). That makes
+the logistic argument dimensionless and leaves <code class="docutils literal notranslate"><span class="pre">_expected_score_scale</span></code> a pure
+sharpness knob. Two competitors with equal ratings give exactly 0.5, and the two
 argument orders are exactly complementary.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>competitor (BaseCompetitor): The competitor to compare against.</p>
