@@ -230,7 +230,9 @@ class BaseDataset(abc.ABC):
         Split the dataset into train and test sets based on competitors.
 
         This ensures that some competitors are only in the test set, which is useful for
-        evaluating how well the rating system generalizes to new competitors.
+        workflows that can evaluate new competitors. These test rows are not evaluable
+        through :func:`evaluate_arena_with_dataset` or :func:`benchmark_competitors`,
+        because those paths only score matchups between two trained competitors.
 
         Args:
             test_ratio: Ratio of competitors to reserve for testing (0.0 to 1.0)

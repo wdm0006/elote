@@ -11,6 +11,7 @@ import numbers
 
 from elote.arenas.base import BaseArena, Bout, History
 from elote.datasets.base import DataSplit
+from elote.logging import logger
 
 
 def _scores_from_attributes(
@@ -176,6 +177,7 @@ def evaluate_arena_with_dataset(
         batch_size = len(sorted_data)
 
     total_batches = (len(sorted_data) + batch_size - 1) // batch_size
+    skipped_bouts = 0
 
     for batch_idx in range(total_batches):
         start_idx = batch_idx * batch_size
@@ -186,6 +188,7 @@ def evaluate_arena_with_dataset(
         for a, b, outcome, _, attributes in batch:
             # Skip if either competitor is not in the arena
             if a not in arena.competitors or b not in arena.competitors:
+                skipped_bouts += 1
                 continue
 
             # Get the expected outcome
@@ -200,6 +203,18 @@ def evaluate_arena_with_dataset(
         # Report progress
         if progress_callback is not None:
             progress_callback(end_idx, len(sorted_data))
+
+    if skipped_bouts > 0:
+        logger.warning(
+            "Skipped %d/%d evaluation bouts: competitor not found in training history.",
+            skipped_bouts,
+            len(sorted_data),
+        )
+    if not history.bouts:
+        logger.warning(
+            "Evaluation history is empty after evaluating %d test bouts; metrics are not meaningful.",
+            len(sorted_data),
+        )
 
     return history
 
