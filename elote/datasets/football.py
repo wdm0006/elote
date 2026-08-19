@@ -12,12 +12,22 @@ from typing import List, Tuple, Dict, Any, Optional
 
 from elote.datasets.base import BaseDataset
 
+# Bumped whenever the cached CSV's schema or the meaning of its columns changes, so an
+# existing cache written by an older version of this module cannot be reused silently.
+CACHE_SCHEMA_VERSION = 2
+
 
 class CollegeFootballDataset(BaseDataset):
     """
     College football dataset for testing and evaluating different rating algorithms.
 
     This dataset contains college football games from the College Football Data API using sportsdataverse.
+
+    Competitor identifiers are the programs' display names ("Auburn Tigers", "Clemson Tigers"),
+    taken from the feed's ``home_display_name``/``away_display_name`` columns. Earlier versions
+    used ``home_name``/``away_name``, which carry only the mascot ("Tigers") and therefore merged
+    distinct programs into a single competitor. Callers that stored ratings keyed off the old
+    identifiers need to re-key or retrain them.
     """
 
     def __init__(self, cache_dir: Optional[str] = None, start_year: int = 2015, end_year: int = 2022, max_memory_mb: int = 1024):
@@ -40,8 +50,12 @@ class CollegeFootballDataset(BaseDataset):
         # Create cache directory if it doesn't exist
         os.makedirs(self.cache_dir, exist_ok=True)
 
-        # File to cache the data
-        self.data_file = os.path.join(self.cache_dir, f"college_football_games_{start_year}_{end_year}.csv")
+        # File to cache the data. The schema version is part of the name so that a cache written
+        # by an older version of this module is not reused after the column mapping changes.
+        self.data_file = os.path.join(
+            self.cache_dir,
+            f"college_football_games_v{CACHE_SCHEMA_VERSION}_{start_year}_{end_year}.csv",
+        )
 
     def download(self) -> None:
         """
@@ -102,6 +116,23 @@ class CollegeFootballDataset(BaseDataset):
         if all_games.empty:
             raise ValueError("No games data was retrieved. Check your internet connection or try again later.")
 
+        all_games = self._prepare_games(all_games)
+
+        # Save to CSV
+        all_games.to_csv(self.data_file, index=False)
+
+        print(f"Downloaded {len(all_games)} games and saved to {self.data_file}")
+
+    def _prepare_games(self, all_games: pd.DataFrame) -> pd.DataFrame:
+        """
+        Normalize a raw schedule frame into the cached CSV's schema.
+
+        Args:
+            all_games: Raw schedule rows as returned by ``sportsdataverse``.
+
+        Returns:
+            A frame with the columns this dataset caches and loads.
+        """
         # Select and rename relevant columns based on the actual column names in the data
         # First, print the columns to debug
         print(f"Available columns: {all_games.columns.tolist()}")
@@ -109,11 +140,20 @@ class CollegeFootballDataset(BaseDataset):
         # Map the columns from sportsdataverse to our expected format
         column_mapping = {
             "date": "game_date",  # Use a different name to avoid conflicts
-            "home_name": "home_team",
-            "away_name": "away_team",
             "home_score": "home_points",
             "away_score": "away_points",
         }
+
+        # The feed's home_name/away_name hold only the mascot ("Tigers"), which collapses distinct
+        # programs into one competitor. The display names ("Auburn Tigers") identify the program, so
+        # prefer them and keep the mascot columns purely as a fallback for feeds that lack them.
+        for home_src, away_src in (("home_display_name", "away_display_name"), ("home_name", "away_name")):
+            if home_src in all_games.columns and away_src in all_games.columns:
+                column_mapping[home_src] = "home_team"
+                column_mapping[away_src] = "away_team"
+                break
+        else:
+            print("Warning: no competitor identifier columns found in data")
 
         # Check which columns actually exist and create a valid mapping
         valid_mapping = {}
@@ -168,10 +208,7 @@ class CollegeFootballDataset(BaseDataset):
         if "start_date" in all_games.columns:
             all_games = all_games.sort_values(by="start_date")
 
-        # Save to CSV
-        all_games.to_csv(self.data_file, index=False)
-
-        print(f"Downloaded {len(all_games)} games and saved to {self.data_file}")
+        return all_games
 
     def load(self) -> List[Tuple[str, str, float, datetime.datetime, Dict[str, Any]]]:
         """

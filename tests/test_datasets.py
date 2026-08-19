@@ -45,6 +45,10 @@ except Exception:
     HAS_FOOTBALL = False
     CollegeFootballDataset = None
 
+# The adapter class itself imports fine without sportsdataverse (that extra is only needed to
+# download), so the identifier/cache tests below run unconditionally against a local fixture.
+from elote.datasets.football import CACHE_SCHEMA_VERSION, CollegeFootballDataset as FootballDataset
+
 
 class TestDataSplit(unittest.TestCase):
     """Tests for the DataSplit class."""
@@ -666,6 +670,114 @@ class TestCollegeFootballDataset(unittest.TestCase):
             self.assertIsInstance(matchup[2], float)  # outcome
             self.assertIsInstance(matchup[3], datetime.datetime)  # timestamp
             self.assertIsInstance(matchup[4], dict)  # attributes
+
+
+class TestCollegeFootballDatasetIdentifiers(unittest.TestCase):
+    """Tests that the college football dataset names programs rather than mascots.
+
+    These build the cached CSV from a local fixture frame, so they need neither
+    sportsdataverse nor network access.
+    """
+
+    # Mirrors the ESPN feed's shape: home_name/away_name are the mascot, while
+    # home_display_name/away_display_name name the program. The second row is two
+    # different programs that share the mascot "Tigers".
+    RAW_GAMES = pd.DataFrame(
+        {
+            "date": ["2021-09-04", "2021-09-11", "2021-09-18"],
+            "start_date": ["2021-09-04", "2021-09-11", "2021-09-18"],
+            "home_name": ["Tigers", "Tigers", "Wildcats"],
+            "away_name": ["Wildcats", "Tigers", "Tigers"],
+            "home_display_name": ["Auburn Tigers", "Clemson Tigers", "Kentucky Wildcats"],
+            "away_display_name": ["Arizona Wildcats", "LSU Tigers", "Missouri Tigers"],
+            "home_score": [30, 10, 21],
+            "away_score": [10, 27, 21],
+            "status_type_completed": [True, True, True],
+        }
+    )
+
+    def setUp(self):
+        """Set up a temporary directory for testing."""
+        self.temp_dir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        """Clean up temporary files."""
+        shutil.rmtree(self.temp_dir)
+
+    def _dataset_from(self, raw_games):
+        """Build a dataset whose cache holds the prepared form of ``raw_games``."""
+        dataset = FootballDataset(cache_dir=self.temp_dir, start_year=2021, end_year=2021)
+        dataset._prepare_games(raw_games).to_csv(dataset.data_file, index=False)
+        return dataset
+
+    def test_programs_sharing_a_mascot_stay_distinct(self):
+        """Two programs sharing a mascot must yield two distinct competitor identifiers."""
+        matchups = self._dataset_from(self.RAW_GAMES).load()
+
+        identifiers = {m[0] for m in matchups} | {m[1] for m in matchups}
+        self.assertEqual(
+            identifiers,
+            {
+                "Auburn Tigers",
+                "Arizona Wildcats",
+                "Clemson Tigers",
+                "LSU Tigers",
+                "Kentucky Wildcats",
+                "Missouri Tigers",
+            },
+        )
+
+    def test_emitted_rows_match_the_fixture(self):
+        """Each row names its two programs and carries the outcome implied by the scores."""
+        matchups = self._dataset_from(self.RAW_GAMES).load()
+
+        self.assertEqual(
+            [(a, b, outcome) for a, b, outcome, _timestamp, _attributes in matchups],
+            [
+                ("Auburn Tigers", "Arizona Wildcats", 1.0),
+                ("Clemson Tigers", "LSU Tigers", 0.0),
+                ("Kentucky Wildcats", "Missouri Tigers", 0.5),
+            ],
+        )
+
+    def test_no_row_pairs_a_competitor_with_itself(self):
+        """A competitor must never appear on both sides of the same row."""
+        matchups = self._dataset_from(self.RAW_GAMES).load()
+
+        for competitor_a, competitor_b, _outcome, _timestamp, _attributes in matchups:
+            self.assertNotEqual(competitor_a, competitor_b)
+
+    def test_falls_back_to_name_columns_when_display_names_missing(self):
+        """A feed without the display-name columns still yields identifiers."""
+        raw_games = self.RAW_GAMES.drop(columns=["home_display_name", "away_display_name"])
+        matchups = self._dataset_from(raw_games).load()
+
+        identifiers = {m[0] for m in matchups} | {m[1] for m in matchups}
+        self.assertEqual(identifiers, {"Tigers", "Wildcats"})
+
+    def test_cache_path_carries_the_schema_version(self):
+        """The cached CSV path is versioned, so a stale cache cannot suppress the mapping."""
+        dataset = FootballDataset(cache_dir=self.temp_dir, start_year=2020, end_year=2021)
+
+        self.assertEqual(
+            os.path.basename(dataset.data_file),
+            f"college_football_games_v{CACHE_SCHEMA_VERSION}_2020_2021.csv",
+        )
+
+        # A cache written by the pre-fix code lives at the unversioned path and is ignored.
+        legacy_path = os.path.join(self.temp_dir, "college_football_games_2020_2021.csv")
+        pd.DataFrame(
+            {
+                "start_date": ["2020-09-05"],
+                "home_team": ["Tigers"],
+                "away_team": ["Tigers"],
+                "home_points": [28],
+                "away_points": [21],
+            }
+        ).to_csv(legacy_path, index=False)
+
+        self.assertNotEqual(dataset.data_file, legacy_path)
+        self.assertFalse(os.path.exists(dataset.data_file))
 
 
 class TestDatasetUtils(unittest.TestCase):
