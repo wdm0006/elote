@@ -126,7 +126,7 @@ Mathematical Formulation
    * - **Colley Matrix**
      - Ratings solve :math:`C r = b`; :math:`E_A = \frac{1}{1 + e^{-4 (r_A - r_B)}}`
    * - **Massey**
-     - Ratings solve :math:`M r = p` with :math:`M = D - A`; :math:`E_A = \frac{1}{1 + e^{-2 (r_A - r_B)}}`
+     - Ratings solve :math:`M r = p` with :math:`M = D - A`; :math:`E_A = \frac{1}{1 + e^{-2 (r_A - r_B) / \sigma}}`, where :math:`\sigma` is the fitted rating spread
    * - **Keener**
      - Ratings are the dominant eigenvector of :math:`H_{ij} = h(a_{ij}) / g_i + \varepsilon` with :math:`a_{ij} = \frac{S_{ij} + 1}{S_{ij} + S_{ji} + 2}` and :math:`h(x) = \frac{1}{2} + \frac{1}{2}\mathrm{sgn}(x - \frac{1}{2})\sqrt{|2x - 1|}`; :math:`E_A = \frac{r_A}{r_A + r_B}`
    * - **Pythagorean**
