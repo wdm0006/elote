@@ -529,7 +529,7 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         return cls(initial_rating=params.get("initial_rating", cls._default_initial_rating))
 
     def __eq__(self, other: Any) -> bool:
-        """Check if two competitors are equal based on their unique ID.
+        """Check if two competitors are the same object.
 
         Args:
             other: The other competitor to compare with.
@@ -537,14 +537,12 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         Returns:
             bool: True if the competitors are the same object, False otherwise.
         """
-        if not isinstance(other, ColleyMatrixCompetitor):
-            return NotImplemented
-        return self._id == other._id
+        return self is other
 
     def __hash__(self) -> int:
-        """Get a hash value for this competitor based on its unique ID.
+        """Get a hash value for this competitor based on its object identity.
 
         Returns:
             int: A hash value for this competitor.
         """
-        return hash(self._id)
+        return object.__hash__(self)
