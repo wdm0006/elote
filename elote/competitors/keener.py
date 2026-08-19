@@ -532,11 +532,9 @@ class KeenerCompetitor(BaseCompetitor):
         return f"<KeenerCompetitor: rating={self._rating:.4f}>"
 
     def __eq__(self, other: Any) -> bool:
-        """Check if two competitors are the same object (by unique ID)."""
-        if not isinstance(other, KeenerCompetitor):
-            return NotImplemented
-        return self._id == other._id
+        """Check if two competitors are the same object."""
+        return self is other
 
     def __hash__(self) -> int:
-        """Get a hash value for this competitor based on its unique ID."""
-        return hash(self._id)
+        """Get a hash value for this competitor based on its object identity."""
+        return object.__hash__(self)
