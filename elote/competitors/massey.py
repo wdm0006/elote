@@ -58,12 +58,21 @@ class MasseyCompetitor(BaseCompetitor):
     - Ratings are zero mean within a connected group, so roughly half of them are negative
     - The rating difference is directly interpretable as a predicted margin
 
+    **Rating scale.** Because the rating difference carries the caller's own units, every fit
+    also records ``_rating_scale``, the spread of the connected group's ratings.
+    :meth:`expected_score` divides by it, so the win probabilities do not change when the same
+    schedule is expressed in different point units, and do not saturate to 0.0/1.0 when real
+    point margins put the ratings on a points-per-game scale. It is ``1.0`` for a competitor
+    that has never been fitted, and it survives :meth:`export_state` / :meth:`from_state`.
+
     Class Attributes:
         _minimum_rating (float): The minimum allowed rating value. Default: ``-inf``. Massey
             ratings are zero mean and routinely negative, so no floor is imposed.
         _default_initial_rating (float): Default initial rating. Default: 0.0.
-        _expected_score_scale (float): Logistic scale used by :meth:`expected_score` to turn a
-            rating difference into a win probability. Default: 2.0, chosen so that the widest
+        _expected_score_scale (float): Dimensionless sharpness multiplier used by
+            :meth:`expected_score`. The rating difference is divided by the fitted rating
+            spread before it reaches the logistic, so this constant does not depend on the
+            units the caller's scores are in. Default: 2.0, chosen so that the widest
             plausible unit-margin gap maps to roughly the same probability as the widest gap
             under Colley's ``1 / (1 + exp(-4 * diff))``.
         _round_decimals (int): Number of decimal places fitted ratings are canonicalized to, so
@@ -74,6 +83,8 @@ class MasseyCompetitor(BaseCompetitor):
     _default_initial_rating: ClassVar[float] = 0.0
     _expected_score_scale: ClassVar[float] = 2.0
     _round_decimals: ClassVar[int] = 13
+    # Floor for the fitted rating spread, so a degenerate all-equal group cannot divide by zero.
+    _minimum_rating_scale: ClassVar[float] = 1e-9
 
     def __init__(self, initial_rating: Optional[float] = None):
         """Initialize a new Massey competitor.
@@ -92,6 +103,10 @@ class MasseyCompetitor(BaseCompetitor):
         # margins this is simply wins minus losses; with real scores it is the sum of
         # ``self_score - opponent_score`` over every game played.
         self._point_differential = 0.0
+        # Spread of the connected group's fitted ratings, used to make the argument of the
+        # expected-score logistic dimensionless. 1.0 until this competitor is fitted, so a
+        # directly constructed competitor keeps the raw rating difference.
+        self._rating_scale = 1.0
         self._opponents: Dict["MasseyCompetitor", int] = {}  # Opponent -> num games
         self._margins_for: Dict["MasseyCompetitor", float] = {}
         # Unique ID for hashing (instances are used as dict keys in the match graph).
@@ -138,7 +153,12 @@ class MasseyCompetitor(BaseCompetitor):
 
         Massey ratings are on a margin scale rather than a probability scale, so the predicted
         margin ``r_self - r_competitor`` is squashed through a logistic function to obtain a
-        win probability. Two competitors with equal ratings give exactly 0.5, and the two
+        win probability. Because that margin is in whatever units the caller's scores are in --
+        unit margins when ``scores`` is omitted, points per game when it is supplied -- the
+        difference is first divided by the fitted rating spread (the root-mean-square rating
+        difference within the connected group, see :meth:`_update_rating_scale`). That makes
+        the logistic argument dimensionless and leaves ``_expected_score_scale`` a pure
+        sharpness knob. Two competitors with equal ratings give exactly 0.5, and the two
         argument orders are exactly complementary.
 
         Args:
@@ -151,10 +171,14 @@ class MasseyCompetitor(BaseCompetitor):
             MissMatchedCompetitorTypesException: If the competitor types don't match.
         """
         self.verify_competitor_types(competitor)
-        rating_diff = self.rating - competitor.rating
+        opponent = cast(MasseyCompetitor, competitor)
+        rating_diff = self.rating - opponent.rating
+        # Symmetric in the two competitors, so the exact complementarity of the tanh form below
+        # is preserved: both argument orders divide by the same number.
+        scale = max(self._rating_scale, opponent._rating_scale)
         # tanh form: symmetric in the sign of rating_diff, so the two argument orders sum to
         # exactly 1.0 in floating point.
-        return float(0.5 * (1.0 + np.tanh(0.5 * self._expected_score_scale * rating_diff)))
+        return float(0.5 * (1.0 + np.tanh(0.5 * self._expected_score_scale * (rating_diff / scale))))
 
     def beat(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has won against the given competitor.
@@ -266,7 +290,9 @@ class MasseyCompetitor(BaseCompetitor):
 
         Builds ``M = D - A`` and the cumulative-margin vector ``p``, replaces the last row of
         ``M`` with all ones (and the last entry of ``p`` with zero) to remove the singularity,
-        and solves the resulting system. The constraint pins the ratings to zero mean.
+        and solves the resulting system. The constraint pins the ratings to zero mean. The
+        spread of the fitted ratings is recorded on every member of the group so that
+        :meth:`expected_score` can normalize by it.
         """
         competitors = self._get_connected_competitors()
         n = len(competitors)
@@ -301,6 +327,7 @@ class MasseyCompetitor(BaseCompetitor):
                 n,
             )
             self._fallback_rating_calculation(competitors)
+            self._update_rating_scale(competitors)
             return
 
         # The solver's pivoting depends on the row order, which is the order competitors were
@@ -311,6 +338,28 @@ class MasseyCompetitor(BaseCompetitor):
 
         for i, comp in enumerate(competitors):
             comp.rating = float(r[i])
+
+        self._update_rating_scale(competitors)
+
+    @classmethod
+    def _update_rating_scale(cls, competitors: List["MasseyCompetitor"]) -> None:
+        """Record the fitted group's rating spread on every member of the group.
+
+        The spread is the root-mean-square rating difference between two members of the group
+        -- the natural scale for the *difference* :meth:`expected_score` normalizes. For a
+        zero-mean group that is exactly ``sqrt(2)`` times the population standard deviation of
+        the ratings. It is canonicalized to ``_round_decimals`` places like the ratings
+        themselves, so that the group's discovery order cannot change it in the last bits, and
+        floored at ``_minimum_rating_scale`` so a degenerate all-equal group cannot divide by
+        zero.
+
+        Args:
+            competitors: The connected group that was just fitted.
+        """
+        spread = np.sqrt(2.0) * np.std([comp.rating for comp in competitors])
+        scale = max(float(np.round(spread, decimals=cls._round_decimals)), cls._minimum_rating_scale)
+        for comp in competitors:
+            comp._rating_scale = scale
 
     def _fallback_rating_calculation(self, competitors: List["MasseyCompetitor"]) -> None:
         """Assign average-margin ratings when the linear system cannot be solved.
@@ -345,6 +394,7 @@ class MasseyCompetitor(BaseCompetitor):
             "losses": self._losses,
             "ties": self._ties,
             "point_differential": self._point_differential,
+            "rating_scale": self._rating_scale,
         }
 
     def _import_parameters(self, parameters: Dict[str, Any]) -> None:
@@ -370,6 +420,7 @@ class MasseyCompetitor(BaseCompetitor):
         self._losses = state.get("losses", 0)
         self._ties = state.get("ties", 0)
         self._point_differential = state.get("point_differential", float(self._wins - self._losses))
+        self._rating_scale = state.get("rating_scale", 1.0)
         self._opponents = {}
         self._margins_for = {}
 
@@ -393,6 +444,7 @@ class MasseyCompetitor(BaseCompetitor):
         self._losses = 0
         self._ties = 0
         self._point_differential = 0.0
+        self._rating_scale = 1.0
         self._opponents = {}
         self._margins_for = {}
 

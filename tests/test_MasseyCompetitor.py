@@ -1,4 +1,6 @@
 import json
+import math
+import random
 import unittest
 
 from elote import EloCompetitor, LambdaArena, MasseyCompetitor
@@ -294,3 +296,136 @@ class TestMasseyRatingSetterValidation(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def _football_shaped_schedule(seed=17, competitors=20, matchups=300):
+    """Build a seeded schedule of point-scored games on a points-per-game scale.
+
+    Each competitor gets a latent strength drawn from ``N(0, 10)``; a game between ``a`` and
+    ``b`` scores each side from ``N(28 +/- (s_a - s_b) / 2, 10)``, rounded and floored at zero,
+    so margins are tens of points rather than the unit margins Massey falls back to when no
+    ``scores`` payload is supplied.
+
+    Returns:
+        list: ``(a, b, a_score, b_score)`` tuples, all decisive.
+    """
+    rng = random.Random(seed)
+    names = ["c%d" % i for i in range(competitors)]
+    strength = {name: rng.gauss(0, 10) for name in names}
+
+    schedule = []
+    for _ in range(matchups):
+        a, b = rng.sample(names, 2)
+        edge = strength[a] - strength[b]
+        a_score = max(0, round(rng.gauss(28 + edge / 2, 10)))
+        b_score = max(0, round(rng.gauss(28 - edge / 2, 10)))
+        if a_score == b_score:
+            a_score += 1
+        schedule.append((a, b, float(a_score), float(b_score)))
+    return schedule
+
+
+def _trained_arena_predictions(train_fraction=0.7, **kwargs):
+    """Train a score-fed Massey arena on part of a schedule and predict the rest.
+
+    Returns:
+        list: ``(predicted_probability_for_a, actual_outcome)`` pairs for the held-out games.
+    """
+    schedule = _football_shaped_schedule(**kwargs)
+    split = int(len(schedule) * train_fraction)
+
+    arena = LambdaArena(None, base_competitor=MasseyCompetitor)
+    for a, b, a_score, b_score in schedule[:split]:
+        arena.matchup(a, b, outcome=1.0 if a_score > b_score else 0.0, scores=(a_score, b_score))
+
+    return [
+        (arena.expected_score(a, b), 1.0 if a_score > b_score else 0.0) for a, b, a_score, b_score in schedule[split:]
+    ]
+
+
+class TestMasseyScoredArenaProbabilities(unittest.TestCase):
+    """Predicted probabilities stay usable once Massey is fed real point margins.
+
+    With real scores the fitted ratings are points per game, so the rating difference is
+    routinely tens of points. Without the rating-scale normalization in ``expected_score`` the
+    logistic saturates and returns exactly 0.0 / 1.0, which makes log loss unbounded. These
+    tests assert on probability values, not on accuracy -- accuracy is structurally blind to
+    the defect, since the normalization is a monotone recalibration that reorders nothing.
+    """
+
+    def setUp(self):
+        self.predictions = _trained_arena_predictions()
+        self.probabilities = [p for p, _ in self.predictions]
+
+    def test_no_prediction_is_degenerate(self):
+        """No held-out prediction is exactly 0.0 or 1.0."""
+        self.assertEqual([p for p in self.probabilities if p in (0.0, 1.0)], [])
+
+    def test_no_prediction_lands_in_the_extreme_bins(self):
+        """No held-out prediction is <= 1e-3 or >= 1 - 1e-3."""
+        extreme = [p for p in self.probabilities if p <= 1e-3 or p >= 1 - 1e-3]
+        self.assertEqual(extreme, [], "%d of %d predictions saturated" % (len(extreme), len(self.probabilities)))
+        self.assertGreater(min(self.probabilities), 0.008)
+        self.assertLess(max(self.probabilities), 0.992)
+
+    def test_log_loss_and_brier_are_pinned(self):
+        """Value assertions on this arena's calibration, so a future remapping is visible."""
+        n = len(self.predictions)
+        self.assertEqual(n, 90)
+
+        log_loss = sum(-(y * math.log(p) + (1 - y) * math.log(1 - p)) for p, y in self.predictions) / n
+        brier = sum((p - y) ** 2 for p, y in self.predictions) / n
+
+        self.assertAlmostEqual(log_loss, 0.4938, places=4)
+        self.assertAlmostEqual(brier, 0.1610, places=4)
+
+    def test_accuracy_is_unchanged_by_the_normalization(self):
+        """Documentation, not a guard: accuracy cannot see the defect at all."""
+        correct = sum(1 for p, y in self.predictions if (p > 0.5) == (y > 0.5))
+        self.assertAlmostEqual(correct / len(self.predictions), 0.7555555555555555, places=12)
+
+
+class TestMasseyRatingScale(unittest.TestCase):
+    """The fitted rating scale that makes the expected-score logistic dimensionless."""
+
+    def test_defaults_to_one_for_an_unfitted_competitor(self):
+        self.assertEqual(MasseyCompetitor()._rating_scale, 1.0)
+        self.assertEqual(MasseyCompetitor(initial_rating=7.5)._rating_scale, 1.0)
+
+    def test_expected_score_is_invariant_to_the_unit_of_the_scores(self):
+        """The same schedule in tenths of a point gives the same probabilities."""
+        points = [("a", "b", 31.0, 17.0), ("b", "c", 24.0, 20.0), ("a", "c", 45.0, 10.0)]
+
+        def fit(factor):
+            competitors = {name: MasseyCompetitor() for name in "abc"}
+            for first, second, first_score, second_score in points:
+                competitors[first].beat(competitors[second], scores=(first_score * factor, second_score * factor))
+            return competitors
+
+        unit, scaled = fit(1.0), fit(10.0)
+        for first, second in (("a", "b"), ("b", "c"), ("a", "c")):
+            with self.subTest(pair=(first, second)):
+                self.assertAlmostEqual(
+                    unit[first].expected_score(unit[second]),
+                    scaled[first].expected_score(scaled[second]),
+                    places=12,
+                )
+
+    def test_scale_survives_the_state_round_trip(self):
+        a, b, c = MasseyCompetitor(), MasseyCompetitor(), MasseyCompetitor()
+        a.beat(b, scores=(31.0, 17.0))
+        b.beat(c, scores=(24.0, 20.0))
+
+        self.assertGreater(a._rating_scale, 1.0)
+
+        restored = MasseyCompetitor.from_state(json.loads(json.dumps(a.export_state())))
+        self.assertEqual(restored._rating_scale, a._rating_scale)
+        self.assertEqual(restored.expected_score(c), a.expected_score(c))
+
+    def test_reset_restores_the_unfitted_scale(self):
+        a, b = MasseyCompetitor(), MasseyCompetitor()
+        a.beat(b, scores=(31.0, 17.0))
+        self.assertNotEqual(a._rating_scale, 1.0)
+
+        a.reset()
+        self.assertEqual(a._rating_scale, 1.0)

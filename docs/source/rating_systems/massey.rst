@@ -44,9 +44,31 @@ competitors is a logistic function of their rating difference:
 
 .. math::
 
-   E_a = \frac{1}{1 + e^{-s\,(r_a - r_b)}}
+   E_a = \frac{1}{1 + e^{-s\,(r_a - r_b) / \sigma}}
 
-with a class-configurable scale :math:`s` (default 2.0).
+with a class-configurable sharpness :math:`s` (default 2.0).
+
+Normalized rating difference
+----------------------------
+
+The divisor :math:`\sigma` is the **fitted rating scale**: the root-mean-square rating difference
+between two members of the connected group, recorded on every competitor alongside the fit. For a
+zero-mean group that is :math:`\sqrt{2}` times the population standard deviation of the ratings.
+
+This matters because a Massey rating carries the caller's own units. With unit margins the ratings
+sit within roughly :math:`\pm 1`, but with real point scores they are **points per game**, so
+:math:`r_a - r_b` is routinely 10-30 rather than 0.1-1. Dividing by :math:`\sigma` makes the
+logistic argument dimensionless, so:
+
+- probabilities do not saturate to exactly ``0.0`` / ``1.0`` once real point margins are supplied
+  (which would make log loss unbounded and flatten the calibration curve);
+- the same schedule expressed in different point units gives the same probabilities;
+- :math:`s` stays a pure sharpness knob rather than a unit-dependent constant.
+
+The normalization is monotone, so it changes no ordering, no rating and no leaderboard -- only the
+probabilities ``expected_score`` reports. The scale is ``1.0`` for a competitor that has never been
+fitted, so a directly constructed competitor divides by one, and it is carried through
+``export_state()`` / ``from_state()`` as ``rating_scale``.
 
 Margins
 -------
@@ -139,8 +161,17 @@ Customization
 Key parameters:
 
 - **initial_rating**: starting rating value (default: 0.0).
-- **expected_score_scale**: class-level logistic scale used by ``expected_score`` (default: 2.0),
-  settable with ``MasseyCompetitor.configure_class(expected_score_scale=...)``.
+- **expected_score_scale**: class-level sharpness multiplier used by ``expected_score``
+  (default: 2.0), settable with ``MasseyCompetitor.configure_class(expected_score_scale=...)``. It
+  multiplies the *normalized* rating difference, so it does not depend on the units of the scores
+  fed in.
+
+State recorded alongside the fit:
+
+- **rating_scale**: the fitted rating spread ``expected_score`` divides by (see
+  `Normalized rating difference`_). It is ``1.0`` until the competitor is first fitted, is
+  recomputed for the whole connected group on every result, and round-trips through
+  ``export_state()``.
 
 Real-World Applications
 ---------------------
