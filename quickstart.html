@@ -185,7 +185,7 @@
 
 <span class="c1"># Check the probability of player2 beating player1</span>
 <span class="n">win_probability</span> <span class="o">=</span> <span class="n">player2</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player1</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 win probability: </span><span class="si">{</span><span class="n">win_probability</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Player 2 win probability: </span><span class="si">{</span><span class="n">win_probability</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="c1"># Output: Player 2 win probability: 64.01%</span>
 
 <span class="c1"># Record a match result where player1 beats player2 (an upset!)</span>
@@ -194,12 +194,12 @@
 <span class="c1"># player2.lost_to(player1)</span>
 
 <span class="c1"># Check the updated ratings</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 1 new rating: </span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 new rating: </span><span class="si">{</span><span class="n">player2</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Player 1 new rating: </span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Player 2 new rating: </span><span class="si">{</span><span class="n">player2</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Check the new win probability</span>
 <span class="n">new_probability</span> <span class="o">=</span> <span class="n">player2</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player1</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 new win probability: </span><span class="si">{</span><span class="n">new_probability</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Player 2 new win probability: </span><span class="si">{</span><span class="n">new_probability</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="c1"># The probability will have decreased</span>
 </pre></div>
 </div>
@@ -218,8 +218,8 @@
 <span class="c1"># player2.tied(player1)</span>
 
 <span class="c1"># Check the updated ratings</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 1 new rating: </span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 new rating: </span><span class="si">{</span><span class="n">player2</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Player 1 new rating: </span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Player 2 new rating: </span><span class="si">{</span><span class="n">player2</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -232,7 +232,7 @@ competitors’ scores <strong>in the argument order of the call</strong>, whiche
 <span class="n">team_a</span><span class="p">,</span> <span class="n">team_b</span> <span class="o">=</span> <span class="n">MasseyCompetitor</span><span class="p">(),</span> <span class="n">MasseyCompetitor</span><span class="p">()</span>
 
 <span class="n">team_a</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">team_b</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-<span class="c1"># The same game from the loser&#39;s side -- the pair is not reordered:</span>
+<span class="c1"># The same game from the loser's side -- the pair is not reordered:</span>
 <span class="c1"># team_b.lost_to(team_a, scores=(3, 35))</span>
 </pre></div>
 </div>
@@ -240,8 +240,8 @@ competitors’ scores <strong>in the argument order of the call</strong>, whiche
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">LambdaArena</span><span class="p">,</span> <span class="n">MasseyCompetitor</span>
 
 <span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">MasseyCompetitor</span><span class="p">)</span>
-<span class="n">arena</span><span class="o">.</span><span class="n">matchup</span><span class="p">(</span><span class="s2">&quot;Team A&quot;</span><span class="p">,</span> <span class="s2">&quot;Team B&quot;</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-<span class="n">arena</span><span class="o">.</span><span class="n">matchup</span><span class="p">(</span><span class="s2">&quot;Team A&quot;</span><span class="p">,</span> <span class="s2">&quot;Team C&quot;</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">24</span><span class="p">))</span>   <span class="c1"># C won; order unchanged</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">matchup</span><span class="p">(</span><span class="s2">"Team A"</span><span class="p">,</span> <span class="s2">"Team B"</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">matchup</span><span class="p">(</span><span class="s2">"Team A"</span><span class="p">,</span> <span class="s2">"Team C"</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">24</span><span class="p">))</span>   <span class="c1"># C won; order unchanged</span>
 </pre></div>
 </div>
 <p>Scores must be non-negative, finite, and consistent with the result being recorded –
@@ -260,10 +260,10 @@ and <code class="docutils literal notranslate"><span class="pre">away_score</spa
 <span class="n">split</span> <span class="o">=</span> <span class="n">CollegeFootballDataset</span><span class="p">(</span><span class="n">start_year</span><span class="o">=</span><span class="mi">2020</span><span class="p">,</span> <span class="n">end_year</span><span class="o">=</span><span class="mi">2021</span><span class="p">)</span><span class="o">.</span><span class="n">time_split</span><span class="p">(</span><span class="n">test_ratio</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
 
 <span class="n">results</span> <span class="o">=</span> <span class="n">benchmark_competitors</span><span class="p">(</span>
-    <span class="p">[{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="n">MasseyCompetitor</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Massey&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="n">KeenerCompetitor</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Keener&quot;</span><span class="p">}],</span>
+    <span class="p">[{</span><span class="s2">"class"</span><span class="p">:</span> <span class="n">MasseyCompetitor</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Massey"</span><span class="p">},</span> <span class="p">{</span><span class="s2">"class"</span><span class="p">:</span> <span class="n">KeenerCompetitor</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Keener"</span><span class="p">}],</span>
     <span class="n">split</span><span class="p">,</span>
     <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">score_keys</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;home_score&quot;</span><span class="p">,</span> <span class="s2">&quot;away_score&quot;</span><span class="p">),</span>
+    <span class="n">score_keys</span><span class="o">=</span><span class="p">(</span><span class="s2">"home_score"</span><span class="p">,</span> <span class="s2">"away_score"</span><span class="p">),</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -287,14 +287,14 @@ outcome is still a <code class="docutils literal notranslate"><span class="pre">
 
 <span class="c1"># Check win probability</span>
 <span class="n">win_probability</span> <span class="o">=</span> <span class="n">player2</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player1</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 win probability: </span><span class="si">{</span><span class="n">win_probability</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Player 2 win probability: </span><span class="si">{</span><span class="n">win_probability</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Record a match result</span>
 <span class="n">player1</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">player2</span><span class="p">)</span>
 
 <span class="c1"># Check the updated ratings and rating deviations</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 1: rating=</span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">, rd=</span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">rd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2: rating=</span><span class="si">{</span><span class="n">player2</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">, rd=</span><span class="si">{</span><span class="n">player2</span><span class="o">.</span><span class="n">rd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Player 1: rating=</span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">, rd=</span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">rd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Player 2: rating=</span><span class="si">{</span><span class="n">player2</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">, rd=</span><span class="si">{</span><span class="n">player2</span><span class="o">.</span><span class="n">rd</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -315,7 +315,7 @@ outcome is still a <code class="docutils literal notranslate"><span class="pre">
 <span class="c1"># Create arena and run tournament with appropriate initial ratings</span>
 <span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span>
     <span class="n">compare_numbers</span><span class="p">,</span>
-    <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1200</span><span class="p">}</span>
+    <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">"initial_rating"</span><span class="p">:</span> <span class="mi">1200</span><span class="p">}</span>
 <span class="p">)</span>
 <span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
 
@@ -354,9 +354,9 @@ outcome is still a <code class="docutils literal notranslate"><span class="pre">
 
     <span class="k">def</span><span class="w"> </span><span class="nf">leaderboard</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span>
-            <span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span><span class="p">}</span>
+            <span class="p">[{</span><span class="s2">"name"</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">"rating"</span><span class="p">:</span> <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span><span class="p">}</span>
              <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">competitor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="o">.</span><span class="n">items</span><span class="p">()],</span>
-            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;rating&quot;</span><span class="p">],</span>
+            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">"rating"</span><span class="p">],</span>
             <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
 
@@ -364,17 +364,17 @@ outcome is still a <code class="docutils literal notranslate"><span class="pre">
 <span class="n">chess_arena</span> <span class="o">=</span> <span class="n">ChessArena</span><span class="p">()</span>
 
 <span class="c1"># Register some players with initial ratings</span>
-<span class="n">chess_arena</span><span class="o">.</span><span class="n">register_competitor</span><span class="p">(</span><span class="s2">&quot;Magnus&quot;</span><span class="p">,</span> <span class="mi">2800</span><span class="p">)</span>
-<span class="n">chess_arena</span><span class="o">.</span><span class="n">register_competitor</span><span class="p">(</span><span class="s2">&quot;Hikaru&quot;</span><span class="p">,</span> <span class="mi">2750</span><span class="p">)</span>
+<span class="n">chess_arena</span><span class="o">.</span><span class="n">register_competitor</span><span class="p">(</span><span class="s2">"Magnus"</span><span class="p">,</span> <span class="mi">2800</span><span class="p">)</span>
+<span class="n">chess_arena</span><span class="o">.</span><span class="n">register_competitor</span><span class="p">(</span><span class="s2">"Hikaru"</span><span class="p">,</span> <span class="mi">2750</span><span class="p">)</span>
 
 <span class="c1"># Record match results</span>
-<span class="n">chess_arena</span><span class="o">.</span><span class="n">record_result</span><span class="p">(</span><span class="s2">&quot;Magnus&quot;</span><span class="p">,</span> <span class="s2">&quot;Hikaru&quot;</span><span class="p">,</span> <span class="n">winner</span><span class="o">=</span><span class="s2">&quot;Magnus&quot;</span><span class="p">)</span>
-<span class="n">chess_arena</span><span class="o">.</span><span class="n">record_result</span><span class="p">(</span><span class="s2">&quot;Fabiano&quot;</span><span class="p">,</span> <span class="s2">&quot;Magnus&quot;</span><span class="p">,</span> <span class="n">winner</span><span class="o">=</span><span class="s2">&quot;Magnus&quot;</span><span class="p">)</span>  <span class="c1"># Auto-registers Fabiano</span>
+<span class="n">chess_arena</span><span class="o">.</span><span class="n">record_result</span><span class="p">(</span><span class="s2">"Magnus"</span><span class="p">,</span> <span class="s2">"Hikaru"</span><span class="p">,</span> <span class="n">winner</span><span class="o">=</span><span class="s2">"Magnus"</span><span class="p">)</span>
+<span class="n">chess_arena</span><span class="o">.</span><span class="n">record_result</span><span class="p">(</span><span class="s2">"Fabiano"</span><span class="p">,</span> <span class="s2">"Magnus"</span><span class="p">,</span> <span class="n">winner</span><span class="o">=</span><span class="s2">"Magnus"</span><span class="p">)</span>  <span class="c1"># Auto-registers Fabiano</span>
 
 <span class="c1"># Get rankings</span>
 <span class="n">rankings</span> <span class="o">=</span> <span class="n">chess_arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">rank</span><span class="p">,</span> <span class="n">player</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rankings</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rank</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">player</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">player</span><span class="p">[</span><span class="s1">&#39;rating&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">rank</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">player</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">player</span><span class="p">[</span><span class="s1">'rating'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -401,13 +401,13 @@ outcome is still a <code class="docutils literal notranslate"><span class="pre">
 
 <span class="c1"># Use just like any other competitor</span>
 <span class="n">win_probability</span> <span class="o">=</span> <span class="n">player2</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player1</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 win probability: </span><span class="si">{</span><span class="n">win_probability</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Player 2 win probability: </span><span class="si">{</span><span class="n">win_probability</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="n">player1</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">player2</span><span class="p">)</span>
 
 <span class="c1"># All underlying ratings are automatically updated</span>
 <span class="n">new_probability</span> <span class="o">=</span> <span class="n">player2</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player1</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 new win probability: </span><span class="si">{</span><span class="n">new_probability</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Player 2 new win probability: </span><span class="si">{</span><span class="n">new_probability</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -466,6 +466,7 @@ outcome is still a <code class="docutils literal notranslate"><span class="pre">
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/pythagorean.html">Pythagorean Expectation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/whr.html">Whole-History Rating</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/comparison.html">Comparing Rating Systems</a></li>
 </ul>

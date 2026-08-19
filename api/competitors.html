@@ -2575,6 +2575,178 @@ otherwise used by this rating system.</p>
 </dd></dl>
 
 </section>
+<section id="module-elote.competitors.whr">
+<span id="whole-history-rating-competitor"></span><h2>Whole-History Rating Competitor<a class="headerlink" href="#module-elote.competitors.whr" title="Link to this heading">¶</a></h2>
+<p>Whole-History Rating (WHR) for time-aware paired comparisons.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="elote.competitors.whr.WholeHistoryRatingCompetitor">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">elote.competitors.whr.</span></span><span class="sig-name descname"><span class="pre">WholeHistoryRatingCompetitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/competitors/whr.html#WholeHistoryRatingCompetitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.whr.WholeHistoryRatingCompetitor" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCompetitor</span></code></a></p>
+<p>A time-aware Bradley-Terry maximum-a-posteriori rating curve.</p>
+<p>One latent rating is kept for every distinct playing day. Consecutive ratings are
+linked by a Wiener-process prior whose variance is <code class="docutils literal notranslate"><span class="pre">w2</span> <span class="pre">*</span> <span class="pre">elapsed_days</span></code> in Elo
+points squared. Results use the Bradley-Terry likelihood, and a bounded sequence
+of per-competitor tridiagonal Newton updates fits the connected component lazily.</p>
+<p>Serialized state preserves the fitted per-day curve and day index, but cannot
+preserve object references in the game graph. On the first result after restore,
+the latest restored rating becomes the initial rating of a fresh history; restored
+lifetime games are therefore never silently combined with a reset graph.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>w2: Per-day Wiener-process variance in Elo points squared.
+initial_rating: Rating before any games, on the Elo scale.
+max_iterations: Maximum component-wide Newton sweeps per lazy fit.
+precision: Stop when the largest Elo-scale Newton step is below this value.</p>
+</dd>
+</dl>
+<p>Reference: Coulom, R. (2008), <em>Whole-History Rating: A Bayesian Rating System
+for Players of Time-Varying Strength</em>.</p>
+<p>Initialize base competitor state.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.whr.WholeHistoryRatingCompetitor.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/whr.html#WholeHistoryRatingCompetitor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.whr.WholeHistoryRatingCompetitor.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialize base competitor state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.whr.WholeHistoryRatingCompetitor.beat">
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/whr.html#WholeHistoryRatingCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.whr.WholeHistoryRatingCompetitor.beat" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this competitor has won against the given competitor.</p>
+<p>This method updates the ratings of both this competitor and the opponent
+based on the match outcome where this competitor won.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.
+scores (sequence of float, optional): The two non-negative, finite scores in</p>
+<blockquote>
+<div><p>caller order – <code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Rating systems that model
+margin of victory (such as <a class="reference internal" href="../competitors.html#elote.competitors.massey.MasseyCompetitor" title="elote.competitors.massey.MasseyCompetitor"><code class="xref py py-class docutils literal notranslate"><span class="pre">MasseyCompetitor</span></code></a>)
+consume it; the rest validate and ignore it. When omitted, every system falls
+back to its documented unit-score behaviour.</p>
+</div></blockquote>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.
+ValueError: If <code class="docutils literal notranslate"><span class="pre">scores</span></code> is malformed, negative, non-finite, or does not describe</p>
+<blockquote>
+<div><p>a win for this competitor.</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.whr.WholeHistoryRatingCompetitor.configure">
+<span class="sig-name descname"><span class="pre">configure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/whr.html#WholeHistoryRatingCompetitor.configure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.whr.WholeHistoryRatingCompetitor.configure" title="Link to this definition">¶</a></dt>
+<dd><p>Validate and update this instance’s fitting parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.whr.WholeHistoryRatingCompetitor.configure_class">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">configure_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/whr.html#WholeHistoryRatingCompetitor.configure_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.whr.WholeHistoryRatingCompetitor.configure_class" title="Link to this definition">¶</a></dt>
+<dd><p>Configure class-level parameters for this rating system.</p>
+<p>This method allows setting class-level parameters that affect all
+instances of this rating system.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p><a href="#id5"><span class="problematic" id="id6">**</span></a>kwargs: Keyword arguments for class-level parameters.</p>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidParameterException: If any parameter is invalid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.whr.WholeHistoryRatingCompetitor.expected_score">
+<span class="sig-name descname"><span class="pre">expected_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/elote/competitors/whr.html#WholeHistoryRatingCompetitor.expected_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.whr.WholeHistoryRatingCompetitor.expected_score" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the expected score (probability of winning) against another competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor to compare against.</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: The probability of winning (between 0 and 1).</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.whr.WholeHistoryRatingCompetitor.lost_to">
+<span class="sig-name descname"><span class="pre">lost_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/whr.html#WholeHistoryRatingCompetitor.lost_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.whr.WholeHistoryRatingCompetitor.lost_to" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this competitor has lost to the given competitor.</p>
+<p>This is a convenience method that calls beat() on the winning competitor.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that won.
+scores (sequence of float, optional): The two scores in caller order –</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. They are reversed before being handed to
+the winner’s <a class="reference internal" href="../competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.beat" title="elote.competitors.whr.WholeHistoryRatingCompetitor.beat"><code class="xref py py-meth docutils literal notranslate"><span class="pre">beat()</span></code></a>, so the caller never reorders them.</p>
+</div></blockquote>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.
+ValueError: If <code class="docutils literal notranslate"><span class="pre">scores</span></code> is malformed, negative, non-finite, or does not describe</p>
+<blockquote>
+<div><p>a loss for this competitor.</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="elote.competitors.whr.WholeHistoryRatingCompetitor.num_games">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">num_games</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#elote.competitors.whr.WholeHistoryRatingCompetitor.num_games" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="elote.competitors.whr.WholeHistoryRatingCompetitor.rating">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rating</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#elote.competitors.whr.WholeHistoryRatingCompetitor.rating" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current rating value of this competitor.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>float: The current rating value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.whr.WholeHistoryRatingCompetitor.rating_at">
+<span class="sig-name descname"><span class="pre">rating_at</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">when</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">date</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/elote/competitors/whr.html#WholeHistoryRatingCompetitor.rating_at"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.whr.WholeHistoryRatingCompetitor.rating_at" title="Link to this definition">¶</a></dt>
+<dd><p>Return the fitted rating on, or most recently before, <code class="docutils literal notranslate"><span class="pre">when</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.whr.WholeHistoryRatingCompetitor.rating_history">
+<span class="sig-name descname"><span class="pre">rating_history</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">date</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/elote/competitors/whr.html#WholeHistoryRatingCompetitor.rating_history"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.whr.WholeHistoryRatingCompetitor.rating_history" title="Link to this definition">¶</a></dt>
+<dd><p>Return a chronological copy of the fitted <code class="docutils literal notranslate"><span class="pre">(day,</span> <span class="pre">rating)</span></code> curve.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.whr.WholeHistoryRatingCompetitor.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/whr.html#WholeHistoryRatingCompetitor.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.whr.WholeHistoryRatingCompetitor.reset" title="Link to this definition">¶</a></dt>
+<dd><p>Reset the competitor’s state to its initial configuration.</p>
+<p>This method should revert any changes made through updates (beat, lost_to, tied)
+and re-import the initial parameters and state.
+Note: Actual implementation might be needed depending on how initial state is stored.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.whr.WholeHistoryRatingCompetitor.tied">
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/whr.html#WholeHistoryRatingCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.whr.WholeHistoryRatingCompetitor.tied" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this competitor has tied with the given competitor.</p>
+<p>This method updates the ratings of both this competitor and the opponent
+based on a drawn match outcome.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that tied.
+scores (sequence of float, optional): The two scores in caller order –</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. They must be equal, since the result is
+declared a draw.</p>
+</div></blockquote>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.
+ValueError: If <code class="docutils literal notranslate"><span class="pre">scores</span></code> is malformed, negative, non-finite, or is not a draw.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="blended-competitor">
 <h2>Blended Competitor<a class="headerlink" href="#blended-competitor" title="Link to this heading">¶</a></h2>
 <dl class="py class" id="module-elote.competitors.ensemble">
@@ -2783,6 +2955,7 @@ to every sub-competitor.</p>
 <li class="toctree-l1"><a class="reference internal" href="../rating_systems/keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rating_systems/pythagorean.html">Pythagorean Expectation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/whr.html">Whole-History Rating</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rating_systems/ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rating_systems/comparison.html">Comparing Rating Systems</a></li>
 </ul>

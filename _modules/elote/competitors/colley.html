@@ -174,17 +174,17 @@
           <div class="body" role="main">
             
   <h1>Source code for elote.competitors.colley</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""</span>
 <span class="sd">Colley Matrix Method implementation for the Elote library.</span>
 
 <span class="sd">The Colley Matrix Method is a least-squares rating system developed by Dr. Wesley Colley</span>
-<span class="sd">that solves a system of linear equations to obtain rankings. It&#39;s widely used in sports</span>
+<span class="sd">that solves a system of linear equations to obtain rankings. It's widely used in sports</span>
 <span class="sd">rankings, particularly college football.</span>
 
 <span class="sd">References:</span>
-<span class="sd">- Colley, W. N. (2002). Colley&#39;s Bias Free College Football Ranking Method: The Colley Matrix Explained.</span>
+<span class="sd">- Colley, W. N. (2002). Colley's Bias Free College Football Ranking Method: The Colley Matrix Explained.</span>
 <span class="sd">  https://colleyrankings.com/matrate.pdf</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">cast</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Sequence</span>
@@ -193,20 +193,20 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 
-<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;ColleyMatrixCompetitor&quot;</span><span class="p">)</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">"ColleyMatrixCompetitor"</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="ColleyMatrixCompetitor">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.colley.ColleyMatrixCompetitor">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ColleyMatrixCompetitor</span><span class="p">(</span><span class="n">BaseCompetitor</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Colley Matrix Method competitor.</span>
+<span class="w">    </span><span class="sd">"""Colley Matrix Method competitor.</span>
 
 <span class="sd">    The Colley Matrix Method is a least-squares rating system that solves a system of linear</span>
 <span class="sd">    equations to obtain rankings. Unlike Elo which updates ratings incrementally after each match,</span>
 <span class="sd">    Colley Matrix recalculates all ratings using the entire match history.</span>
 
 <span class="sd">    Key characteristics:</span>
-<span class="sd">    - Bias-free (doesn&#39;t depend on schedule order)</span>
+<span class="sd">    - Bias-free (doesn't depend on schedule order)</span>
 <span class="sd">    - Considers only wins and losses (not margin of victory)</span>
 <span class="sd">    - Initial rating of 0.5 for all competitors</span>
 <span class="sd">    - Final ratings are between 0 and 1</span>
@@ -215,7 +215,7 @@
 <span class="sd">    Class Attributes:</span>
 <span class="sd">        _minimum_rating (float): The minimum allowed rating value. Default: 0.0</span>
 <span class="sd">        _default_initial_rating (float): Default initial rating for all competitors. Default: 0.5</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">_minimum_rating</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="n">_default_initial_rating</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
@@ -223,77 +223,77 @@
 <div class="viewcode-block" id="ColleyMatrixCompetitor.__init__">
 <a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.colley.ColleyMatrixCompetitor.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_rating</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a new Colley Matrix competitor.</span>
+<span class="w">        </span><span class="sd">"""Initialize a new Colley Matrix competitor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            initial_rating (float, optional): The initial rating of this competitor. Default: 0.5.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidRatingValueException: If the initial rating is below the minimum rating.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>  <span class="c1"># Call base class constructor</span>
         <span class="k">if</span> <span class="n">initial_rating</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">initial_rating</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Initial rating must be at least </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Initial rating must be at least </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">initial_rating</span> <span class="k">if</span> <span class="n">initial_rating</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_initial_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">&quot;ColleyMatrixCompetitor&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Opponent -&gt; num games</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_head_to_head</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">&quot;ColleyMatrixCompetitor&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Opponent -&gt; wins against</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">"ColleyMatrixCompetitor"</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Opponent -&gt; num games</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_head_to_head</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">"ColleyMatrixCompetitor"</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Opponent -&gt; wins against</span>
         <span class="c1"># Add a unique ID for hashing</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Initialized ColleyMatrixCompetitor </span><span class="si">%d</span><span class="s2"> with initial rating </span><span class="si">%.3f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">)</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Initialized ColleyMatrixCompetitor </span><span class="si">%d</span><span class="s2"> with initial rating </span><span class="si">%.3f</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">)</span></div>
 
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current rating of this competitor.</span>
+<span class="w">        </span><span class="sd">"""Get the current rating of this competitor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            float: The current rating.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span>
 
     <span class="nd">@rating</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the current rating of this competitor.</span>
+<span class="w">        </span><span class="sd">"""Set the current rating of this competitor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            value (float): The new rating value.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidRatingValueException: If the rating value is below the minimum rating.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Setting rating for competitor </span><span class="si">%d</span><span class="s2"> to </span><span class="si">%.3f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Setting rating for competitor </span><span class="si">%d</span><span class="s2"> to </span><span class="si">%.3f</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;Attempted to set rating </span><span class="si">%.3f</span><span class="s2"> below minimum </span><span class="si">%.3f</span><span class="s2"> for </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span>
+                <span class="s2">"Attempted to set rating </span><span class="si">%.3f</span><span class="s2"> below minimum </span><span class="si">%.3f</span><span class="s2"> for </span><span class="si">%d</span><span class="s2">"</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span>
             <span class="p">)</span>
-            <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">num_games</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the total number of games played by this competitor.</span>
+<span class="w">        </span><span class="sd">"""Get the total number of games played by this competitor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            int: The total number of games played.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span>
 
 <div class="viewcode-block" id="ColleyMatrixCompetitor.expected_score">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.colley.ColleyMatrixCompetitor.expected_score">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;BaseCompetitor&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the expected score against another competitor.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">"BaseCompetitor"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Calculate the expected score against another competitor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            competitor (BaseCompetitor): The competitor to compare against.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            float: The expected score (probability of winning).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="n">rating_diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">-</span> <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span>
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span> <span class="o">*</span> <span class="n">rating_diff</span><span class="p">)))</span></div>
@@ -302,7 +302,7 @@
 <div class="viewcode-block" id="ColleyMatrixCompetitor.beat">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.colley.ColleyMatrixCompetitor.beat">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has won against the given competitor.</span>
+<span class="w">        </span><span class="sd">"""Update ratings after this competitor has won against the given competitor.</span>
 
 <span class="sd">        In Colley Matrix Method, we store the match result and recalculate ratings for all</span>
 <span class="sd">        related competitors.</span>
@@ -314,9 +314,9 @@
 <span class="sd">                this rating system.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Competitor </span><span class="si">%s</span><span class="s2"> beat </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don't match.</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Competitor </span><span class="si">%s</span><span class="s2"> beat </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
         <span class="n">competitor_colley</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">ColleyMatrixCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
@@ -333,7 +333,7 @@
         <span class="n">competitor_typed</span><span class="o">.</span><span class="n">_losses</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="n">competitor_typed</span><span class="o">.</span><span class="n">_opponents</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="n">competitor_typed</span><span class="o">.</span><span class="n">_opponents</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Recorded win for </span><span class="si">%d</span><span class="s2">, loss for </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">competitor_typed</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Recorded win for </span><span class="si">%d</span><span class="s2">, loss for </span><span class="si">%d</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">competitor_typed</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
         <span class="c1"># Recalculate ratings for all connected competitors</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_recalculate_ratings</span><span class="p">()</span></div>
 
@@ -341,7 +341,7 @@
 <div class="viewcode-block" id="ColleyMatrixCompetitor.tied">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.colley.ColleyMatrixCompetitor.tied">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has tied with the given competitor.</span>
+<span class="w">        </span><span class="sd">"""Update ratings after this competitor has tied with the given competitor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            competitor (BaseCompetitor): The opponent competitor that tied.</span>
@@ -350,9 +350,9 @@
 <span class="sd">                otherwise used by this rating system.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Competitor </span><span class="si">%s</span><span class="s2"> tied with </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don't match.</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Competitor </span><span class="si">%s</span><span class="s2"> tied with </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
         <span class="n">competitor_colley</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">ColleyMatrixCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
@@ -368,7 +368,7 @@
         <span class="n">competitor_typed</span><span class="o">.</span><span class="n">_opponents</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="n">competitor_typed</span><span class="o">.</span><span class="n">_opponents</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">competitor_typed</span><span class="o">.</span><span class="n">_head_to_head</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="n">competitor_typed</span><span class="o">.</span><span class="n">_head_to_head</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Recorded tie for </span><span class="si">%d</span><span class="s2"> and </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">competitor_typed</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Recorded tie for </span><span class="si">%d</span><span class="s2"> and </span><span class="si">%d</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">competitor_typed</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
         <span class="c1"># Recalculate ratings for all connected competitors</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_recalculate_ratings</span><span class="p">()</span></div>
 
@@ -376,35 +376,35 @@
 <div class="viewcode-block" id="ColleyMatrixCompetitor.lost_to">
 <a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.colley.ColleyMatrixCompetitor.lost_to">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">lost_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has lost to the given competitor.</span>
+<span class="w">        </span><span class="sd">"""Update ratings after this competitor has lost to the given competitor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            competitor (BaseCompetitor): The opponent competitor that won.</span>
 <span class="sd">            scores (sequence of float, optional): The two scores in caller order,</span>
 <span class="sd">                ``(self_score, competitor_score)``. Reversed before being passed to the</span>
-<span class="sd">                winner&#39;s :meth:`beat`.</span>
+<span class="sd">                winner's :meth:`beat`.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Competitor </span><span class="si">%s</span><span class="s2"> lost to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don't match.</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Competitor </span><span class="si">%s</span><span class="s2"> lost to </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
         <span class="n">validated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
         <span class="n">competitor</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">validated</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="n">validated</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">validated</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_get_connected_competitors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;ColleyMatrixCompetitor&quot;</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all competitors connected to this competitor in the match graph.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_connected_competitors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">"ColleyMatrixCompetitor"</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Get all competitors connected to this competitor in the match graph.</span>
 
 <span class="sd">        This builds a network of all competitors that are connected through matches.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            List[ColleyMatrixCompetitor]: A list of all connected competitors.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">visited</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="s2">&quot;ColleyMatrixCompetitor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="n">to_visit</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;ColleyMatrixCompetitor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span>
+<span class="sd">        """</span>
+        <span class="n">visited</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="s2">"ColleyMatrixCompetitor"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">to_visit</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">"ColleyMatrixCompetitor"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span>
         <span class="n">all_competitors</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Finding connected competitors starting from </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Finding connected competitors starting from </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
         <span class="k">while</span> <span class="n">to_visit</span><span class="p">:</span>
             <span class="n">current</span> <span class="o">=</span> <span class="n">to_visit</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">current</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
@@ -417,27 +417,27 @@
                 <span class="k">if</span> <span class="n">opponent</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
                     <span class="n">to_visit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Found </span><span class="si">%d</span><span class="s2"> connected competitors: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_competitors</span><span class="p">),</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">_id</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">all_competitors</span><span class="p">])</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Found </span><span class="si">%d</span><span class="s2"> connected competitors: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_competitors</span><span class="p">),</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">_id</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">all_competitors</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">all_competitors</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_recalculate_ratings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Recalculate ratings for all connected competitors using the Colley Matrix method.</span>
 
 <span class="sd">        This method builds the Colley Matrix C and solves the linear system Cr = b to obtain</span>
 <span class="sd">        ratings for all competitors connected to this one.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Get all connected competitors</span>
         <span class="n">competitors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_connected_competitors</span><span class="p">()</span>
         <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">competitors</span><span class="p">)</span>
 
-        <span class="c1"># If there&#39;s only one competitor, no need to recalculate</span>
+        <span class="c1"># If there's only one competitor, no need to recalculate</span>
         <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Only one competitor in network, skipping recalculation.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Only one competitor in network, skipping recalculation."</span><span class="p">)</span>
             <span class="k">return</span>
 
         <span class="c1"># Build the Colley Matrix C and vector b</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Building Colley Matrix (</span><span class="si">%d</span><span class="s2"> x </span><span class="si">%d</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Building Colley Matrix (</span><span class="si">%d</span><span class="s2"> x </span><span class="si">%d</span><span class="s2">)"</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
         
         <span class="c1"># Pre-allocate arrays for better performance</span>
         <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -465,7 +465,7 @@
 
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># Use more stable solver for better numerical stability</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Solving linear system Cr = b&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Solving linear system Cr = b"</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">1000</span><span class="p">:</span>  <span class="c1"># Use direct solver for smaller systems</span>
                 <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># Use iterative solver for larger systems to save memory</span>
@@ -477,7 +477,7 @@
             <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
 
             <span class="c1"># Update ratings efficiently</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Updating ratings for </span><span class="si">%d</span><span class="s2"> competitors&quot;</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Updating ratings for </span><span class="si">%d</span><span class="s2"> competitors"</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">comp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">competitors</span><span class="p">):</span>
                 <span class="n">comp</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>  <span class="c1"># Ensure Python float type</span>
 
@@ -485,27 +485,27 @@
             <span class="n">total_rating</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
             <span class="n">target_sum</span> <span class="o">=</span> <span class="n">n</span> <span class="o">/</span> <span class="mf">2.0</span>
             <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">total_rating</span> <span class="o">-</span> <span class="n">target_sum</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-10</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Normalizing ratings. Total: </span><span class="si">%.4f</span><span class="s2">, Target: </span><span class="si">%.4f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">total_rating</span><span class="p">,</span> <span class="n">target_sum</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Normalizing ratings. Total: </span><span class="si">%.4f</span><span class="s2">, Target: </span><span class="si">%.4f</span><span class="s2">"</span><span class="p">,</span> <span class="n">total_rating</span><span class="p">,</span> <span class="n">target_sum</span><span class="p">)</span>
                 <span class="n">scale_factor</span> <span class="o">=</span> <span class="n">target_sum</span> <span class="o">/</span> <span class="n">total_rating</span>
                 <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">competitors</span><span class="p">:</span>
                     <span class="n">comp</span><span class="o">.</span><span class="n">_rating</span> <span class="o">*=</span> <span class="n">scale_factor</span>
 
         <span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinAlgError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;Colley Matrix is singular (</span><span class="si">%s</span><span class="s2">). Falling back to win percentage rating calculation for </span><span class="si">%d</span><span class="s2"> competitors.&quot;</span><span class="p">,</span> 
+                <span class="s2">"Colley Matrix is singular (</span><span class="si">%s</span><span class="s2">). Falling back to win percentage rating calculation for </span><span class="si">%d</span><span class="s2"> competitors."</span><span class="p">,</span> 
                 <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="n">n</span>
             <span class="p">)</span>
             <span class="c1"># If the matrix is singular, fall back to a simpler approach</span>
             <span class="c1"># This can happen with certain network structures</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_fallback_rating_calculation</span><span class="p">(</span><span class="n">competitors</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_fallback_rating_calculation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;ColleyMatrixCompetitor&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fallback_rating_calculation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">"ColleyMatrixCompetitor"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Fallback rating calculation when matrix is singular.</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
 <span class="sd">            competitors: List of competitors to calculate ratings for</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">competitors</span><span class="p">)</span>
         
         <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">competitors</span><span class="p">:</span>
@@ -515,7 +515,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># Ensure rating increases with more wins</span>
                 <span class="n">win_pct</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">_wins</span> <span class="o">/</span> <span class="n">comp</span><span class="o">.</span><span class="n">num_games</span>
-                <span class="c1"># Scale to be centered around 0.5, but ensure it&#39;s different from initial</span>
+                <span class="c1"># Scale to be centered around 0.5, but ensure it's different from initial</span>
                 <span class="c1"># to make the test pass</span>
                 <span class="n">new_rating</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="p">(</span><span class="n">win_pct</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
 
@@ -533,7 +533,7 @@
         <span class="c1"># Normalize ratings to ensure sum is n/2</span>
         <span class="n">total_rating</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">comp</span><span class="o">.</span><span class="n">_rating</span> <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">competitors</span><span class="p">)</span>
         <span class="n">target_sum</span> <span class="o">=</span> <span class="n">n</span> <span class="o">/</span> <span class="mf">2.0</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Normalizing fallback ratings. Total: </span><span class="si">%.4f</span><span class="s2">, Target: </span><span class="si">%.4f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">total_rating</span><span class="p">,</span> <span class="n">target_sum</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Normalizing fallback ratings. Total: </span><span class="si">%.4f</span><span class="s2">, Target: </span><span class="si">%.4f</span><span class="s2">"</span><span class="p">,</span> <span class="n">total_rating</span><span class="p">,</span> <span class="n">target_sum</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">total_rating</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-10</span><span class="p">:</span>  <span class="c1"># Avoid division by zero</span>
             <span class="n">scale_factor</span> <span class="o">=</span> <span class="n">target_sum</span> <span class="o">/</span> <span class="n">total_rating</span>
             <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">competitors</span><span class="p">:</span>
@@ -547,30 +547,30 @@
 <div class="viewcode-block" id="ColleyMatrixCompetitor.export_state">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.colley.ColleyMatrixCompetitor.export_state">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">export_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the current state of this competitor for serialization.</span>
+<span class="w">        </span><span class="sd">"""Export the current state of this competitor for serialization.</span>
 
-<span class="sd">        This method exports the competitor&#39;s state in a standardized format that can be</span>
+<span class="sd">        This method exports the competitor's state in a standardized format that can be</span>
 <span class="sd">        used to recreate the competitor with the same state.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: A dictionary containing all necessary information to recreate</span>
-<span class="sd">                 this competitor&#39;s current state.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">                 this competitor's current state.</span>
+<span class="sd">        """</span>
         <span class="c1"># Get parameters and current state</span>
         <span class="n">parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_parameters</span><span class="p">()</span>
         <span class="n">current_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_current_state</span><span class="p">()</span>
 
         <span class="c1"># Create the standardized format</span>
         <span class="n">state_dict</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
-            <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="s2">&quot;created_at&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
-            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">),</span>
-            <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="n">parameters</span><span class="p">,</span>
-            <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="n">current_state</span><span class="p">,</span>
-            <span class="s2">&quot;class_vars&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;minimum_rating&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">,</span>
-                <span class="s2">&quot;default_initial_rating&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_initial_rating</span><span class="p">,</span>
+            <span class="s2">"type"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="s2">"version"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">"created_at"</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+            <span class="s2">"id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">),</span>
+            <span class="s2">"parameters"</span><span class="p">:</span> <span class="n">parameters</span><span class="p">,</span>
+            <span class="s2">"state"</span><span class="p">:</span> <span class="n">current_state</span><span class="p">,</span>
+            <span class="s2">"class_vars"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"minimum_rating"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">,</span>
+                <span class="s2">"default_initial_rating"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_initial_rating</span><span class="p">,</span>
             <span class="p">},</span>
         <span class="p">}</span>
 
@@ -581,53 +581,53 @@
             <span class="n">state_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
         <span class="c1"># Add current_rating for backward compatibility</span>
-        <span class="n">state_dict</span><span class="p">[</span><span class="s2">&quot;current_rating&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span>
+        <span class="n">state_dict</span><span class="p">[</span><span class="s2">"current_rating"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span>
 
         <span class="k">return</span> <span class="n">state_dict</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_export_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the parameters for this competitor for serialization.</span>
+<span class="w">        </span><span class="sd">"""Export the parameters for this competitor for serialization.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Dict[str, Any]: A dictionary of parameters.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">,</span>
+            <span class="s2">"initial_rating"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">,</span>
         <span class="p">}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_export_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the current state of this competitor for serialization.</span>
+<span class="w">        </span><span class="sd">"""Export the current state of this competitor for serialization.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Dict[str, Any]: A dictionary of the current state.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="p">,</span>
-            <span class="s2">&quot;wins&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span><span class="p">,</span>
-            <span class="s2">&quot;losses&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="p">,</span>
-            <span class="s2">&quot;ties&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span><span class="p">,</span>
+            <span class="s2">"rating"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="p">,</span>
+            <span class="s2">"wins"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span><span class="p">,</span>
+            <span class="s2">"losses"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="p">,</span>
+            <span class="s2">"ties"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span><span class="p">,</span>
         <span class="p">}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_import_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Import parameters for this competitor from deserialization.</span>
+<span class="w">        </span><span class="sd">"""Import parameters for this competitor from deserialization.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            params (Dict[str, Any]): A dictionary of parameters.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_initial_rating</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_rating"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_initial_rating</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_import_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Import the current state for this competitor from deserialization.</span>
+<span class="w">        </span><span class="sd">"""Import the current state for this competitor from deserialization.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            state (Dict[str, Any]): A dictionary of the current state.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rating&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;wins&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;losses&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ties&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"rating"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"wins"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"losses"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ties"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Cannot restore opponent references from serialization</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_head_to_head</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -635,7 +635,7 @@
 <a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.colley.ColleyMatrixCompetitor.from_state">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_state</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new competitor from a previously exported state.</span>
+<span class="w">        </span><span class="sd">"""Create a new competitor from a previously exported state.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            state (dict): A dictionary containing the state of a competitor,</span>
@@ -646,54 +646,54 @@
 
 <span class="sd">        Raises:</span>
 <span class="sd">            KeyError: If the state dictionary is missing required keys.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Check if all required keys exist (from both parameters and state)</span>
-        <span class="n">required_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="s2">&quot;rating&quot;</span><span class="p">,</span> <span class="s2">&quot;wins&quot;</span><span class="p">,</span> <span class="s2">&quot;losses&quot;</span><span class="p">,</span> <span class="s2">&quot;ties&quot;</span><span class="p">]</span>
+        <span class="n">required_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"initial_rating"</span><span class="p">,</span> <span class="s2">"rating"</span><span class="p">,</span> <span class="s2">"wins"</span><span class="p">,</span> <span class="s2">"losses"</span><span class="p">,</span> <span class="s2">"ties"</span><span class="p">]</span>
         <span class="n">missing_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">required_keys</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">state</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">missing_keys</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Missing keys in ColleyMatrixCompetitor state: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">missing_keys</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing keys in ColleyMatrixCompetitor state: </span><span class="si">{</span><span class="n">missing_keys</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"Missing keys in ColleyMatrixCompetitor state: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">missing_keys</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Missing keys in ColleyMatrixCompetitor state: </span><span class="si">{</span><span class="n">missing_keys</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="c1"># Configure class variables if provided</span>
-        <span class="k">if</span> <span class="s2">&quot;class_vars&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Applying class variables from state: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;class_vars&quot;</span><span class="p">])</span>
-            <span class="n">class_vars</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;class_vars&quot;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="s2">&quot;minimum_rating&quot;</span> <span class="ow">in</span> <span class="n">class_vars</span><span class="p">:</span>
-                <span class="bp">cls</span><span class="o">.</span><span class="n">_minimum_rating</span> <span class="o">=</span> <span class="n">class_vars</span><span class="p">[</span><span class="s2">&quot;minimum_rating&quot;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="s2">&quot;default_initial_rating&quot;</span> <span class="ow">in</span> <span class="n">class_vars</span><span class="p">:</span>
-                <span class="bp">cls</span><span class="o">.</span><span class="n">_default_initial_rating</span> <span class="o">=</span> <span class="n">class_vars</span><span class="p">[</span><span class="s2">&quot;default_initial_rating&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">"class_vars"</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Applying class variables from state: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="s2">"class_vars"</span><span class="p">])</span>
+            <span class="n">class_vars</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">"class_vars"</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">"minimum_rating"</span> <span class="ow">in</span> <span class="n">class_vars</span><span class="p">:</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">_minimum_rating</span> <span class="o">=</span> <span class="n">class_vars</span><span class="p">[</span><span class="s2">"minimum_rating"</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">"default_initial_rating"</span> <span class="ow">in</span> <span class="n">class_vars</span><span class="p">:</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">_default_initial_rating</span> <span class="o">=</span> <span class="n">class_vars</span><span class="p">[</span><span class="s2">"default_initial_rating"</span><span class="p">]</span>
 
         <span class="c1"># Create a new competitor with the initial rating</span>
-        <span class="n">competitor</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_initial_rating</span><span class="p">))</span>
+        <span class="n">competitor</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_rating"</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_initial_rating</span><span class="p">))</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-            <span class="s2">&quot;Created new ColleyMatrixCompetitor from state with initial rating: </span><span class="si">%.3f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">competitor</span><span class="o">.</span><span class="n">_initial_rating</span>
+            <span class="s2">"Created new ColleyMatrixCompetitor from state with initial rating: </span><span class="si">%.3f</span><span class="s2">"</span><span class="p">,</span> <span class="n">competitor</span><span class="o">.</span><span class="n">_initial_rating</span>
         <span class="p">)</span>
 
         <span class="c1"># Set the current rating if provided</span>
-        <span class="k">if</span> <span class="s2">&quot;rating&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-            <span class="n">competitor</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;rating&quot;</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="s2">&quot;current_rating&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>  <span class="c1"># Backward compatibility</span>
-            <span class="n">competitor</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;current_rating&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">"rating"</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+            <span class="n">competitor</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">"rating"</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="s2">"current_rating"</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>  <span class="c1"># Backward compatibility</span>
+            <span class="n">competitor</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">"current_rating"</span><span class="p">]</span>
 
         <span class="c1"># Set match statistics</span>
-        <span class="n">competitor</span><span class="o">.</span><span class="n">_wins</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;wins&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="n">competitor</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;losses&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="n">competitor</span><span class="o">.</span><span class="n">_ties</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ties&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">competitor</span><span class="o">.</span><span class="n">_wins</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"wins"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">competitor</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"losses"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">competitor</span><span class="o">.</span><span class="n">_ties</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ties"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">competitor</span><span class="o">.</span><span class="n">_opponents</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">competitor</span><span class="o">.</span><span class="n">_head_to_head</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="c1"># Note: We can&#39;t restore the opponent list from state</span>
+        <span class="c1"># Note: We can't restore the opponent list from state</span>
         <span class="c1"># This would require reconstructing the entire match history</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Successfully created ColleyMatrixCompetitor </span><span class="si">%d</span><span class="s2"> from state.&quot;</span><span class="p">,</span> <span class="n">competitor</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Successfully created ColleyMatrixCompetitor </span><span class="si">%d</span><span class="s2"> from state."</span><span class="p">,</span> <span class="n">competitor</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">competitor</span></div>
 
 
 <div class="viewcode-block" id="ColleyMatrixCompetitor.reset">
 <a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.colley.ColleyMatrixCompetitor.reset">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset this competitor to its initial state.&quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Resetting ColleyMatrixCompetitor </span><span class="si">%d</span><span class="s2"> to initial state.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
+<span class="w">        </span><span class="sd">"""Reset this competitor to its initial state."""</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Resetting ColleyMatrixCompetitor </span><span class="si">%d</span><span class="s2"> to initial state."</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="mi">0</span>
@@ -703,52 +703,52 @@
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of this competitor.</span>
+<span class="w">        </span><span class="sd">"""Return a string representation of this competitor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            str: A string representation of this competitor.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;ColleyMatrixCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, W/L/T=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_wins</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ties</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"&lt;ColleyMatrixCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, W/L/T=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_wins</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ties</span><span class="si">}</span><span class="s2">&gt;"</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of this competitor.</span>
+<span class="w">        </span><span class="sd">"""Return a string representation of this competitor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            str: A string representation of this competitor.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;ColleyMatrixCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"&lt;ColleyMatrixCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&gt;"</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_from_parameters</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new competitor from parameters.</span>
+<span class="w">        </span><span class="sd">"""Create a new competitor from parameters.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            params (Dict[str, Any]): A dictionary of parameters.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            T: A new competitor instance.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_initial_rating</span><span class="p">))</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_rating"</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_initial_rating</span><span class="p">))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if two competitors are equal based on their unique ID.</span>
+<span class="w">        </span><span class="sd">"""Check if two competitors are equal based on their unique ID.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            other: The other competitor to compare with.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True if the competitors are the same object, False otherwise.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">ColleyMatrixCompetitor</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_id</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a hash value for this competitor based on its unique ID.</span>
+<span class="w">        </span><span class="sd">"""Get a hash value for this competitor based on its unique ID.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            int: A hash value for this competitor.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span></div>
 
 </pre></div>
@@ -785,6 +785,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/pythagorean.html">Pythagorean Expectation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/whr.html">Whole-History Rating</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/comparison.html">Comparing Rating Systems</a></li>
 </ul>

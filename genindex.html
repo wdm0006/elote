@@ -193,6 +193,7 @@
  | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
  | <a href="#V"><strong>V</strong></a>
+ | <a href="#W"><strong>W</strong></a>
  
 </div>
 <h2 id="_">_</h2>
@@ -230,6 +231,8 @@
         <li><a href="api/competitors.html#elote.competitors.pythagorean.PythagoreanCompetitor.__init__">(elote.competitors.pythagorean.PythagoreanCompetitor method)</a>
 </li>
         <li><a href="api/competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.__init__">(elote.competitors.trueskill.TrueSkillCompetitor method)</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.__init__">(elote.competitors.whr.WholeHistoryRatingCompetitor method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -283,6 +286,8 @@
 </li>
         <li><a href="api/competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.beat">(elote.competitors.trueskill.TrueSkillCompetitor method)</a>, <a href="competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.beat">[1]</a>
 </li>
+        <li><a href="api/competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.beat">(elote.competitors.whr.WholeHistoryRatingCompetitor method)</a>, <a href="competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.beat">[1]</a>
+</li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -307,7 +312,11 @@
       <li><a href="api/competitors.html#elote.competitors.colley.ColleyMatrixCompetitor">ColleyMatrixCompetitor (class in elote.competitors.colley)</a>, <a href="competitors.html#elote.competitors.colley.ColleyMatrixCompetitor">[1]</a>
 </li>
       <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.configure">configure() (elote.competitors.base.BaseCompetitor method)</a>
+
+      <ul>
+        <li><a href="api/competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.configure">(elote.competitors.whr.WholeHistoryRatingCompetitor method)</a>
 </li>
+      </ul></li>
       <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.configure_class">configure_class() (elote.competitors.base.BaseCompetitor class method)</a>
 
       <ul>
@@ -318,6 +327,8 @@
         <li><a href="api/competitors.html#elote.competitors.massey.MasseyCompetitor.configure_class">(elote.competitors.massey.MasseyCompetitor class method)</a>
 </li>
         <li><a href="api/competitors.html#elote.competitors.pythagorean.PythagoreanCompetitor.configure_class">(elote.competitors.pythagorean.PythagoreanCompetitor class method)</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.configure_class">(elote.competitors.whr.WholeHistoryRatingCompetitor class method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -444,13 +455,20 @@
         <li><a href="api/competitors.html#module-elote.competitors.pythagorean">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     elote.competitors.trueskill
 
       <ul>
         <li><a href="api/competitors.html#module-elote.competitors.trueskill">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    elote.competitors.whr
+
+      <ul>
+        <li><a href="api/competitors.html#module-elote.competitors.whr">module</a>
 </li>
       </ul></li>
       <li><a href="api/arenas.html#elote.arenas.lambda_arena.LambdaArena.evaluate_performance">evaluate_performance() (elote.arenas.lambda_arena.LambdaArena method)</a>, <a href="arenas.html#elote.arenas.lambda_arena.LambdaArena.evaluate_performance">[1]</a>
@@ -484,6 +502,8 @@
 </li>
         <li><a href="api/competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.expected_score">(elote.competitors.trueskill.TrueSkillCompetitor method)</a>, <a href="competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.expected_score">[1]</a>
 </li>
+        <li><a href="api/competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.expected_score">(elote.competitors.whr.WholeHistoryRatingCompetitor method)</a>, <a href="competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.expected_score">[1]</a>
+</li>
       </ul></li>
       <li><a href="api/arenas.html#elote.arenas.base.BaseArena.export_state">export_state() (elote.arenas.base.BaseArena method)</a>
 
@@ -515,6 +535,8 @@
         <li><a href="competitors.html#elote.competitors.pythagorean.PythagoreanCompetitor.export_state">(elote.competitors.pythagorean.PythagoreanCompetitor method)</a>
 </li>
         <li><a href="api/competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.export_state">(elote.competitors.trueskill.TrueSkillCompetitor method)</a>, <a href="competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.export_state">[1]</a>
+</li>
+        <li><a href="competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.export_state">(elote.competitors.whr.WholeHistoryRatingCompetitor method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -553,6 +575,8 @@
         <li><a href="competitors.html#elote.competitors.pythagorean.PythagoreanCompetitor.from_json">(elote.competitors.pythagorean.PythagoreanCompetitor class method)</a>
 </li>
         <li><a href="competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.from_json">(elote.competitors.trueskill.TrueSkillCompetitor class method)</a>
+</li>
+        <li><a href="competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.from_json">(elote.competitors.whr.WholeHistoryRatingCompetitor class method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -645,8 +669,6 @@
       </ul></li>
       <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.list_competitor_types">list_competitor_types() (elote.competitors.base.BaseCompetitor class method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.lost_to">lost_to() (elote.competitors.base.BaseCompetitor method)</a>
 
       <ul>
@@ -657,6 +679,8 @@
         <li><a href="api/competitors.html#elote.competitors.keener.KeenerCompetitor.lost_to">(elote.competitors.keener.KeenerCompetitor method)</a>
 </li>
         <li><a href="api/competitors.html#elote.competitors.massey.MasseyCompetitor.lost_to">(elote.competitors.massey.MasseyCompetitor method)</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.lost_to">(elote.competitors.whr.WholeHistoryRatingCompetitor method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -711,6 +735,8 @@
 </li>
         <li><a href="api/competitors.html#module-elote.competitors.trueskill">elote.competitors.trueskill</a>
 </li>
+        <li><a href="api/competitors.html#module-elote.competitors.whr">elote.competitors.whr</a>
+</li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -732,6 +758,8 @@
         <li><a href="api/competitors.html#elote.competitors.massey.MasseyCompetitor.num_games">(elote.competitors.massey.MasseyCompetitor property)</a>
 </li>
         <li><a href="api/competitors.html#elote.competitors.pythagorean.PythagoreanCompetitor.num_games">(elote.competitors.pythagorean.PythagoreanCompetitor property)</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.num_games">(elote.competitors.whr.WholeHistoryRatingCompetitor property)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -793,9 +821,15 @@
 </li>
         <li><a href="api/competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.rating">(elote.competitors.trueskill.TrueSkillCompetitor property)</a>, <a href="competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.rating">[1]</a>
 </li>
+        <li><a href="api/competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.rating">(elote.competitors.whr.WholeHistoryRatingCompetitor property)</a>, <a href="competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.rating">[1]</a>
+</li>
       </ul></li>
+      <li><a href="api/competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.rating_at">rating_at() (elote.competitors.whr.WholeHistoryRatingCompetitor method)</a>, <a href="competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.rating_at">[1]</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.rating_history">rating_history() (elote.competitors.whr.WholeHistoryRatingCompetitor method)</a>, <a href="competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.rating_history">[1]</a>
+</li>
       <li><a href="api/competitors.html#elote.competitors.glicko2.Glicko2Competitor.rd">rd (elote.competitors.glicko2.Glicko2Competitor property)</a>
 </li>
       <li><a href="api/arenas.html#elote.arenas.base.History.report_results">report_results() (elote.arenas.base.History method)</a>, <a href="arenas.html#elote.arenas.base.History.report_results">[1]</a>
@@ -826,6 +860,8 @@
         <li><a href="api/competitors.html#elote.competitors.pythagorean.PythagoreanCompetitor.reset">(elote.competitors.pythagorean.PythagoreanCompetitor method)</a>
 </li>
         <li><a href="api/competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.reset">(elote.competitors.trueskill.TrueSkillCompetitor method)</a>
+</li>
+        <li><a href="api/competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.reset">(elote.competitors.whr.WholeHistoryRatingCompetitor method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -877,6 +913,8 @@
 </li>
         <li><a href="api/competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.tied">(elote.competitors.trueskill.TrueSkillCompetitor method)</a>, <a href="competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.tied">[1]</a>
 </li>
+        <li><a href="api/competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.tied">(elote.competitors.whr.WholeHistoryRatingCompetitor method)</a>, <a href="competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.tied">[1]</a>
+</li>
       </ul></li>
       <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.to_json">to_json() (elote.competitors.base.BaseCompetitor method)</a>
 
@@ -904,6 +942,8 @@
         <li><a href="competitors.html#elote.competitors.pythagorean.PythagoreanCompetitor.to_json">(elote.competitors.pythagorean.PythagoreanCompetitor method)</a>
 </li>
         <li><a href="competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.to_json">(elote.competitors.trueskill.TrueSkillCompetitor method)</a>
+</li>
+        <li><a href="competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.to_json">(elote.competitors.whr.WholeHistoryRatingCompetitor method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -969,6 +1009,14 @@
   </ul></td>
 </tr></table>
 
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor">WholeHistoryRatingCompetitor (class in elote.competitors.whr)</a>, <a href="competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor">[1]</a>
+</li>
+  </ul></td>
+</tr></table>
+
 
 
             <div class="clearer"></div>
@@ -1003,6 +1051,7 @@
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/pythagorean.html">Pythagorean Expectation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/whr.html">Whole-History Rating</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/comparison.html">Comparing Rating Systems</a></li>
 </ul>

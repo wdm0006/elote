@@ -181,15 +181,15 @@
 <span class="n">better</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">()</span>
 <span class="n">best</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">()</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Starting ratings:&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Starting ratings:'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">After matches&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">After matches'</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
     <span class="n">better</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">good</span><span class="p">)</span>
     <span class="n">best</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">better</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Starting</span> <span class="n">ratings</span><span class="p">:</span>
@@ -217,15 +217,15 @@
 <span class="n">better</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">450</span><span class="p">)</span>
 <span class="n">best</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Starting ratings:&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Starting ratings:'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">After matches&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">After matches'</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
     <span class="n">better</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">good</span><span class="p">)</span>
     <span class="n">best</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">better</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Starting</span> <span class="n">ratings</span><span class="p">:</span>
@@ -264,16 +264,16 @@
 <span class="n">best</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
 <span class="n">also_best</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Starting ratings:&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">also_best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Starting ratings:'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">also_best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">After matches&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">After matches'</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
     <span class="n">better</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">good</span><span class="p">)</span>
     <span class="n">better</span><span class="o">.</span><span class="n">lost_to</span><span class="p">(</span><span class="n">best</span><span class="p">)</span>
     <span class="n">best</span><span class="o">.</span><span class="n">tied</span><span class="p">(</span><span class="n">also_best</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">also_best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">also_best</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Starting</span> <span class="n">ratings</span><span class="p">:</span>
@@ -310,13 +310,13 @@
 <span class="n">good</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
 <span class="n">better</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;probability of better beating good: </span><span class="si">%5.2f%%</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">better</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">good</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;probability of good beating better: </span><span class="si">%5.2f%%</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">better</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'probability of better beating good: </span><span class="si">%5.2f%%</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">better</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">good</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'probability of good beating better: </span><span class="si">%5.2f%%</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">better</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="p">))</span>
 
 <span class="n">good</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">better</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;probability of better beating good: </span><span class="si">%5.2f%%</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">better</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">good</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;probability of good beating better: </span><span class="si">%5.2f%%</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">better</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'probability of better beating good: </span><span class="si">%5.2f%%</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">better</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">good</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'probability of good beating better: </span><span class="si">%5.2f%%</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">good</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">better</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="p">))</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">probability</span> <span class="n">of</span> <span class="n">better</span> <span class="n">beating</span> <span class="n">good</span><span class="p">:</span> <span class="mf">64.01</span><span class="o">%</span>
@@ -345,32 +345,32 @@
 <span class="n">matchups</span> <span class="o">=</span> <span class="p">[(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)]</span>
 
 <span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-<span class="n">arena</span><span class="o">.</span><span class="n">set_competitor_class_var</span><span class="p">(</span><span class="s1">&#39;_k_factor&#39;</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">set_competitor_class_var</span><span class="p">(</span><span class="s1">'_k_factor'</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
 <span class="c1"># Using 1200 as initial rating (standard chess starting rating) to prevent negative ratings</span>
-<span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">,</span> <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1200</span><span class="p">})</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">,</span> <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">"initial_rating"</span><span class="p">:</span> <span class="mi">1200</span><span class="p">})</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arena results:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Arena results:"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Arena</span> <span class="n">results</span><span class="p">:</span>
 <span class="p">[</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1013.2827659706424</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">1013.2827659706424</span>
     <span class="p">},</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1058.4698600862191</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">1058.4698600862191</span>
     <span class="p">},</span>
     <span class="o">...</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1328.7158907591229</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">1328.7158907591229</span>
     <span class="p">},</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1435.6511383857194</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">1435.6511383857194</span>
     <span class="p">}</span>
 <span class="p">]</span>
 </pre></div>
@@ -397,32 +397,32 @@
 <span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span>
     <span class="n">func</span><span class="p">,</span>
     <span class="n">base_competitor</span><span class="o">=</span><span class="n">DWZCompetitor</span><span class="p">,</span>
-    <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1200</span><span class="p">}</span>
+    <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">"initial_rating"</span><span class="p">:</span> <span class="mi">1200</span><span class="p">}</span>
 <span class="p">)</span>
 <span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arena results:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Arena results:"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Arena</span> <span class="n">results</span><span class="p">:</span>
 <span class="p">[</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1012.72183429478434</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">1012.72183429478434</span>
     <span class="p">},</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1044.28657694745118</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">1044.28657694745118</span>
     <span class="p">},</span>
     <span class="o">...</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1358.7172315502228</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">1358.7172315502228</span>
     <span class="p">},</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1411.6297448123669</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">1411.6297448123669</span>
     <span class="p">}</span>
 <span class="p">]</span>
 </pre></div>
@@ -450,28 +450,28 @@
 <span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">ECFCompetitor</span><span class="p">)</span>
 <span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arena results:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Arena results:"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Arena</span> <span class="n">results</span><span class="p">:</span>
 <span class="p">[</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">100.0</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">100.0</span>
     <span class="p">},</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">106.99453852992116</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">106.99453852992116</span>
     <span class="p">},</span>
     <span class="o">...</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">134.9562091605315</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">134.9562091605315</span>
     <span class="p">},</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">145.9090955086219</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">145.9090955086219</span>
     <span class="p">}</span>
 <span class="p">]</span>
 </pre></div>
@@ -497,32 +497,32 @@
 <span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span>
     <span class="n">func</span><span class="p">,</span>
     <span class="n">base_competitor</span><span class="o">=</span><span class="n">GlickoCompetitor</span><span class="p">,</span>
-    <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1500</span><span class="p">}</span>
+    <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">"initial_rating"</span><span class="p">:</span> <span class="mi">1500</span><span class="p">}</span>
 <span class="p">)</span>
 <span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arena results:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Arena results:"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Arena</span> <span class="n">results</span><span class="p">:</span>
 <span class="p">[</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1126.83348029853865</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">1126.83348029853865</span>
     <span class="p">},</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1395.7055271953318</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">1395.7055271953318</span>
     <span class="p">},</span>
     <span class="o">...</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">2421.232857002417</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">2421.232857002417</span>
     <span class="p">},</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">2984.275564273142</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">2984.275564273142</span>
     <span class="p">}</span>
 <span class="p">]</span>
 </pre></div>
@@ -550,10 +550,10 @@
 <span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span>
     <span class="n">func</span><span class="p">,</span>
     <span class="n">base_competitor</span><span class="o">=</span><span class="n">GlickoCompetitor</span><span class="p">,</span>
-    <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1500</span><span class="p">}</span>
+    <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">"initial_rating"</span><span class="p">:</span> <span class="mi">1500</span><span class="p">}</span>
 <span class="p">)</span>
 <span class="n">arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arena results:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Arena results:"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 
 <span class="c1"># Export state and create a deep copy to avoid modifying the original</span>
@@ -569,48 +569,48 @@
 
 <span class="c1"># Run more matches</span>
 <span class="n">new_arena</span><span class="o">.</span><span class="n">tournament</span><span class="p">(</span><span class="n">matchups</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arena results:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Arena results:"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">new_arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Arena</span> <span class="n">results</span><span class="p">:</span>
 <span class="p">[</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1455.4305146831251</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">1455.4305146831251</span>
     <span class="p">},</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1515.7289656415517</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">1515.7289656415517</span>
     <span class="p">},</span>
     <span class="o">...</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1673.3452669422734</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">1673.3452669422734</span>
     <span class="p">},</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1967.7914038679244</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">1967.7914038679244</span>
     <span class="p">}</span>
 <span class="p">]</span>
 <span class="n">Arena</span> <span class="n">results</span><span class="p">:</span>
 <span class="p">[</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1304.09061767108824</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">1304.09061767108824</span>
     <span class="p">},</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1339.4265505050406</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">1339.4265505050406</span>
     <span class="p">},</span>
     <span class="o">...</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">2253.7482792356805</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">2253.7482792356805</span>
     <span class="p">},</span>
     <span class="p">{</span>
-        <span class="s2">&quot;competitor&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">2403.5118562872744</span>
+        <span class="s2">"competitor"</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">2403.5118562872744</span>
     <span class="p">}</span>
 <span class="p">]</span>
 </pre></div>
@@ -634,38 +634,38 @@
 <span class="n">json_str</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span>
 
 <span class="c1"># Print the serialized JSON (formatted for readability)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Serialized competitor:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Serialized competitor:"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_str</span><span class="p">),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 
 <span class="c1"># Deserialize from JSON</span>
 <span class="n">new_competitor</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">json_str</span><span class="p">)</span>
 
 <span class="c1"># Verify the ratings match</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Original rating: </span><span class="si">{</span><span class="n">competitor</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Deserialized rating: </span><span class="si">{</span><span class="n">new_competitor</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Original rating: </span><span class="si">{</span><span class="n">competitor</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Deserialized rating: </span><span class="si">{</span><span class="n">new_competitor</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Continue using the deserialized competitor</span>
 <span class="n">new_competitor</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1450</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Updated rating after another match: </span><span class="si">{</span><span class="n">new_competitor</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Updated rating after another match: </span><span class="si">{</span><span class="n">new_competitor</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Serialized</span> <span class="n">competitor</span><span class="p">:</span>
 <span class="p">{</span>
-    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;EloCompetitor&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="s2">&quot;created_at&quot;</span><span class="p">:</span> <span class="mi">1625097600</span><span class="p">,</span>
-    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;550e8400-e29b-41d4-a716-446655440000&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1500</span>
+    <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"EloCompetitor"</span><span class="p">,</span>
+    <span class="s2">"version"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">"created_at"</span><span class="p">:</span> <span class="mi">1625097600</span><span class="p">,</span>
+    <span class="s2">"id"</span><span class="p">:</span> <span class="s2">"550e8400-e29b-41d4-a716-446655440000"</span><span class="p">,</span>
+    <span class="s2">"parameters"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"initial_rating"</span><span class="p">:</span> <span class="mi">1500</span>
     <span class="p">},</span>
-    <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">1524.32</span>
+    <span class="s2">"state"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="mf">1524.32</span>
     <span class="p">},</span>
-    <span class="s2">&quot;class_vars&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;k_factor&quot;</span><span class="p">:</span> <span class="mi">32</span>
+    <span class="s2">"class_vars"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"k_factor"</span><span class="p">:</span> <span class="mi">32</span>
     <span class="p">},</span>
-    <span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1500</span><span class="p">,</span>
-    <span class="s2">&quot;current_rating&quot;</span><span class="p">:</span> <span class="mf">1524.32</span>
+    <span class="s2">"initial_rating"</span><span class="p">:</span> <span class="mi">1500</span><span class="p">,</span>
+    <span class="s2">"current_rating"</span><span class="p">:</span> <span class="mf">1524.32</span>
 <span class="p">}</span>
 <span class="n">Original</span> <span class="n">rating</span><span class="p">:</span> <span class="mf">1524.32</span>
 <span class="n">Deserialized</span> <span class="n">rating</span><span class="p">:</span> <span class="mf">1524.32</span>
@@ -708,6 +708,7 @@
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/pythagorean.html">Pythagorean Expectation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/whr.html">Whole-History Rating</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/comparison.html">Comparing Rating Systems</a></li>
 </ul>

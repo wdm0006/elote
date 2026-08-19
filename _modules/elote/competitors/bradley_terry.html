@@ -174,7 +174,7 @@
           <div class="body" role="main">
             
   <h1>Source code for elote.competitors.bradley_terry</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""</span>
 <span class="sd">Bradley-Terry model implementation for the Elote library.</span>
 
 <span class="sd">The Bradley-Terry model is a probabilistic model for paired comparisons. Each competitor</span>
@@ -197,7 +197,7 @@
 <span class="sd">  Method of Paired Comparisons. Biometrika, 39(3/4), 324-345.</span>
 <span class="sd">- Hunter, D. R. (2004). MM algorithms for generalized Bradley-Terry models. The Annals of</span>
 <span class="sd">  Statistics, 32(1), 384-406.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">cast</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Sequence</span>
@@ -207,13 +207,13 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote.competitors.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="n">InvalidParameterException</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 
-<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;BradleyTerryCompetitor&quot;</span><span class="p">)</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">"BradleyTerryCompetitor"</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="BradleyTerryCompetitor">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.bradley_terry.BradleyTerryCompetitor">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BradleyTerryCompetitor</span><span class="p">(</span><span class="n">BaseCompetitor</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Bradley-Terry model competitor.</span>
+<span class="w">    </span><span class="sd">"""Bradley-Terry model competitor.</span>
 
 <span class="sd">    The Bradley-Terry model assigns each competitor a latent strength and models the</span>
 <span class="sd">    probability that one competitor beats another as a function of the difference of their</span>
@@ -238,7 +238,7 @@
 <span class="sd">            phantom opponent). Default: 0.1.</span>
 <span class="sd">        _max_iter (int): Maximum MM iterations per fit. Default: 10000.</span>
 <span class="sd">        _tol (float): Convergence tolerance on the max change in log-strength. Default: 1e-8.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">_minimum_rating</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="n">_anchor_rating</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1500.0</span>
@@ -250,7 +250,7 @@
 <div class="viewcode-block" id="BradleyTerryCompetitor.__init__">
 <a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.bradley_terry.BradleyTerryCompetitor.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_rating</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a new Bradley-Terry competitor.</span>
+<span class="w">        </span><span class="sd">"""Initialize a new Bradley-Terry competitor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            initial_rating (float, optional): The initial rating of this competitor, on the</span>
@@ -258,7 +258,7 @@
 
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidParameterException: If the regularization or iteration parameters are invalid.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>  <span class="c1"># Call base class constructor</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">initial_rating</span> <span class="k">if</span> <span class="n">initial_rating</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_anchor_rating</span>
@@ -267,54 +267,54 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">&quot;BradleyTerryCompetitor&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Opponent -&gt; num games</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_head_to_head</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">&quot;BradleyTerryCompetitor&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Opponent -&gt; wins against</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">"BradleyTerryCompetitor"</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Opponent -&gt; num games</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_head_to_head</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">"BradleyTerryCompetitor"</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Opponent -&gt; wins against</span>
         <span class="c1"># Unique ID for hashing (instances are used as dict keys in the match graph).</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-            <span class="s2">&quot;Initialized BradleyTerryCompetitor </span><span class="si">%d</span><span class="s2"> with initial rating </span><span class="si">%.3f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span>
+            <span class="s2">"Initialized BradleyTerryCompetitor </span><span class="si">%d</span><span class="s2"> with initial rating </span><span class="si">%.3f</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span>
         <span class="p">)</span></div>
 
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current rating of this competitor on the Elo-like reporting scale.</span>
+<span class="w">        </span><span class="sd">"""Get the current rating of this competitor on the Elo-like reporting scale.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            float: The current rating.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_anchor_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span>
 
     <span class="nd">@rating</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the current rating of this competitor on the Elo-like reporting scale.</span>
+<span class="w">        </span><span class="sd">"""Set the current rating of this competitor on the Elo-like reporting scale.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            value (float): The new rating value.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Setting rating for competitor </span><span class="si">%d</span><span class="s2"> to </span><span class="si">%.3f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Setting rating for competitor </span><span class="si">%d</span><span class="s2"> to </span><span class="si">%.3f</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">value</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_anchor_rating</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">num_games</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the total number of games played by this competitor.</span>
+<span class="w">        </span><span class="sd">"""Get the total number of games played by this competitor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            int: The total number of games played.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span>
 
 <div class="viewcode-block" id="BradleyTerryCompetitor.expected_score">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.bradley_terry.BradleyTerryCompetitor.expected_score">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;BaseCompetitor&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the expected score against another competitor.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">"BaseCompetitor"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Calculate the expected score against another competitor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            competitor (BaseCompetitor): The competitor to compare against.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            float: The expected score (probability of winning).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="n">other</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">BradleyTerryCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
         <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_beta</span> <span class="o">-</span> <span class="n">other</span><span class="o">.</span><span class="n">_beta</span><span class="p">)))</span></div>
@@ -323,7 +323,7 @@
 <div class="viewcode-block" id="BradleyTerryCompetitor.beat">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.bradley_terry.BradleyTerryCompetitor.beat">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has won against the given competitor.</span>
+<span class="w">        </span><span class="sd">"""Update ratings after this competitor has won against the given competitor.</span>
 
 <span class="sd">        The result is recorded on both competitors and the strengths of the entire connected</span>
 <span class="sd">        component are re-fit by maximum likelihood.</span>
@@ -335,9 +335,9 @@
 <span class="sd">                this rating system.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Competitor </span><span class="si">%s</span><span class="s2"> beat </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don't match.</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Competitor </span><span class="si">%s</span><span class="s2"> beat </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
         <span class="n">opponent</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">BradleyTerryCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
@@ -350,14 +350,14 @@
         <span class="n">opponent</span><span class="o">.</span><span class="n">_opponents</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="n">opponent</span><span class="o">.</span><span class="n">_opponents</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">opponent</span><span class="o">.</span><span class="n">_head_to_head</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Recorded win for </span><span class="si">%d</span><span class="s2">, loss for </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">opponent</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Recorded win for </span><span class="si">%d</span><span class="s2">, loss for </span><span class="si">%d</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">opponent</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_recalculate_ratings</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="BradleyTerryCompetitor.tied">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.bradley_terry.BradleyTerryCompetitor.tied">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has tied with the given competitor.</span>
+<span class="w">        </span><span class="sd">"""Update ratings after this competitor has tied with the given competitor.</span>
 
 <span class="sd">        A tie is counted as half a win for each side.</span>
 
@@ -368,9 +368,9 @@
 <span class="sd">                otherwise used by this rating system.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Competitor </span><span class="si">%s</span><span class="s2"> tied with </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don't match.</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Competitor </span><span class="si">%s</span><span class="s2"> tied with </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
         <span class="n">opponent</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">BradleyTerryCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
@@ -383,38 +383,38 @@
         <span class="n">opponent</span><span class="o">.</span><span class="n">_opponents</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="n">opponent</span><span class="o">.</span><span class="n">_opponents</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">opponent</span><span class="o">.</span><span class="n">_head_to_head</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="n">opponent</span><span class="o">.</span><span class="n">_head_to_head</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Recorded tie for </span><span class="si">%d</span><span class="s2"> and </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">opponent</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Recorded tie for </span><span class="si">%d</span><span class="s2"> and </span><span class="si">%d</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">opponent</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_recalculate_ratings</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="BradleyTerryCompetitor.lost_to">
 <a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.bradley_terry.BradleyTerryCompetitor.lost_to">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">lost_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has lost to the given competitor.</span>
+<span class="w">        </span><span class="sd">"""Update ratings after this competitor has lost to the given competitor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            competitor (BaseCompetitor): The opponent competitor that won.</span>
 <span class="sd">            scores (sequence of float, optional): The two scores in caller order,</span>
 <span class="sd">                ``(self_score, competitor_score)``. Reversed before being passed to the</span>
-<span class="sd">                winner&#39;s :meth:`beat`.</span>
+<span class="sd">                winner's :meth:`beat`.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Competitor </span><span class="si">%s</span><span class="s2"> lost to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don't match.</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Competitor </span><span class="si">%s</span><span class="s2"> lost to </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="n">validated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
         <span class="n">competitor</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">validated</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="n">validated</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">validated</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_get_connected_competitors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;BradleyTerryCompetitor&quot;</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all competitors connected to this competitor in the match graph.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_connected_competitors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">"BradleyTerryCompetitor"</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Get all competitors connected to this competitor in the match graph.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            List[BradleyTerryCompetitor]: A list of all connected competitors.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">visited</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="s2">&quot;BradleyTerryCompetitor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="n">to_visit</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;BradleyTerryCompetitor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span>
+<span class="sd">        """</span>
+        <span class="n">visited</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="s2">"BradleyTerryCompetitor"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">to_visit</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">"BradleyTerryCompetitor"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span>
         <span class="n">all_competitors</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">while</span> <span class="n">to_visit</span><span class="p">:</span>
@@ -427,21 +427,21 @@
                 <span class="k">if</span> <span class="n">opponent</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
                     <span class="n">to_visit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Found </span><span class="si">%d</span><span class="s2"> connected competitors&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_competitors</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Found </span><span class="si">%d</span><span class="s2"> connected competitors"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_competitors</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">all_competitors</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_recalculate_ratings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Re-fit the Bradley-Terry strengths for all connected competitors.</span>
+<span class="w">        </span><span class="sd">"""Re-fit the Bradley-Terry strengths for all connected competitors.</span>
 
 <span class="sd">        Uses the minorization-maximization (MM) update of Hunter (2004) with geometric-mean</span>
 <span class="sd">        normalization and a small regularization term (virtual results against an average phantom</span>
 <span class="sd">        opponent) so that the maximum-likelihood estimate exists and is unique even when a</span>
 <span class="sd">        competitor is undefeated or winless within its component.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">competitors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_connected_competitors</span><span class="p">()</span>
         <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">competitors</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Only one competitor in network, skipping recalculation.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Only one competitor in network, skipping recalculation."</span><span class="p">)</span>
             <span class="k">return</span>
 
         <span class="n">idx</span> <span class="o">=</span> <span class="p">{</span><span class="n">comp</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">comp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">competitors</span><span class="p">)}</span>
@@ -482,7 +482,7 @@
             <span class="n">max_delta</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">new_p</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">p</span><span class="p">))))</span>
             <span class="n">p</span> <span class="o">=</span> <span class="n">new_p</span>
             <span class="k">if</span> <span class="n">max_delta</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tol</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Bradley-Terry fit converged in </span><span class="si">%d</span><span class="s2"> iterations&quot;</span><span class="p">,</span> <span class="n">iteration</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Bradley-Terry fit converged in </span><span class="si">%d</span><span class="s2"> iterations"</span><span class="p">,</span> <span class="n">iteration</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
                 <span class="k">break</span>
 
         <span class="c1"># Write back re-centered log-strengths (mean beta == 0).</span>
@@ -492,74 +492,74 @@
             <span class="n">comp</span><span class="o">.</span><span class="n">_beta</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">betas</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_export_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the parameters used to initialize this competitor.</span>
+<span class="w">        </span><span class="sd">"""Export the parameters used to initialize this competitor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: A dictionary containing the initialization parameters.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">,</span>
+            <span class="s2">"initial_rating"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">,</span>
         <span class="p">}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_export_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the current state variables of this competitor.</span>
+<span class="w">        </span><span class="sd">"""Export the current state variables of this competitor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: A dictionary containing the current state variables.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span>
-            <span class="s2">&quot;beta&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span><span class="p">,</span>
-            <span class="s2">&quot;wins&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span><span class="p">,</span>
-            <span class="s2">&quot;losses&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="p">,</span>
-            <span class="s2">&quot;ties&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span><span class="p">,</span>
+            <span class="s2">"rating"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span>
+            <span class="s2">"beta"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span><span class="p">,</span>
+            <span class="s2">"wins"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span><span class="p">,</span>
+            <span class="s2">"losses"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="p">,</span>
+            <span class="s2">"ties"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span><span class="p">,</span>
         <span class="p">}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_import_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Import parameters from a state dictionary.</span>
+<span class="w">        </span><span class="sd">"""Import parameters from a state dictionary.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            parameters (dict): A dictionary containing parameters.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_anchor_rating</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_rating"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_anchor_rating</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_anchor_rating</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_import_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Import current state variables from a state dictionary.</span>
+<span class="w">        </span><span class="sd">"""Import current state variables from a state dictionary.</span>
 
 <span class="sd">        Note: opponent references cannot be restored from serialization, so the match graph is</span>
 <span class="sd">        reset; the rating and aggregate win/loss/tie counts are preserved.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            state (dict): A dictionary containing state variables.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="s2">&quot;beta&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;beta&quot;</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="s2">&quot;rating&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s2">&quot;rating&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_anchor_rating</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;wins&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;losses&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ties&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="s2">"beta"</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">"beta"</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="s2">"rating"</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s2">"rating"</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_anchor_rating</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"wins"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"losses"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ties"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_head_to_head</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_from_parameters</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new competitor instance from parameters.</span>
+<span class="w">        </span><span class="sd">"""Create a new competitor instance from parameters.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            parameters (dict): A dictionary containing parameters.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            BradleyTerryCompetitor: A new competitor instance.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_anchor_rating</span><span class="p">))</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_rating"</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_anchor_rating</span><span class="p">))</span>
 
 <div class="viewcode-block" id="BradleyTerryCompetitor.reset">
 <a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.bradley_terry.BradleyTerryCompetitor.reset">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset this competitor to its initial state.&quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Resetting BradleyTerryCompetitor </span><span class="si">%d</span><span class="s2"> to initial state.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
+<span class="w">        </span><span class="sd">"""Reset this competitor to its initial state."""</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Resetting BradleyTerryCompetitor </span><span class="si">%d</span><span class="s2"> to initial state."</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_beta</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_anchor_rating</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="mi">0</span>
@@ -572,42 +572,42 @@
 <a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.bradley_terry.BradleyTerryCompetitor.configure_class">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">configure_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure class-level parameters for this rating system.</span>
+<span class="w">        </span><span class="sd">"""Configure class-level parameters for this rating system.</span>
 
 <span class="sd">        Overrides the base implementation to validate the regularization and iteration</span>
 <span class="sd">        parameters.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidParameterException: If any parameter is invalid.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;reg&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;reg must be non-negative&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_iter&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;max_iter must be at least 1&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scale&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;scale must be positive&quot;</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"reg"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">"reg must be non-negative"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"max_iter"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">"max_iter must be at least 1"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"scale"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">"scale must be positive"</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">configure_class</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of this competitor.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return a string representation of this competitor."""</span>
         <span class="k">return</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;&lt;BradleyTerryCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rating</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;W/L/T=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_wins</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ties</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+            <span class="sa">f</span><span class="s2">"&lt;BradleyTerryCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rating</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, "</span>
+            <span class="sa">f</span><span class="s2">"W/L/T=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_wins</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ties</span><span class="si">}</span><span class="s2">&gt;"</span>
         <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of this competitor.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;BradleyTerryCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rating</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return a string representation of this competitor."""</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"&lt;BradleyTerryCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rating</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&gt;"</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if two competitors are the same object (by unique ID).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Check if two competitors are the same object (by unique ID)."""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BradleyTerryCompetitor</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_id</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a hash value for this competitor based on its unique ID.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Get a hash value for this competitor based on its unique ID."""</span>
         <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span></div>
 
 </pre></div>
@@ -644,6 +644,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/pythagorean.html">Pythagorean Expectation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/whr.html">Whole-History Rating</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/comparison.html">Comparing Rating Systems</a></li>
 </ul>

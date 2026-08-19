@@ -186,18 +186,18 @@
 <div class="viewcode-block" id="BaseArena">
 <a class="viewcode-back" href="../../../api/arenas.html#elote.arenas.base.BaseArena">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BaseArena</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base abstract class for all arena implementations.</span>
+<span class="w">    </span><span class="sd">"""Base abstract class for all arena implementations.</span>
 
 <span class="sd">    Arenas manage competitions between multiple competitors, handling matchups,</span>
 <span class="sd">    tournaments, and leaderboard generation. This class defines the interface</span>
 <span class="sd">    that all arena implementations must follow.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="BaseArena.set_competitor_class_var">
 <a class="viewcode-back" href="../../../api/arenas.html#elote.arenas.base.BaseArena.set_competitor_class_var">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_competitor_class_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set a class variable on all competitors in this arena.</span>
+<span class="w">        </span><span class="sd">"""Set a class variable on all competitors in this arena.</span>
 
 <span class="sd">        This method allows for global configuration of all competitors</span>
 <span class="sd">        managed by this arena.</span>
@@ -205,7 +205,7 @@
 <span class="sd">        Args:</span>
 <span class="sd">            name (str): The name of the class variable to set.</span>
 <span class="sd">            value: The value to set for the class variable.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">pass</span></div>
 
 
@@ -213,13 +213,13 @@
 <a class="viewcode-back" href="../../../api/arenas.html#elote.arenas.base.BaseArena.tournament">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">tournament</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matchups</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a tournament with the given matchups.</span>
+<span class="w">        </span><span class="sd">"""Run a tournament with the given matchups.</span>
 
 <span class="sd">        A tournament consists of multiple matchups between competitors.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            matchups (list): A list of matchup pairs to process.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">pass</span></div>
 
 
@@ -227,7 +227,7 @@
 <a class="viewcode-back" href="../../../api/arenas.html#elote.arenas.base.BaseArena.matchup">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">matchup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process a single matchup between two competitors.</span>
+<span class="w">        </span><span class="sd">"""Process a single matchup between two competitors.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            a: The first competitor or competitor identifier.</span>
@@ -235,7 +235,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            The result of the matchup.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">pass</span></div>
 
 
@@ -243,11 +243,11 @@
 <a class="viewcode-back" href="../../../api/arenas.html#elote.arenas.base.BaseArena.leaderboard">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">leaderboard</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a leaderboard of all competitors.</span>
+<span class="w">        </span><span class="sd">"""Generate a leaderboard of all competitors.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            list: A sorted list of competitors and their ratings.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">pass</span></div>
 
 
@@ -255,12 +255,12 @@
 <a class="viewcode-back" href="../../../api/arenas.html#elote.arenas.base.BaseArena.export_state">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">export_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the current state of this arena for serialization.</span>
+<span class="w">        </span><span class="sd">"""Export the current state of this arena for serialization.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: A dictionary containing all necessary information to recreate</span>
-<span class="sd">                 this arena&#39;s current state.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">                 this arena's current state.</span>
+<span class="sd">        """</span>
         <span class="k">pass</span></div>
 </div>
 
@@ -269,36 +269,36 @@
 <div class="viewcode-block" id="History">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.History">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">History</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tracks the history of bouts (matchups) and provides analysis methods.</span>
+<span class="w">    </span><span class="sd">"""Tracks the history of bouts (matchups) and provides analysis methods.</span>
 
 <span class="sd">    This class stores the results of matchups and provides methods to analyze</span>
 <span class="sd">    the performance of the rating system.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="History.__init__">
 <a class="viewcode-back" href="../../../api/arenas.html#elote.arenas.base.History.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize an empty history of bouts.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Initialize an empty history of bouts."""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Bout</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;History initialized.&quot;</span><span class="p">)</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"History initialized."</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="History.add_bout">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.History.add_bout">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">add_bout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bout</span><span class="p">:</span> <span class="s2">&quot;Bout&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a bout to the history.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_bout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bout</span><span class="p">:</span> <span class="s2">"Bout"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Add a bout to the history.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            bout (Bout): The bout object to add to the history.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bout</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Added bout between </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">bout</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">bout</span><span class="o">.</span><span class="n">b</span><span class="p">)</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Added bout between </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">bout</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">bout</span><span class="o">.</span><span class="n">b</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="History.report_results">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.History.report_results">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">report_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a report of the results in this history.</span>
+<span class="w">        </span><span class="sd">"""Generate a report of the results in this history.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            lower_threshold (float): The lower probability threshold for predictions.</span>
@@ -306,26 +306,26 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            list: A list of dictionaries containing the results of each bout.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">report</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Generating results report for </span><span class="si">%d</span><span class="s2"> bouts&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Generating results report for </span><span class="si">%d</span><span class="s2"> bouts"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">:</span>
             <span class="n">predicted_winner</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_winner</span><span class="p">(</span><span class="n">lower_threshold</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="p">)</span>
             <span class="n">actual_winner</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">actual_winner</span><span class="p">()</span>
-            <span class="n">actual_winner_id</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">a</span> <span class="k">if</span> <span class="n">actual_winner</span> <span class="o">==</span> <span class="s2">&quot;a&quot;</span> <span class="k">else</span> <span class="n">bout</span><span class="o">.</span><span class="n">b</span> <span class="k">if</span> <span class="n">actual_winner</span> <span class="o">==</span> <span class="s2">&quot;b&quot;</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">actual_winner_id</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">a</span> <span class="k">if</span> <span class="n">actual_winner</span> <span class="o">==</span> <span class="s2">"a"</span> <span class="k">else</span> <span class="n">bout</span><span class="o">.</span><span class="n">b</span> <span class="k">if</span> <span class="n">actual_winner</span> <span class="o">==</span> <span class="s2">"b"</span> <span class="k">else</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">actual_winner_id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="n">actual_winner_id</span> <span class="o">=</span> <span class="n">actual_winner_id</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
             <span class="n">report</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="p">{</span>
-                    <span class="s2">&quot;predicted_winner&quot;</span><span class="p">:</span> <span class="n">predicted_winner</span><span class="p">,</span>
-                    <span class="c1"># Deprecated misspelled alias of &quot;predicted_winner&quot;, kept for</span>
-                    <span class="c1"># backward compatibility. Prefer &quot;predicted_winner&quot;; this key</span>
+                    <span class="s2">"predicted_winner"</span><span class="p">:</span> <span class="n">predicted_winner</span><span class="p">,</span>
+                    <span class="c1"># Deprecated misspelled alias of "predicted_winner", kept for</span>
+                    <span class="c1"># backward compatibility. Prefer "predicted_winner"; this key</span>
                     <span class="c1"># will be removed in a future release.</span>
-                    <span class="s2">&quot;predicted_winnder&quot;</span><span class="p">:</span> <span class="n">predicted_winner</span><span class="p">,</span>
-                    <span class="s2">&quot;predicted_loser&quot;</span><span class="p">:</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_loser</span><span class="p">(</span><span class="n">lower_threshold</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="p">),</span>
-                    <span class="s2">&quot;probability&quot;</span><span class="p">:</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
-                    <span class="s2">&quot;actual_winner&quot;</span><span class="p">:</span> <span class="n">actual_winner</span><span class="p">,</span>
-                    <span class="s2">&quot;correct&quot;</span><span class="p">:</span> <span class="n">predicted_winner</span> <span class="o">==</span> <span class="n">actual_winner_id</span><span class="p">,</span>
+                    <span class="s2">"predicted_winnder"</span><span class="p">:</span> <span class="n">predicted_winner</span><span class="p">,</span>
+                    <span class="s2">"predicted_loser"</span><span class="p">:</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_loser</span><span class="p">(</span><span class="n">lower_threshold</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="p">),</span>
+                    <span class="s2">"probability"</span><span class="p">:</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+                    <span class="s2">"actual_winner"</span><span class="p">:</span> <span class="n">actual_winner</span><span class="p">,</span>
+                    <span class="s2">"correct"</span><span class="p">:</span> <span class="n">predicted_winner</span> <span class="o">==</span> <span class="n">actual_winner_id</span><span class="p">,</span>
                 <span class="p">}</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">report</span></div>
@@ -334,7 +334,7 @@
 <div class="viewcode-block" id="History.confusion_matrix">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.History.confusion_matrix">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">confusion_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.45</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.55</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Calculate the confusion matrix for the history of bouts.</span>
 
 <span class="sd">        Args:</span>
@@ -342,8 +342,8 @@
 <span class="sd">            upper_threshold: The upper threshold for prediction (above this is a prediction for the first competitor)</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            A dictionary with confusion matrix metrics: {&#39;tp&#39;: int, &#39;fp&#39;: int, &#39;tn&#39;: int, &#39;fn&#39;: int}</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            A dictionary with confusion matrix metrics: {'tp': int, 'fp': int, 'tn': int, 'fn': int}</span>
+<span class="sd">        """</span>
         <span class="n">true_positives</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">false_positives</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">true_negatives</span> <span class="o">=</span> <span class="mi">0</span>
@@ -351,7 +351,7 @@
         <span class="n">skipped_bouts</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="s2">&quot;Calculating confusion matrix for </span><span class="si">%d</span><span class="s2"> bouts with thresholds: [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">]&quot;</span><span class="p">,</span>
+            <span class="s2">"Calculating confusion matrix for </span><span class="si">%d</span><span class="s2"> bouts with thresholds: [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">]"</span><span class="p">,</span>
             <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">),</span>
             <span class="n">lower_threshold</span><span class="p">,</span>
             <span class="n">upper_threshold</span><span class="p">,</span>
@@ -362,19 +362,19 @@
             <span class="n">actual_winner</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">_normalized_outcome</span><span class="p">()</span>
             <span class="n">predicted_prob</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span>
 
-            <span class="c1"># Skip if we don&#39;t have both actual and predicted values</span>
+            <span class="c1"># Skip if we don't have both actual and predicted values</span>
             <span class="k">if</span> <span class="n">actual_winner</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">predicted_prob</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">skipped_bouts</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">continue</span>
 
-            <span class="c1"># Convert predicted_prob to float if it&#39;s a string or None</span>
+            <span class="c1"># Convert predicted_prob to float if it's a string or None</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">predicted_prob</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">predicted_prob</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">predicted_prob</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                     <span class="c1"># If conversion fails, skip this bout</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                        <span class="s2">&quot;Could not convert predicted_prob &#39;</span><span class="si">%s</span><span class="s2">&#39; to float, skipping bout.&quot;</span><span class="p">,</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span>
+                        <span class="s2">"Could not convert predicted_prob '</span><span class="si">%s</span><span class="s2">' to float, skipping bout."</span><span class="p">,</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span>
                     <span class="p">)</span>
                     <span class="n">skipped_bouts</span> <span class="o">+=</span> <span class="mi">1</span>
                     <span class="k">continue</span>
@@ -384,42 +384,42 @@
 
             <span class="c1"># Determine the predicted outcome</span>
             <span class="k">if</span> <span class="n">predicted_prob</span> <span class="o">&gt;</span> <span class="n">upper_threshold</span><span class="p">:</span>
-                <span class="n">predicted_winner</span> <span class="o">=</span> <span class="s2">&quot;a&quot;</span>
+                <span class="n">predicted_winner</span> <span class="o">=</span> <span class="s2">"a"</span>
             <span class="k">elif</span> <span class="n">predicted_prob</span> <span class="o">&lt;</span> <span class="n">lower_threshold</span><span class="p">:</span>
-                <span class="n">predicted_winner</span> <span class="o">=</span> <span class="s2">&quot;b&quot;</span>
+                <span class="n">predicted_winner</span> <span class="o">=</span> <span class="s2">"b"</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">predicted_winner</span> <span class="o">=</span> <span class="s2">&quot;draw&quot;</span>
+                <span class="n">predicted_winner</span> <span class="o">=</span> <span class="s2">"draw"</span>
 
             <span class="c1"># Update confusion matrix</span>
-            <span class="k">if</span> <span class="n">predicted_winner</span> <span class="o">==</span> <span class="s2">&quot;draw&quot;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">actual_winner</span> <span class="o">==</span> <span class="s2">&quot;draw&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">predicted_winner</span> <span class="o">==</span> <span class="s2">"draw"</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">actual_winner</span> <span class="o">==</span> <span class="s2">"draw"</span><span class="p">:</span>
                     <span class="n">true_positives</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># Correctly predicted draw</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">false_positives</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># Incorrectly predicted draw</span>
-            <span class="k">elif</span> <span class="n">actual_winner</span> <span class="o">==</span> <span class="s2">&quot;draw&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">actual_winner</span> <span class="o">==</span> <span class="s2">"draw"</span><span class="p">:</span>
                 <span class="n">false_negatives</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># Failed to predict draw</span>
-            <span class="k">elif</span> <span class="n">predicted_winner</span> <span class="o">==</span> <span class="s2">&quot;a&quot;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">actual_winner</span> <span class="o">==</span> <span class="s2">&quot;a&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">predicted_winner</span> <span class="o">==</span> <span class="s2">"a"</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">actual_winner</span> <span class="o">==</span> <span class="s2">"a"</span><span class="p">:</span>
                     <span class="n">true_positives</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">false_positives</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">elif</span> <span class="n">predicted_winner</span> <span class="o">==</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">actual_winner</span> <span class="o">==</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">predicted_winner</span> <span class="o">==</span> <span class="s2">"b"</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">actual_winner</span> <span class="o">==</span> <span class="s2">"b"</span><span class="p">:</span>
                     <span class="n">true_negatives</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">false_negatives</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="k">if</span> <span class="n">skipped_bouts</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Skipped </span><span class="si">%d</span><span class="s2"> bouts during confusion matrix calculation due to missing data.&quot;</span><span class="p">,</span> <span class="n">skipped_bouts</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Skipped </span><span class="si">%d</span><span class="s2"> bouts during confusion matrix calculation due to missing data."</span><span class="p">,</span> <span class="n">skipped_bouts</span><span class="p">)</span>
 
         <span class="c1"># Return results as a dictionary</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;tp&quot;</span><span class="p">:</span> <span class="n">true_positives</span><span class="p">,</span> <span class="s2">&quot;fp&quot;</span><span class="p">:</span> <span class="n">false_positives</span><span class="p">,</span> <span class="s2">&quot;tn&quot;</span><span class="p">:</span> <span class="n">true_negatives</span><span class="p">,</span> <span class="s2">&quot;fn&quot;</span><span class="p">:</span> <span class="n">false_negatives</span><span class="p">}</span></div>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"tp"</span><span class="p">:</span> <span class="n">true_positives</span><span class="p">,</span> <span class="s2">"fp"</span><span class="p">:</span> <span class="n">false_positives</span><span class="p">,</span> <span class="s2">"tn"</span><span class="p">:</span> <span class="n">true_negatives</span><span class="p">,</span> <span class="s2">"fn"</span><span class="p">:</span> <span class="n">false_negatives</span><span class="p">}</span></div>
 
 
 <div class="viewcode-block" id="History.random_search">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.History.random_search">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">random_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trials</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Search for optimal prediction thresholds using random sampling.</span>
+<span class="w">        </span><span class="sd">"""Search for optimal prediction thresholds using random sampling.</span>
 
 <span class="sd">        This method performs a random search to find the best lower and upper</span>
 <span class="sd">        thresholds that maximize the overall accuracy, including draws.</span>
@@ -435,14 +435,14 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            tuple: A tuple containing (best_accuracy, best_thresholds).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">best_accuracy</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">best_thresholds</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>  <span class="c1"># Initialize with default values</span>
         <span class="n">num_bouts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Performing random search for optimal thresholds with </span><span class="si">%d</span><span class="s2"> trials on </span><span class="si">%d</span><span class="s2"> bouts.&quot;</span><span class="p">,</span> <span class="n">trials</span><span class="p">,</span> <span class="n">num_bouts</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Performing random search for optimal thresholds with </span><span class="si">%d</span><span class="s2"> trials on </span><span class="si">%d</span><span class="s2"> bouts."</span><span class="p">,</span> <span class="n">trials</span><span class="p">,</span> <span class="n">num_bouts</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">num_bouts</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Cannot perform random search on empty history.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Cannot perform random search on empty history."</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">best_accuracy</span><span class="p">,</span> <span class="n">best_thresholds</span>
 
         <span class="n">rng</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">random</span> <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
@@ -463,33 +463,33 @@
 
             <span class="c1"># Calculate metrics with the random thresholds</span>
             <span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_metrics</span><span class="p">(</span><span class="o">*</span><span class="n">thresholds</span><span class="p">)</span>
-            <span class="n">accuracy</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">]</span>
+            <span class="n">accuracy</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">"accuracy"</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="n">accuracy</span> <span class="o">&gt;</span> <span class="n">best_accuracy</span><span class="p">:</span>
                 <span class="n">best_accuracy</span> <span class="o">=</span> <span class="n">accuracy</span>
                 <span class="n">best_thresholds</span> <span class="o">=</span> <span class="n">thresholds</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                    <span class="s2">&quot;Random search trial </span><span class="si">%d</span><span class="s2">: New best accuracy </span><span class="si">%.4f</span><span class="s2"> with thresholds [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">]&quot;</span><span class="p">,</span>
+                    <span class="s2">"Random search trial </span><span class="si">%d</span><span class="s2">: New best accuracy </span><span class="si">%.4f</span><span class="s2"> with thresholds [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">]"</span><span class="p">,</span>
                     <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
                     <span class="n">best_accuracy</span><span class="p">,</span>
                     <span class="o">*</span><span class="n">best_thresholds</span><span class="p">,</span>
                 <span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="s2">&quot;Random search complete. Best accuracy: </span><span class="si">%.4f</span><span class="s2"> with thresholds [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">]&quot;</span><span class="p">,</span> <span class="n">best_accuracy</span><span class="p">,</span> <span class="o">*</span><span class="n">best_thresholds</span>
+            <span class="s2">"Random search complete. Best accuracy: </span><span class="si">%.4f</span><span class="s2"> with thresholds [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">]"</span><span class="p">,</span> <span class="n">best_accuracy</span><span class="p">,</span> <span class="o">*</span><span class="n">best_thresholds</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">best_accuracy</span><span class="p">,</span> <span class="n">best_thresholds</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_labeled_predictions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Collect the (predicted probability, actual label) pairs used for scoring.</span>
+<span class="w">        </span><span class="sd">"""Collect the (predicted probability, actual label) pairs used for scoring.</span>
 
 <span class="sd">        The skipping and coercion rules mirror :meth:`confusion_matrix` exactly, so the</span>
-<span class="sd">        number of returned pairs is the denominator of ``calculate_metrics()[&quot;accuracy&quot;]``.</span>
+<span class="sd">        number of returned pairs is the denominator of ``calculate_metrics()["accuracy"]``.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            list: A list of ``(probability, label)`` tuples where label is &#39;a&#39;, &#39;b&#39; or &#39;draw&#39;.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            list: A list of ``(probability, label)`` tuples where label is 'a', 'b' or 'draw'.</span>
+<span class="sd">        """</span>
         <span class="n">pairs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">:</span>
             <span class="n">actual</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">_normalized_outcome</span><span class="p">()</span>
@@ -507,9 +507,9 @@
 <div class="viewcode-block" id="History.optimize_thresholds">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.History.optimize_thresholds">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">optimize_thresholds</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">,</span> <span class="n">initial_thresholds</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"L-BFGS-B"</span><span class="p">,</span> <span class="n">initial_thresholds</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find the prediction thresholds that maximize accuracy.</span>
+<span class="w">        </span><span class="sd">"""Find the prediction thresholds that maximize accuracy.</span>
 
 <span class="sd">        Accuracy is a step function of the thresholds: it only changes at the distinct</span>
 <span class="sd">        values of ``Bout.predicted_outcome``. This method therefore evaluates every</span>
@@ -527,27 +527,27 @@
 <span class="sd">            tuple: (best_accuracy, best_thresholds) where:</span>
 <span class="sd">                - best_accuracy: The accuracy achieved with the optimized thresholds</span>
 <span class="sd">                - best_thresholds: List of [lower_threshold, upper_threshold]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">num_bouts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Optimizing thresholds by exact sweep over </span><span class="si">%d</span><span class="s2"> bouts.&quot;</span><span class="p">,</span> <span class="n">num_bouts</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Optimizing thresholds by exact sweep over </span><span class="si">%d</span><span class="s2"> bouts."</span><span class="p">,</span> <span class="n">num_bouts</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">num_bouts</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Cannot optimize thresholds on empty history.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Cannot optimize thresholds on empty history."</span><span class="p">)</span>
             <span class="k">return</span> <span class="mf">0.0</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">initial_thresholds</span><span class="p">)</span>
 
         <span class="n">pairs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labeled_predictions</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">pairs</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No valid predicted outcomes found in history. Cannot optimize.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"No valid predicted outcomes found in history. Cannot optimize."</span><span class="p">)</span>
             <span class="k">return</span> <span class="mf">0.0</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">initial_thresholds</span><span class="p">)</span>
 
         <span class="n">pairs</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">pair</span><span class="p">:</span> <span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pairs</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Predicted outcome range: [</span><span class="si">%.4f</span><span class="s2">, </span><span class="si">%.4f</span><span class="s2">]&quot;</span><span class="p">,</span> <span class="n">pairs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">pairs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Predicted outcome range: [</span><span class="si">%.4f</span><span class="s2">, </span><span class="si">%.4f</span><span class="s2">]"</span><span class="p">,</span> <span class="n">pairs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">pairs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
 
         <span class="c1"># Group the sorted pairs by distinct probability and count each label per group.</span>
         <span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">group_counts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">label_index</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;draw&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+        <span class="n">label_index</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"a"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"draw"</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
         <span class="k">for</span> <span class="n">probability</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">values</span> <span class="ow">or</span> <span class="n">probability</span> <span class="o">!=</span> <span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
                 <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probability</span><span class="p">)</span>
@@ -615,20 +615,20 @@
         <span class="n">best_thresholds</span> <span class="o">=</span> <span class="p">[</span><span class="n">lower_cut</span><span class="p">[</span><span class="n">best_i</span><span class="p">],</span> <span class="n">upper_cut</span><span class="p">[</span><span class="n">best_j</span><span class="p">]]</span>
 
         <span class="c1"># Keep the supplied thresholds when they already achieve the optimum.</span>
-        <span class="n">baseline_accuracy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_metrics</span><span class="p">(</span><span class="o">*</span><span class="n">initial_thresholds</span><span class="p">)[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">]</span>
+        <span class="n">baseline_accuracy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_metrics</span><span class="p">(</span><span class="o">*</span><span class="n">initial_thresholds</span><span class="p">)[</span><span class="s2">"accuracy"</span><span class="p">]</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-            <span class="s2">&quot;Baseline accuracy with initial thresholds [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">]: </span><span class="si">%.4f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">initial_thresholds</span><span class="p">,</span> <span class="n">baseline_accuracy</span>
+            <span class="s2">"Baseline accuracy with initial thresholds [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">]: </span><span class="si">%.4f</span><span class="s2">"</span><span class="p">,</span> <span class="o">*</span><span class="n">initial_thresholds</span><span class="p">,</span> <span class="n">baseline_accuracy</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">baseline_accuracy</span> <span class="o">&gt;=</span> <span class="n">best_accuracy</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="s2">&quot;Initial thresholds [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">] already achieve the optimal accuracy </span><span class="si">%.4f</span><span class="s2">.&quot;</span><span class="p">,</span>
+                <span class="s2">"Initial thresholds [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">] already achieve the optimal accuracy </span><span class="si">%.4f</span><span class="s2">."</span><span class="p">,</span>
                 <span class="o">*</span><span class="n">initial_thresholds</span><span class="p">,</span>
                 <span class="n">baseline_accuracy</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">return</span> <span class="n">baseline_accuracy</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">initial_thresholds</span><span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="s2">&quot;Optimization complete. Best accuracy: </span><span class="si">%.4f</span><span class="s2"> with thresholds [</span><span class="si">%.4f</span><span class="s2">, </span><span class="si">%.4f</span><span class="s2">]&quot;</span><span class="p">,</span> <span class="n">best_accuracy</span><span class="p">,</span> <span class="o">*</span><span class="n">best_thresholds</span>
+            <span class="s2">"Optimization complete. Best accuracy: </span><span class="si">%.4f</span><span class="s2"> with thresholds [</span><span class="si">%.4f</span><span class="s2">, </span><span class="si">%.4f</span><span class="s2">]"</span><span class="p">,</span> <span class="n">best_accuracy</span><span class="p">,</span> <span class="o">*</span><span class="n">best_thresholds</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">best_accuracy</span><span class="p">,</span> <span class="n">best_thresholds</span></div>
 
@@ -636,7 +636,7 @@
 <div class="viewcode-block" id="History.calculate_metrics">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.History.calculate_metrics">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">calculate_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Calculate performance metrics based on the confusion matrix.</span>
 
 <span class="sd">        Args:</span>
@@ -645,16 +645,16 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A dictionary with metrics including accuracy, precision, recall, F1 score, and the confusion matrix</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Get the confusion matrix</span>
         <span class="n">cm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">confusion_matrix</span><span class="p">(</span><span class="n">lower_threshold</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Calculated confusion matrix: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">cm</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Calculated confusion matrix: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">cm</span><span class="p">)</span>
 
         <span class="c1"># Extract values from the confusion matrix</span>
-        <span class="n">tp</span> <span class="o">=</span> <span class="n">cm</span><span class="p">[</span><span class="s2">&quot;tp&quot;</span><span class="p">]</span>
-        <span class="n">fp</span> <span class="o">=</span> <span class="n">cm</span><span class="p">[</span><span class="s2">&quot;fp&quot;</span><span class="p">]</span>
-        <span class="n">tn</span> <span class="o">=</span> <span class="n">cm</span><span class="p">[</span><span class="s2">&quot;tn&quot;</span><span class="p">]</span>
-        <span class="n">fn</span> <span class="o">=</span> <span class="n">cm</span><span class="p">[</span><span class="s2">&quot;fn&quot;</span><span class="p">]</span>
+        <span class="n">tp</span> <span class="o">=</span> <span class="n">cm</span><span class="p">[</span><span class="s2">"tp"</span><span class="p">]</span>
+        <span class="n">fp</span> <span class="o">=</span> <span class="n">cm</span><span class="p">[</span><span class="s2">"fp"</span><span class="p">]</span>
+        <span class="n">tn</span> <span class="o">=</span> <span class="n">cm</span><span class="p">[</span><span class="s2">"tn"</span><span class="p">]</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="n">cm</span><span class="p">[</span><span class="s2">"fn"</span><span class="p">]</span>
 
         <span class="c1"># Calculate total predictions</span>
         <span class="n">total</span> <span class="o">=</span> <span class="n">tp</span> <span class="o">+</span> <span class="n">fp</span> <span class="o">+</span> <span class="n">tn</span> <span class="o">+</span> <span class="n">fn</span>
@@ -663,20 +663,20 @@
         <span class="n">accuracy</span> <span class="o">=</span> <span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">tn</span><span class="p">)</span> <span class="o">/</span> <span class="n">total</span> <span class="k">if</span> <span class="n">total</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
 
         <span class="c1"># Calculate precision</span>
-        <span class="n">precision</span> <span class="o">=</span> <span class="n">tp</span> <span class="o">/</span> <span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">fp</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">fp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)</span>
+        <span class="n">precision</span> <span class="o">=</span> <span class="n">tp</span> <span class="o">/</span> <span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">fp</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">fp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">)</span>
 
         <span class="c1"># Calculate recall</span>
-        <span class="n">recall</span> <span class="o">=</span> <span class="n">tp</span> <span class="o">/</span> <span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">fn</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">fn</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)</span>
+        <span class="n">recall</span> <span class="o">=</span> <span class="n">tp</span> <span class="o">/</span> <span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">fn</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">fn</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">)</span>
 
         <span class="c1"># Calculate F1 score</span>
-        <span class="n">f1</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">precision</span> <span class="o">*</span> <span class="n">recall</span> <span class="o">/</span> <span class="p">(</span><span class="n">precision</span> <span class="o">+</span> <span class="n">recall</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">precision</span> <span class="o">+</span> <span class="n">recall</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)</span>
+        <span class="n">f1</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">precision</span> <span class="o">*</span> <span class="n">recall</span> <span class="o">/</span> <span class="p">(</span><span class="n">precision</span> <span class="o">+</span> <span class="n">recall</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">precision</span> <span class="o">+</span> <span class="n">recall</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-            <span class="s2">&quot;Calculated metrics: Accuracy=</span><span class="si">%.4f</span><span class="s2">, Precision=</span><span class="si">%.4f</span><span class="s2">, Recall=</span><span class="si">%.4f</span><span class="s2">, F1=</span><span class="si">%.4f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">recall</span><span class="p">,</span> <span class="n">f1</span>
+            <span class="s2">"Calculated metrics: Accuracy=</span><span class="si">%.4f</span><span class="s2">, Precision=</span><span class="si">%.4f</span><span class="s2">, Recall=</span><span class="si">%.4f</span><span class="s2">, F1=</span><span class="si">%.4f</span><span class="s2">"</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">recall</span><span class="p">,</span> <span class="n">f1</span>
         <span class="p">)</span>
 
         <span class="c1"># Return all metrics</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;accuracy&quot;</span><span class="p">:</span> <span class="n">accuracy</span><span class="p">,</span> <span class="s2">&quot;precision&quot;</span><span class="p">:</span> <span class="n">precision</span><span class="p">,</span> <span class="s2">&quot;recall&quot;</span><span class="p">:</span> <span class="n">recall</span><span class="p">,</span> <span class="s2">&quot;f1&quot;</span><span class="p">:</span> <span class="n">f1</span><span class="p">,</span> <span class="s2">&quot;confusion_matrix&quot;</span><span class="p">:</span> <span class="n">cm</span><span class="p">}</span></div>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"accuracy"</span><span class="p">:</span> <span class="n">accuracy</span><span class="p">,</span> <span class="s2">"precision"</span><span class="p">:</span> <span class="n">precision</span><span class="p">,</span> <span class="s2">"recall"</span><span class="p">:</span> <span class="n">recall</span><span class="p">,</span> <span class="s2">"f1"</span><span class="p">:</span> <span class="n">f1</span><span class="p">,</span> <span class="s2">"confusion_matrix"</span><span class="p">:</span> <span class="n">cm</span><span class="p">}</span></div>
 
 
 <div class="viewcode-block" id="History.calculate_metrics_with_draws">
@@ -684,7 +684,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">calculate_metrics_with_draws</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">lower_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.33</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.66</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate evaluation metrics for the bout history, treating predictions</span>
+<span class="w">        </span><span class="sd">"""Calculate evaluation metrics for the bout history, treating predictions</span>
 <span class="sd">        between thresholds as explicit draw predictions.</span>
 
 <span class="sd">        Args:</span>
@@ -693,7 +693,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: A dictionary containing accuracy, precision, recall, F1 score, and draw metrics.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Count the different prediction outcomes</span>
         <span class="n">total_bouts</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">correct_predictions</span> <span class="o">=</span> <span class="mi">0</span>
@@ -702,7 +702,7 @@
         <span class="n">skipped_bouts</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="s2">&quot;Calculating metrics with draws for </span><span class="si">%d</span><span class="s2"> bouts using thresholds [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">]&quot;</span><span class="p">,</span>
+            <span class="s2">"Calculating metrics with draws for </span><span class="si">%d</span><span class="s2"> bouts using thresholds [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">]"</span><span class="p">,</span>
             <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">),</span>
             <span class="n">lower_threshold</span><span class="p">,</span>
             <span class="n">upper_threshold</span><span class="p">,</span>
@@ -711,7 +711,7 @@
         <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">:</span>
             <span class="n">actual</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">_normalized_outcome</span><span class="p">()</span>
 
-            <span class="c1"># Skip if we don&#39;t have both actual and predicted values</span>
+            <span class="c1"># Skip if we don't have both actual and predicted values</span>
             <span class="k">if</span> <span class="n">actual</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">skipped_bouts</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">continue</span>
@@ -720,32 +720,32 @@
 
             <span class="c1"># Determine predicted outcome</span>
             <span class="k">if</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&gt;</span> <span class="n">upper_threshold</span><span class="p">:</span>
-                <span class="n">predicted</span> <span class="o">=</span> <span class="s2">&quot;a&quot;</span>
+                <span class="n">predicted</span> <span class="o">=</span> <span class="s2">"a"</span>
             <span class="k">elif</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&lt;</span> <span class="n">lower_threshold</span><span class="p">:</span>
-                <span class="n">predicted</span> <span class="o">=</span> <span class="s2">&quot;b&quot;</span>
+                <span class="n">predicted</span> <span class="o">=</span> <span class="s2">"b"</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">predicted</span> <span class="o">=</span> <span class="s2">&quot;draw&quot;</span>
+                <span class="n">predicted</span> <span class="o">=</span> <span class="s2">"draw"</span>
 
             <span class="c1"># Count correct predictions</span>
             <span class="k">if</span> <span class="n">predicted</span> <span class="o">==</span> <span class="n">actual</span><span class="p">:</span>
                 <span class="n">correct_predictions</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">if</span> <span class="n">predicted</span> <span class="o">==</span> <span class="s2">&quot;draw&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">predicted</span> <span class="o">==</span> <span class="s2">"draw"</span><span class="p">:</span>
                     <span class="n">true_draw</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">elif</span> <span class="n">predicted</span> <span class="o">==</span> <span class="s2">&quot;draw&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">predicted</span> <span class="o">==</span> <span class="s2">"draw"</span><span class="p">:</span>
                 <span class="n">false_draw</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="k">if</span> <span class="n">total_bouts</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No valid bouts found to calculate metrics with draws.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"No valid bouts found to calculate metrics with draws."</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">{</span>
-                <span class="s2">&quot;accuracy&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="s2">&quot;precision&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="s2">&quot;recall&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="s2">&quot;f1&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="s2">&quot;true_draw&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="s2">&quot;false_draw&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="s2">&quot;draw_rate&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="s2">&quot;draw_accuracy&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="s2">&quot;confusion_matrix&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">confusion_matrix</span><span class="p">(</span><span class="n">lower_threshold</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="p">),</span>
+                <span class="s2">"accuracy"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">"precision"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">"recall"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">"f1"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">"true_draw"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">"false_draw"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">"draw_rate"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">"draw_accuracy"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">"confusion_matrix"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">confusion_matrix</span><span class="p">(</span><span class="n">lower_threshold</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="p">),</span>
             <span class="p">}</span>
 
         <span class="c1"># Calculate overall accuracy</span>
@@ -756,26 +756,26 @@
 
         <span class="c1"># Return combined metrics</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;accuracy&quot;</span><span class="p">:</span> <span class="n">accuracy</span><span class="p">,</span>
-            <span class="s2">&quot;precision&quot;</span><span class="p">:</span> <span class="n">cm</span><span class="p">[</span><span class="s2">&quot;tp&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">cm</span><span class="p">[</span><span class="s2">&quot;tp&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">cm</span><span class="p">[</span><span class="s2">&quot;fp&quot;</span><span class="p">])</span> <span class="k">if</span> <span class="p">(</span><span class="n">cm</span><span class="p">[</span><span class="s2">&quot;tp&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">cm</span><span class="p">[</span><span class="s2">&quot;fp&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;recall&quot;</span><span class="p">:</span> <span class="n">cm</span><span class="p">[</span><span class="s2">&quot;tp&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">cm</span><span class="p">[</span><span class="s2">&quot;tp&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">cm</span><span class="p">[</span><span class="s2">&quot;fn&quot;</span><span class="p">])</span> <span class="k">if</span> <span class="p">(</span><span class="n">cm</span><span class="p">[</span><span class="s2">&quot;tp&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">cm</span><span class="p">[</span><span class="s2">&quot;fn&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;f1&quot;</span><span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">cm</span><span class="p">[</span><span class="s2">&quot;tp&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">cm</span><span class="p">[</span><span class="s2">&quot;tp&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">cm</span><span class="p">[</span><span class="s2">&quot;fp&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">cm</span><span class="p">[</span><span class="s2">&quot;fn&quot;</span><span class="p">])</span>
-            <span class="k">if</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">cm</span><span class="p">[</span><span class="s2">&quot;tp&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">cm</span><span class="p">[</span><span class="s2">&quot;fp&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">cm</span><span class="p">[</span><span class="s2">&quot;fn&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="s2">"accuracy"</span><span class="p">:</span> <span class="n">accuracy</span><span class="p">,</span>
+            <span class="s2">"precision"</span><span class="p">:</span> <span class="n">cm</span><span class="p">[</span><span class="s2">"tp"</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">cm</span><span class="p">[</span><span class="s2">"tp"</span><span class="p">]</span> <span class="o">+</span> <span class="n">cm</span><span class="p">[</span><span class="s2">"fp"</span><span class="p">])</span> <span class="k">if</span> <span class="p">(</span><span class="n">cm</span><span class="p">[</span><span class="s2">"tp"</span><span class="p">]</span> <span class="o">+</span> <span class="n">cm</span><span class="p">[</span><span class="s2">"fp"</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">"recall"</span><span class="p">:</span> <span class="n">cm</span><span class="p">[</span><span class="s2">"tp"</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">cm</span><span class="p">[</span><span class="s2">"tp"</span><span class="p">]</span> <span class="o">+</span> <span class="n">cm</span><span class="p">[</span><span class="s2">"fn"</span><span class="p">])</span> <span class="k">if</span> <span class="p">(</span><span class="n">cm</span><span class="p">[</span><span class="s2">"tp"</span><span class="p">]</span> <span class="o">+</span> <span class="n">cm</span><span class="p">[</span><span class="s2">"fn"</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">"f1"</span><span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">cm</span><span class="p">[</span><span class="s2">"tp"</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">cm</span><span class="p">[</span><span class="s2">"tp"</span><span class="p">]</span> <span class="o">+</span> <span class="n">cm</span><span class="p">[</span><span class="s2">"fp"</span><span class="p">]</span> <span class="o">+</span> <span class="n">cm</span><span class="p">[</span><span class="s2">"fn"</span><span class="p">])</span>
+            <span class="k">if</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">cm</span><span class="p">[</span><span class="s2">"tp"</span><span class="p">]</span> <span class="o">+</span> <span class="n">cm</span><span class="p">[</span><span class="s2">"fp"</span><span class="p">]</span> <span class="o">+</span> <span class="n">cm</span><span class="p">[</span><span class="s2">"fn"</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span>
             <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;true_draw&quot;</span><span class="p">:</span> <span class="n">true_draw</span><span class="p">,</span>
-            <span class="s2">&quot;false_draw&quot;</span><span class="p">:</span> <span class="n">false_draw</span><span class="p">,</span>
-            <span class="s2">&quot;draw_rate&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">true_draw</span> <span class="o">+</span> <span class="n">false_draw</span><span class="p">)</span> <span class="o">/</span> <span class="n">total_bouts</span> <span class="k">if</span> <span class="n">total_bouts</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;draw_accuracy&quot;</span><span class="p">:</span> <span class="n">true_draw</span> <span class="o">/</span> <span class="p">(</span><span class="n">true_draw</span> <span class="o">+</span> <span class="n">false_draw</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">true_draw</span> <span class="o">+</span> <span class="n">false_draw</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;confusion_matrix&quot;</span><span class="p">:</span> <span class="n">cm</span><span class="p">,</span>
+            <span class="s2">"true_draw"</span><span class="p">:</span> <span class="n">true_draw</span><span class="p">,</span>
+            <span class="s2">"false_draw"</span><span class="p">:</span> <span class="n">false_draw</span><span class="p">,</span>
+            <span class="s2">"draw_rate"</span><span class="p">:</span> <span class="p">(</span><span class="n">true_draw</span> <span class="o">+</span> <span class="n">false_draw</span><span class="p">)</span> <span class="o">/</span> <span class="n">total_bouts</span> <span class="k">if</span> <span class="n">total_bouts</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">"draw_accuracy"</span><span class="p">:</span> <span class="n">true_draw</span> <span class="o">/</span> <span class="p">(</span><span class="n">true_draw</span> <span class="o">+</span> <span class="n">false_draw</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">true_draw</span> <span class="o">+</span> <span class="n">false_draw</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">"confusion_matrix"</span><span class="p">:</span> <span class="n">cm</span><span class="p">,</span>
         <span class="p">}</span></div>
 
 
 <div class="viewcode-block" id="History.accuracy_by_prior_bouts">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.History.accuracy_by_prior_bouts">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">accuracy_by_prior_bouts</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">arena</span><span class="p">:</span> <span class="s2">&quot;BaseArena&quot;</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">bin_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">arena</span><span class="p">:</span> <span class="s2">"BaseArena"</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">bin_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate accuracy based on the number of prior bouts for each competitor.</span>
+<span class="w">        </span><span class="sd">"""Calculate accuracy based on the number of prior bouts for each competitor.</span>
 
 <span class="sd">        This method analyzes how accuracy changes as competitors participate in more bouts,</span>
 <span class="sd">        properly accounting for draws as a third outcome category.</span>
@@ -786,43 +786,43 @@
 <span class="sd">            bin_size (int): Size of bins for grouping bout counts. Must be a positive integer.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            dict: A dictionary with &#39;binned&#39; key containing binned accuracy data. Every</span>
+<span class="sd">            dict: A dictionary with 'binned' key containing binned accuracy data. Every</span>
 <span class="sd">            non-empty bin reports its observed ``correct / total`` accuracy, however few</span>
 <span class="sd">            bouts it holds.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            ValueError: If ``bin_size`` is not a positive integer.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bin_size</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bin_size</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Integral</span><span class="p">)</span> <span class="ow">or</span> <span class="n">bin_size</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;bin_size must be a positive integer, got </span><span class="si">{</span><span class="n">bin_size</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"bin_size must be a positive integer, got </span><span class="si">{</span><span class="n">bin_size</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="c1"># Default thresholds if not provided</span>
         <span class="k">if</span> <span class="n">thresholds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">lower_threshold</span><span class="p">,</span> <span class="n">upper_threshold</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                <span class="s2">&quot;Using default thresholds for accuracy by prior bouts: [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">]&quot;</span><span class="p">,</span> <span class="n">lower_threshold</span><span class="p">,</span> <span class="n">upper_threshold</span>
+                <span class="s2">"Using default thresholds for accuracy by prior bouts: [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">]"</span><span class="p">,</span> <span class="n">lower_threshold</span><span class="p">,</span> <span class="n">upper_threshold</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">lower_threshold</span><span class="p">,</span> <span class="n">upper_threshold</span> <span class="o">=</span> <span class="n">thresholds</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                <span class="s2">&quot;Using provided thresholds for accuracy by prior bouts: [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">]&quot;</span><span class="p">,</span> <span class="n">lower_threshold</span><span class="p">,</span> <span class="n">upper_threshold</span>
+                <span class="s2">"Using provided thresholds for accuracy by prior bouts: [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">]"</span><span class="p">,</span> <span class="n">lower_threshold</span><span class="p">,</span> <span class="n">upper_threshold</span>
             <span class="p">)</span>
 
         <span class="c1"># Track the number of bouts for each competitor</span>
         <span class="n">competitor_bout_counts</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="c1"># Count all bouts from arena&#39;s history (which includes training data)</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">arena</span><span class="p">,</span> <span class="s2">&quot;history&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">history</span><span class="p">,</span> <span class="s2">&quot;bouts&quot;</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Populating initial bout counts from arena history (</span><span class="si">%d</span><span class="s2"> bouts)&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">bouts</span><span class="p">))</span>
+        <span class="c1"># Count all bouts from arena's history (which includes training data)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">arena</span><span class="p">,</span> <span class="s2">"history"</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">history</span><span class="p">,</span> <span class="s2">"bouts"</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Populating initial bout counts from arena history (</span><span class="si">%d</span><span class="s2"> bouts)"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">bouts</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="n">arena</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">bouts</span><span class="p">:</span>
                 <span class="n">competitor_bout_counts</span><span class="p">[</span><span class="n">bout</span><span class="o">.</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">competitor_bout_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bout</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
                 <span class="n">competitor_bout_counts</span><span class="p">[</span><span class="n">bout</span><span class="o">.</span><span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="n">competitor_bout_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bout</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Arena history not found or empty. Initial bout counts will be zero.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Arena history not found or empty. Initial bout counts will be zero."</span><span class="p">)</span>
 
         <span class="c1"># Track accuracy by minimum bout count</span>
         <span class="n">accuracy_by_min_bouts</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Calculating accuracy by prior bouts for </span><span class="si">%d</span><span class="s2"> evaluation bouts.&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Calculating accuracy by prior bouts for </span><span class="si">%d</span><span class="s2"> evaluation bouts."</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">))</span>
 
         <span class="c1"># Process each bout in the evaluation history</span>
         <span class="n">skipped_bouts</span> <span class="o">=</span> <span class="mi">0</span>
@@ -844,31 +844,31 @@
             <span class="c1"># Determine the minimum bout count between the two competitors</span>
             <span class="n">min_bout_count</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">a_count</span><span class="p">,</span> <span class="n">b_count</span><span class="p">)</span>
 
-            <span class="c1"># Initialize the bucket if it doesn&#39;t exist</span>
+            <span class="c1"># Initialize the bucket if it doesn't exist</span>
             <span class="k">if</span> <span class="n">min_bout_count</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">accuracy_by_min_bouts</span><span class="p">:</span>
-                <span class="n">accuracy_by_min_bouts</span><span class="p">[</span><span class="n">min_bout_count</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;correct&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+                <span class="n">accuracy_by_min_bouts</span><span class="p">[</span><span class="n">min_bout_count</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"correct"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"total"</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
 
             <span class="c1"># Check if prediction is correct, properly handling draws</span>
             <span class="n">is_predicted_draw</span> <span class="o">=</span> <span class="n">lower_threshold</span> <span class="o">&lt;=</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&lt;=</span> <span class="n">upper_threshold</span>
 
             <span class="k">if</span> <span class="p">(</span>
-                <span class="p">(</span><span class="n">is_predicted_draw</span> <span class="ow">and</span> <span class="n">actual</span> <span class="o">==</span> <span class="s2">&quot;draw&quot;</span><span class="p">)</span>
-                <span class="ow">or</span> <span class="p">(</span><span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&gt;</span> <span class="n">upper_threshold</span> <span class="ow">and</span> <span class="n">actual</span> <span class="o">==</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span>
-                <span class="ow">or</span> <span class="p">(</span><span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&lt;</span> <span class="n">lower_threshold</span> <span class="ow">and</span> <span class="n">actual</span> <span class="o">==</span> <span class="s2">&quot;b&quot;</span><span class="p">)</span>
+                <span class="p">(</span><span class="n">is_predicted_draw</span> <span class="ow">and</span> <span class="n">actual</span> <span class="o">==</span> <span class="s2">"draw"</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="p">(</span><span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&gt;</span> <span class="n">upper_threshold</span> <span class="ow">and</span> <span class="n">actual</span> <span class="o">==</span> <span class="s2">"a"</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="p">(</span><span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&lt;</span> <span class="n">lower_threshold</span> <span class="ow">and</span> <span class="n">actual</span> <span class="o">==</span> <span class="s2">"b"</span><span class="p">)</span>
             <span class="p">):</span>
-                <span class="n">accuracy_by_min_bouts</span><span class="p">[</span><span class="n">min_bout_count</span><span class="p">][</span><span class="s2">&quot;correct&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">accuracy_by_min_bouts</span><span class="p">[</span><span class="n">min_bout_count</span><span class="p">][</span><span class="s2">"correct"</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
-            <span class="n">accuracy_by_min_bouts</span><span class="p">[</span><span class="n">min_bout_count</span><span class="p">][</span><span class="s2">&quot;total&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">accuracy_by_min_bouts</span><span class="p">[</span><span class="n">min_bout_count</span><span class="p">][</span><span class="s2">"total"</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="k">if</span> <span class="n">skipped_bouts</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Skipped </span><span class="si">%d</span><span class="s2"> bouts with unrecognized outcomes while calculating accuracy.&quot;</span><span class="p">,</span> <span class="n">skipped_bouts</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Skipped </span><span class="si">%d</span><span class="s2"> bouts with unrecognized outcomes while calculating accuracy."</span><span class="p">,</span> <span class="n">skipped_bouts</span><span class="p">)</span>
 
         <span class="c1"># Calculate accuracy for each bucket</span>
         <span class="k">for</span> <span class="n">_bout_count</span><span class="p">,</span> <span class="n">metrics</span> <span class="ow">in</span> <span class="n">accuracy_by_min_bouts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;total&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;correct&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;total&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">"total"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">metrics</span><span class="p">[</span><span class="s2">"accuracy"</span><span class="p">]</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">"correct"</span><span class="p">]</span> <span class="o">/</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">"total"</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">metrics</span><span class="p">[</span><span class="s2">"accuracy"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># Group data into bins for smoother visualization</span>
         <span class="n">binned_data</span> <span class="o">=</span> <span class="p">{}</span>
@@ -876,38 +876,38 @@
             <span class="n">bin_index</span> <span class="o">=</span> <span class="n">count</span> <span class="o">//</span> <span class="n">bin_size</span>
             <span class="k">if</span> <span class="n">bin_index</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">binned_data</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                    <span class="s2">&quot;Creating new bin </span><span class="si">%d</span><span class="s2"> (counts </span><span class="si">%d</span><span class="s2">-</span><span class="si">%d</span><span class="s2">)&quot;</span><span class="p">,</span>
+                    <span class="s2">"Creating new bin </span><span class="si">%d</span><span class="s2"> (counts </span><span class="si">%d</span><span class="s2">-</span><span class="si">%d</span><span class="s2">)"</span><span class="p">,</span>
                     <span class="n">bin_index</span><span class="p">,</span>
                     <span class="n">bin_index</span> <span class="o">*</span> <span class="n">bin_size</span><span class="p">,</span>
                     <span class="p">(</span><span class="n">bin_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">bin_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="n">binned_data</span><span class="p">[</span><span class="n">bin_index</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;accuracy_sum&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+                <span class="n">binned_data</span><span class="p">[</span><span class="n">bin_index</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"accuracy_sum"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"total"</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
 
-            <span class="k">if</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">binned_data</span><span class="p">[</span><span class="n">bin_index</span><span class="p">][</span><span class="s2">&quot;accuracy_sum&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;total&quot;</span><span class="p">]</span>
-            <span class="n">binned_data</span><span class="p">[</span><span class="n">bin_index</span><span class="p">][</span><span class="s2">&quot;total&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;total&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">"accuracy"</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">binned_data</span><span class="p">[</span><span class="n">bin_index</span><span class="p">][</span><span class="s2">"accuracy_sum"</span><span class="p">]</span> <span class="o">+=</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">"accuracy"</span><span class="p">]</span> <span class="o">*</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">"total"</span><span class="p">]</span>
+            <span class="n">binned_data</span><span class="p">[</span><span class="n">bin_index</span><span class="p">][</span><span class="s2">"total"</span><span class="p">]</span> <span class="o">+=</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">"total"</span><span class="p">]</span>
 
         <span class="c1"># Calculate average accuracy for each bin</span>
         <span class="k">for</span> <span class="n">bin_idx</span><span class="p">,</span> <span class="n">bin_data</span> <span class="ow">in</span> <span class="n">binned_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">bin_data</span><span class="p">[</span><span class="s2">&quot;total&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">bin_data</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bin_data</span><span class="p">[</span><span class="s2">&quot;accuracy_sum&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">bin_data</span><span class="p">[</span><span class="s2">&quot;total&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">bin_data</span><span class="p">[</span><span class="s2">"total"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">bin_data</span><span class="p">[</span><span class="s2">"accuracy"</span><span class="p">]</span> <span class="o">=</span> <span class="n">bin_data</span><span class="p">[</span><span class="s2">"accuracy_sum"</span><span class="p">]</span> <span class="o">/</span> <span class="n">bin_data</span><span class="p">[</span><span class="s2">"total"</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">bin_data</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">del</span> <span class="n">bin_data</span><span class="p">[</span><span class="s2">&quot;accuracy_sum&quot;</span><span class="p">]</span>
+                <span class="n">bin_data</span><span class="p">[</span><span class="s2">"accuracy"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">del</span> <span class="n">bin_data</span><span class="p">[</span><span class="s2">"accuracy_sum"</span><span class="p">]</span>
 
             <span class="c1"># Add bin range information</span>
-            <span class="n">bin_data</span><span class="p">[</span><span class="s2">&quot;min_bouts&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bin_idx</span> <span class="o">*</span> <span class="n">bin_size</span>
-            <span class="n">bin_data</span><span class="p">[</span><span class="s2">&quot;max_bouts&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">bin_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">bin_size</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">bin_data</span><span class="p">[</span><span class="s2">"min_bouts"</span><span class="p">]</span> <span class="o">=</span> <span class="n">bin_idx</span> <span class="o">*</span> <span class="n">bin_size</span>
+            <span class="n">bin_data</span><span class="p">[</span><span class="s2">"max_bouts"</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">bin_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">bin_size</span> <span class="o">-</span> <span class="mi">1</span>
 
         <span class="c1"># Return only the binned data in the expected format</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Completed accuracy by prior bouts calculation with bin size </span><span class="si">%d</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="n">bin_size</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;binned&quot;</span><span class="p">:</span> <span class="n">binned_data</span><span class="p">}</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Completed accuracy by prior bouts calculation with bin size </span><span class="si">%d</span><span class="s2">."</span><span class="p">,</span> <span class="n">bin_size</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"binned"</span><span class="p">:</span> <span class="n">binned_data</span><span class="p">}</span></div>
 
 
 <div class="viewcode-block" id="History.get_calibration_data">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.History.get_calibration_data">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_calibration_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute calibration data from the bout history.</span>
+<span class="w">        </span><span class="sd">"""Compute calibration data from the bout history.</span>
 
 <span class="sd">        This method extracts predicted probabilities and actual outcomes from the bout history</span>
 <span class="sd">        and prepares them for calibration curve plotting.</span>
@@ -921,12 +921,12 @@
 <span class="sd">                - y_true: List of actual scores (1.0 for wins, 0.5 for draws,</span>
 <span class="sd">                  0.0 for losses)</span>
 <span class="sd">                - y_prob: List of predicted probabilities</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Extract predicted probabilities and actual outcomes</span>
         <span class="n">y_prob</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">y_true</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">skipped_bouts</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Extracting calibration data for </span><span class="si">%d</span><span class="s2"> bouts.&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Extracting calibration data for </span><span class="si">%d</span><span class="s2"> bouts."</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">))</span>
 
         <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">:</span>
             <span class="n">label</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">_normalized_outcome</span><span class="p">()</span>
@@ -934,12 +934,12 @@
                 <span class="n">skipped_bouts</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">continue</span>
             <span class="n">y_prob</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span><span class="p">)</span>
-            <span class="n">y_true</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;draw&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">}[</span><span class="n">label</span><span class="p">])</span>
+            <span class="n">y_true</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"a"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">"draw"</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">}[</span><span class="n">label</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="n">skipped_bouts</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Skipped </span><span class="si">%d</span><span class="s2"> bouts while extracting calibration data due to missing values.&quot;</span><span class="p">,</span> <span class="n">skipped_bouts</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Skipped </span><span class="si">%d</span><span class="s2"> bouts while extracting calibration data due to missing values."</span><span class="p">,</span> <span class="n">skipped_bouts</span><span class="p">)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Extracted </span><span class="si">%d</span><span class="s2"> valid data points for calibration.&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_true</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Extracted </span><span class="si">%d</span><span class="s2"> valid data points for calibration."</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_true</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">y_true</span><span class="p">,</span> <span class="n">y_prob</span></div>
 </div>
 
@@ -948,7 +948,7 @@
 <div class="viewcode-block" id="Bout">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Bout</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A single bout between two competitors.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""A single bout between two competitors."""</span>
 
 <div class="viewcode-block" id="Bout.__init__">
 <a class="viewcode-back" href="../../../api/arenas.html#elote.arenas.base.Bout.__init__">[docs]</a>
@@ -960,7 +960,7 @@
         <span class="n">outcome</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
         <span class="n">attributes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialize a bout.</span>
 
 <span class="sd">        Args:</span>
@@ -969,7 +969,7 @@
 <span class="sd">            predicted_outcome: The predicted probability of a winning</span>
 <span class="sd">            outcome: The actual outcome of the bout</span>
 <span class="sd">            attributes: Optional dictionary of additional attributes</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">=</span> <span class="n">predicted_outcome</span>
@@ -980,39 +980,39 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_normalized_outcome</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcome</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">outcome</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;win&quot;</span><span class="p">,</span> <span class="s2">&quot;won&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span> <span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">]:</span>
-                <span class="k">return</span> <span class="s2">&quot;a&quot;</span>
-            <span class="k">if</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="s2">&quot;lost&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> <span class="s2">&quot;n&quot;</span><span class="p">]:</span>
-                <span class="k">return</span> <span class="s2">&quot;b&quot;</span>
-            <span class="k">if</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;draw&quot;</span><span class="p">,</span> <span class="s2">&quot;tie&quot;</span><span class="p">,</span> <span class="s2">&quot;tied&quot;</span><span class="p">,</span> <span class="s2">&quot;0.5&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;equal&quot;</span><span class="p">,</span> <span class="s2">&quot;eq&quot;</span><span class="p">]:</span>
-                <span class="k">return</span> <span class="s2">&quot;draw&quot;</span>
+            <span class="k">if</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"win"</span><span class="p">,</span> <span class="s2">"won"</span><span class="p">,</span> <span class="s2">"1"</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"true"</span><span class="p">,</span> <span class="s2">"t"</span><span class="p">,</span> <span class="s2">"yes"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="s2">"a"</span>
+            <span class="k">if</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"loss"</span><span class="p">,</span> <span class="s2">"lost"</span><span class="p">,</span> <span class="s2">"0"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">,</span> <span class="s2">"false"</span><span class="p">,</span> <span class="s2">"f"</span><span class="p">,</span> <span class="s2">"no"</span><span class="p">,</span> <span class="s2">"n"</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="s2">"b"</span>
+            <span class="k">if</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"draw"</span><span class="p">,</span> <span class="s2">"tie"</span><span class="p">,</span> <span class="s2">"tied"</span><span class="p">,</span> <span class="s2">"0.5"</span><span class="p">,</span> <span class="s2">"d"</span><span class="p">,</span> <span class="s2">"equal"</span><span class="p">,</span> <span class="s2">"eq"</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="s2">"draw"</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcome</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">return</span> <span class="s2">&quot;a&quot;</span>
+                <span class="k">return</span> <span class="s2">"a"</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">return</span> <span class="s2">&quot;b&quot;</span>
+                <span class="k">return</span> <span class="s2">"b"</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="mf">0.5</span><span class="p">:</span>
-                <span class="k">return</span> <span class="s2">&quot;draw&quot;</span>
+                <span class="k">return</span> <span class="s2">"draw"</span>
 
         <span class="k">return</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="Bout.actual_winner">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout.actual_winner">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">actual_winner</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Return the actual winner of the bout based on the outcome.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            str or None: &#39;a&#39; if a won, &#39;b&#39; if b won, None if it was a draw or unclear</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            str or None: 'a' if a won, 'b' if b won, None if it was a draw or unclear</span>
+<span class="sd">        """</span>
         <span class="n">outcome</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalized_outcome</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">outcome</span> <span class="k">if</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span></div>
+        <span class="k">return</span> <span class="n">outcome</span> <span class="k">if</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="Bout.true_positive">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout.true_positive">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">true_positive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if this bout is a true positive prediction.</span>
+<span class="w">        </span><span class="sd">"""Check if this bout is a true positive prediction.</span>
 
 <span class="sd">        A true positive occurs when the model correctly predicts a win.</span>
 
@@ -1021,12 +1021,12 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True if this bout is a true positive, False otherwise.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcome</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="s2">&quot;win&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="s2">"win"</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span></div>
@@ -1035,7 +1035,7 @@
 <div class="viewcode-block" id="Bout.false_positive">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout.false_positive">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">false_positive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if this bout is a false positive prediction.</span>
+<span class="w">        </span><span class="sd">"""Check if this bout is a false positive prediction.</span>
 
 <span class="sd">        A false positive occurs when the model incorrectly predicts a win.</span>
 
@@ -1044,12 +1044,12 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True if this bout is a false positive, False otherwise.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcome</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">!=</span> <span class="s2">&quot;win&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">!=</span> <span class="s2">"win"</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span></div>
@@ -1058,7 +1058,7 @@
 <div class="viewcode-block" id="Bout.true_negative">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout.true_negative">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">true_negative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if this bout is a true negative prediction.</span>
+<span class="w">        </span><span class="sd">"""Check if this bout is a true negative prediction.</span>
 
 <span class="sd">        A true negative occurs when the model correctly predicts a non-win.</span>
 
@@ -1067,12 +1067,12 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True if this bout is a true negative, False otherwise.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&lt;=</span> <span class="n">threshold</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcome</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="s2">&quot;loss&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="s2">"loss"</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span></div>
@@ -1081,7 +1081,7 @@
 <div class="viewcode-block" id="Bout.false_negative">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout.false_negative">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">false_negative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if this bout is a false negative prediction.</span>
+<span class="w">        </span><span class="sd">"""Check if this bout is a false negative prediction.</span>
 
 <span class="sd">        A false negative occurs when the model incorrectly predicts a non-win.</span>
 
@@ -1090,12 +1090,12 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True if this bout is a false negative, False otherwise.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&lt;=</span> <span class="n">threshold</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcome</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">!=</span> <span class="s2">&quot;loss&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">!=</span> <span class="s2">"loss"</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcome</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span></div>
@@ -1104,7 +1104,7 @@
 <div class="viewcode-block" id="Bout.predicted_winner">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout.predicted_winner">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">predicted_winner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine the predicted winner of this bout.</span>
+<span class="w">        </span><span class="sd">"""Determine the predicted winner of this bout.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            lower_threshold (float): The lower probability threshold for predictions.</span>
@@ -1112,7 +1112,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            str: The identifier of the predicted winner, or None if no winner is predicted.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&gt;</span> <span class="n">upper_threshold</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&lt;</span> <span class="n">lower_threshold</span><span class="p">:</span>
@@ -1124,7 +1124,7 @@
 <div class="viewcode-block" id="Bout.predicted_loser">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.Bout.predicted_loser">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">predicted_loser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine the predicted loser of this bout.</span>
+<span class="w">        </span><span class="sd">"""Determine the predicted loser of this bout.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            lower_threshold (float): The lower probability threshold for predictions.</span>
@@ -1132,7 +1132,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            str: The identifier of the predicted loser, or None if no loser is predicted.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&gt;</span> <span class="n">upper_threshold</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&lt;</span> <span class="n">lower_threshold</span><span class="p">:</span>
@@ -1175,6 +1175,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/pythagorean.html">Pythagorean Expectation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/whr.html">Whole-History Rating</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/comparison.html">Comparing Rating Systems</a></li>
 </ul>

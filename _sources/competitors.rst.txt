@@ -67,6 +67,12 @@ Bradley-Terry Competitor
 .. autoclass:: elote.competitors.bradley_terry.BradleyTerryCompetitor
     :members: export_state,expected_score,beat,tied,rating,to_json,from_json
 
+Whole-History Rating Competitor
+-------------------------------
+
+.. autoclass:: elote.competitors.whr.WholeHistoryRatingCompetitor
+    :members: export_state,expected_score,beat,tied,rating,rating_at,rating_history,to_json,from_json
+
 BlendedCompetitor
 -----------------
 

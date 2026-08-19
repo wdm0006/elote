@@ -187,18 +187,18 @@
 <h2>Standardized Format<a class="headerlink" href="#standardized-format" title="Link to this heading">¶</a></h2>
 <p>As of version 1.0.0, all competitors use a standardized serialization format that includes the following fields:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;EloCompetitor&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1625097600</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;550e8400-e29b-41d4-a716-446655440000&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;parameters&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;initial_rating&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1500</span>
+<span class="w">    </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"EloCompetitor"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="mi">1625097600</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"550e8400-e29b-41d4-a716-446655440000"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"parameters"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"initial_rating"</span><span class="p">:</span><span class="w"> </span><span class="mi">1500</span>
 <span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">&quot;state&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;rating&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1550</span>
+<span class="w">    </span><span class="nt">"state"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"rating"</span><span class="p">:</span><span class="w"> </span><span class="mi">1550</span>
 <span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">&quot;class_vars&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;k_factor&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">32</span>
+<span class="w">    </span><span class="nt">"class_vars"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"k_factor"</span><span class="p">:</span><span class="w"> </span><span class="mi">32</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -226,16 +226,16 @@
 <p>For backward compatibility, the serialized format also includes flattened parameters and state variables at the top level of the dictionary. This allows older code that expects these fields to continue working.</p>
 <p>For example, in addition to the structured format above, the serialized JSON also includes:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;EloCompetitor&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1625097600</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;550e8400-e29b-41d4-a716-446655440000&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;parameters&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">&quot;state&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">&quot;class_vars&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"EloCompetitor"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="mi">1625097600</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"550e8400-e29b-41d4-a716-446655440000"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"parameters"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">"state"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">"class_vars"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">},</span>
 
-<span class="w">    </span><span class="nt">&quot;initial_rating&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1500</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;current_rating&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1550</span>
+<span class="w">    </span><span class="nt">"initial_rating"</span><span class="p">:</span><span class="w"> </span><span class="mi">1500</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"current_rating"</span><span class="p">:</span><span class="w"> </span><span class="mi">1550</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -280,7 +280,7 @@
 <span class="k">try</span><span class="p">:</span>
     <span class="n">glicko_competitor</span> <span class="o">=</span> <span class="n">GlickoCompetitor</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">json_str</span><span class="p">)</span>
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -302,19 +302,19 @@
 <span class="n">json_str</span> <span class="o">=</span> <span class="n">competitor</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span>
 
 <span class="c1"># Print the serialized JSON (formatted for readability)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Serialized competitor:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Serialized competitor:"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_str</span><span class="p">),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 
 <span class="c1"># Deserialize from JSON</span>
 <span class="n">new_competitor</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">json_str</span><span class="p">)</span>
 
 <span class="c1"># Verify the ratings match</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Original rating: </span><span class="si">{</span><span class="n">competitor</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Deserialized rating: </span><span class="si">{</span><span class="n">new_competitor</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Original rating: </span><span class="si">{</span><span class="n">competitor</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Deserialized rating: </span><span class="si">{</span><span class="n">new_competitor</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Continue using the deserialized competitor</span>
 <span class="n">new_competitor</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1450</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Updated rating after another match: </span><span class="si">{</span><span class="n">new_competitor</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Updated rating after another match: </span><span class="si">{</span><span class="n">new_competitor</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -322,43 +322,43 @@
 <h2>Implementing Serialization in Custom Competitors<a class="headerlink" href="#implementing-serialization-in-custom-competitors" title="Link to this heading">¶</a></h2>
 <p>If you’re implementing a custom competitor, you need to implement the following methods to support the standardized serialization format:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">_export_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Export the parameters used to initialize this competitor.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Export the parameters used to initialize this competitor."""</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">,</span>
+        <span class="s2">"initial_rating"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">,</span>
         <span class="c1"># Include any other parameters used during initialization</span>
     <span class="p">}</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_export_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Export the current state variables of this competitor.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Export the current state variables of this competitor."""</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="p">,</span>
+        <span class="s2">"rating"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="p">,</span>
         <span class="c1"># Include any other state variables that change during usage</span>
     <span class="p">}</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_import_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Import parameters from a state dictionary.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="s2">&quot;initial_rating&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
-        <span class="n">initial_rating</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Import parameters from a state dictionary."""</span>
+    <span class="k">if</span> <span class="s2">"initial_rating"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="n">initial_rating</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="s2">"initial_rating"</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">initial_rating</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Initial rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Initial rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
 
     <span class="c1"># Import any other parameters</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_import_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Import current state variables from a state dictionary.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="s2">&quot;rating&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-        <span class="n">rating</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;rating&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Import current state variables from a state dictionary."""</span>
+    <span class="k">if</span> <span class="s2">"rating"</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+        <span class="n">rating</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">"rating"</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">rating</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidStateException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InvalidStateException</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">rating</span>
 
     <span class="c1"># Import any other state variables</span>
 
 <span class="nd">@classmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_create_from_parameters</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a new competitor instance from parameters.&quot;&quot;&quot;</span>
-    <span class="n">initial_rating</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="mi">1500</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">"""Create a new competitor instance from parameters."""</span>
+    <span class="n">initial_rating</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_rating"</span><span class="p">,</span> <span class="mi">1500</span><span class="p">)</span>
 
     <span class="c1"># Create a new instance with the parameters</span>
     <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">initial_rating</span><span class="p">)</span>
@@ -401,6 +401,7 @@
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/pythagorean.html">Pythagorean Expectation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/whr.html">Whole-History Rating</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/comparison.html">Comparing Rating Systems</a></li>
 </ul>

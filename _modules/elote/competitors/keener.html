@@ -174,13 +174,13 @@
           <div class="body" role="main">
             
   <h1>Source code for elote.competitors.keener</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Keener Ratings implementation for the Elote library.</span>
+<span></span><span class="sd">"""Keener Ratings implementation for the Elote library.</span>
 
-<span class="sd">Keener&#39;s method is the score-based member of the classical global-fit family. Where</span>
+<span class="sd">Keener's method is the score-based member of the classical global-fit family. Where</span>
 <span class="sd">:class:`~elote.competitors.colley.ColleyMatrixCompetitor` and</span>
 <span class="sd">:class:`~elote.competitors.massey.MasseyCompetitor` solve a linear system, Keener builds a</span>
 <span class="sd">square *preference matrix* from the points competitors have scored on one another and reads</span>
-<span class="sd">the ratings off that matrix&#39;s dominant eigenvector.</span>
+<span class="sd">the ratings off that matrix's dominant eigenvector.</span>
 
 <span class="sd">The construction has four steps. Let ``S_ij`` be the total number of points ``i`` has scored</span>
 <span class="sd">against ``j`` across all their meetings.</span>
@@ -194,7 +194,7 @@
 
 <span class="sd">   A pair that has never met gives ``a_ij = 1/2`` -- no evidence either way.</span>
 
-<span class="sd">2. **Skew transform.** ``a_ij`` is pushed away from the middle by Keener&#39;s skew function</span>
+<span class="sd">2. **Skew transform.** ``a_ij`` is pushed away from the middle by Keener's skew function</span>
 
 <span class="sd">   .. math::</span>
 
@@ -209,7 +209,7 @@
 <span class="sd">3. **Games-played normalization.** Row ``i`` is divided by the number of games ``i`` played,</span>
 <span class="sd">   so a competitor cannot accumulate rating merely by playing more often.</span>
 
-<span class="sd">4. **Stabilization.** A small positive constant is added to every entry. Keener&#39;s own</span>
+<span class="sd">4. **Stabilization.** A small positive constant is added to every entry. Keener's own</span>
 <span class="sd">   ``A + eps * E`` perturbation makes the matrix strictly positive, so Perron-Frobenius</span>
 <span class="sd">   applies: the dominant eigenvalue is real and simple and its eigenvector is strictly</span>
 <span class="sd">   positive and unique up to scale. Without it a schedule whose graph is bipartite or</span>
@@ -221,9 +221,9 @@
 <span class="sd">References:</span>
 <span class="sd">- Keener, J. P. (1993). The Perron-Frobenius Theorem and the Ranking of Football Teams.</span>
 <span class="sd">  SIAM Review, 35(1), 80-93.</span>
-<span class="sd">- Langville, A. N., &amp; Meyer, C. D. (2012). Who&#39;s #1? The Science of Rating and Ranking.</span>
+<span class="sd">- Langville, A. N., &amp; Meyer, C. D. (2012). Who's #1? The Science of Rating and Ranking.</span>
 <span class="sd">  Princeton University Press, chapter 4.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">cast</span><span class="p">,</span> <span class="n">Set</span>
@@ -233,13 +233,13 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote.competitors.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="n">InvalidParameterException</span><span class="p">,</span> <span class="n">InvalidRatingValueException</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 
-<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;KeenerCompetitor&quot;</span><span class="p">)</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">"KeenerCompetitor"</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="KeenerCompetitor">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.keener.KeenerCompetitor">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">KeenerCompetitor</span><span class="p">(</span><span class="n">BaseCompetitor</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Keener Ratings competitor.</span>
+<span class="w">    </span><span class="sd">"""Keener Ratings competitor.</span>
 
 <span class="sd">    Keener rates a connected population from the dominant eigenvector of a pairwise</span>
 <span class="sd">    preference matrix built from points scored. Like Colley, Massey and Bradley-Terry -- and</span>
@@ -247,7 +247,7 @@
 <span class="sd">    re-fit from the complete match history, which makes the method order independent.</span>
 
 <span class="sd">    **Scores.** ``beat`` / ``lost_to`` / ``tied`` accept the common optional ``scores``</span>
-<span class="sd">    payload, the two competitors&#39; scores in caller order. Keener is a score-based method, so</span>
+<span class="sd">    payload, the two competitors' scores in caller order. Keener is a score-based method, so</span>
 <span class="sd">    supplying real scores is what it is built for. When they are omitted the implementation</span>
 <span class="sd">    falls back to the same unit scores the rest of the library uses: the winner is credited</span>
 <span class="sd">    ``1`` and the loser ``0``, and a draw credits each side ``0.5``. Unit-score Keener still</span>
@@ -264,16 +264,16 @@
 <span class="sd">        _default_initial_rating (float): Default initial rating. Default: 1.0, which is the</span>
 <span class="sd">            mean the fitted ratings are normalized to, so an unplayed competitor sits exactly</span>
 <span class="sd">            at the population average.</span>
-<span class="sd">        _perturbation (float): Keener&#39;s ``eps``, added to every matrix entry so the matrix is</span>
+<span class="sd">        _perturbation (float): Keener's ``eps``, added to every matrix entry so the matrix is</span>
 <span class="sd">            strictly positive and Perron-Frobenius applies. Default: 1e-4.</span>
 <span class="sd">        _expected_score_scale (float): Logistic scale applied to the log rating ratio by</span>
 <span class="sd">            :meth:`expected_score`. Default: 1.0, which is the plain Keener share</span>
 <span class="sd">            ``r_a / (r_a + r_b)``.</span>
 <span class="sd">        _round_decimals (int): Number of decimal places fitted ratings are canonicalized to,</span>
 <span class="sd">            so that solver noise cannot make mathematically identical records differ.</span>
-<span class="sd">            Default: 10, chosen because the eigen-solve&#39;s row-order noise is around 5e-15 --</span>
+<span class="sd">            Default: 10, chosen because the eigen-solve's row-order noise is around 5e-15 --</span>
 <span class="sd">            five orders of magnitude below the rounding grid.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">_minimum_rating</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="n">_default_initial_rating</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
@@ -288,7 +288,7 @@
 <div class="viewcode-block" id="KeenerCompetitor.__init__">
 <a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.keener.KeenerCompetitor.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_rating</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a new Keener competitor.</span>
+<span class="w">        </span><span class="sd">"""Initialize a new Keener competitor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            initial_rating (float, optional): The initial rating of this competitor.</span>
@@ -296,12 +296,12 @@
 
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidRatingValueException: If the initial rating is not positive.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">initial_rating</span> <span class="k">if</span> <span class="n">initial_rating</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_initial_rating</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span><span class="s2">&quot;Keener ratings are strictly positive; initial_rating must be &gt; 0&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span><span class="s2">"Keener ratings are strictly positive; initial_rating must be &gt; 0"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="mi">0</span>
@@ -310,54 +310,54 @@
         <span class="c1"># summary of the score history; the per-opponent breakdown below is not.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_points_for</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_points_against</span> <span class="o">=</span> <span class="mf">0.0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">&quot;KeenerCompetitor&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Opponent -&gt; num games</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">"KeenerCompetitor"</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Opponent -&gt; num games</span>
         <span class="c1"># Opponent -&gt; total points this competitor has scored against that opponent. This is</span>
         <span class="c1"># the S_ij the preference matrix is built from.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_scores_for</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">&quot;KeenerCompetitor&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scores_for</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">"KeenerCompetitor"</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="c1"># Unique ID for hashing (instances are used as dict keys in the match graph).</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Initialized KeenerCompetitor </span><span class="si">%d</span><span class="s2"> with initial rating </span><span class="si">%.6f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">)</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Initialized KeenerCompetitor </span><span class="si">%d</span><span class="s2"> with initial rating </span><span class="si">%.6f</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">)</span></div>
 
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current rating of this competitor.</span>
+<span class="w">        </span><span class="sd">"""Get the current rating of this competitor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            float: The current rating.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span>
 
     <span class="nd">@rating</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the current rating of this competitor.</span>
+<span class="w">        </span><span class="sd">"""Set the current rating of this competitor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            value (float): The new rating value.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidRatingValueException: If the rating value is below the minimum rating.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;Attempted to set rating </span><span class="si">%.6f</span><span class="s2"> below minimum </span><span class="si">%.6f</span><span class="s2"> for </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span>
+                <span class="s2">"Attempted to set rating </span><span class="si">%.6f</span><span class="s2"> below minimum </span><span class="si">%.6f</span><span class="s2"> for </span><span class="si">%d</span><span class="s2">"</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span>
             <span class="p">)</span>
-            <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">num_games</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the total number of games played by this competitor.</span>
+<span class="w">        </span><span class="sd">"""Get the total number of games played by this competitor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            int: The total number of games played.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span>
 
 <div class="viewcode-block" id="KeenerCompetitor.expected_score">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.keener.KeenerCompetitor.expected_score">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;BaseCompetitor&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the expected score against another competitor.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">"BaseCompetitor"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Calculate the expected score against another competitor.</span>
 
 <span class="sd">        Keener ratings are positive strengths rather than probabilities, so the natural</span>
 <span class="sd">        mapping is the share ``r_self / (r_self + r_competitor)``. That share is computed</span>
@@ -372,8 +372,8 @@
 <span class="sd">            float: The expected score (probability of winning).</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don't match.</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="n">mine</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_probability_floor</span><span class="p">)</span>
         <span class="n">theirs</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">competitor</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_probability_floor</span><span class="p">)</span>
@@ -384,7 +384,7 @@
 <div class="viewcode-block" id="KeenerCompetitor.beat">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.keener.KeenerCompetitor.beat">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has won against the given competitor.</span>
+<span class="w">        </span><span class="sd">"""Update ratings after this competitor has won against the given competitor.</span>
 
 <span class="sd">        The scores are recorded in the match graph and the whole connected group is re-fit.</span>
 
@@ -395,10 +395,10 @@
 <span class="sd">                ``0`` are recorded.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don't match.</span>
 <span class="sd">            ValueError: If ``scores`` does not describe a win for this competitor.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Competitor </span><span class="si">%s</span><span class="s2"> beat </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Competitor </span><span class="si">%s</span><span class="s2"> beat </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="n">validated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
         <span class="n">opponent</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">KeenerCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
@@ -408,14 +408,14 @@
         <span class="n">opponent</span><span class="o">.</span><span class="n">_losses</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_record_game</span><span class="p">(</span><span class="n">opponent</span><span class="p">,</span> <span class="n">mine</span><span class="p">,</span> <span class="n">theirs</span><span class="p">)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Recorded win for </span><span class="si">%d</span><span class="s2"> (</span><span class="si">%.3f</span><span class="s2">-</span><span class="si">%.3f</span><span class="s2">), loss for </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">mine</span><span class="p">,</span> <span class="n">theirs</span><span class="p">,</span> <span class="n">opponent</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Recorded win for </span><span class="si">%d</span><span class="s2"> (</span><span class="si">%.3f</span><span class="s2">-</span><span class="si">%.3f</span><span class="s2">), loss for </span><span class="si">%d</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">mine</span><span class="p">,</span> <span class="n">theirs</span><span class="p">,</span> <span class="n">opponent</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_recalculate_ratings</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="KeenerCompetitor.tied">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.keener.KeenerCompetitor.tied">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has tied with the given competitor.</span>
+<span class="w">        </span><span class="sd">"""Update ratings after this competitor has tied with the given competitor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            competitor (BaseCompetitor): The opponent competitor that tied.</span>
@@ -424,10 +424,10 @@
 <span class="sd">                side is credited the unit draw score ``0.5``.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don't match.</span>
 <span class="sd">            ValueError: If ``scores`` does not describe a draw.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Competitor </span><span class="si">%s</span><span class="s2"> tied with </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Competitor </span><span class="si">%s</span><span class="s2"> tied with </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="n">validated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
         <span class="n">opponent</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">KeenerCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
@@ -437,39 +437,39 @@
         <span class="n">opponent</span><span class="o">.</span><span class="n">_ties</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_record_game</span><span class="p">(</span><span class="n">opponent</span><span class="p">,</span> <span class="n">mine</span><span class="p">,</span> <span class="n">theirs</span><span class="p">)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Recorded tie for </span><span class="si">%d</span><span class="s2"> and </span><span class="si">%d</span><span class="s2"> (</span><span class="si">%.3f</span><span class="s2">-</span><span class="si">%.3f</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">opponent</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">mine</span><span class="p">,</span> <span class="n">theirs</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Recorded tie for </span><span class="si">%d</span><span class="s2"> and </span><span class="si">%d</span><span class="s2"> (</span><span class="si">%.3f</span><span class="s2">-</span><span class="si">%.3f</span><span class="s2">)"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">opponent</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">mine</span><span class="p">,</span> <span class="n">theirs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_recalculate_ratings</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="KeenerCompetitor.lost_to">
 <a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.keener.KeenerCompetitor.lost_to">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">lost_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has lost to the given competitor.</span>
+<span class="w">        </span><span class="sd">"""Update ratings after this competitor has lost to the given competitor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            competitor (BaseCompetitor): The opponent competitor that won.</span>
 <span class="sd">            scores (sequence of float, optional): The two scores in caller order,</span>
 <span class="sd">                ``(self_score, competitor_score)``. Reversed before being passed to the</span>
-<span class="sd">                winner&#39;s :meth:`beat`.</span>
+<span class="sd">                winner's :meth:`beat`.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don't match.</span>
 <span class="sd">            ValueError: If ``scores`` does not describe a loss for this competitor.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Competitor </span><span class="si">%s</span><span class="s2"> lost to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Competitor </span><span class="si">%s</span><span class="s2"> lost to </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="n">validated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
         <span class="n">competitor</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">validated</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="n">validated</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">validated</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_record_game</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opponent</span><span class="p">:</span> <span class="s2">&quot;KeenerCompetitor&quot;</span><span class="p">,</span> <span class="n">mine</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">theirs</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record one game&#39;s scores on both sides of the match graph.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_record_game</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opponent</span><span class="p">:</span> <span class="s2">"KeenerCompetitor"</span><span class="p">,</span> <span class="n">mine</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">theirs</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Record one game's scores on both sides of the match graph.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            opponent: The other competitor in the game.</span>
 <span class="sd">            mine: The points this competitor scored.</span>
 <span class="sd">            theirs: The points the opponent scored.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_points_for</span> <span class="o">+=</span> <span class="n">mine</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_points_against</span> <span class="o">+=</span> <span class="n">theirs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span><span class="p">[</span><span class="n">opponent</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">opponent</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
@@ -480,14 +480,14 @@
         <span class="n">opponent</span><span class="o">.</span><span class="n">_opponents</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="n">opponent</span><span class="o">.</span><span class="n">_opponents</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="n">opponent</span><span class="o">.</span><span class="n">_scores_for</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="n">opponent</span><span class="o">.</span><span class="n">_scores_for</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">+</span> <span class="n">theirs</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_get_connected_competitors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;KeenerCompetitor&quot;</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all competitors connected to this competitor in the match graph.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_connected_competitors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">"KeenerCompetitor"</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Get all competitors connected to this competitor in the match graph.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            List[KeenerCompetitor]: A list of all connected competitors.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">visited</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="s2">&quot;KeenerCompetitor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="n">to_visit</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;KeenerCompetitor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span>
+<span class="sd">        """</span>
+        <span class="n">visited</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="s2">"KeenerCompetitor"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">to_visit</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">"KeenerCompetitor"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span>
         <span class="n">all_competitors</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">while</span> <span class="n">to_visit</span><span class="p">:</span>
@@ -500,12 +500,12 @@
                 <span class="k">if</span> <span class="n">opponent</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
                     <span class="n">to_visit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Found </span><span class="si">%d</span><span class="s2"> connected competitors&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_competitors</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Found </span><span class="si">%d</span><span class="s2"> connected competitors"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_competitors</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">all_competitors</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_preference_matrix</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="s2">&quot;np.ndarray&quot;</span><span class="p">,</span> <span class="n">pair_games</span><span class="p">:</span> <span class="s2">&quot;np.ndarray&quot;</span><span class="p">,</span> <span class="n">games</span><span class="p">:</span> <span class="s2">&quot;np.ndarray&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;np.ndarray&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build Keener&#39;s stabilized preference matrix from a raw score matrix.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_preference_matrix</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="s2">"np.ndarray"</span><span class="p">,</span> <span class="n">pair_games</span><span class="p">:</span> <span class="s2">"np.ndarray"</span><span class="p">,</span> <span class="n">games</span><span class="p">:</span> <span class="s2">"np.ndarray"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"np.ndarray"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Build Keener's stabilized preference matrix from a raw score matrix.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            scores: ``S``, where ``S[i, j]`` is the total number of points ``i`` scored</span>
@@ -516,42 +516,42 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            numpy.ndarray: The strictly positive preference matrix.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">totals</span> <span class="o">=</span> <span class="n">scores</span> <span class="o">+</span> <span class="n">scores</span><span class="o">.</span><span class="n">T</span>
         <span class="c1"># Laplace-smoothed score share.</span>
         <span class="n">proportions</span> <span class="o">=</span> <span class="p">(</span><span class="n">scores</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">totals</span> <span class="o">+</span> <span class="mf">2.0</span><span class="p">)</span>
 
-        <span class="c1"># Keener&#39;s skew transform: monotone, fixes 1/2, and h(x) + h(1 - x) == 1.</span>
+        <span class="c1"># Keener's skew transform: monotone, fixes 1/2, and h(x) + h(1 - x) == 1.</span>
         <span class="n">centered</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">proportions</span> <span class="o">-</span> <span class="mf">1.0</span>
         <span class="n">preferences</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">centered</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">centered</span><span class="p">))</span>
 
         <span class="c1"># A pair that never met expresses no preference, and neither does a competitor</span>
-        <span class="c1"># against itself. Leaving unplayed pairs at the &quot;no evidence&quot; value h(1/2) = 1/2</span>
+        <span class="c1"># against itself. Leaving unplayed pairs at the "no evidence" value h(1/2) = 1/2</span>
         <span class="c1"># instead would swamp the row: on a sparse schedule the n - games_i entries for</span>
         <span class="c1"># opponents never faced dominate the games_i real ones, and the fit degenerates</span>
         <span class="c1"># into a ranking by 1 / games_played.</span>
         <span class="n">preferences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pair_games</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">preferences</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
         <span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">preferences</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
 
-        <span class="c1"># Divide by games played, making each row the competitor&#39;s average preference per</span>
+        <span class="c1"># Divide by games played, making each row the competitor's average preference per</span>
         <span class="c1"># game, so a longer schedule is not itself worth rating.</span>
         <span class="n">preferences</span> <span class="o">=</span> <span class="n">preferences</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">games</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
 
-        <span class="c1"># Keener&#39;s eps * E perturbation: makes the matrix strictly positive, so its dominant</span>
+        <span class="c1"># Keener's eps * E perturbation: makes the matrix strictly positive, so its dominant</span>
         <span class="c1"># eigenvalue is simple and its eigenvector strictly positive. This is also what</span>
         <span class="c1"># connects competitors who never met, which the mask above disconnected.</span>
-        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;np.ndarray&quot;</span><span class="p">,</span> <span class="n">preferences</span> <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_perturbation</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"np.ndarray"</span><span class="p">,</span> <span class="n">preferences</span> <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_perturbation</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_recalculate_ratings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Re-fit the Keener ratings for all connected competitors.</span>
+<span class="w">        </span><span class="sd">"""Re-fit the Keener ratings for all connected competitors.</span>
 
 <span class="sd">        Builds the preference matrix for the connected group, takes the eigenvector of its</span>
-<span class="sd">        dominant eigenvalue, and scales the result so the group&#39;s ratings average 1.0.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        dominant eigenvalue, and scales the result so the group's ratings average 1.0.</span>
+<span class="sd">        """</span>
         <span class="n">competitors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_connected_competitors</span><span class="p">()</span>
         <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">competitors</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Only one competitor in network, skipping recalculation.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Only one competitor in network, skipping recalculation."</span><span class="p">)</span>
             <span class="k">return</span>
 
         <span class="n">idx</span> <span class="o">=</span> <span class="p">{</span><span class="n">comp</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">comp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">competitors</span><span class="p">)}</span>
@@ -576,7 +576,7 @@
             <span class="n">eigenvalues</span><span class="p">,</span> <span class="n">eigenvectors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinAlgError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;Keener eigenvector solve failed (</span><span class="si">%s</span><span class="s2">). Falling back to mean-preference ratings for </span><span class="si">%d</span><span class="s2"> competitors.&quot;</span><span class="p">,</span>
+                <span class="s2">"Keener eigenvector solve failed (</span><span class="si">%s</span><span class="s2">). Falling back to mean-preference ratings for </span><span class="si">%d</span><span class="s2"> competitors."</span><span class="p">,</span>
                 <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
                 <span class="n">n</span><span class="p">,</span>
             <span class="p">)</span>
@@ -592,14 +592,14 @@
             <span class="n">vector</span> <span class="o">=</span> <span class="o">-</span><span class="n">vector</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">vector</span><span class="p">))</span> <span class="ow">or</span> <span class="n">vector</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Keener eigenvector was degenerate for </span><span class="si">%d</span><span class="s2"> competitors; falling back.&quot;</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Keener eigenvector was degenerate for </span><span class="si">%d</span><span class="s2"> competitors; falling back."</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_fallback_rating_calculation</span><span class="p">(</span><span class="n">competitors</span><span class="p">,</span> <span class="n">matrix</span><span class="p">)</span>
             <span class="k">return</span>
 
         <span class="n">vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">vector</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_probability_floor</span><span class="p">)</span>
         <span class="n">ratings</span> <span class="o">=</span> <span class="n">vector</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="n">vector</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
 
-        <span class="c1"># LAPACK&#39;s pivoting follows row order, and row order is the order competitors were</span>
+        <span class="c1"># LAPACK's pivoting follows row order, and row order is the order competitors were</span>
         <span class="c1"># discovered in, so two runs over the same results can differ in the last few bits.</span>
         <span class="c1"># Canonicalizing makes mathematically identical records compare exactly equal and</span>
         <span class="c1"># makes the fit order independent.</span>
@@ -608,13 +608,13 @@
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">comp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">competitors</span><span class="p">):</span>
             <span class="n">comp</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ratings</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_fallback_rating_calculation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;KeenerCompetitor&quot;</span><span class="p">],</span> <span class="n">matrix</span><span class="p">:</span> <span class="s2">&quot;np.ndarray&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Assign mean-preference ratings when the eigenvector cannot be computed.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fallback_rating_calculation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">"KeenerCompetitor"</span><span class="p">],</span> <span class="n">matrix</span><span class="p">:</span> <span class="s2">"np.ndarray"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Assign mean-preference ratings when the eigenvector cannot be computed.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            competitors: The connected group of competitors to rate.</span>
 <span class="sd">            matrix: The preference matrix that was built for them.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">means</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">total</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">means</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
         <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">competitors</span><span class="p">)</span>
@@ -626,74 +626,74 @@
             <span class="n">comp</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_probability_floor</span><span class="p">))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_export_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the parameters used to initialize this competitor.</span>
+<span class="w">        </span><span class="sd">"""Export the parameters used to initialize this competitor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: A dictionary containing the initialization parameters.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">,</span>
+            <span class="s2">"initial_rating"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">,</span>
         <span class="p">}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_export_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the current state variables of this competitor.</span>
+<span class="w">        </span><span class="sd">"""Export the current state variables of this competitor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: A dictionary containing the current state variables.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="p">,</span>
-            <span class="s2">&quot;wins&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span><span class="p">,</span>
-            <span class="s2">&quot;losses&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="p">,</span>
-            <span class="s2">&quot;ties&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span><span class="p">,</span>
-            <span class="s2">&quot;points_for&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_points_for</span><span class="p">,</span>
-            <span class="s2">&quot;points_against&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_points_against</span><span class="p">,</span>
+            <span class="s2">"rating"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="p">,</span>
+            <span class="s2">"wins"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span><span class="p">,</span>
+            <span class="s2">"losses"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="p">,</span>
+            <span class="s2">"ties"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span><span class="p">,</span>
+            <span class="s2">"points_for"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_points_for</span><span class="p">,</span>
+            <span class="s2">"points_against"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_points_against</span><span class="p">,</span>
         <span class="p">}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_import_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Import parameters from a state dictionary.</span>
+<span class="w">        </span><span class="sd">"""Import parameters from a state dictionary.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            parameters (dict): A dictionary containing parameters.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_initial_rating</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_rating"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_initial_rating</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_import_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Import current state variables from a state dictionary.</span>
+<span class="w">        </span><span class="sd">"""Import current state variables from a state dictionary.</span>
 
 <span class="sd">        Note: opponent references cannot be restored from serialization, so the match graph is</span>
 <span class="sd">        reset; the rating and the aggregate score totals are preserved.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            state (dict): A dictionary containing state variables.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rating&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;wins&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;losses&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ties&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_points_for</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;points_for&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_points_against</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;points_against&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"rating"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"wins"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"losses"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ties"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_points_for</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"points_for"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_points_against</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"points_against"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scores_for</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_from_parameters</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new competitor instance from parameters.</span>
+<span class="w">        </span><span class="sd">"""Create a new competitor instance from parameters.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            parameters (dict): A dictionary containing parameters.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            KeenerCompetitor: A new competitor instance.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_initial_rating</span><span class="p">))</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_rating"</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_initial_rating</span><span class="p">))</span>
 
 <div class="viewcode-block" id="KeenerCompetitor.reset">
 <a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.keener.KeenerCompetitor.reset">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset this competitor to its initial state.&quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Resetting KeenerCompetitor </span><span class="si">%d</span><span class="s2"> to initial state.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
+<span class="w">        </span><span class="sd">"""Reset this competitor to its initial state."""</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Resetting KeenerCompetitor </span><span class="si">%d</span><span class="s2"> to initial state."</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="mi">0</span>
@@ -708,36 +708,36 @@
 <a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.keener.KeenerCompetitor.configure_class">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">configure_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure class-level parameters for this rating system.</span>
+<span class="w">        </span><span class="sd">"""Configure class-level parameters for this rating system.</span>
 
 <span class="sd">        Overrides the base implementation to validate the Keener-specific parameters.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidParameterException: If any parameter is invalid.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="s2">&quot;expected_score_scale&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;expected_score_scale&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;expected_score_scale must be positive&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s2">&quot;perturbation&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;perturbation&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;perturbation must be positive&quot;</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="s2">"expected_score_scale"</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">"expected_score_scale"</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">"expected_score_scale must be positive"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">"perturbation"</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">"perturbation"</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">"perturbation must be positive"</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">configure_class</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of this competitor.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;KeenerCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, W/L/T=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_wins</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ties</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return a string representation of this competitor."""</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"&lt;KeenerCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, W/L/T=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_wins</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_ties</span><span class="si">}</span><span class="s2">&gt;"</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of this competitor.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;KeenerCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return a string representation of this competitor."""</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"&lt;KeenerCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&gt;"</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if two competitors are the same object (by unique ID).&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Check if two competitors are the same object (by unique ID)."""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">KeenerCompetitor</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_id</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a hash value for this competitor based on its unique ID.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Get a hash value for this competitor based on its unique ID."""</span>
         <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span></div>
 
 </pre></div>
@@ -774,6 +774,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/pythagorean.html">Pythagorean Expectation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/whr.html">Whole-History Rating</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/comparison.html">Comparing Rating Systems</a></li>
 </ul>

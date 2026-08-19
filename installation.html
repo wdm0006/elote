@@ -207,12 +207,12 @@ make<span class="w"> </span>install-dev
 <span class="c1"># Or using pip</span>
 git<span class="w"> </span>clone<span class="w"> </span>https://github.com/yourusername/elote.git
 <span class="nb">cd</span><span class="w"> </span>elote
-pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[dev]"</span>
 
 <span class="c1"># Or using uv</span>
 git<span class="w"> </span>clone<span class="w"> </span>https://github.com/yourusername/elote.git
 <span class="nb">cd</span><span class="w"> </span>elote
-uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[dev]"</span>
 </pre></div>
 </div>
 <p>The development installation includes additional dependencies needed for testing, linting, and documentation.</p>
@@ -228,7 +228,7 @@ uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </s
 
 <span class="c1"># Calculate expected score</span>
 <span class="n">expected</span> <span class="o">=</span> <span class="n">player2</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player1</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Installation successful! Expected score: </span><span class="si">{</span><span class="n">expected</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Installation successful! Expected score: </span><span class="si">{</span><span class="n">expected</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>If this runs without errors, Elote is installed correctly.</p>
@@ -237,13 +237,13 @@ uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </s
 <h2>Installing Optional Dependencies<a class="headerlink" href="#installing-optional-dependencies" title="Link to this heading">¶</a></h2>
 <p>Elote has several optional dependency groups that can be installed based on your needs:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install with visualization dependencies</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;elote[viz]&quot;</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"elote[viz]"</span>
 
 <span class="c1"># Install with all optional dependencies</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;elote[all]&quot;</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"elote[all]"</span>
 
 <span class="c1"># Install development dependencies</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;elote[dev]&quot;</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"elote[dev]"</span>
 </pre></div>
 </div>
 </section>
@@ -327,6 +327,7 @@ pip<span class="w"> </span>install<span class="w"> </span>elote
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/pythagorean.html">Pythagorean Expectation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/whr.html">Whole-History Rating</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/comparison.html">Comparing Rating Systems</a></li>
 </ul>

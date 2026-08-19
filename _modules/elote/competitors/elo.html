@@ -179,26 +179,26 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote.competitors.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="n">InvalidRatingValueException</span><span class="p">,</span> <span class="n">InvalidParameterException</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>  <span class="c1"># Import directly from the logging submodule</span>
 
-<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;EloCompetitor&quot;</span><span class="p">)</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">"EloCompetitor"</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="EloCompetitor">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.elo.EloCompetitor">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EloCompetitor</span><span class="p">(</span><span class="n">BaseCompetitor</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Elo rating system competitor.</span>
+<span class="w">    </span><span class="sd">"""Elo rating system competitor.</span>
 
 <span class="sd">    The Elo rating system is a method for calculating the relative skill levels of players</span>
 <span class="sd">    in zero-sum games such as chess. It is named after its creator Arpad Elo, a Hungarian-American</span>
 <span class="sd">    physics professor and chess master.</span>
 
-<span class="sd">    In the Elo system, each player&#39;s rating changes based on the outcome of games and the</span>
+<span class="sd">    In the Elo system, each player's rating changes based on the outcome of games and the</span>
 <span class="sd">    rating of their opponents. The difference in ratings between two players determines</span>
 <span class="sd">    the expected outcome of a match, and the actual outcome is used to update the ratings.</span>
 
 <span class="sd">    Class Attributes:</span>
 <span class="sd">        _base_rating (float): Base rating divisor used in the transformed rating calculation. Default: 400.</span>
 <span class="sd">        _k_factor (float): Factor that determines how much ratings change after each match. Default: 32.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">_base_rating</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mi">400</span>
     <span class="n">_k_factor</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mi">32</span>
@@ -206,7 +206,7 @@
 <div class="viewcode-block" id="EloCompetitor.__init__">
 <a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.elo.EloCompetitor.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_rating</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span> <span class="n">k_factor</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize an Elo competitor.</span>
+<span class="w">        </span><span class="sd">"""Initialize an Elo competitor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            initial_rating (float, optional): The initial rating of this competitor. Default: 400.</span>
@@ -216,106 +216,106 @@
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidRatingValueException: If the initial rating is below the minimum rating.</span>
 <span class="sd">            InvalidParameterException: If the k_factor is negative.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>  <span class="c1"># Call base class constructor</span>
         <span class="k">if</span> <span class="n">initial_rating</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Initial rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Initial rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">k_factor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">k_factor</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;K-factor must be positive&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">"K-factor must be positive"</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">=</span> <span class="n">k_factor</span> <span class="k">if</span> <span class="n">k_factor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">EloCompetitor</span><span class="o">.</span><span class="n">_k_factor</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-            <span class="s2">&quot;Initialized EloCompetitor with initial rating </span><span class="si">%.1f</span><span class="s2">, k_factor=</span><span class="si">%.1f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span>
+            <span class="s2">"Initialized EloCompetitor with initial rating </span><span class="si">%.1f</span><span class="s2">, k_factor=</span><span class="si">%.1f</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span>
         <span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of this competitor.</span>
+<span class="w">        </span><span class="sd">"""Return a string representation of this competitor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            str: A string representation of this competitor.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;EloCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="si">}</span><span class="s2">, k_factor=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"&lt;EloCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="si">}</span><span class="s2">, k_factor=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span><span class="si">}</span><span class="s2">&gt;"</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a string representation of this competitor.</span>
+<span class="w">        </span><span class="sd">"""Return a string representation of this competitor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            str: A string representation of this competitor.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;EloCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"&lt;EloCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="si">}</span><span class="s2">&gt;"</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_export_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the parameters used to initialize this competitor.</span>
+<span class="w">        </span><span class="sd">"""Export the parameters used to initialize this competitor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: A dictionary containing the initialization parameters.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">,</span>
-            <span class="s2">&quot;k_factor&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">_k_factor</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">"initial_rating"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">,</span>
+            <span class="s2">"k_factor"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">_k_factor</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_export_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the current state variables of this competitor.</span>
+<span class="w">        </span><span class="sd">"""Export the current state variables of this competitor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: A dictionary containing the current state variables.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="p">,</span>
+            <span class="s2">"rating"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="p">,</span>
         <span class="p">}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_import_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Import parameters from a state dictionary.</span>
+<span class="w">        </span><span class="sd">"""Import parameters from a state dictionary.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            parameters (dict): A dictionary containing parameters.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidParameterException: If any parameter is invalid.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Validate and set initial_rating</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Importing parameters for EloCompetitor: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
-        <span class="n">initial_rating</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Importing parameters for EloCompetitor: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+        <span class="n">initial_rating</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_rating"</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">initial_rating</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid initial_rating in state: </span><span class="si">%.1f</span><span class="s2"> (minimum </span><span class="si">%.1f</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">initial_rating</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"Invalid initial_rating in state: </span><span class="si">%.1f</span><span class="s2"> (minimum </span><span class="si">%.1f</span><span class="s2">)"</span><span class="p">,</span> <span class="n">initial_rating</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Initial rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Initial rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
 
         <span class="c1"># Validate and set k_factor</span>
-        <span class="n">k_factor</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;k_factor&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">k_factor</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"k_factor"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">k_factor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">k_factor</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">&quot;K-factor must be positive&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">"K-factor must be positive"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">=</span> <span class="n">k_factor</span> <span class="k">if</span> <span class="n">k_factor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">EloCompetitor</span><span class="o">.</span><span class="n">_k_factor</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_import_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Import current state variables from a state dictionary.</span>
+<span class="w">        </span><span class="sd">"""Import current state variables from a state dictionary.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            state (dict): A dictionary containing state variables.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidParameterException: If any state variable is invalid.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Validate and set rating</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Importing current state for EloCompetitor: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-        <span class="n">rating</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rating&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Importing current state for EloCompetitor: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="n">rating</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"rating"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">rating</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid rating in state: </span><span class="si">%.1f</span><span class="s2"> (minimum </span><span class="si">%.1f</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">rating</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"Invalid rating in state: </span><span class="si">%.1f</span><span class="s2"> (minimum </span><span class="si">%.1f</span><span class="s2">)"</span><span class="p">,</span> <span class="n">rating</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">rating</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_from_parameters</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new competitor instance from parameters.</span>
+<span class="w">        </span><span class="sd">"""Create a new competitor instance from parameters.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            parameters (dict): A dictionary containing parameters.</span>
@@ -325,21 +325,21 @@
 
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidParameterException: If any parameter is invalid.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">initial_rating</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="mi">400</span><span class="p">),</span>
-            <span class="n">k_factor</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;k_factor&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+            <span class="n">initial_rating</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_rating"</span><span class="p">,</span> <span class="mi">400</span><span class="p">),</span>
+            <span class="n">k_factor</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"k_factor"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="EloCompetitor.export_state">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.elo.EloCompetitor.export_state">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">export_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export the current state of this competitor for serialization.</span>
+<span class="w">        </span><span class="sd">"""Export the current state of this competitor for serialization.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: A dictionary containing all necessary information to recreate</span>
-<span class="sd">                 this competitor&#39;s current state.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">                 this competitor's current state.</span>
+<span class="sd">        """</span>
         <span class="c1"># Use the new standardized format</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">export_state</span><span class="p">()</span></div>
 
@@ -348,7 +348,7 @@
 <a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.elo.EloCompetitor.from_state">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_state</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new competitor from a previously exported state.</span>
+<span class="w">        </span><span class="sd">"""Create a new competitor from a previously exported state.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            state (dict): A dictionary containing the state of a competitor,</span>
@@ -359,25 +359,25 @@
 
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidParameterException: If any parameter in the state is invalid.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Validate and set initial_rating</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating EloCompetitor from state: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Creating EloCompetitor from state: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
         <span class="c1"># Handle legacy state format</span>
-        <span class="k">if</span> <span class="s2">&quot;type&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Using legacy state format for EloCompetitor.from_state&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">"type"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Using legacy state format for EloCompetitor.from_state"</span><span class="p">)</span>
             <span class="c1"># Configure class variables if provided</span>
-            <span class="k">if</span> <span class="s2">&quot;class_vars&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Applying legacy class variables: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;class_vars&quot;</span><span class="p">])</span>
-                <span class="n">class_vars</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;class_vars&quot;</span><span class="p">]</span>
-                <span class="k">if</span> <span class="s2">&quot;base_rating&quot;</span> <span class="ow">in</span> <span class="n">class_vars</span><span class="p">:</span>
-                    <span class="bp">cls</span><span class="o">.</span><span class="n">_base_rating</span> <span class="o">=</span> <span class="n">class_vars</span><span class="p">[</span><span class="s2">&quot;base_rating&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">"class_vars"</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Applying legacy class variables: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="s2">"class_vars"</span><span class="p">])</span>
+                <span class="n">class_vars</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">"class_vars"</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s2">"base_rating"</span> <span class="ow">in</span> <span class="n">class_vars</span><span class="p">:</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">_base_rating</span> <span class="o">=</span> <span class="n">class_vars</span><span class="p">[</span><span class="s2">"base_rating"</span><span class="p">]</span>
 
             <span class="c1"># Create a new competitor with the initial rating</span>
-            <span class="n">competitor</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">,</span> <span class="mi">400</span><span class="p">),</span> <span class="n">k_factor</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;k_factor&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+            <span class="n">competitor</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_rating"</span><span class="p">,</span> <span class="mi">400</span><span class="p">),</span> <span class="n">k_factor</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"k_factor"</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
 
             <span class="c1"># Set the current rating if provided</span>
-            <span class="k">if</span> <span class="s2">&quot;current_rating&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-                <span class="n">competitor</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;current_rating&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">"current_rating"</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+                <span class="n">competitor</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">"current_rating"</span><span class="p">]</span>
 
             <span class="k">return</span> <span class="n">competitor</span>
 
@@ -388,50 +388,50 @@
 <div class="viewcode-block" id="EloCompetitor.reset">
 <a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.elo.EloCompetitor.reset">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset this competitor to its initial state.</span>
+<span class="w">        </span><span class="sd">"""Reset this competitor to its initial state.</span>
 
-<span class="sd">        This method resets the competitor&#39;s rating to the initial rating.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Resetting EloCompetitor to initial state (rating=</span><span class="si">%.1f</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">)</span>
+<span class="sd">        This method resets the competitor's rating to the initial rating.</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Resetting EloCompetitor to initial state (rating=</span><span class="si">%.1f</span><span class="s2">)"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span></div>
 
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">transformed_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the transformed rating for this competitor.</span>
+<span class="w">        </span><span class="sd">"""Get the transformed rating for this competitor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            float: The transformed rating.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_rating</span><span class="p">))</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current rating of this competitor.</span>
+<span class="w">        </span><span class="sd">"""Get the current rating of this competitor.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            float: The current rating.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span>
 
     <span class="nd">@rating</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the current rating of this competitor.</span>
+<span class="w">        </span><span class="sd">"""Set the current rating of this competitor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            value (float): The new rating value.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidRatingValueException: If the rating value is below the minimum rating.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Setting rating for EloCompetitor to </span><span class="si">%.1f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Setting rating for EloCompetitor to </span><span class="si">%.1f</span><span class="s2">"</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Attempted to set rating </span><span class="si">%.1f</span><span class="s2"> below minimum </span><span class="si">%.1f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Attempted to set rating </span><span class="si">%.1f</span><span class="s2"> below minimum </span><span class="si">%.1f</span><span class="s2">"</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_new_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actual_score</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">expected_score</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate this competitor&#39;s new rating after a match.</span>
+<span class="w">        </span><span class="sd">"""Calculate this competitor's new rating after a match.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            actual_score (float): The score achieved in the match (1.0, 0.5, or 0.0).</span>
@@ -439,23 +439,23 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            float: The new rating, saturated at the minimum rating.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">new_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">*</span> <span class="p">(</span><span class="n">actual_score</span> <span class="o">-</span> <span class="n">expected_score</span><span class="p">)</span>
         <span class="n">new_rating_clamped</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">,</span> <span class="n">new_rating</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;New rating calculated: </span><span class="si">%.1f</span><span class="s2"> (Clamped: </span><span class="si">%.1f</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">new_rating</span><span class="p">,</span> <span class="n">new_rating_clamped</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"New rating calculated: </span><span class="si">%.1f</span><span class="s2"> (Clamped: </span><span class="si">%.1f</span><span class="s2">)"</span><span class="p">,</span> <span class="n">new_rating</span><span class="p">,</span> <span class="n">new_rating_clamped</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">new_rating_clamped</span><span class="p">)</span>
 
 <div class="viewcode-block" id="EloCompetitor.expected_score">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.elo.EloCompetitor.expected_score">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">&quot;BaseCompetitor&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the expected score against another competitor.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">"BaseCompetitor"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Calculate the expected score against another competitor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            competitor (BaseCompetitor): The competitor to compare against.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            float: The expected score (probability of winning).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transformed_rating</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transformed_rating</span> <span class="o">+</span> <span class="n">competitor</span><span class="o">.</span><span class="n">transformed_rating</span><span class="p">))</span></div>
 
@@ -463,7 +463,7 @@
 <div class="viewcode-block" id="EloCompetitor.beat">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.elo.EloCompetitor.beat">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has won against the given competitor.</span>
+<span class="w">        </span><span class="sd">"""Update ratings after this competitor has won against the given competitor.</span>
 
 <span class="sd">        This method updates the ratings of both this competitor and the opponent</span>
 <span class="sd">        based on the match outcome where this competitor won.</span>
@@ -475,12 +475,12 @@
 <span class="sd">                this rating system.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don't match.</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
         <span class="n">competitor_elo</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">EloCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> beat </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor_elo</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"</span><span class="si">%s</span><span class="s2"> beat </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor_elo</span><span class="p">)</span>
 
         <span class="n">win_es</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">competitor_elo</span><span class="p">)</span>
         <span class="n">lose_es</span> <span class="o">=</span> <span class="n">competitor_elo</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -495,7 +495,7 @@
 <div class="viewcode-block" id="EloCompetitor.tied">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.elo.EloCompetitor.tied">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update ratings after this competitor has tied with the given competitor.</span>
+<span class="w">        </span><span class="sd">"""Update ratings after this competitor has tied with the given competitor.</span>
 
 <span class="sd">        This method updates the ratings of both this competitor and the opponent</span>
 <span class="sd">        based on a drawn match outcome.</span>
@@ -507,12 +507,12 @@
 <span class="sd">                otherwise used by this rating system.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don&#39;t match.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don't match.</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
         <span class="n">competitor_elo</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">EloCompetitor</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> tied with </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor_elo</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"</span><span class="si">%s</span><span class="s2"> tied with </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor_elo</span><span class="p">)</span>
 
         <span class="n">win_es</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">competitor_elo</span><span class="p">)</span>
         <span class="n">lose_es</span> <span class="o">=</span> <span class="n">competitor_elo</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -558,6 +558,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/pythagorean.html">Pythagorean Expectation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/whr.html">Whole-History Rating</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/comparison.html">Comparing Rating Systems</a></li>
 </ul>

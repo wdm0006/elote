@@ -191,8 +191,8 @@ objects, one for each of 3 players in a game:</p>
 <span class="n">better_player</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1200</span><span class="p">)</span>
 <span class="n">best_player</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1200</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Starting ratings:&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">good_player</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better_player</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best_player</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Starting ratings:'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">good_player</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better_player</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best_player</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
 </pre></div>
 </div>
 <p>All we do is initialize them, and print out their starting ratings. Rating is our measure of how good we think a
@@ -205,11 +205,11 @@ competitor is with the information at hand. Here we don’t really have any info
 and one of them wins. This gives us some new information to update our ratings with. For each of the matches we simulate
 we will have <code class="docutils literal notranslate"><span class="pre">better_player</span></code> beat <code class="docutils literal notranslate"><span class="pre">good_player</span></code> or <code class="docutils literal notranslate"><span class="pre">best_player</span></code> beat <code class="docutils literal notranslate"><span class="pre">better_player</span></code>. At each iteration, we will
 print out the ratings to get an idea of how they change over time.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">After matches&#39;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">After matches'</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
     <span class="n">better_player</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">good_player</span><span class="p">)</span>
     <span class="n">best_player</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">better_player</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">good_player</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better_player</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best_player</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">, </span><span class="si">%7.2f</span><span class="s1">'</span> <span class="o">%</span> <span class="p">(</span><span class="n">good_player</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">better_player</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">best_player</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="p">))</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">After</span> <span class="n">matches</span>
@@ -265,6 +265,7 @@ docs on the competitors page.</p>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/pythagorean.html">Pythagorean Expectation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/whr.html">Whole-History Rating</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/comparison.html">Comparing Rating Systems</a></li>
 </ul>

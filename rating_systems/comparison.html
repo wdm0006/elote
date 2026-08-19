@@ -273,7 +273,14 @@
 <td><p>Yes</p></td>
 <td><p>Maximum-likelihood ranking</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Ensemble</strong></p></td>
+<tr class="row-odd"><td><p><strong>Whole-History Rating</strong></p></td>
+<td><p>Coulom (2008)</p></td>
+<td><p>High</p></td>
+<td><p>No</p></td>
+<td><p>Yes</p></td>
+<td><p>Time-varying strength curves</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Ensemble</strong></p></td>
 <td><p>Meta-system</p></td>
 <td><p>High</p></td>
 <td><p>Depends on components</p></td>
@@ -284,7 +291,7 @@
 </table>
 <p>Online systems (Elo, Glicko, Glicko-2, TrueSkill, ECF, DWZ, Pythagorean) update ratings
 incrementally after each result. Global-fit systems (Colley Matrix, Massey, Keener and
-Bradley-Terry) re-solve the whole connected group of competitors from the full set of results,
+Bradley-Terry and Whole-History Rating) fit the whole connected group from the full set of results,
 which makes them order independent. Pythagorean is order independent too, for a different reason:
 its state is a running sum of points that ignores the opponent graph entirely. Massey, Keener and
 Pythagorean are the three that read the optional score payload; the rest use only who beat whom.</p>
@@ -335,7 +342,10 @@ Pythagorean are the three that read the optional score payload; the rest use onl
 <tr class="row-even"><td><p><strong>Bradley-Terry</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(P(A \text{ beats } B) = \frac{p_A}{p_A + p_B} = \frac{1}{1 + e^{-(\beta_A - \beta_B)}}\)</span></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Ensemble</strong></p></td>
+<tr class="row-odd"><td><p><strong>Whole-History Rating</strong></p></td>
+<td><p>Bradley-Terry likelihood per game plus <span class="math notranslate nohighlight">\(r_{t+1}-r_t \sim N(0, w^2\Delta t)\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Ensemble</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(E_{ensemble} = \sum_{i=1}^{n} w_i \times E_i\)</span> where <span class="math notranslate nohighlight">\(w_i\)</span> are weights</p></td>
 </tr>
 </tbody>
@@ -387,7 +397,10 @@ Pythagorean are the three that read the optional score payload; the rest use onl
 <tr class="row-even"><td><p><strong>Bradley-Terry</strong></p></td>
 <td><p>Initial rating, Scale, Regularization, Max iterations</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Ensemble</strong></p></td>
+<tr class="row-odd"><td><p><strong>Whole-History Rating</strong></p></td>
+<td><p>Per-day variance (w2), Initial rating, Max iterations, Precision</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Ensemble</strong></p></td>
 <td><p>Component systems, Weights</p></td>
 </tr>
 </tbody>
@@ -541,6 +554,19 @@ Pythagorean are the three that read the optional score payload; the rest use onl
 - The match graph cannot be serialized (only aggregate counts)
 - More expensive than Elo for very large populations</p>
 </section>
+<section id="whole-history-rating">
+<h3>Whole-History Rating<a class="headerlink" href="#whole-history-rating" title="Link to this heading">¶</a></h3>
+<p><strong>Strengths:</strong>
+- Estimates a queryable rating curve rather than one lifetime strength
+- Later evidence revises earlier ratings
+- Time gaps explicitly control how freely strength can move
+- Lazy, bounded fitting avoids optimizing after every result</p>
+<p><strong>Weaknesses:</strong>
+- More computationally expensive than a single-rating model
+- Requires meaningful timestamps for the time curve
+- The opponent graph cannot be serialized; continued play starts a fresh history
+- Provides no separate uncertainty estimate</p>
+</section>
 <section id="ensemble">
 <h3>Ensemble<a class="headerlink" href="#ensemble" title="Link to this heading">¶</a></h3>
 <p><strong>Strengths:</strong>
@@ -569,7 +595,8 @@ Pythagorean are the three that read the optional score payload; the rest use onl
 - Team and multiplayer games: TrueSkill
 - General purpose: Elo or Glicko</p></li>
 <li><p><strong>Order Independence</strong>: Do you need a ranking that ignores schedule order?
-- Yes: Colley Matrix, Massey, Keener, Bradley-Terry, or Pythagorean
+- Yes: Colley Matrix, Massey, Keener, Bradley-Terry, Whole-History Rating, or Pythagorean
+- Yes, and historical strength matters: Whole-History Rating
 - Yes, and you have real scores: Massey (linear margin), Keener (bounded score share), or</p>
 <blockquote>
 <div><p>Pythagorean (points ratio, no strength of schedule)</p>
@@ -604,6 +631,7 @@ Pythagorean are the three that read the optional score payload; the rest use onl
     <span class="n">KeenerCompetitor</span><span class="p">,</span>
     <span class="n">PythagoreanCompetitor</span><span class="p">,</span>
     <span class="n">BradleyTerryCompetitor</span><span class="p">,</span>
+    <span class="n">WholeHistoryRatingCompetitor</span><span class="p">,</span>
     <span class="n">BlendedCompetitor</span><span class="p">,</span>
 <span class="p">)</span>
 
@@ -640,18 +668,21 @@ Pythagorean are the three that read the optional score payload; the rest use onl
 <span class="c1"># Bradley-Terry (Elo-compatible scale)</span>
 <span class="n">bt_player</span> <span class="o">=</span> <span class="n">BradleyTerryCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
 
+<span class="c1"># Whole-History Rating (time-aware Elo-compatible curve)</span>
+<span class="n">whr_player</span> <span class="o">=</span> <span class="n">WholeHistoryRatingCompetitor</span><span class="p">(</span><span class="n">w2</span><span class="o">=</span><span class="mf">300.0</span><span class="p">)</span>
+
 <span class="c1"># Ensemble (blend of sub-competitors)</span>
 <span class="n">ensemble_player</span> <span class="o">=</span> <span class="n">BlendedCompetitor</span><span class="p">(</span>
     <span class="n">competitors</span><span class="o">=</span><span class="p">[</span>
-        <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;EloCompetitor&quot;</span><span class="p">,</span> <span class="s2">&quot;competitor_kwargs&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1500</span><span class="p">}},</span>
-        <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;GlickoCompetitor&quot;</span><span class="p">,</span> <span class="s2">&quot;competitor_kwargs&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;initial_rating&quot;</span><span class="p">:</span> <span class="mi">1500</span><span class="p">}},</span>
+        <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"EloCompetitor"</span><span class="p">,</span> <span class="s2">"competitor_kwargs"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"initial_rating"</span><span class="p">:</span> <span class="mi">1500</span><span class="p">}},</span>
+        <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"GlickoCompetitor"</span><span class="p">,</span> <span class="s2">"competitor_kwargs"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"initial_rating"</span><span class="p">:</span> <span class="mi">1500</span><span class="p">}},</span>
     <span class="p">]</span>
 <span class="p">)</span>
 
 <span class="c1"># Usage is the same for all systems: expected_score, beat, tied, lost_to</span>
 <span class="n">player</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
 <span class="n">opponent</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1400</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected score: </span><span class="si">{</span><span class="n">player</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Expected score: </span><span class="si">{</span><span class="n">player</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="n">player</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">opponent</span><span class="p">)</span>  <span class="c1"># record a win</span>
 
 <span class="c1"># Score-based systems additionally accept the optional scores payload</span>
@@ -710,6 +741,7 @@ Pythagorean are the three that read the optional score payload; the rest use onl
 <li class="toctree-l1"><a class="reference internal" href="keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pythagorean.html">Pythagorean Expectation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="whr.html">Whole-History Rating</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Comparing Rating Systems</a></li>
 </ul>

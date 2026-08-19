@@ -227,13 +227,13 @@ every single game.</p></li>
 <span class="n">player2</span> <span class="o">=</span> <span class="n">Glicko2Competitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1700</span><span class="p">,</span> <span class="n">initial_rd</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
 
 <span class="c1"># Get win probability</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 2 win probability: </span><span class="si">{</span><span class="n">player2</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player1</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Player 2 win probability: </span><span class="si">{</span><span class="n">player2</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player1</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Record a match result (an optional match_time can be supplied)</span>
 <span class="n">player1</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">player2</span><span class="p">)</span>
 
 <span class="c1"># Rating, RD, and volatility are all updated</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player 1: rating=</span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">, rd=</span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">rd</span><span class="si">}</span><span class="s2">, vol=</span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">volatility</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Player 1: rating=</span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">rating</span><span class="si">}</span><span class="s2">, rd=</span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">rd</span><span class="si">}</span><span class="s2">, vol=</span><span class="si">{</span><span class="n">player1</span><span class="o">.</span><span class="n">volatility</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -306,6 +306,7 @@ Applied Statistics, 48, 377-394.</p></li>
 <li class="toctree-l1"><a class="reference internal" href="keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pythagorean.html">Pythagorean Expectation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="whr.html">Whole-History Rating</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="comparison.html">Comparing Rating Systems</a></li>
 </ul>

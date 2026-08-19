@@ -219,7 +219,7 @@ more than a 7-6 win: the margin a game contributes is <code class="docutils lite
 <span class="n">team_a</span><span class="p">,</span> <span class="n">team_b</span> <span class="o">=</span> <span class="n">MasseyCompetitor</span><span class="p">(),</span> <span class="n">MasseyCompetitor</span><span class="p">()</span>
 
 <span class="n">team_a</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">team_b</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>          <span class="c1"># +32 for A, -32 for B</span>
-<span class="c1"># The same game recorded from the loser&#39;s side -- scores stay in caller order:</span>
+<span class="c1"># The same game recorded from the loser's side -- scores stay in caller order:</span>
 <span class="c1"># team_b.lost_to(team_a, scores=(3, 35))</span>
 </pre></div>
 </div>
@@ -228,8 +228,8 @@ with an explicit <code class="docutils literal notranslate"><span class="pre">ou
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">LambdaArena</span><span class="p">,</span> <span class="n">MasseyCompetitor</span>
 
 <span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">MasseyCompetitor</span><span class="p">)</span>
-<span class="n">arena</span><span class="o">.</span><span class="n">matchup</span><span class="p">(</span><span class="s2">&quot;Team A&quot;</span><span class="p">,</span> <span class="s2">&quot;Team B&quot;</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-<span class="n">arena</span><span class="o">.</span><span class="n">matchup</span><span class="p">(</span><span class="s2">&quot;Team A&quot;</span><span class="p">,</span> <span class="s2">&quot;Team C&quot;</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">24</span><span class="p">))</span>   <span class="c1"># C won, order unchanged</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">matchup</span><span class="p">(</span><span class="s2">"Team A"</span><span class="p">,</span> <span class="s2">"Team B"</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">matchup</span><span class="p">(</span><span class="s2">"Team A"</span><span class="p">,</span> <span class="s2">"Team C"</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">24</span><span class="p">))</span>   <span class="c1"># C won, order unchanged</span>
 </pre></div>
 </div>
 <p>When <code class="docutils literal notranslate"><span class="pre">scores</span></code> is omitted the implementation falls back to <strong>unit margins</strong>: a win contributes
@@ -274,16 +274,16 @@ are rated independently of one another.</p></li>
 <span class="n">team_c</span> <span class="o">=</span> <span class="n">MasseyCompetitor</span><span class="p">()</span>
 
 <span class="c1"># Get win probability</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Team A win probability: </span><span class="si">{</span><span class="n">team_a</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">team_b</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Team A win probability: </span><span class="si">{</span><span class="n">team_a</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">team_b</span><span class="p">)</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Record results; the whole connected group is re-solved after each one</span>
 <span class="n">team_a</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">team_b</span><span class="p">)</span>
 <span class="n">team_a</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">team_c</span><span class="p">)</span>
 <span class="n">team_b</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">team_c</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Team A: </span><span class="si">{</span><span class="n">team_a</span><span class="o">.</span><span class="n">rating</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>   <span class="c1"># 0.667</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Team B: </span><span class="si">{</span><span class="n">team_b</span><span class="o">.</span><span class="n">rating</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>   <span class="c1"># 0.000</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Team C: </span><span class="si">{</span><span class="n">team_c</span><span class="o">.</span><span class="n">rating</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>   <span class="c1"># -0.667</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Team A: </span><span class="si">{</span><span class="n">team_a</span><span class="o">.</span><span class="n">rating</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>   <span class="c1"># 0.667</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Team B: </span><span class="si">{</span><span class="n">team_b</span><span class="o">.</span><span class="n">rating</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>   <span class="c1"># 0.000</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Team C: </span><span class="si">{</span><span class="n">team_c</span><span class="o">.</span><span class="n">rating</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>   <span class="c1"># -0.667</span>
 </pre></div>
 </div>
 </section>
@@ -348,6 +348,7 @@ chapter 2. Princeton University Press.</p></li>
 <li class="toctree-l1"><a class="reference internal" href="keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pythagorean.html">Pythagorean Expectation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="whr.html">Whole-History Rating</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="comparison.html">Comparing Rating Systems</a></li>
 </ul>

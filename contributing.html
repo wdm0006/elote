@@ -190,10 +190,10 @@
 make<span class="w"> </span>install-dev
 
 <span class="c1"># Or using pip</span>
-pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[dev]"</span>
 
 <span class="c1"># Or using uv</span>
-uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev]&quot;</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[dev]"</span>
 </pre></div>
 </div>
 </li>
@@ -243,9 +243,9 @@ make<span class="w"> </span>format
 </li>
 <li><p><strong>Commit Your Changes</strong></p>
 <p>Follow the conventional commits format for your commit messages:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;feat: add new feature&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"feat: add new feature"</span>
 <span class="c1"># or</span>
-git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;fix: resolve issue with X&quot;</span>
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"fix: resolve issue with X"</span>
 </pre></div>
 </div>
 </li>
@@ -293,7 +293,7 @@ git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </sp
         <span class="c1"># Initialize other parameters</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Calculate the expected score (probability of winning) against another competitor.</span>
 
 <span class="sd">        Args:</span>
@@ -301,18 +301,18 @@ git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </sp
 
 <span class="sd">        Returns:</span>
 <span class="sd">            float: The probability of winning (between 0 and 1)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Implement the expected score calculation</span>
         <span class="k">pass</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">update_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">,</span> <span class="n">score</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Update the rating based on a match result.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            competitor: The opponent NewRatingCompetitor</span>
 <span class="sd">            score: The actual score (1 for win, 0.5 for draw, 0 for loss)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># Implement the rating update logic</span>
         <span class="k">pass</span>
 </pre></div>
@@ -414,6 +414,7 @@ make<span class="w"> </span>test-cov
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/pythagorean.html">Pythagorean Expectation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/whr.html">Whole-History Rating</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/comparison.html">Comparing Rating Systems</a></li>
 </ul>

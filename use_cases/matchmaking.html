@@ -201,84 +201,84 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">players</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">register_player</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">,</span> <span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register a new player in the matchmaking system&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Register a new player in the matchmaking system"""</span>
         <span class="k">if</span> <span class="n">player_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">player_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s1">&#39;competitor&#39;</span><span class="p">:</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">initial_rating</span><span class="p">),</span>
-                <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">player_id</span><span class="p">,</span>
-                <span class="s1">&#39;matches_played&#39;</span><span class="p">:</span> <span class="mi">0</span>
+                <span class="s1">'competitor'</span><span class="p">:</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">initial_rating</span><span class="p">),</span>
+                <span class="s1">'id'</span><span class="p">:</span> <span class="n">player_id</span><span class="p">,</span>
+                <span class="s1">'matches_played'</span><span class="p">:</span> <span class="mi">0</span>
             <span class="p">}</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">player_id</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">find_match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">,</span> <span class="n">max_rating_diff</span><span class="o">=</span><span class="mi">200</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find a suitable opponent for a player&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Find a suitable opponent for a player"""</span>
         <span class="k">if</span> <span class="n">player_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">register_player</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span>
 
         <span class="n">player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">player_id</span><span class="p">]</span>
-        <span class="n">player_rating</span> <span class="o">=</span> <span class="n">player</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span>
+        <span class="n">player_rating</span> <span class="o">=</span> <span class="n">player</span><span class="p">[</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span>
 
         <span class="c1"># Filter players within rating range</span>
         <span class="n">candidates</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">p</span> <span class="k">for</span> <span class="n">pid</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">pid</span> <span class="o">!=</span> <span class="n">player_id</span> <span class="ow">and</span>
-            <span class="nb">abs</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span> <span class="o">-</span> <span class="n">player_rating</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">max_rating_diff</span>
+            <span class="nb">abs</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span> <span class="o">-</span> <span class="n">player_rating</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">max_rating_diff</span>
         <span class="p">]</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">candidates</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># No suitable match found</span>
 
         <span class="c1"># Sort by rating difference (ascending)</span>
-        <span class="n">candidates</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span> <span class="o">-</span> <span class="n">player_rating</span><span class="p">))</span>
+        <span class="n">candidates</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span> <span class="o">-</span> <span class="n">player_rating</span><span class="p">))</span>
 
         <span class="c1"># Return the best match</span>
-        <span class="k">return</span> <span class="n">candidates</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">candidates</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">'id'</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">record_match_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">winner_id</span><span class="p">,</span> <span class="n">loser_id</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record the result of a match&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Record the result of a match"""</span>
         <span class="k">if</span> <span class="n">winner_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">register_player</span><span class="p">(</span><span class="n">winner_id</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">loser_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">register_player</span><span class="p">(</span><span class="n">loser_id</span><span class="p">)</span>
 
         <span class="c1"># Update ratings</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">winner_id</span><span class="p">][</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">loser_id</span><span class="p">][</span><span class="s1">&#39;competitor&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">winner_id</span><span class="p">][</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">loser_id</span><span class="p">][</span><span class="s1">'competitor'</span><span class="p">])</span>
 
         <span class="c1"># Update match counts</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">winner_id</span><span class="p">][</span><span class="s1">&#39;matches_played&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">loser_id</span><span class="p">][</span><span class="s1">&#39;matches_played&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">winner_id</span><span class="p">][</span><span class="s1">'matches_played'</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">loser_id</span><span class="p">][</span><span class="s1">'matches_played'</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">get_player_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get stats for a player&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Get stats for a player"""</span>
         <span class="k">if</span> <span class="n">player_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="n">player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">player_id</span><span class="p">]</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">player_id</span><span class="p">,</span>
-            <span class="s1">&#39;rating&#39;</span><span class="p">:</span> <span class="n">player</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span>
-            <span class="s1">&#39;matches_played&#39;</span><span class="p">:</span> <span class="n">player</span><span class="p">[</span><span class="s1">&#39;matches_played&#39;</span><span class="p">]</span>
+            <span class="s1">'id'</span><span class="p">:</span> <span class="n">player_id</span><span class="p">,</span>
+            <span class="s1">'rating'</span><span class="p">:</span> <span class="n">player</span><span class="p">[</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span>
+            <span class="s1">'matches_played'</span><span class="p">:</span> <span class="n">player</span><span class="p">[</span><span class="s1">'matches_played'</span><span class="p">]</span>
         <span class="p">}</span>
 
 <span class="c1"># Usage example</span>
 <span class="n">matchmaker</span> <span class="o">=</span> <span class="n">MatchmakingSystem</span><span class="p">()</span>
 
 <span class="c1"># Register some players</span>
-<span class="n">matchmaker</span><span class="o">.</span><span class="n">register_player</span><span class="p">(</span><span class="s2">&quot;player1&quot;</span><span class="p">,</span> <span class="mi">1600</span><span class="p">)</span>
-<span class="n">matchmaker</span><span class="o">.</span><span class="n">register_player</span><span class="p">(</span><span class="s2">&quot;player2&quot;</span><span class="p">,</span> <span class="mi">1550</span><span class="p">)</span>
-<span class="n">matchmaker</span><span class="o">.</span><span class="n">register_player</span><span class="p">(</span><span class="s2">&quot;player3&quot;</span><span class="p">,</span> <span class="mi">1700</span><span class="p">)</span>
-<span class="n">matchmaker</span><span class="o">.</span><span class="n">register_player</span><span class="p">(</span><span class="s2">&quot;player4&quot;</span><span class="p">,</span> <span class="mi">1400</span><span class="p">)</span>
+<span class="n">matchmaker</span><span class="o">.</span><span class="n">register_player</span><span class="p">(</span><span class="s2">"player1"</span><span class="p">,</span> <span class="mi">1600</span><span class="p">)</span>
+<span class="n">matchmaker</span><span class="o">.</span><span class="n">register_player</span><span class="p">(</span><span class="s2">"player2"</span><span class="p">,</span> <span class="mi">1550</span><span class="p">)</span>
+<span class="n">matchmaker</span><span class="o">.</span><span class="n">register_player</span><span class="p">(</span><span class="s2">"player3"</span><span class="p">,</span> <span class="mi">1700</span><span class="p">)</span>
+<span class="n">matchmaker</span><span class="o">.</span><span class="n">register_player</span><span class="p">(</span><span class="s2">"player4"</span><span class="p">,</span> <span class="mi">1400</span><span class="p">)</span>
 
 <span class="c1"># Find a match for player1</span>
-<span class="n">opponent_id</span> <span class="o">=</span> <span class="n">matchmaker</span><span class="o">.</span><span class="n">find_match</span><span class="p">(</span><span class="s2">&quot;player1&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found match: player1 vs </span><span class="si">{</span><span class="n">opponent_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">opponent_id</span> <span class="o">=</span> <span class="n">matchmaker</span><span class="o">.</span><span class="n">find_match</span><span class="p">(</span><span class="s2">"player1"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Found match: player1 vs </span><span class="si">{</span><span class="n">opponent_id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Record match result</span>
-<span class="n">matchmaker</span><span class="o">.</span><span class="n">record_match_result</span><span class="p">(</span><span class="s2">&quot;player1&quot;</span><span class="p">,</span> <span class="n">opponent_id</span><span class="p">)</span>
+<span class="n">matchmaker</span><span class="o">.</span><span class="n">record_match_result</span><span class="p">(</span><span class="s2">"player1"</span><span class="p">,</span> <span class="n">opponent_id</span><span class="p">)</span>
 
 <span class="c1"># Check updated ratings</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player1 rating: </span><span class="si">{</span><span class="n">matchmaker</span><span class="o">.</span><span class="n">get_player_stats</span><span class="p">(</span><span class="s1">&#39;player1&#39;</span><span class="p">)[</span><span class="s1">&#39;rating&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Opponent rating: </span><span class="si">{</span><span class="n">matchmaker</span><span class="o">.</span><span class="n">get_player_stats</span><span class="p">(</span><span class="n">opponent_id</span><span class="p">)[</span><span class="s1">&#39;rating&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Player1 rating: </span><span class="si">{</span><span class="n">matchmaker</span><span class="o">.</span><span class="n">get_player_stats</span><span class="p">(</span><span class="s1">'player1'</span><span class="p">)[</span><span class="s1">'rating'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Opponent rating: </span><span class="si">{</span><span class="n">matchmaker</span><span class="o">.</span><span class="n">get_player_stats</span><span class="p">(</span><span class="n">opponent_id</span><span class="p">)[</span><span class="s1">'rating'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -294,26 +294,26 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">players</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">register_player</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">,</span> <span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">initial_rd</span><span class="o">=</span><span class="mi">350</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register a new player with Glicko rating&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Register a new player with Glicko rating"""</span>
         <span class="k">if</span> <span class="n">player_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">player_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s1">&#39;competitor&#39;</span><span class="p">:</span> <span class="n">GlickoCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">initial_rating</span><span class="p">,</span> <span class="n">initial_rd</span><span class="o">=</span><span class="n">initial_rd</span><span class="p">),</span>
-                <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">player_id</span><span class="p">,</span>
-                <span class="s1">&#39;matches_played&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="s1">&#39;last_active&#39;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="s1">'competitor'</span><span class="p">:</span> <span class="n">GlickoCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">initial_rating</span><span class="p">,</span> <span class="n">initial_rd</span><span class="o">=</span><span class="n">initial_rd</span><span class="p">),</span>
+                <span class="s1">'id'</span><span class="p">:</span> <span class="n">player_id</span><span class="p">,</span>
+                <span class="s1">'matches_played'</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s1">'last_active'</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
             <span class="p">}</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">player_id</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">find_match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">,</span> <span class="n">max_rating_diff</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">consider_rd</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find a match considering both rating and rating deviation&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Find a match considering both rating and rating deviation"""</span>
         <span class="k">if</span> <span class="n">player_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">register_player</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span>
 
         <span class="n">player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">player_id</span><span class="p">]</span>
-        <span class="n">player_rating</span> <span class="o">=</span> <span class="n">player</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span>
-        <span class="n">player_rd</span> <span class="o">=</span> <span class="n">player</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rd</span>
+        <span class="n">player_rating</span> <span class="o">=</span> <span class="n">player</span><span class="p">[</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span>
+        <span class="n">player_rd</span> <span class="o">=</span> <span class="n">player</span><span class="p">[</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">rd</span>
 
-        <span class="c1"># Update all players&#39; RD based on inactivity</span>
+        <span class="c1"># Update all players' RD based on inactivity</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_inactive_players</span><span class="p">()</span>
 
         <span class="n">candidates</span> <span class="o">=</span> <span class="p">[]</span>
@@ -322,15 +322,15 @@
                 <span class="k">continue</span>
 
             <span class="c1"># Basic rating difference check</span>
-            <span class="n">rating_diff</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span> <span class="o">-</span> <span class="n">player_rating</span><span class="p">)</span>
+            <span class="n">rating_diff</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span> <span class="o">-</span> <span class="n">player_rating</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">rating_diff</span> <span class="o">&gt;</span> <span class="n">max_rating_diff</span><span class="p">:</span>
                 <span class="k">continue</span>
 
             <span class="c1"># Calculate match quality score (lower is better)</span>
             <span class="k">if</span> <span class="n">consider_rd</span><span class="p">:</span>
                 <span class="c1"># Consider both rating difference and uncertainty</span>
-                <span class="c1"># Higher RD means we&#39;re less certain about the rating</span>
-                <span class="n">combined_rd</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">player_rd</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rd</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="c1"># Higher RD means we're less certain about the rating</span>
+                <span class="n">combined_rd</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">player_rd</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">rd</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
                 <span class="n">match_quality</span> <span class="o">=</span> <span class="n">rating_diff</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">combined_rd</span><span class="o">/</span><span class="mi">100</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">match_quality</span> <span class="o">=</span> <span class="n">rating_diff</span>
@@ -347,47 +347,47 @@
         <span class="k">return</span> <span class="n">candidates</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_update_inactive_players</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update RD for inactive players&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Update RD for inactive players"""</span>
         <span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">player_id</span><span class="p">,</span> <span class="n">player</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="c1"># Calculate days since last activity</span>
-            <span class="n">days_inactive</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_time</span> <span class="o">-</span> <span class="n">player</span><span class="p">[</span><span class="s1">&#39;last_active&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">24</span><span class="p">)</span>
+            <span class="n">days_inactive</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_time</span> <span class="o">-</span> <span class="n">player</span><span class="p">[</span><span class="s1">'last_active'</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">24</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">days_inactive</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="c1"># Increase RD based on inactivity (simplified)</span>
-                <span class="c1"># In a real system, you&#39;d use the proper Glicko formula</span>
-                <span class="n">player</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+                <span class="c1"># In a real system, you'd use the proper Glicko formula</span>
+                <span class="n">player</span><span class="p">[</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
                     <span class="mi">350</span><span class="p">,</span>  <span class="c1"># Max RD</span>
-                    <span class="n">player</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rd</span> <span class="o">+</span> <span class="p">(</span><span class="n">days_inactive</span> <span class="o">*</span> <span class="mi">5</span><span class="p">)</span>  <span class="c1"># Increase by 5 per day</span>
+                    <span class="n">player</span><span class="p">[</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">rd</span> <span class="o">+</span> <span class="p">(</span><span class="n">days_inactive</span> <span class="o">*</span> <span class="mi">5</span><span class="p">)</span>  <span class="c1"># Increase by 5 per day</span>
                 <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">record_match_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">winner_id</span><span class="p">,</span> <span class="n">loser_id</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record match result and update ratings&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Record match result and update ratings"""</span>
         <span class="k">if</span> <span class="n">winner_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">register_player</span><span class="p">(</span><span class="n">winner_id</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">loser_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">register_player</span><span class="p">(</span><span class="n">loser_id</span><span class="p">)</span>
 
         <span class="c1"># Update ratings</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">winner_id</span><span class="p">][</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">loser_id</span><span class="p">][</span><span class="s1">&#39;competitor&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">winner_id</span><span class="p">][</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">loser_id</span><span class="p">][</span><span class="s1">'competitor'</span><span class="p">])</span>
 
         <span class="c1"># Update match counts and activity time</span>
         <span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">player_id</span> <span class="ow">in</span> <span class="p">[</span><span class="n">winner_id</span><span class="p">,</span> <span class="n">loser_id</span><span class="p">]:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">player_id</span><span class="p">][</span><span class="s1">&#39;matches_played&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">player_id</span><span class="p">][</span><span class="s1">&#39;last_active&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_time</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">player_id</span><span class="p">][</span><span class="s1">'matches_played'</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">player_id</span><span class="p">][</span><span class="s1">'last_active'</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_time</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">get_player_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get detailed stats for a player&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Get detailed stats for a player"""</span>
         <span class="k">if</span> <span class="n">player_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="n">player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">player_id</span><span class="p">]</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">player_id</span><span class="p">,</span>
-            <span class="s1">&#39;rating&#39;</span><span class="p">:</span> <span class="n">player</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span>
-            <span class="s1">&#39;rating_deviation&#39;</span><span class="p">:</span> <span class="n">player</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rd</span><span class="p">,</span>
-            <span class="s1">&#39;matches_played&#39;</span><span class="p">:</span> <span class="n">player</span><span class="p">[</span><span class="s1">&#39;matches_played&#39;</span><span class="p">],</span>
-            <span class="s1">&#39;last_active&#39;</span><span class="p">:</span> <span class="n">player</span><span class="p">[</span><span class="s1">&#39;last_active&#39;</span><span class="p">]</span>
+            <span class="s1">'id'</span><span class="p">:</span> <span class="n">player_id</span><span class="p">,</span>
+            <span class="s1">'rating'</span><span class="p">:</span> <span class="n">player</span><span class="p">[</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span>
+            <span class="s1">'rating_deviation'</span><span class="p">:</span> <span class="n">player</span><span class="p">[</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">rd</span><span class="p">,</span>
+            <span class="s1">'matches_played'</span><span class="p">:</span> <span class="n">player</span><span class="p">[</span><span class="s1">'matches_played'</span><span class="p">],</span>
+            <span class="s1">'last_active'</span><span class="p">:</span> <span class="n">player</span><span class="p">[</span><span class="s1">'last_active'</span><span class="p">]</span>
         <span class="p">}</span>
 </pre></div>
 </div>
@@ -405,17 +405,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">teams</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">register_player</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">,</span> <span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register an individual player&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Register an individual player"""</span>
         <span class="k">if</span> <span class="n">player_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">player_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s1">&#39;competitor&#39;</span><span class="p">:</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">initial_rating</span><span class="p">),</span>
-                <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">player_id</span><span class="p">,</span>
-                <span class="s1">&#39;matches_played&#39;</span><span class="p">:</span> <span class="mi">0</span>
+                <span class="s1">'competitor'</span><span class="p">:</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="n">initial_rating</span><span class="p">),</span>
+                <span class="s1">'id'</span><span class="p">:</span> <span class="n">player_id</span><span class="p">,</span>
+                <span class="s1">'matches_played'</span><span class="p">:</span> <span class="mi">0</span>
             <span class="p">}</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">player_id</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">register_team</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">team_id</span><span class="p">,</span> <span class="n">player_ids</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register a team with its players&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Register a team with its players"""</span>
         <span class="k">if</span> <span class="n">team_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">teams</span><span class="p">:</span>
             <span class="c1"># Ensure all players are registered</span>
             <span class="k">for</span> <span class="n">player_id</span> <span class="ow">in</span> <span class="n">player_ids</span><span class="p">:</span>
@@ -424,74 +424,74 @@
 
             <span class="c1"># Create team</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">teams</span><span class="p">[</span><span class="n">team_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">team_id</span><span class="p">,</span>
-                <span class="s1">&#39;player_ids&#39;</span><span class="p">:</span> <span class="n">player_ids</span><span class="p">,</span>
-                <span class="s1">&#39;matches_played&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="s1">&#39;competitor&#39;</span><span class="p">:</span> <span class="n">EloCompetitor</span><span class="p">(</span>
+                <span class="s1">'id'</span><span class="p">:</span> <span class="n">team_id</span><span class="p">,</span>
+                <span class="s1">'player_ids'</span><span class="p">:</span> <span class="n">player_ids</span><span class="p">,</span>
+                <span class="s1">'matches_played'</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s1">'competitor'</span><span class="p">:</span> <span class="n">EloCompetitor</span><span class="p">(</span>
                     <span class="n">initial_rating</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_calculate_team_rating</span><span class="p">(</span><span class="n">player_ids</span><span class="p">)</span>
                 <span class="p">)</span>
             <span class="p">}</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">teams</span><span class="p">[</span><span class="n">team_id</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_team_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_ids</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate a team&#39;s rating based on player ratings&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Calculate a team's rating based on player ratings"""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">player_ids</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">1500</span>
 
-        <span class="n">ratings</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span> <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">player_ids</span><span class="p">]</span>
+        <span class="n">ratings</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span> <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">player_ids</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">statistics</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">ratings</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">find_team_match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">team_id</span><span class="p">,</span> <span class="n">max_rating_diff</span><span class="o">=</span><span class="mi">200</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find a suitable opponent team&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Find a suitable opponent team"""</span>
         <span class="k">if</span> <span class="n">team_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">teams</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="n">team</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">teams</span><span class="p">[</span><span class="n">team_id</span><span class="p">]</span>
-        <span class="n">team_rating</span> <span class="o">=</span> <span class="n">team</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span>
+        <span class="n">team_rating</span> <span class="o">=</span> <span class="n">team</span><span class="p">[</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span>
 
         <span class="c1"># Filter teams within rating range</span>
         <span class="n">candidates</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">t</span> <span class="k">for</span> <span class="n">tid</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">teams</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">tid</span> <span class="o">!=</span> <span class="n">team_id</span> <span class="ow">and</span>
-            <span class="nb">abs</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span> <span class="o">-</span> <span class="n">team_rating</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">max_rating_diff</span>
+            <span class="nb">abs</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span> <span class="o">-</span> <span class="n">team_rating</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">max_rating_diff</span>
         <span class="p">]</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">candidates</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="c1"># Sort by rating difference</span>
-        <span class="n">candidates</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span> <span class="o">-</span> <span class="n">team_rating</span><span class="p">))</span>
+        <span class="n">candidates</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span> <span class="o">-</span> <span class="n">team_rating</span><span class="p">))</span>
 
         <span class="c1"># Return the best match</span>
-        <span class="k">return</span> <span class="n">candidates</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">candidates</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">'id'</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">record_team_match_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">winner_team_id</span><span class="p">,</span> <span class="n">loser_team_id</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record the result of a team match&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Record the result of a team match"""</span>
         <span class="k">if</span> <span class="n">winner_team_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">teams</span> <span class="ow">or</span> <span class="n">loser_team_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">teams</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
 
         <span class="c1"># Update team ratings</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">teams</span><span class="p">[</span><span class="n">winner_team_id</span><span class="p">][</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">teams</span><span class="p">[</span><span class="n">loser_team_id</span><span class="p">][</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">teams</span><span class="p">[</span><span class="n">winner_team_id</span><span class="p">][</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">teams</span><span class="p">[</span><span class="n">loser_team_id</span><span class="p">][</span><span class="s1">'competitor'</span><span class="p">]</span>
         <span class="p">)</span>
 
         <span class="c1"># Update match counts</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">teams</span><span class="p">[</span><span class="n">winner_team_id</span><span class="p">][</span><span class="s1">&#39;matches_played&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">teams</span><span class="p">[</span><span class="n">loser_team_id</span><span class="p">][</span><span class="s1">&#39;matches_played&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">teams</span><span class="p">[</span><span class="n">winner_team_id</span><span class="p">][</span><span class="s1">'matches_played'</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">teams</span><span class="p">[</span><span class="n">loser_team_id</span><span class="p">][</span><span class="s1">'matches_played'</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="c1"># Also update individual player ratings based on their contribution</span>
         <span class="c1"># This is a simplified approach - real systems would consider individual performance</span>
-        <span class="k">for</span> <span class="n">player_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">teams</span><span class="p">[</span><span class="n">winner_team_id</span><span class="p">][</span><span class="s1">&#39;player_ids&#39;</span><span class="p">]:</span>
-            <span class="k">for</span> <span class="n">opponent_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">teams</span><span class="p">[</span><span class="n">loser_team_id</span><span class="p">][</span><span class="s1">&#39;player_ids&#39;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">player_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">teams</span><span class="p">[</span><span class="n">winner_team_id</span><span class="p">][</span><span class="s1">'player_ids'</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">opponent_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">teams</span><span class="p">[</span><span class="n">loser_team_id</span><span class="p">][</span><span class="s1">'player_ids'</span><span class="p">]:</span>
                 <span class="c1"># Reduce the K-factor effect for team games</span>
-                <span class="n">k_factor_original</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">player_id</span><span class="p">][</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">k_factor</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">player_id</span><span class="p">][</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">k_factor</span> <span class="o">=</span> <span class="n">k_factor_original</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">teams</span><span class="p">[</span><span class="n">winner_team_id</span><span class="p">][</span><span class="s1">&#39;player_ids&#39;</span><span class="p">])</span>
+                <span class="n">k_factor_original</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">player_id</span><span class="p">][</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">k_factor</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">player_id</span><span class="p">][</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">k_factor</span> <span class="o">=</span> <span class="n">k_factor_original</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">teams</span><span class="p">[</span><span class="n">winner_team_id</span><span class="p">][</span><span class="s1">'player_ids'</span><span class="p">])</span>
 
                 <span class="c1"># Update rating</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">player_id</span><span class="p">][</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">opponent_id</span><span class="p">][</span><span class="s1">&#39;competitor&#39;</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">player_id</span><span class="p">][</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">opponent_id</span><span class="p">][</span><span class="s1">'competitor'</span><span class="p">])</span>
 
                 <span class="c1"># Restore K-factor</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">player_id</span><span class="p">][</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">k_factor</span> <span class="o">=</span> <span class="n">k_factor_original</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">player_id</span><span class="p">][</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">k_factor</span> <span class="o">=</span> <span class="n">k_factor_original</span>
 
         <span class="k">return</span> <span class="kc">True</span>
 </pre></div>
@@ -501,18 +501,18 @@
 <h2>Matchmaking with Exploration<a class="headerlink" href="#matchmaking-with-exploration" title="Link to this heading">¶</a></h2>
 <p>To avoid always matching the same players and to better learn player skills, we can incorporate exploration:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">find_match_with_exploration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">,</span> <span class="n">max_rating_diff</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">exploration_rate</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find a match with some randomness to explore player skills&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Find a match with some randomness to explore player skills"""</span>
     <span class="k">if</span> <span class="n">player_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">register_player</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span>
 
     <span class="n">player</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">player_id</span><span class="p">]</span>
-    <span class="n">player_rating</span> <span class="o">=</span> <span class="n">player</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span>
+    <span class="n">player_rating</span> <span class="o">=</span> <span class="n">player</span><span class="p">[</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span>
 
     <span class="c1"># Get all players within rating range</span>
     <span class="n">candidates</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">pid</span> <span class="k">for</span> <span class="n">pid</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">pid</span> <span class="o">!=</span> <span class="n">player_id</span> <span class="ow">and</span>
-        <span class="nb">abs</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span> <span class="o">-</span> <span class="n">player_rating</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">max_rating_diff</span>
+        <span class="nb">abs</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span> <span class="o">-</span> <span class="n">player_rating</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">max_rating_diff</span>
     <span class="p">]</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">candidates</span><span class="p">:</span>
@@ -523,7 +523,7 @@
         <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">candidates</span><span class="p">)</span>
 
     <span class="c1"># Otherwise, pick the closest match by rating</span>
-    <span class="n">candidates</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">pid</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">&#39;competitor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span> <span class="o">-</span> <span class="n">player_rating</span><span class="p">))</span>
+    <span class="n">candidates</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">pid</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">players</span><span class="p">[</span><span class="n">pid</span><span class="p">][</span><span class="s1">'competitor'</span><span class="p">]</span><span class="o">.</span><span class="n">rating</span> <span class="o">-</span> <span class="n">player_rating</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">candidates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 </div>
@@ -590,6 +590,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../rating_systems/keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rating_systems/pythagorean.html">Pythagorean Expectation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/whr.html">Whole-History Rating</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rating_systems/ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rating_systems/comparison.html">Comparing Rating Systems</a></li>
 </ul>

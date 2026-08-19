@@ -82,6 +82,12 @@ Overview Comparison
      - No
      - Yes
      - Maximum-likelihood ranking
+   * - **Whole-History Rating**
+     - Coulom (2008)
+     - High
+     - No
+     - Yes
+     - Time-varying strength curves
    * - **Ensemble**
      - Meta-system
      - High
@@ -91,7 +97,7 @@ Overview Comparison
 
 Online systems (Elo, Glicko, Glicko-2, TrueSkill, ECF, DWZ, Pythagorean) update ratings
 incrementally after each result. Global-fit systems (Colley Matrix, Massey, Keener and
-Bradley-Terry) re-solve the whole connected group of competitors from the full set of results,
+Bradley-Terry and Whole-History Rating) fit the whole connected group from the full set of results,
 which makes them order independent. Pythagorean is order independent too, for a different reason:
 its state is a running sum of points that ignores the opponent graph entirely. Massey, Keener and
 Pythagorean are the three that read the optional score payload; the rest use only who beat whom.
@@ -127,6 +133,8 @@ Mathematical Formulation
      - :math:`w = \frac{PF^{k}}{PF^{k} + PA^{k}}` on prior-adjusted point totals; :math:`E_A = \frac{w_A - w_A w_B}{w_A + w_B - 2 w_A w_B}` (log5)
    * - **Bradley-Terry**
      - :math:`P(A \text{ beats } B) = \frac{p_A}{p_A + p_B} = \frac{1}{1 + e^{-(\beta_A - \beta_B)}}`
+   * - **Whole-History Rating**
+     - Bradley-Terry likelihood per game plus :math:`r_{t+1}-r_t \sim N(0, w^2\Delta t)`
    * - **Ensemble**
      - :math:`E_{ensemble} = \sum_{i=1}^{n} w_i \times E_i` where :math:`w_i` are weights
 
@@ -161,6 +169,8 @@ Key Parameters
      - Exponent (default 2.37), Prior points (default 1.0); no initial rating
    * - **Bradley-Terry**
      - Initial rating, Scale, Regularization, Max iterations
+   * - **Whole-History Rating**
+     - Per-day variance (w2), Initial rating, Max iterations, Precision
    * - **Ensemble**
      - Component systems, Weights
 
@@ -335,6 +345,21 @@ Bradley-Terry
 - The match graph cannot be serialized (only aggregate counts)
 - More expensive than Elo for very large populations
 
+Whole-History Rating
+^^^^^^^^^^^^^^^^^^^^
+
+**Strengths:**
+- Estimates a queryable rating curve rather than one lifetime strength
+- Later evidence revises earlier ratings
+- Time gaps explicitly control how freely strength can move
+- Lazy, bounded fitting avoids optimizing after every result
+
+**Weaknesses:**
+- More computationally expensive than a single-rating model
+- Requires meaningful timestamps for the time curve
+- The opponent graph cannot be serialized; continued play starts a fresh history
+- Provides no separate uncertainty estimate
+
 Ensemble
 ^^^^^^^^
 
@@ -367,7 +392,8 @@ Consider the following factors when choosing a rating system:
    - General purpose: Elo or Glicko
 
 3. **Order Independence**: Do you need a ranking that ignores schedule order?
-   - Yes: Colley Matrix, Massey, Keener, Bradley-Terry, or Pythagorean
+   - Yes: Colley Matrix, Massey, Keener, Bradley-Terry, Whole-History Rating, or Pythagorean
+   - Yes, and historical strength matters: Whole-History Rating
    - Yes, and you have real scores: Massey (linear margin), Keener (bounded score share), or
      Pythagorean (points ratio, no strength of schedule)
    - No: any other online system (Elo, Glicko, etc.)
@@ -403,6 +429,7 @@ Here's a quick comparison of how to use each system in Elote:
         KeenerCompetitor,
         PythagoreanCompetitor,
         BradleyTerryCompetitor,
+        WholeHistoryRatingCompetitor,
         BlendedCompetitor,
     )
 
@@ -438,6 +465,9 @@ Here's a quick comparison of how to use each system in Elote:
 
     # Bradley-Terry (Elo-compatible scale)
     bt_player = BradleyTerryCompetitor(initial_rating=1500)
+
+    # Whole-History Rating (time-aware Elo-compatible curve)
+    whr_player = WholeHistoryRatingCompetitor(w2=300.0)
 
     # Ensemble (blend of sub-competitors)
     ensemble_player = BlendedCompetitor(
