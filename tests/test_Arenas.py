@@ -15,6 +15,7 @@ from elote import (
     LambdaArena,
     MasseyCompetitor,
     PythagoreanCompetitor,
+    WholeHistoryRatingCompetitor,
     TrueSkillCompetitor,
 )
 
@@ -452,6 +453,7 @@ class TestArenaStateRoundTrip(unittest.TestCase):
         MasseyCompetitor,
         KeenerCompetitor,
         PythagoreanCompetitor,
+        WholeHistoryRatingCompetitor,
     )
 
     # Colley, Massey, Bradley-Terry and Keener reset their opponent match graph on import by design
