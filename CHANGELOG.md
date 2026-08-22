@@ -15,7 +15,9 @@ New rating systems
    queryable per-playing-day rating curve (#150).
  * Added `KeenerCompetitor`, the score-based member of the classical global-fit family. Keener builds
    a smoothed, skew-transformed preference matrix from the points competitors have scored on one
-   another and reads ratings off its dominant eigenvector (#124).
+   another and reads ratings off its dominant eigenvector (#124). Its games-played normalization carries a prior of two
+   pseudo-games, without which a competitor's single result concentrates its whole row on one
+   opponent and the dominant eigenvector reads that concentration as strength.
 
 Margin of victory
 

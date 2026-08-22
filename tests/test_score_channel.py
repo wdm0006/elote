@@ -331,11 +331,11 @@ class TestDatasetScoreForwarding(unittest.TestCase):
         """Pinned literals for both paths of the other score-consuming system."""
         self.assertEqual(
             _leaderboard(_trained(KeenerCompetitor, SCORED_ROWS)),
-            {"Steelers": 1.5088623362, "Ravens": 0.9649085365, "Browns": 0.923455846, "Bengals": 0.6027732813},
+            {"Steelers": 1.5779221429, "Ravens": 0.9983714654, "Browns": 0.860490018, "Bengals": 0.5632163737},
         )
         self.assertEqual(
             _leaderboard(_trained(KeenerCompetitor, SCORED_ROWS, score_keys=SCORE_KEYS)),
-            {"Steelers": 1.7295652954, "Ravens": 0.9585153377, "Browns": 0.9169460231, "Bengals": 0.3949733438},
+            {"Steelers": 1.7971469679, "Ravens": 0.9883138165, "Browns": 0.8486487294, "Bengals": 0.3658904862},
         )
 
     def test_scores_are_inert_for_a_system_that_ignores_them(self):
