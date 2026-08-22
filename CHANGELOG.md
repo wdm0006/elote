@@ -1,10 +1,79 @@
-v1.2.1
+v1.3.0
 ======
+
+Four new rating systems, margin-of-victory support end to end, and an evaluation path that is
+deterministic and reproducible from the dataset split through to the chosen threshold. Twelve rating
+systems now ship, against eight in v1.2.0.
 
 New rating systems
 
- * Added Whole-History Rating (`WholeHistoryRatingCompetitor`), a lazy, bounded time-aware
-   Bradley-Terry MAP system with a queryable per-playing-day rating curve.
+ * Added `MasseyCompetitor`, the least-squares classical rating system, which fits every result at
+   once and can use point margins rather than outcomes alone (#120).
+ * Added `PythagoreanCompetitor`, the Pythagorean expectation system, rating competitors from points
+   scored and allowed (#142).
+ * Added `WholeHistoryRatingCompetitor`, a lazy, bounded time-aware Bradley-Terry MAP system with a
+   queryable per-playing-day rating curve (#150).
+ * Added `KeenerCompetitor`, the score-based member of the classical global-fit family. Keener builds
+   a smoothed, skew-transformed preference matrix from the points competitors have scored on one
+   another and reads ratings off its dominant eigenvector (#124).
+
+Margin of victory
+
+ * Added an optional score channel to the result API, so a bout can carry the score as well as the
+   outcome. Systems that cannot use a margin ignore it (#124).
+ * Dataset point scores are threaded into the margin-aware rating systems, so Massey and Pythagorean
+   see real margins in benchmarks and arena runs rather than synthesized ones (#139).
+
+Evaluation and benchmarking
+
+ * Threshold optimization is now an exact, deterministic sweep rather than a stochastic search. The
+   same history produces the same thresholds every time (#116).
+ * `SyntheticDataset` and split seeding are instance-local and reproducible, so two datasets built in
+   one process no longer share generator state (#115).
+ * `accuracy_by_prior_bouts` reports small bins instead of dropping them, and normalizes outcomes the
+   same way the rest of the metrics do, which makes cold-start calibration readable (#141, #148).
+ * Dataset evaluation warns when it skips bouts rather than silently narrowing the sample (#151).
+ * Arena evaluation skips competitors it has never seen instead of inventing them at the default
+   rating (#140).
+ * Global-fit rating floors are preserved in benchmarks, and the benchmark's initial-rating
+   normalization is applied for real without mutating competitor class state (#95, #127).
+ * College football competitors are identified by program rather than mascot, so a program that
+   changes its mascot keeps one rating (#153).
+ * Calibration outcome normalization was corrected, so calibration curves and accuracy agree on what
+   a result was (#121).
+
+Improvements
+
+ * The Bradley-Terry MM refit is vectorized with NumPy, which makes repeated global refits practical
+   on larger pools (#104).
+ * A `LambdaArena` can be restored from its own `export_state()` output, and a restored global fit
+   keeps its comparison graph consistent (#96, #138).
+ * Global-fit competitor identity no longer depends on the order state was loaded in (#152).
+ * `LambdaArena.expected_score` is a pure read and no longer mutates arena state (#137).
+ * Glicko competitors can start from a historical match time, so an imported history does not begin
+   with an inactivity penalty (#131).
+ * Colley's tie perturbation was removed; ties are handled by the linear system itself (#103).
+ * Elo ratings saturate at the configured minimum instead of raising (#97).
+ * Validation on the way in: blended competitor compositions must match (#102), bulk arena APIs
+   validate their outcomes (#149), dataset split ratios and iterator batch sizes are checked (#112),
+   and the dataset helpers handle empty inputs (#108).
+
+Bug fixes
+
+ * Fixed an inverted TrueSkill draw margin and unified its three call sites (#119).
+ * Fixed the TrueSkill `expected_score` draw adjustment (#111).
+ * Fixed `MasseyCompetitor.expected_score` to normalize by the fitted rating scale, so its
+   probabilities are comparable with the other systems (#154).
+ * A drawn training matchup now records a `Bout`, so draws reach the metrics (#110).
+
+Compatibility notes
+
+ * Predicted probabilities change for TrueSkill on drawn bouts and for Massey. Recalibrate any
+   thresholds tuned against v1.2.1.
+ * The score channel is optional everywhere; existing result-reporting calls are unaffected.
+
+v1.2.1
+======
 
 A correctness release. Every shipped rating system except Elo, DWZ, Colley and Bradley-Terry had at
 least one numeric defect, and the prediction-quality metrics silently discarded drawn bouts. Ratings
