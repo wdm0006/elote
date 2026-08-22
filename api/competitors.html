@@ -15,11 +15,11 @@
         gtag('config', 'G-Z43R9PWW0B');
     </script>
     
-    <title>Competitors API Reference &#8212; elote 1.3.0 documentation</title>
+    <title>Competitors API Reference &#8212; elote 1.3.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=30d13653" />
     <link rel="stylesheet" type="text/css" href="../_static/css/wabi.css?v=501c8ac3" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=71d92741" />
-    <script src="../_static/documentation_options.js?v=1f29e9d3"></script>
+    <script src="../_static/documentation_options.js?v=bb516dca"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
@@ -1997,8 +1997,11 @@ so the matrix stays antisymmetric about <code class="docutils literal notranslat
 very large margins, which is what stops the method rewarding running up the score without
 limit.</p>
 </li>
-<li><p><strong>Games-played normalization.</strong> Row <code class="docutils literal notranslate"><span class="pre">i</span></code> is divided by the number of games <code class="docutils literal notranslate"><span class="pre">i</span></code> played,
-so a competitor cannot accumulate rating merely by playing more often.</p></li>
+<li><p><strong>Games-played normalization.</strong> Row <code class="docutils literal notranslate"><span class="pre">i</span></code> is divided by the number of games <code class="docutils literal notranslate"><span class="pre">i</span></code> played
+plus a small prior, so a competitor cannot accumulate rating merely by playing more often,
+and cannot accumulate it by playing barely at all either. The prior matters on a ragged
+schedule: without it, a competitor’s single game concentrates its entire row on one
+opponent, which the eigenvector reads as strength.</p></li>
 <li><p><strong>Stabilization.</strong> A small positive constant is added to every entry. Keener’s own
 <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">+</span> <span class="pre">eps</span> <span class="pre">*</span> <span class="pre">E</span></code> perturbation makes the matrix strictly positive, so Perron-Frobenius
 applies: the dominant eigenvalue is real and simple and its eigenvector is strictly
@@ -2043,6 +2046,12 @@ produces a sensible ranking, but it only sees who beat whom.</p>
 at the population average.</p>
 </dd>
 <dt>_perturbation (float): Keener’s <code class="docutils literal notranslate"><span class="pre">eps</span></code>, added to every matrix entry so the matrix is</dt><dd><p>strictly positive and Perron-Frobenius applies. Default: 1e-4.</p>
+</dd>
+<dt>_games_prior (float): Pseudo-games added to the games-played denominator, shrinking a</dt><dd><p>competitor’s average preference toward zero in proportion to how little evidence
+backs it. Default: 2.0, matching the two pseudo-observations the Laplace-smoothed
+score share already assumes. Without it, a competitor with a single game puts all
+of its row weight on one opponent and the dominant eigenvector rewards that
+concentration, so a one-game team can outrate an undefeated one.</p>
 </dd>
 <dt>_expected_score_scale (float): Logistic scale applied to the log rating ratio by</dt><dd><p><a class="reference internal" href="../competitors.html#elote.competitors.keener.KeenerCompetitor.expected_score" title="elote.competitors.keener.KeenerCompetitor.expected_score"><code class="xref py py-meth docutils literal notranslate"><span class="pre">expected_score()</span></code></a>. Default: 1.0, which is the plain Keener share
 <code class="docutils literal notranslate"><span class="pre">r_a</span> <span class="pre">/</span> <span class="pre">(r_a</span> <span class="pre">+</span> <span class="pre">r_b)</span></code>.</p>

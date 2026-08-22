@@ -14,11 +14,11 @@
         gtag('config', 'G-Z43R9PWW0B');
     </script>
     
-    <title>elote.competitors.keener &#8212; elote 1.3.0 documentation</title>
+    <title>elote.competitors.keener &#8212; elote 1.3.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=30d13653" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/wabi.css?v=501c8ac3" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=71d92741" />
-    <script src="../../../_static/documentation_options.js?v=1f29e9d3"></script>
+    <script src="../../../_static/documentation_options.js?v=bb516dca"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -206,8 +206,11 @@
 <span class="sd">   very large margins, which is what stops the method rewarding running up the score without</span>
 <span class="sd">   limit.</span>
 
-<span class="sd">3. **Games-played normalization.** Row ``i`` is divided by the number of games ``i`` played,</span>
-<span class="sd">   so a competitor cannot accumulate rating merely by playing more often.</span>
+<span class="sd">3. **Games-played normalization.** Row ``i`` is divided by the number of games ``i`` played</span>
+<span class="sd">   plus a small prior, so a competitor cannot accumulate rating merely by playing more often,</span>
+<span class="sd">   and cannot accumulate it by playing barely at all either. The prior matters on a ragged</span>
+<span class="sd">   schedule: without it, a competitor's single game concentrates its entire row on one</span>
+<span class="sd">   opponent, which the eigenvector reads as strength.</span>
 
 <span class="sd">4. **Stabilization.** A small positive constant is added to every entry. Keener's own</span>
 <span class="sd">   ``A + eps * E`` perturbation makes the matrix strictly positive, so Perron-Frobenius</span>
@@ -266,6 +269,12 @@
 <span class="sd">            at the population average.</span>
 <span class="sd">        _perturbation (float): Keener's ``eps``, added to every matrix entry so the matrix is</span>
 <span class="sd">            strictly positive and Perron-Frobenius applies. Default: 1e-4.</span>
+<span class="sd">        _games_prior (float): Pseudo-games added to the games-played denominator, shrinking a</span>
+<span class="sd">            competitor's average preference toward zero in proportion to how little evidence</span>
+<span class="sd">            backs it. Default: 2.0, matching the two pseudo-observations the Laplace-smoothed</span>
+<span class="sd">            score share already assumes. Without it, a competitor with a single game puts all</span>
+<span class="sd">            of its row weight on one opponent and the dominant eigenvector rewards that</span>
+<span class="sd">            concentration, so a one-game team can outrate an undefeated one.</span>
 <span class="sd">        _expected_score_scale (float): Logistic scale applied to the log rating ratio by</span>
 <span class="sd">            :meth:`expected_score`. Default: 1.0, which is the plain Keener share</span>
 <span class="sd">            ``r_a / (r_a + r_b)``.</span>
@@ -278,6 +287,7 @@
     <span class="n">_minimum_rating</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="n">_default_initial_rating</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
     <span class="n">_perturbation</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-4</span>
+    <span class="n">_games_prior</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span>
     <span class="n">_expected_score_scale</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
     <span class="n">_round_decimals</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
 
@@ -535,7 +545,15 @@
 
         <span class="c1"># Divide by games played, making each row the competitor's average preference per</span>
         <span class="c1"># game, so a longer schedule is not itself worth rating.</span>
-        <span class="n">preferences</span> <span class="o">=</span> <span class="n">preferences</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">games</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="c1">#</span>
+        <span class="c1"># The denominator carries a prior of `_games_prior` pseudo-games. Dividing by the raw</span>
+        <span class="c1"># count equalizes row sums but not row *concentration*: a competitor with one game</span>
+        <span class="c1"># places all of its weight on a single opponent, and the dominant eigenvector rewards</span>
+        <span class="c1"># that, so a one-game team could outrate an undefeated one with a full schedule. The</span>
+        <span class="c1"># prior shrinks a thin row toward zero by a factor of g / (g + prior) and leaves a</span>
+        <span class="c1"># full schedule essentially untouched. It is the same correction the Laplace-smoothed</span>
+        <span class="c1"># score share above already applies to a thin pairwise record.</span>
+        <span class="n">preferences</span> <span class="o">=</span> <span class="n">preferences</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">games</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_games_prior</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
 
         <span class="c1"># Keener's eps * E perturbation: makes the matrix strictly positive, so its dominant</span>
         <span class="c1"># eigenvalue is simple and its eigenvector strictly positive. This is also what</span>
