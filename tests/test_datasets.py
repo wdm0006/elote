@@ -22,6 +22,7 @@ from elote import (
     evaluate_arena_with_dataset,
     train_and_evaluate_arena,
     list_available_datasets,
+    WholeHistoryRatingCompetitor,
 )
 from elote.arenas.base import Bout, History
 
@@ -1131,6 +1132,67 @@ class TestCollegeFootballPartialDownload(unittest.TestCase):
         self.assertTrue(os.path.exists(dataset.data_file))
         cached = pd.read_csv(dataset.data_file)
         self.assertEqual(len(cached), 9)
+
+
+
+class TestTrainingForwardsMatchTime(unittest.TestCase):
+    """A dataset row's timestamp must reach the competitors, not just the sort.
+
+    Whole-History Rating keeps one latent rating per playing day, Glicko and Glicko-2 inflate
+    rating deviation for time since last match, and DWZ's development coefficient depends on
+    age at the time of the match. None of them has any other source for the date, so dropping
+    it makes every row in a dataset look simultaneous.
+    """
+
+    class _RecordingArena:
+        def __init__(self):
+            self.match_times = []
+
+        def matchup(self, a, b, attributes=None, match_time=None, outcome=None, scores=None):
+            self.match_times.append(match_time)
+
+    def _rows(self):
+        return [
+            ("A", "B", 1.0, datetime.datetime(2020, 1, 6), None),
+            ("C", "D", 0.0, datetime.datetime(2020, 2, 6), None),
+            ("E", "F", 0.5, datetime.datetime(2020, 3, 6), None),
+        ]
+
+    def test_match_time_is_forwarded_for_every_outcome(self):
+        arena = self._RecordingArena()
+        train_arena_with_dataset(arena, self._rows())
+
+        self.assertEqual(
+            arena.match_times,
+            [
+                datetime.datetime(2020, 1, 6),
+                datetime.datetime(2020, 2, 6),
+                datetime.datetime(2020, 3, 6),
+            ],
+        )
+
+    def test_rows_without_a_timestamp_still_train(self):
+        arena = self._RecordingArena()
+        train_arena_with_dataset(arena, [("A", "B", 1.0, None, None)])
+        self.assertEqual(arena.match_times, [None])
+
+    def test_whr_builds_one_rating_per_playing_day(self):
+        """End to end: distinct dates must produce distinct days in the fitted curve."""
+        arena = LambdaArena(lambda a, b: True, base_competitor=WholeHistoryRatingCompetitor)
+        train_arena_with_dataset(
+            arena,
+            [
+                ("A", "B", 1.0, datetime.datetime(2020, 1, 6), None),
+                ("A", "B", 1.0, datetime.datetime(2020, 6, 6), None),
+                ("A", "B", 1.0, datetime.datetime(2020, 11, 6), None),
+            ],
+        )
+        history = arena.competitors["A"].rating_history()
+        self.assertEqual(len(history), 3, f"expected three playing days, got {history}")
+        self.assertEqual(
+            [day for day, _rating in history],
+            [datetime.date(2020, 1, 6), datetime.date(2020, 6, 6), datetime.date(2020, 11, 6)],
+        )
 
 
 if __name__ == "__main__":

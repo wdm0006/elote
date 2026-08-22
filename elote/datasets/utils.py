@@ -105,26 +105,31 @@ def train_arena_with_dataset(
         end_idx = min(start_idx + batch_size, len(sorted_data))
         batch = sorted_data[start_idx:end_idx]
 
-        # Process each matchup
-        for a, b, outcome, _, attributes in batch:
+        # Process each matchup. The row's timestamp is forwarded as match_time: the
+        # time-aware systems (Whole-History Rating's per-day curve, Glicko and Glicko-2's
+        # inactivity inflation, DWZ's age-dependent development coefficient) have no other
+        # source for it, and without it every row in a dataset looks simultaneous.
+        for a, b, outcome, when, attributes in batch:
             scores = None if score_keys is None else _scores_from_attributes(attributes, score_keys)
 
             if outcome == 1.0:
                 # A wins
                 if scores is None:
-                    arena.matchup(a, b, attributes=attributes)
+                    arena.matchup(a, b, attributes=attributes, match_time=when)
                 else:
-                    arena.matchup(a, b, attributes=attributes, outcome=1.0, scores=scores)
+                    arena.matchup(a, b, attributes=attributes, match_time=when, outcome=1.0, scores=scores)
             elif outcome == 0.0:
                 # B wins. The call is reversed so b is the winner, so the score pair has to
                 # be reversed with it to stay in the arena's caller order.
                 if scores is None:
-                    arena.matchup(b, a, attributes=attributes)
+                    arena.matchup(b, a, attributes=attributes, match_time=when)
                 else:
-                    arena.matchup(b, a, attributes=attributes, outcome=1.0, scores=(scores[1], scores[0]))
+                    arena.matchup(
+                        b, a, attributes=attributes, match_time=when, outcome=1.0, scores=(scores[1], scores[0])
+                    )
             else:
                 # Draw
-                arena.matchup(a, b, attributes=attributes, outcome=0.5, scores=scores)
+                arena.matchup(a, b, attributes=attributes, match_time=when, outcome=0.5, scores=scores)
 
         # Report progress
         if progress_callback is not None:
