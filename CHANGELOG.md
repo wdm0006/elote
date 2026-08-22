@@ -1,3 +1,28 @@
+v1.3.2
+======
+
+New features
+
+ * Added `elote.evaluation` with `walk_forward()`, `group_by_period()` and `tune()`.
+   `walk_forward` runs the predict-then-learn protocol that `evaluate_competitor` cannot
+   express: every bout in a period is predicted before any of it is used for fitting, then the
+   period is learned and the run steps forward. It reports log loss and Brier alongside
+   accuracy, skips competitors it has not seen rather than inventing them, and counts draws
+   separately. `tune()` grid-searches competitor parameters against it and defaults to log
+   loss, because accuracy is a rank statistic and cannot see a parameter that changes
+   confidence without changing order.
+
+Bug fixes
+
+ * `train_arena_with_dataset` now forwards each row's timestamp to the arena as `match_time`.
+   It previously used the timestamp only to sort, so every time-aware rating system trained
+   through the dataset helpers, and therefore through `benchmark_competitors`, saw a dataset
+   in which every game happened at the same instant. Whole-History Rating was worst affected,
+   since its model is one latent rating per playing day: on eight seasons of college football
+   this cost it 4.6 points of accuracy and moved it from fifth of twelve to last. Glicko,
+   Glicko-2 and DWZ each gained 0.7 to 1.1 points; Elo, which has no time model, was
+   unchanged. Metrics computed from any dataset benchmark of a time-aware system will change.
+
 v1.3.1
 ======
 
