@@ -67,6 +67,13 @@ from elote.datasets.utils import train_arena_with_dataset, evaluate_arena_with_d
 
 # Core analysis modules - always available
 from elote.benchmark import evaluate_competitor, benchmark_competitors
+from elote.evaluation import (
+    WalkForwardReport,
+    TuningResult,
+    group_by_period,
+    walk_forward,
+    tune,
+)
 from elote.visualization import (
     plot_rating_system_comparison,
     plot_optimized_accuracy_comparison,
@@ -108,6 +115,11 @@ __all__ = [
     # Benchmarking
     "evaluate_competitor",
     "benchmark_competitors",
+    "WalkForwardReport",
+    "TuningResult",
+    "group_by_period",
+    "walk_forward",
+    "tune",
     # Visualization
     "plot_rating_system_comparison",
     "plot_optimized_accuracy_comparison",
