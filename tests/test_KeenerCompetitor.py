@@ -287,5 +287,74 @@ class TestKeenerArena(unittest.TestCase):
         self.assertEqual(len(arena.history.bouts), 1)
 
 
+class TestKeenerSmallSampleShrinkage(unittest.TestCase):
+    """The games-played denominator carries a prior so thin schedules cannot dominate."""
+
+    def _round_robin(self, names, repeats=2):
+        strength = {name: 40 - 5 * i for i, name in enumerate(names)}
+        competitors = {name: KeenerCompetitor() for name in names}
+        for _ in range(repeats):
+            for i, a in enumerate(names):
+                for b in names[i + 1:]:
+                    competitors[a].beat(competitors[b], scores=(strength[a], strength[b]))
+        return competitors
+
+    def test_thin_schedule_does_not_outrate_a_full_one(self):
+        """A one-game competitor must not outrate an undefeated one with a full schedule.
+
+        Dividing each row of the preference matrix by games played equalizes row sums but not
+        row concentration: a single game puts all of a competitor's weight on one opponent,
+        and the dominant eigenvector reads that concentration as strength.
+        """
+        names = ["Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot"]
+        competitors = self._round_robin(names)
+
+        cameo = KeenerCompetitor()
+        cameo.beat(competitors["Foxtrot"], scores=(21, 20))
+
+        alpha = competitors["Alpha"]
+        self.assertEqual(alpha.num_games, 10)
+        self.assertEqual(cameo.num_games, 1)
+        self.assertGreater(
+            alpha.rating,
+            cameo.rating,
+            f"one-game competitor rated {cameo.rating:.4f} over undefeated {alpha.rating:.4f}",
+        )
+
+        ordered = sorted(names, key=lambda n: -competitors[n].rating)
+        self.assertEqual(ordered[:4], ["Alpha", "Bravo", "Charlie", "Delta"])
+
+    def test_prior_leaves_a_full_schedule_essentially_unchanged(self):
+        """The prior shrinks thin rows; it must not meaningfully move a well-played group."""
+        names = ["Alpha", "Bravo", "Charlie", "Delta"]
+
+        def fit(prior):
+            original = KeenerCompetitor._games_prior
+            KeenerCompetitor._games_prior = prior
+            try:
+                competitors = self._round_robin(names, repeats=10)
+                return [competitors[n].rating for n in names]
+            finally:
+                KeenerCompetitor._games_prior = original
+
+        with_prior = fit(2.0)
+        without_prior = fit(0.0)
+
+        self.assertEqual(sorted(with_prior, reverse=True), with_prior)
+        for prior_rating, raw_rating in zip(with_prior, without_prior, strict=True):
+            self.assertLess(
+                abs(prior_rating - raw_rating),
+                0.05,
+                f"prior moved a 30-game rating from {raw_rating:.4f} to {prior_rating:.4f}",
+            )
+
+    def test_ratings_still_average_one(self):
+        """The documented normalization survives the change."""
+        competitors = self._round_robin(["Alpha", "Bravo", "Charlie", "Delta"])
+        ratings = [c.rating for c in competitors.values()]
+        self.assertAlmostEqual(sum(ratings) / len(ratings), 1.0, places=9)
+
+
+
 if __name__ == "__main__":
     unittest.main()

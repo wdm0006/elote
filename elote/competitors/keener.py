@@ -30,8 +30,11 @@ against ``j`` across all their meetings.
    very large margins, which is what stops the method rewarding running up the score without
    limit.
 
-3. **Games-played normalization.** Row ``i`` is divided by the number of games ``i`` played,
-   so a competitor cannot accumulate rating merely by playing more often.
+3. **Games-played normalization.** Row ``i`` is divided by the number of games ``i`` played
+   plus a small prior, so a competitor cannot accumulate rating merely by playing more often,
+   and cannot accumulate it by playing barely at all either. The prior matters on a ragged
+   schedule: without it, a competitor's single game concentrates its entire row on one
+   opponent, which the eigenvector reads as strength.
 
 4. **Stabilization.** A small positive constant is added to every entry. Keener's own
    ``A + eps * E`` perturbation makes the matrix strictly positive, so Perron-Frobenius
@@ -88,6 +91,12 @@ class KeenerCompetitor(BaseCompetitor):
             at the population average.
         _perturbation (float): Keener's ``eps``, added to every matrix entry so the matrix is
             strictly positive and Perron-Frobenius applies. Default: 1e-4.
+        _games_prior (float): Pseudo-games added to the games-played denominator, shrinking a
+            competitor's average preference toward zero in proportion to how little evidence
+            backs it. Default: 2.0, matching the two pseudo-observations the Laplace-smoothed
+            score share already assumes. Without it, a competitor with a single game puts all
+            of its row weight on one opponent and the dominant eigenvector rewards that
+            concentration, so a one-game team can outrate an undefeated one.
         _expected_score_scale (float): Logistic scale applied to the log rating ratio by
             :meth:`expected_score`. Default: 1.0, which is the plain Keener share
             ``r_a / (r_a + r_b)``.
@@ -100,6 +109,7 @@ class KeenerCompetitor(BaseCompetitor):
     _minimum_rating: ClassVar[float] = 0.0
     _default_initial_rating: ClassVar[float] = 1.0
     _perturbation: ClassVar[float] = 1e-4
+    _games_prior: ClassVar[float] = 2.0
     _expected_score_scale: ClassVar[float] = 1.0
     _round_decimals: ClassVar[int] = 10
 
@@ -342,7 +352,15 @@ class KeenerCompetitor(BaseCompetitor):
 
         # Divide by games played, making each row the competitor's average preference per
         # game, so a longer schedule is not itself worth rating.
-        preferences = preferences / np.maximum(games, 1.0)[:, None]
+        #
+        # The denominator carries a prior of `_games_prior` pseudo-games. Dividing by the raw
+        # count equalizes row sums but not row *concentration*: a competitor with one game
+        # places all of its weight on a single opponent, and the dominant eigenvector rewards
+        # that, so a one-game team could outrate an undefeated one with a full schedule. The
+        # prior shrinks a thin row toward zero by a factor of g / (g + prior) and leaves a
+        # full schedule essentially untouched. It is the same correction the Laplace-smoothed
+        # score share above already applies to a thin pairwise record.
+        preferences = preferences / (np.maximum(games, 0.0) + cls._games_prior)[:, None]
 
         # Keener's eps * E perturbation: makes the matrix strictly positive, so its dominant
         # eigenvalue is simple and its eigenvector strictly positive. This is also what
