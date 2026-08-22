@@ -1,3 +1,26 @@
+v1.3.1
+======
+
+A correctness release for two defects found while reproducing the v1.3.0 benchmark on real
+college football data.
+
+Bug fixes
+
+ * `KeenerCompetitor` no longer lets a competitor with a very thin schedule outrate one with a
+   full schedule. Dividing each row of the preference matrix by games played equalizes row
+   sums but not row concentration: a competitor with a single game puts all of its weight on
+   one opponent, and the dominant eigenvector reads that concentration as strength. On the
+   college football dataset the top five Keener ratings were teams that had played one or two
+   games. The games-played denominator now carries a prior of two pseudo-games
+   (`KeenerCompetitor._games_prior`), the same correction the Laplace-smoothed score share
+   already applies to a thin pairwise record. Keener ratings from v1.3.0 will change.
+ * `CollegeFootballDataset.download()` no longer caches a download that lost a season. A
+   per-year fetch failure was printed and swallowed, and the short result written to a cache
+   keyed only on the requested year range, so every later run silently read a dataset with a
+   season missing. Failed seasons are now collected and raised, nothing is written, and a
+   season that legitimately returns no games is reported through `elote.logging` rather than
+   `print`.
+
 v1.3.0
 ======
 

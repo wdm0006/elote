@@ -9,8 +9,14 @@ Recall the construction for a connected group, with ``S_ij`` the points ``i`` sc
 
     a_ij = (S_ij + 1) / (S_ij + S_ji + 2)                  Laplace-smoothed score share
     h(x) = 1/2 + 1/2 * sgn(x - 1/2) * sqrt(|2x - 1|)       Keener's skew transform
-    H_ij = h(a_ij) / games_i + eps                         row-normalized, eps = 1e-4
+    H_ij = h(a_ij) / (games_i + prior) + eps               row-normalized, eps = 1e-4
     r    = dominant eigenvector of H, scaled to mean 1.0
+
+The shipped default carries ``prior = _games_prior = 2.0``, which keeps a competitor with a
+very thin schedule from concentrating its whole row on one opponent. The reference cases in
+:class:`TestKeenerKnownValues` pin the prior-free construction (``prior = 0``), because that
+is the form the closed solutions below were derived for;
+:class:`TestKeenerKnownValuesWithDefaultPrior` pins the shipped default separately.
 
 Ratings are canonicalized to ``_round_decimals`` (10) places, so assertions use 9 places.
 """
@@ -32,6 +38,15 @@ def _skew(share):
 
 
 class TestKeenerKnownValues(unittest.TestCase):
+    """Reference values for the prior-free construction the closed forms were derived for."""
+
+    def setUp(self):
+        self._original_prior = KeenerCompetitor._games_prior
+        KeenerCompetitor._games_prior = 0.0
+
+    def tearDown(self):
+        KeenerCompetitor._games_prior = self._original_prior
+
     def test_single_scored_game_matches_the_two_by_two_closed_form(self):
         """One 35-3 game between two competitors.
 
@@ -140,6 +155,56 @@ class TestKeenerKnownValues(unittest.TestCase):
         self.assertAlmostEqual(a.rating, 1.67957399744031952, places=PLACES)
         self.assertAlmostEqual(b.rating, 0.86984806605940995, places=PLACES)
         self.assertAlmostEqual(c.rating, 0.45057793650027053, places=PLACES)
+
+
+
+class TestKeenerKnownValuesWithDefaultPrior(unittest.TestCase):
+    """Reference values for the shipped default, ``_games_prior = 2.0``."""
+
+    def test_single_scored_game_matches_the_two_by_two_closed_form(self):
+        """The same 35-3 game, with the games prior in the denominator.
+
+        Both competitors played one game, so each row is divided by ``1 + 2 = 3``:
+
+            H = [[eps, p], [q, eps]]  with  p = h(0.9)/3 + eps, q = h(0.1)/3 + eps.
+
+        The shape is unchanged, so the dominant eigenvector is still proportional to
+        ``(sqrt(p), sqrt(q))`` and scaling to mean 1.0 over n = 2 gives the same expression.
+        The prior cancels in a two-competitor group where both played the same number of
+        games, which is exactly what it should do: it corrects *relative* thinness.
+        """
+        prior = KeenerCompetitor._games_prior
+        self.assertEqual(prior, 2.0)
+
+        p = _skew(0.9) / (1.0 + prior) + EPS
+        q = _skew(0.1) / (1.0 + prior) + EPS
+        root_p, root_q = math.sqrt(p), math.sqrt(q)
+        expected_a = 2.0 * root_p / (root_p + root_q)
+        expected_b = 2.0 * root_q / (root_p + root_q)
+
+        a, b = KeenerCompetitor(), KeenerCompetitor()
+        a.beat(b, scores=(35.0, 3.0))
+
+        self.assertAlmostEqual(a.rating, expected_a, places=PLACES)
+        self.assertAlmostEqual(b.rating, expected_b, places=PLACES)
+
+    def test_prior_demotes_a_competitor_with_a_thinner_schedule(self):
+        """Two competitors with identical per-game records, one with a longer schedule.
+
+        Both beat their opponents by the same margin every time, so their average preference
+        is identical and the prior is the only thing separating them. The one with more
+        evidence behind that average rates higher.
+        """
+        opponents = [KeenerCompetitor() for _ in range(5)]
+        busy, quiet = KeenerCompetitor(), KeenerCompetitor()
+
+        for opponent in opponents:
+            busy.beat(opponent, scores=(30.0, 10.0))
+        quiet.beat(opponents[0], scores=(30.0, 10.0))
+
+        self.assertEqual(busy.num_games, 5)
+        self.assertEqual(quiet.num_games, 1)
+        self.assertGreater(busy.rating, quiet.rating)
 
 
 if __name__ == "__main__":

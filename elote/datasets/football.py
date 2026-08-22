@@ -11,6 +11,7 @@ import pandas as pd
 from typing import List, Tuple, Dict, Any, Optional
 
 from elote.datasets.base import BaseDataset
+from elote.logging import logger
 
 # Bumped whenever the cached CSV's schema or the meaning of its columns changes, so an
 # existing cache written by an older version of this module cannot be reused silently.
@@ -91,6 +92,9 @@ class CollegeFootballDataset(BaseDataset):
         all_games = pd.DataFrame()
 
         # Download data for each year
+        failed_years: Dict[int, str] = {}
+        empty_years: List[int] = []
+
         for year in range(self.start_year, self.end_year + 1):
             print(f"Fetching data for {year}...")
             try:
@@ -104,17 +108,40 @@ class CollegeFootballDataset(BaseDataset):
                     return_as_pandas=True,
                 )
 
-                if year_data is not None and not year_data.empty:
-                    # Keep only completed games
-                    year_data = year_data[year_data["status_type_completed"] == True]  # noqa: E712
-                    all_games = pd.concat([all_games, year_data], ignore_index=True)
-            except Exception as e:
-                print(f"Error fetching data for year {year}: {e}")
-                print("Continuing with next year...")
-                continue
+                if year_data is None or year_data.empty:
+                    empty_years.append(year)
+                    logger.warning("Season %d returned no games from the upstream feed.", year)
+                    continue
+
+                # Keep only completed games
+                year_data = year_data[year_data["status_type_completed"] == True]  # noqa: E712
+                all_games = pd.concat([all_games, year_data], ignore_index=True)
+            except Exception as e:  # noqa: BLE001 - reported below, never swallowed
+                failed_years[year] = f"{type(e).__name__}: {e}"
+                logger.warning("Fetching season %d failed: %s", year, failed_years[year])
+
+        if failed_years:
+            # A partial download must never be cached. The cache is keyed only by the
+            # requested year range, so writing a short result here would make every later
+            # run silently read a dataset with a season missing, with nothing to signal it.
+            detail = "; ".join(f"{year} ({reason})" for year, reason in sorted(failed_years.items()))
+            raise RuntimeError(
+                f"Failed to fetch {len(failed_years)} of "
+                f"{self.end_year - self.start_year + 1} requested seasons: {detail}. "
+                "Nothing was cached; re-run to retry."
+            )
 
         if all_games.empty:
             raise ValueError("No games data was retrieved. Check your internet connection or try again later.")
+
+        if empty_years:
+            logger.warning(
+                "Seasons with no games in the feed: %s. The cached dataset covers %d-%d "
+                "but does not contain these seasons.",
+                ", ".join(str(year) for year in empty_years),
+                self.start_year,
+                self.end_year,
+            )
 
         all_games = self._prepare_games(all_games)
 
