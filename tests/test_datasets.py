@@ -1069,5 +1069,69 @@ class TestDatasetUtils(unittest.TestCase):
         self.assertIn(skipped_message, captured.output)
 
 
+
+class TestCollegeFootballPartialDownload(unittest.TestCase):
+    """A season that fails to fetch must not be silently cached.
+
+    The cache file is keyed only by the requested year range, so writing a short result
+    after a transient failure makes every later run read a dataset with a season missing
+    and nothing to signal it.
+    """
+
+    def setUp(self):
+        self.cache_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.cache_dir, True)
+
+    @staticmethod
+    def _season_frame(year, rows=3):
+        return pd.DataFrame(
+            {
+                "start_date": [f"{year}-09-0{i + 1}T17:00Z" for i in range(rows)],
+                "home_display_name": [f"Home {year} {i}" for i in range(rows)],
+                "away_display_name": [f"Away {year} {i}" for i in range(rows)],
+                "home_score": [20 + i for i in range(rows)],
+                "away_score": [10 + i for i in range(rows)],
+                "neutral_site": [False] * rows,
+                "status_type_completed": [True] * rows,
+            }
+        )
+
+    def _run_download(self, schedule_side_effect):
+        from elote.datasets.football import CollegeFootballDataset
+
+        dataset = CollegeFootballDataset(cache_dir=self.cache_dir, start_year=2019, end_year=2021)
+        fake_cfb = MagicMock()
+        fake_cfb.espn_cfb_schedule.side_effect = schedule_side_effect
+        fake_pkg = MagicMock()
+        fake_pkg.cfb = fake_cfb
+        # `import sportsdataverse.cfb as cfb` resolves the submodule from sys.modules.
+        with patch.dict(
+            "sys.modules",
+            {"sportsdataverse": fake_pkg, "sportsdataverse.cfb": fake_cfb},
+        ):
+            dataset.download()
+        return dataset
+
+    def test_a_failed_season_raises_and_caches_nothing(self):
+        def side_effect(dates, **_kwargs):
+            if dates == 2020:
+                raise ConnectionError("upstream timed out")
+            return self._season_frame(dates)
+
+        with self.assertRaises(RuntimeError) as ctx:
+            self._run_download(side_effect)
+
+        message = str(ctx.exception)
+        self.assertIn("2020", message)
+        self.assertIn("ConnectionError", message)
+        self.assertEqual(os.listdir(self.cache_dir), [], "a partial download was cached")
+
+    def test_a_complete_download_is_cached(self):
+        dataset = self._run_download(lambda dates, **_kwargs: self._season_frame(dates))
+        self.assertTrue(os.path.exists(dataset.data_file))
+        cached = pd.read_csv(dataset.data_file)
+        self.assertEqual(len(cached), 9)
+
+
 if __name__ == "__main__":
     unittest.main()
