@@ -6,29 +6,9 @@ from elote.competitors.base import (
     InvalidStateException,
     MissMatchedCompetitorTypesException,
 )
-from elote import (
-    EloCompetitor,
-    ECFCompetitor,
-    DWZCompetitor,
-    GlickoCompetitor,
-    Glicko2Competitor,
-    TrueSkillCompetitor,
-    ColleyMatrixCompetitor,
-)
 from elote.logging import logger  # Import directly from the logging submodule
 
 T = TypeVar("T", bound="BlendedCompetitor")
-
-# Dictionary mapping competitor type names to their classes
-competitor_types = {
-    "EloCompetitor": EloCompetitor,
-    "ECFCompetitor": ECFCompetitor,
-    "DWZCompetitor": DWZCompetitor,
-    "GlickoCompetitor": GlickoCompetitor,
-    "Glicko2Competitor": Glicko2Competitor,
-    "TrueSkillCompetitor": TrueSkillCompetitor,
-    "ColleyMatrixCompetitor": ColleyMatrixCompetitor,
-}
 
 
 class BlendedCompetitor(BaseCompetitor):
@@ -264,21 +244,17 @@ class BlendedCompetitor(BaseCompetitor):
             competitors = []
             for comp_state in competitors_state:
                 comp_type_name = comp_state.get("type", "EloCompetitor")
-                comp_type = competitor_types.get(comp_type_name)
-
-                if comp_type is None:
-                    logger.error("Unknown competitor type found in legacy state: %s", comp_type_name)
-                    raise InvalidParameterException(f"Unknown competitor type: {comp_type_name}")
+                BaseCompetitor.get_competitor_class(comp_type_name)
 
                 comp_kwargs = comp_state.get("competitor_kwargs", {})
 
-                # Create a new competitor specification with just the initial parameters
-                competitors.append(
-                    {
-                        "type": comp_type_name,
-                        "competitor_kwargs": {"initial_rating": comp_kwargs.get("initial_rating", 400)},
-                    }
+                # Create a new competitor specification with just the initial parameters.
+                # Only forward an initial rating the state actually carries: not every
+                # rating system takes one.
+                initial_kwargs = (
+                    {"initial_rating": comp_kwargs["initial_rating"]} if "initial_rating" in comp_kwargs else {}
                 )
+                competitors.append({"type": comp_type_name, "competitor_kwargs": initial_kwargs})
 
             # Create the blended competitor
             blended = cls(competitors=competitors, blend_mode=blend_mode)
@@ -286,7 +262,7 @@ class BlendedCompetitor(BaseCompetitor):
             # Now update each sub-competitor with its full state
             for i, comp_state in enumerate(competitors_state):
                 comp_type_name = comp_state.get("type", "EloCompetitor")
-                comp_type = competitor_types.get(comp_type_name)
+                comp_type = BaseCompetitor.get_competitor_class(comp_type_name)
                 comp_kwargs = comp_state.get("competitor_kwargs", {})
 
                 # Replace the sub-competitor with one created from the full state
