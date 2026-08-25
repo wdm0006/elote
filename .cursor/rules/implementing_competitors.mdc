@@ -254,17 +254,15 @@ def _helper_method(self, value: float) -> float:
     return result
 ```
 
-## Step 5: Register Your Competitor (Optional)
+## Step 5: Registration (Nothing To Do)
 
-If you want your competitor to be usable with `BlendedCompetitor`, add it to the `competitor_types` dictionary in `elote/competitors/ensemble.py`:
+Subclassing `BaseCompetitor` registers your class automatically via `__init_subclass__`, so it is
+immediately resolvable by name through `BaseCompetitor.get_competitor_class` and usable with
+`BlendedCompetitor` and `from_state`. There is no separate type map to update.
 
 ```python
-from elote.competitors.my_new_competitor import MyNewCompetitor
-
-competitor_types = {
-    # Existing competitors...
-    "MyNewCompetitor": MyNewCompetitor,
-}
+BaseCompetitor.get_competitor_class("MyNewCompetitor")  # -> MyNewCompetitor
+"MyNewCompetitor" in BaseCompetitor.list_competitor_types()  # -> True
 ```
 
 ## Best Practices

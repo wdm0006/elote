@@ -1,6 +1,12 @@
+import inspect
 import unittest
-from elote import BlendedCompetitor, GlickoCompetitor
-from elote.competitors.base import MissMatchedCompetitorTypesException
+
+from elote import BlendedCompetitor, BradleyTerryCompetitor, EloCompetitor, GlickoCompetitor
+from elote.competitors.base import (
+    BaseCompetitor,
+    InvalidParameterException,
+    MissMatchedCompetitorTypesException,
+)
 
 
 class TestBlendedCompetitor(unittest.TestCase):
@@ -128,3 +134,54 @@ class TestBlendedCompetitor(unittest.TestCase):
                     r"BlendedCompetitor compositions .* cannot be co-mingled",
                 ):
                     getattr(player1, operation)(player2)
+
+
+class TestBlendedCompetitorLegacyState(unittest.TestCase):
+    """The legacy ``from_state`` shape resolves sub-competitors through the class registry."""
+
+    @staticmethod
+    def _legacy_state(*sub_states):
+        return {
+            "blend_mode": "mean",
+            "competitors": [{"type": type(c).__name__, "competitor_kwargs": c.export_state()} for c in sub_states],
+        }
+
+    @staticmethod
+    def _new_competitor(name):
+        competitor_class = BaseCompetitor.get_competitor_class(name)
+        if "initial_rating" in inspect.signature(competitor_class.__init__).parameters:
+            return competitor_class(initial_rating=1234)
+        return competitor_class()
+
+    def test_restores_bradley_terry_sub_competitor(self):
+        elo = EloCompetitor(initial_rating=400)
+        bradley_terry = BradleyTerryCompetitor(initial_rating=400)
+        bradley_terry.beat(BradleyTerryCompetitor(initial_rating=400))
+        expected_rating = bradley_terry.rating
+
+        restored = BlendedCompetitor.from_state(self._legacy_state(elo, bradley_terry))
+
+        self.assertEqual(
+            [type(c).__name__ for c in restored.sub_competitors], ["EloCompetitor", "BradleyTerryCompetitor"]
+        )
+        self.assertEqual(restored.sub_competitors[0].rating, 400)
+        self.assertAlmostEqual(restored.sub_competitors[1].rating, expected_rating)
+        self.assertAlmostEqual(restored.expected_score(restored), 0.5)
+
+    def test_accepts_every_registered_competitor_type(self):
+        names = [n for n in BaseCompetitor.list_competitor_types() if n != "BlendedCompetitor"]
+        self.assertIn("BradleyTerryCompetitor", names)
+
+        for name in names:
+            with self.subTest(competitor_type=name):
+                sub_competitor = self._new_competitor(name)
+                restored = BlendedCompetitor.from_state(self._legacy_state(sub_competitor))
+                self.assertEqual(len(restored.sub_competitors), 1)
+                self.assertIsInstance(restored.sub_competitors[0], type(sub_competitor))
+                self.assertAlmostEqual(restored.sub_competitors[0].rating, sub_competitor.rating)
+
+    def test_unknown_competitor_type_raises(self):
+        state = {"blend_mode": "mean", "competitors": [{"type": "NotACompetitor", "competitor_kwargs": {}}]}
+
+        with self.assertRaisesRegex(InvalidParameterException, "Unknown competitor type: NotACompetitor"):
+            BlendedCompetitor.from_state(state)
