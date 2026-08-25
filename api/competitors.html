@@ -487,12 +487,14 @@ that use different rating systems, which would lead to invalid results.</p>
 <code class="docutils literal notranslate"><span class="pre">a.beat(b,</span> <span class="pre">scores=(x,</span> <span class="pre">y))</span></code> <code class="docutils literal notranslate"><span class="pre">x</span></code> is <code class="docutils literal notranslate"><span class="pre">a</span></code>’s score and <code class="docutils literal notranslate"><span class="pre">y</span></code> is <code class="docutils literal notranslate"><span class="pre">b</span></code>’s. The same
 ordering holds for <code class="docutils literal notranslate"><span class="pre">lost_to</span></code>, <code class="docutils literal notranslate"><span class="pre">tied</span></code> and <code class="xref py py-meth docutils literal notranslate"><span class="pre">elote.LambdaArena.matchup()</span></code>, so a
 caller never has to reorder a score pair to match the method it is calling.</p>
-<dl>
-<dt>Args:</dt><dd><p>scores (sequence of float, optional): The two scores in caller order, or <code class="docutils literal notranslate"><span class="pre">None</span></code>.
-outcome (float): The declared result from the first score’s perspective –</p>
-<blockquote>
-<div><p><code class="docutils literal notranslate"><span class="pre">1.0</span></code> (first competitor won), <code class="docutils literal notranslate"><span class="pre">0.0</span></code> (first competitor lost) or <code class="docutils literal notranslate"><span class="pre">0.5</span></code> (draw).</p>
-</div></blockquote>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>scores (sequence of float, optional): The two scores in caller order, or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</dt><dd><p>Any real number is accepted – including NumPy scalars such as <code class="docutils literal notranslate"><span class="pre">np.int64</span></code> and
+<code class="docutils literal notranslate"><span class="pre">np.float32</span></code> – and normalized to a built-in <code class="docutils literal notranslate"><span class="pre">float</span></code>.</p>
+</dd>
+<dt>outcome (float): The declared result from the first score’s perspective –</dt><dd><p><code class="docutils literal notranslate"><span class="pre">1.0</span></code> (first competitor won), <code class="docutils literal notranslate"><span class="pre">0.0</span></code> (first competitor lost) or <code class="docutils literal notranslate"><span class="pre">0.5</span></code> (draw).</p>
+</dd>
+</dl>
 </dd>
 <dt>Returns:</dt><dd><p>tuple of float, or None: The validated scores as floats, or <code class="docutils literal notranslate"><span class="pre">None</span></code> when no score
 payload was supplied.</p>
