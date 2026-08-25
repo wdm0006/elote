@@ -182,29 +182,9 @@
     <span class="n">InvalidStateException</span><span class="p">,</span>
     <span class="n">MissMatchedCompetitorTypesException</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">EloCompetitor</span><span class="p">,</span>
-    <span class="n">ECFCompetitor</span><span class="p">,</span>
-    <span class="n">DWZCompetitor</span><span class="p">,</span>
-    <span class="n">GlickoCompetitor</span><span class="p">,</span>
-    <span class="n">Glicko2Competitor</span><span class="p">,</span>
-    <span class="n">TrueSkillCompetitor</span><span class="p">,</span>
-    <span class="n">ColleyMatrixCompetitor</span><span class="p">,</span>
-<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>  <span class="c1"># Import directly from the logging submodule</span>
 
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">"BlendedCompetitor"</span><span class="p">)</span>
-
-<span class="c1"># Dictionary mapping competitor type names to their classes</span>
-<span class="n">competitor_types</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">"EloCompetitor"</span><span class="p">:</span> <span class="n">EloCompetitor</span><span class="p">,</span>
-    <span class="s2">"ECFCompetitor"</span><span class="p">:</span> <span class="n">ECFCompetitor</span><span class="p">,</span>
-    <span class="s2">"DWZCompetitor"</span><span class="p">:</span> <span class="n">DWZCompetitor</span><span class="p">,</span>
-    <span class="s2">"GlickoCompetitor"</span><span class="p">:</span> <span class="n">GlickoCompetitor</span><span class="p">,</span>
-    <span class="s2">"Glicko2Competitor"</span><span class="p">:</span> <span class="n">Glicko2Competitor</span><span class="p">,</span>
-    <span class="s2">"TrueSkillCompetitor"</span><span class="p">:</span> <span class="n">TrueSkillCompetitor</span><span class="p">,</span>
-    <span class="s2">"ColleyMatrixCompetitor"</span><span class="p">:</span> <span class="n">ColleyMatrixCompetitor</span><span class="p">,</span>
-<span class="p">}</span>
 
 
 <div class="viewcode-block" id="BlendedCompetitor">
@@ -450,21 +430,17 @@
             <span class="n">competitors</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">comp_state</span> <span class="ow">in</span> <span class="n">competitors_state</span><span class="p">:</span>
                 <span class="n">comp_type_name</span> <span class="o">=</span> <span class="n">comp_state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"type"</span><span class="p">,</span> <span class="s2">"EloCompetitor"</span><span class="p">)</span>
-                <span class="n">comp_type</span> <span class="o">=</span> <span class="n">competitor_types</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">comp_type_name</span><span class="p">)</span>
-
-                <span class="k">if</span> <span class="n">comp_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"Unknown competitor type found in legacy state: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">comp_type_name</span><span class="p">)</span>
-                    <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unknown competitor type: </span><span class="si">{</span><span class="n">comp_type_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="n">BaseCompetitor</span><span class="o">.</span><span class="n">get_competitor_class</span><span class="p">(</span><span class="n">comp_type_name</span><span class="p">)</span>
 
                 <span class="n">comp_kwargs</span> <span class="o">=</span> <span class="n">comp_state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"competitor_kwargs"</span><span class="p">,</span> <span class="p">{})</span>
 
-                <span class="c1"># Create a new competitor specification with just the initial parameters</span>
-                <span class="n">competitors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="p">{</span>
-                        <span class="s2">"type"</span><span class="p">:</span> <span class="n">comp_type_name</span><span class="p">,</span>
-                        <span class="s2">"competitor_kwargs"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"initial_rating"</span><span class="p">:</span> <span class="n">comp_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_rating"</span><span class="p">,</span> <span class="mi">400</span><span class="p">)},</span>
-                    <span class="p">}</span>
+                <span class="c1"># Create a new competitor specification with just the initial parameters.</span>
+                <span class="c1"># Only forward an initial rating the state actually carries: not every</span>
+                <span class="c1"># rating system takes one.</span>
+                <span class="n">initial_kwargs</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="p">{</span><span class="s2">"initial_rating"</span><span class="p">:</span> <span class="n">comp_kwargs</span><span class="p">[</span><span class="s2">"initial_rating"</span><span class="p">]}</span> <span class="k">if</span> <span class="s2">"initial_rating"</span> <span class="ow">in</span> <span class="n">comp_kwargs</span> <span class="k">else</span> <span class="p">{}</span>
                 <span class="p">)</span>
+                <span class="n">competitors</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"type"</span><span class="p">:</span> <span class="n">comp_type_name</span><span class="p">,</span> <span class="s2">"competitor_kwargs"</span><span class="p">:</span> <span class="n">initial_kwargs</span><span class="p">})</span>
 
             <span class="c1"># Create the blended competitor</span>
             <span class="n">blended</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">competitors</span><span class="o">=</span><span class="n">competitors</span><span class="p">,</span> <span class="n">blend_mode</span><span class="o">=</span><span class="n">blend_mode</span><span class="p">)</span>
@@ -472,7 +448,7 @@
             <span class="c1"># Now update each sub-competitor with its full state</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">comp_state</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">competitors_state</span><span class="p">):</span>
                 <span class="n">comp_type_name</span> <span class="o">=</span> <span class="n">comp_state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"type"</span><span class="p">,</span> <span class="s2">"EloCompetitor"</span><span class="p">)</span>
-                <span class="n">comp_type</span> <span class="o">=</span> <span class="n">competitor_types</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">comp_type_name</span><span class="p">)</span>
+                <span class="n">comp_type</span> <span class="o">=</span> <span class="n">BaseCompetitor</span><span class="o">.</span><span class="n">get_competitor_class</span><span class="p">(</span><span class="n">comp_type_name</span><span class="p">)</span>
                 <span class="n">comp_kwargs</span> <span class="o">=</span> <span class="n">comp_state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"competitor_kwargs"</span><span class="p">,</span> <span class="p">{})</span>
 
                 <span class="c1"># Replace the sub-competitor with one created from the full state</span>
