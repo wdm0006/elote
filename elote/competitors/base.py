@@ -1,6 +1,7 @@
 import abc
 import json
 import math
+import numbers
 import uuid
 from typing import Dict, Any, Optional, Sequence, Tuple, TypeVar, Type, ClassVar, List, cast
 
@@ -64,6 +65,8 @@ def validate_scores(scores: Optional[Sequence[float]], outcome: float) -> Option
 
     Args:
         scores (sequence of float, optional): The two scores in caller order, or ``None``.
+            Any real number is accepted -- including NumPy scalars such as ``np.int64`` and
+            ``np.float32`` -- and normalized to a built-in ``float``.
         outcome (float): The declared result from the first score's perspective --
             ``1.0`` (first competitor won), ``0.0`` (first competitor lost) or ``0.5`` (draw).
 
@@ -85,13 +88,17 @@ def validate_scores(scores: Optional[Sequence[float]], outcome: float) -> Option
 
     validated: List[float] = []
     for value in scores:
-        if isinstance(value, bool) or not isinstance(value, (int, float)):
+        # numbers.Real rather than the built-in types, so the NumPy scalars a pandas or
+        # NumPy pipeline produces are accepted here exactly as they are by the dataset
+        # score path. Booleans and complex values are still not real numbers.
+        if isinstance(value, bool) or not isinstance(value, numbers.Real):
             raise ValueError(f"scores must contain only numbers, got {value!r}")
-        if not math.isfinite(value):
+        as_float = float(value)
+        if not math.isfinite(as_float):
             raise ValueError(f"scores must be finite, got {value!r}")
-        if value < 0:
+        if as_float < 0:
             raise ValueError(f"scores must be non-negative, got {value!r}")
-        validated.append(float(value))
+        validated.append(as_float)
 
     first, second = validated
     if outcome == 1.0 and not first > second:

@@ -10,6 +10,8 @@ import datetime
 import random
 import unittest
 
+import numpy as np
+
 from elote import (
     BradleyTerryCompetitor,
     ColleyMatrixCompetitor,
@@ -28,6 +30,7 @@ from elote import (
     benchmark_competitors,
     train_arena_with_dataset,
 )
+from elote.competitors.base import validate_scores
 
 
 def _always_true(a, b, attributes=None):
@@ -68,6 +71,12 @@ class TestScoreValidation(unittest.TestCase):
         ("too long", (3.0, 1.0, 0.0)),
         ("non numeric", (3.0, "1")),
         ("boolean", (True, False)),
+        ("numpy boolean", (np.bool_(True), np.bool_(False))),
+        ("complex", (complex(3, 0), complex(1, 0))),
+        ("numpy complex", (np.complex128(3), np.complex128(1))),
+        ("numpy nan", (np.float32("nan"), np.float32(1.0))),
+        ("numpy infinite", (np.float32("inf"), np.float32(1.0))),
+        ("numpy negative", (np.float32(3.0), np.float32(-1.0))),
         ("negative", (3.0, -1.0)),
         ("infinite", (float("inf"), 1.0)),
         ("nan", (float("nan"), 1.0)),
@@ -108,6 +117,86 @@ class TestScoreValidation(unittest.TestCase):
                 before = (a.export_state()["state"], b.export_state()["state"])
                 with self.assertRaises(ValueError):
                     a.beat(b, scores=(-1.0, -2.0))
+                self.assertEqual((a.export_state()["state"], b.export_state()["state"]), before)
+
+
+class TestNumpyScoreValidation(unittest.TestCase):
+    """Real NumPy scalars are as acceptable as the built-in numbers they stand in for.
+
+    NumPy and pandas pipelines hand out ``np.int64``/``np.float32`` rather than ``int``/
+    ``float``, and the dataset score path already accepts any non-boolean ``numbers.Real``.
+    ``np.float64`` is deliberately absent from these fixtures: it subclasses ``float``, so it
+    was accepted before this contract was widened and proves nothing.
+    """
+
+    # (label, win_scores) -- the winner's score first, as beat() requires.
+    NUMPY_SCALARS = (
+        ("numpy int64", (np.int64(3), np.int64(1))),
+        ("numpy int32", (np.int32(3), np.int32(1))),
+        ("numpy float32", (np.float32(3.5), np.float32(1.25))),
+        ("numpy float16", (np.float16(3.0), np.float16(1.0))),
+        ("mixed numpy and builtin", (np.int64(3), 1.0)),
+    )
+
+    def test_validate_scores_normalizes_to_builtin_floats(self):
+        """The accepted values come back as built-in floats, not the NumPy scalars given."""
+        for label, win_scores in self.NUMPY_SCALARS:
+            with self.subTest(payload=label):
+                first, second = validate_scores(win_scores, 1.0)
+                # `is float`, not isinstance: np.float64 subclasses float, so isinstance
+                # would pass on an implementation that skipped the conversion entirely.
+                self.assertIs(type(first), float)
+                self.assertIs(type(second), float)
+                self.assertEqual((first, second), (float(win_scores[0]), float(win_scores[1])))
+
+    def test_results_accept_numpy_scores_for_every_competitor(self):
+        """beat/lost_to/tied take outcome-consistent NumPy pairs and move real ratings."""
+        for competitor_class in COMPETITOR_CLASSES:
+            for label, win_scores in self.NUMPY_SCALARS:
+                with self.subTest(competitor=competitor_class.__name__, payload=label):
+                    high, low = win_scores
+                    draw = (low, low)
+
+                    a, b = competitor_class(), competitor_class()
+                    before = a.export_state()["state"]
+                    a.beat(b, scores=(high, low))
+                    a.lost_to(b, scores=(low, high))
+                    a.tied(b, scores=draw)
+                    self.assertNotEqual(a.export_state()["state"], before)
+
+    def test_numpy_scores_match_the_equivalent_builtin_payload(self):
+        """A NumPy pair and its float equivalent drive identical rating updates."""
+        for competitor_class in COMPETITOR_CLASSES:
+            with self.subTest(competitor=competitor_class.__name__):
+                numpy_a, numpy_b = competitor_class(), competitor_class()
+                float_a, float_b = competitor_class(), competitor_class()
+
+                numpy_a.beat(numpy_b, scores=(np.int64(3), np.float32(1.0)))
+                float_a.beat(float_b, scores=(3.0, 1.0))
+
+                # Glicko-1/Glicko-2 inflate RD from wall-clock elapsed time, so the two runs
+                # differ by ~1e-10 for reasons unrelated to the score payload.
+                self.assertAlmostEqual(numpy_a.rating, float_a.rating, places=6)
+                self.assertAlmostEqual(numpy_b.rating, float_b.rating, places=6)
+
+    def test_numpy_scores_that_disagree_with_the_outcome_are_rejected(self):
+        for competitor_class in COMPETITOR_CLASSES:
+            with self.subTest(competitor=competitor_class.__name__):
+                a, b = competitor_class(), competitor_class()
+                with self.assertRaises(ValueError):
+                    a.beat(b, scores=(np.int64(1), np.int64(3)))
+                with self.assertRaises(ValueError):
+                    a.lost_to(b, scores=(np.float32(3.0), np.float32(1.0)))
+                with self.assertRaises(ValueError):
+                    a.tied(b, scores=(np.int64(3), np.int64(1)))
+
+    def test_rejected_numpy_scores_leave_both_competitors_untouched(self):
+        for competitor_class in COMPETITOR_CLASSES:
+            with self.subTest(competitor=competitor_class.__name__):
+                a, b = competitor_class(), competitor_class()
+                before = (a.export_state()["state"], b.export_state()["state"])
+                with self.assertRaises(ValueError):
+                    a.beat(b, scores=(np.float32("nan"), np.float32(1.0)))
                 self.assertEqual((a.export_state()["state"], b.export_state()["state"]), before)
 
 
