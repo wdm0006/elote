@@ -3,14 +3,17 @@
 import datetime
 import math
 import unittest
+from unittest.mock import patch
 
 from elote import (
     EloCompetitor,
     PythagoreanCompetitor,
+    WholeHistoryRatingCompetitor,
     group_by_period,
     tune,
     walk_forward,
 )
+from elote.competitors.base import InvalidParameterException
 
 
 def _row(a, b, outcome, when, scores=None):
@@ -117,6 +120,29 @@ class TestWalkForward(unittest.TestCase):
         walk_forward(PythagoreanCompetitor, _season(), warmup=1, competitor_params={"exponent": 9.0})
         self.assertEqual(PythagoreanCompetitor._exponent, before)
 
+    def test_valid_class_parameter_changes_metrics(self):
+        low = walk_forward(EloCompetitor, _season(), warmup=1, competitor_params={"k_factor": 8})
+        high = walk_forward(EloCompetitor, _season(), warmup=1, competitor_params={"k_factor": 64})
+        self.assertNotEqual(low.log_loss, high.log_loss)
+
+    def test_rejects_constructor_parameter_with_grid_searchable_default(self):
+        with self.assertRaisesRegex(InvalidParameterException, "w2.*default_w2.*base_competitor_kwargs"):
+            walk_forward(
+                WholeHistoryRatingCompetitor,
+                _season(),
+                warmup=1,
+                competitor_params={"w2": 100.0},
+            )
+
+    def test_rejects_constructor_parameter_without_class_default(self):
+        with self.assertRaisesRegex(InvalidParameterException, "initial_rating.*base_competitor_kwargs"):
+            walk_forward(EloCompetitor, _season(), warmup=1, competitor_params={"initial_rating": 1500})
+
+    def test_rejects_typo_before_training(self):
+        periods = [[("A", "B")]]
+        with self.assertRaisesRegex(InvalidParameterException, "kfactor"):
+            walk_forward(EloCompetitor, periods, competitor_params={"kfactor": 32})
+
     def test_rejects_a_warmup_that_leaves_nothing_to_score(self):
         periods = _season(weeks=2)
         with self.assertRaises(ValueError):
@@ -163,6 +189,22 @@ class TestTune(unittest.TestCase):
             tune(EloCompetitor, {"k_factor": [16]}, _season(), metric="nonsense")
         with self.assertRaises(ValueError):
             tune(EloCompetitor, {}, _season())
+
+    def test_rejects_bad_grid_before_running_any_point(self):
+        with patch("elote.evaluation.walk_forward") as mocked_walk_forward:
+            with self.assertRaisesRegex(InvalidParameterException, "kfactor"):
+                tune(EloCompetitor, {"kfactor": [8, 16, 32]}, _season())
+        mocked_walk_forward.assert_not_called()
+
+    def test_whole_history_class_default_changes_log_loss(self):
+        results = tune(
+            WholeHistoryRatingCompetitor,
+            {"default_w2": [1.0, 5000.0]},
+            _season(weeks=8, teams=("A", "B", "C", "D", "E", "F", "G", "H")),
+            warmup=1,
+        )
+        losses = {round(result.report.log_loss, 10) for result in results}
+        self.assertEqual(len(losses), 2)
 
 
 if __name__ == "__main__":

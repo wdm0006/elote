@@ -24,7 +24,7 @@ from itertools import product
 from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Type
 
 from elote.arenas.lambda_arena import LambdaArena
-from elote.competitors.base import BaseCompetitor
+from elote.competitors.base import BaseCompetitor, InvalidParameterException
 from elote.datasets.utils import train_arena_with_dataset
 from elote.logging import logger
 
@@ -34,6 +34,25 @@ __all__ = ["WalkForwardReport", "TuningResult", "group_by_period", "walk_forward
 Row = Tuple[Any, Any, float, Optional[datetime], Optional[Dict[str, Any]]]
 
 _PROBABILITY_EPS = 1e-12
+
+
+def _validate_competitor_params(competitor_class: Type[BaseCompetitor], names: Iterable[str]) -> None:
+    for name in names:
+        class_variable = f"_{name}"
+        if hasattr(competitor_class, class_variable):
+            continue
+        default_name = f"default_{name}"
+        if hasattr(competitor_class, f"_{default_name}"):
+            route = (
+                f"use {default_name!r} to tune its class-level default; "
+                f"fixed constructor arguments such as {name!r} go in base_competitor_kwargs"
+            )
+        else:
+            route = f"constructor arguments such as {name!r} go in base_competitor_kwargs"
+        raise InvalidParameterException(
+            f"{competitor_class.__name__} has no class variable {class_variable!r}; "
+            f"{route}, not competitor_params"
+        )
 
 
 @dataclass(frozen=True)
@@ -128,8 +147,10 @@ def walk_forward(
     Args:
         competitor_class: The rating system to evaluate.
         periods: Ordered periods of dataset rows, as produced by :func:`group_by_period`.
-        competitor_params: Class variables to set for the duration of the run, without the
-            leading underscore. ``{"w2": 100.0}`` sets ``_w2``.
+        competitor_params: Existing class-level knobs to set for the duration of the run,
+            without the leading underscore. ``{"default_w2": 100.0}`` sets
+            ``_default_w2``. Constructor arguments instead belong in
+            ``base_competitor_kwargs``.
         base_competitor_kwargs: Constructor keyword arguments for every competitor.
         comparison_function: Arena comparison function. Defaults to one that reports the
             recorded outcome, which is what a dataset row already carries.
@@ -149,6 +170,8 @@ def walk_forward(
     if periods and warmup >= len(periods):
         raise ValueError(f"warmup ({warmup}) leaves no periods to score (have {len(periods)})")
 
+    _validate_competitor_params(competitor_class, (competitor_params or {}).keys())
+
     comparison = comparison_function if comparison_function is not None else (lambda a, b, attributes=None: True)
     arena = LambdaArena(
         comparison,
@@ -157,7 +180,7 @@ def walk_forward(
     )
 
     overrides = {f"_{name}": value for name, value in (competitor_params or {}).items()}
-    originals = {name: getattr(competitor_class, name) for name in overrides if hasattr(competitor_class, name)}
+    originals = {name: getattr(competitor_class, name) for name in overrides}
 
     predictions = skipped = draws = 0
     log_loss_total = brier_total = 0.0
@@ -200,9 +223,6 @@ def walk_forward(
     finally:
         for name, value in originals.items():
             setattr(competitor_class, name, value)
-        for name in overrides:
-            if name not in originals:
-                delattr(competitor_class, name)
 
     if not predictions:
         logger.warning("Walk-forward produced no scored predictions (skipped %d, draws %d).", skipped, draws)
@@ -251,6 +271,8 @@ def tune(
         raise ValueError(f"unknown metric {metric!r}; expected 'log_loss', 'brier' or 'accuracy'")
     if not param_grid:
         raise ValueError("param_grid must not be empty")
+
+    _validate_competitor_params(competitor_class, param_grid)
 
     names = sorted(param_grid)
     results: List[TuningResult] = []
