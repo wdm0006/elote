@@ -43,6 +43,7 @@ Analysis and Benchmarking:
 """
 
 # Core competitors - always available
+from elote.competitors.base import BaseCompetitor
 from elote.competitors.elo import EloCompetitor
 from elote.competitors.glicko import GlickoCompetitor
 from elote.competitors.glicko2 import Glicko2Competitor
@@ -89,6 +90,7 @@ from typing import Any, List, Dict
 # Base __all__ list with always-available exports
 __all__ = [
     # Competitors
+    "BaseCompetitor",
     "EloCompetitor",
     "GlickoCompetitor",
     "Glicko2Competitor",

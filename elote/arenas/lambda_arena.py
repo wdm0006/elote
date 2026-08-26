@@ -188,6 +188,51 @@ class LambdaArena(BaseArena):
                 self.competitors[b].beat(self.competitors[a], scores=reversed_scores)
             self.history.add_bout(Bout(a, b, predicted_outcome, outcome="loss", attributes=attributes))
 
+    def rating_period(
+        self,
+        matchups: Sequence[Tuple[Any, Any, float, Optional[Sequence[float]]]],
+        *,
+        period_end: Optional[datetime.datetime] = None,
+    ) -> None:
+        """Process a batch of results against one shared pre-period state.
+
+        Every row is validated before the arena is changed. Predictions for all rows
+        are then captured before the batch is applied, so an earlier result in the
+        period cannot inform a later prediction from the same period.
+
+        Args:
+            matchups: ``(competitor_a, competitor_b, outcome, scores)`` tuples. Outcomes
+                are ``1.0``, ``0.0``, or ``0.5`` from A's perspective. Scores are
+                optional and use ``(a_score, b_score)`` caller order.
+
+            period_end: The shared activity time for time-aware competitors.
+
+        Raises:
+            ValueError: If any outcome or score payload is invalid. Validation happens
+                before competitors or bouts are added.
+        """
+        validated_matchups: List[Tuple[Any, Any, float, Optional[Tuple[float, float]]]] = []
+        for a, b, outcome, scores in matchups:
+            self._validate_outcome(outcome)
+            validated_scores = BaseCompetitor._validate_scores(scores, outcome)
+            validated_matchups.append((a, b, outcome, validated_scores))
+
+        for a, b, _, _ in validated_matchups:
+            if a not in self.competitors:
+                self.competitors[a] = self.base_competitor(**self.base_competitor_kwargs)
+            if b not in self.competitors:
+                self.competitors[b] = self.base_competitor(**self.base_competitor_kwargs)
+
+        predictions = [self.expected_score(a, b) for a, b, _, _ in validated_matchups]
+        results = [
+            (self.competitors[a], self.competitors[b], outcome, scores)
+            for a, b, outcome, scores in validated_matchups
+        ]
+        self.base_competitor.apply_rating_period(results, period_end=period_end)
+
+        for (a, b, outcome, _), predicted_outcome in zip(validated_matchups, predictions, strict=True):
+            self.history.add_bout(Bout(a, b, predicted_outcome, outcome=outcome))
+
     def expected_score(self, a: Any, b: Any) -> float:
         """Calculate the expected score for a matchup between two competitors.
 
