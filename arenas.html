@@ -177,6 +177,20 @@
 type of arena implemented, LambdaArenas</p>
 <section id="lambda-arena">
 <h2>Lambda Arena<a class="headerlink" href="#lambda-arena" title="Link to this heading">¶</a></h2>
+<section id="rating-periods">
+<h3>Rating periods<a class="headerlink" href="#rating-periods" title="Link to this heading">¶</a></h3>
+<p>A rating period is a batch of results that share one pre-period rating state. Use
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">rating_period()</span></code> when every prediction in the batch should
+be made before any result in that batch changes a rating. This differs from calling
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">matchup()</span></code> repeatedly, where each result immediately informs
+the next prediction.</p>
+<p>Each row is <code class="docutils literal notranslate"><span class="pre">(competitor_a,</span> <span class="pre">competitor_b,</span> <span class="pre">outcome,</span> <span class="pre">scores)</span></code>. The outcome is
+<code class="docutils literal notranslate"><span class="pre">1.0</span></code>, <code class="docutils literal notranslate"><span class="pre">0.0</span></code>, or <code class="docutils literal notranslate"><span class="pre">0.5</span></code> from the first competitor’s perspective, and scores
+may be <code class="docutils literal notranslate"><span class="pre">None</span></code>. All currently shipped rating systems use
+<a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor.apply_rating_period" title="elote.competitors.base.BaseCompetitor.apply_rating_period"><code class="xref py py-meth docutils literal notranslate"><span class="pre">apply_rating_period()</span></code></a>’s sequential
+default, so their final ratings match a stream of the same pairwise updates. A
+period-native system can override that operation to update its population
+simultaneously while keeping the pairwise API intact.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="elote.arenas.lambda_arena.LambdaArena">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">elote.arenas.lambda_arena.</span></span><span class="sig-name descname"><span class="pre">LambdaArena</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">func:</span> <span class="pre">~typing.Callable[[...],</span> <span class="pre">bool</span> <span class="pre">|</span> <span class="pre">None],</span> <span class="pre">base_competitor:</span> <span class="pre">~typing.Type[~elote.competitors.base.BaseCompetitor]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'elote.competitors.elo.EloCompetitor'&gt;,</span> <span class="pre">base_competitor_kwargs:</span> <span class="pre">~typing.Dict[str,</span> <span class="pre">~typing.Any]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">initial_state:</span> <span class="pre">~typing.Dict[~typing.Any,</span> <span class="pre">~typing.Dict[str,</span> <span class="pre">~typing.Any]]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/elote/arenas/lambda_arena.html#LambdaArena"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.arenas.lambda_arena.LambdaArena" title="Link to this definition">¶</a></dt>
@@ -314,6 +328,29 @@ negative, non-finite, or disagrees with <code class="docutils literal notranslat
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="elote.arenas.lambda_arena.LambdaArena.rating_period">
+<span class="sig-name descname"><span class="pre">rating_period</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matchups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">period_end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/arenas/lambda_arena.html#LambdaArena.rating_period"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.arenas.lambda_arena.LambdaArena.rating_period" title="Link to this definition">¶</a></dt>
+<dd><p>Process a batch of results against one shared pre-period state.</p>
+<p>Every row is validated before the arena is changed. Predictions for all rows
+are then captured before the batch is applied, so an earlier result in the
+period cannot inform a later prediction from the same period.</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>matchups: <code class="docutils literal notranslate"><span class="pre">(competitor_a,</span> <span class="pre">competitor_b,</span> <span class="pre">outcome,</span> <span class="pre">scores)</span></code> tuples. Outcomes</dt><dd><p>are <code class="docutils literal notranslate"><span class="pre">1.0</span></code>, <code class="docutils literal notranslate"><span class="pre">0.0</span></code>, or <code class="docutils literal notranslate"><span class="pre">0.5</span></code> from A’s perspective. Scores are
+optional and use <code class="docutils literal notranslate"><span class="pre">(a_score,</span> <span class="pre">b_score)</span></code> caller order.</p>
+</dd>
+</dl>
+<p>period_end: The shared activity time for time-aware competitors.</p>
+</dd>
+<dt>Raises:</dt><dd><dl class="simple">
+<dt>ValueError: If any outcome or score payload is invalid. Validation happens</dt><dd><p>before competitors or bouts are added.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="elote.arenas.lambda_arena.LambdaArena.set_competitor_class_var">
 <span class="sig-name descname"><span class="pre">set_competitor_class_var</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/arenas/lambda_arena.html#LambdaArena.set_competitor_class_var"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.arenas.lambda_arena.LambdaArena.set_competitor_class_var" title="Link to this definition">¶</a></dt>
 <dd><p>Set a class variable on the base competitor class.</p>
@@ -358,6 +395,7 @@ progress_bar (bool, optional): Whether to display a progress bar.</p>
 
 </dd></dl>
 
+</section>
 </section>
 <section id="helpers">
 <h2>Helpers<a class="headerlink" href="#helpers" title="Link to this heading">¶</a></h2>

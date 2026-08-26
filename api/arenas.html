@@ -706,6 +706,29 @@ negative, non-finite, or disagrees with <code class="docutils literal notranslat
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="elote.arenas.lambda_arena.LambdaArena.rating_period">
+<span class="sig-name descname"><span class="pre">rating_period</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matchups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">period_end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/arenas/lambda_arena.html#LambdaArena.rating_period"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.arenas.lambda_arena.LambdaArena.rating_period" title="Link to this definition">¶</a></dt>
+<dd><p>Process a batch of results against one shared pre-period state.</p>
+<p>Every row is validated before the arena is changed. Predictions for all rows
+are then captured before the batch is applied, so an earlier result in the
+period cannot inform a later prediction from the same period.</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>matchups: <code class="docutils literal notranslate"><span class="pre">(competitor_a,</span> <span class="pre">competitor_b,</span> <span class="pre">outcome,</span> <span class="pre">scores)</span></code> tuples. Outcomes</dt><dd><p>are <code class="docutils literal notranslate"><span class="pre">1.0</span></code>, <code class="docutils literal notranslate"><span class="pre">0.0</span></code>, or <code class="docutils literal notranslate"><span class="pre">0.5</span></code> from A’s perspective. Scores are
+optional and use <code class="docutils literal notranslate"><span class="pre">(a_score,</span> <span class="pre">b_score)</span></code> caller order.</p>
+</dd>
+</dl>
+<p>period_end: The shared activity time for time-aware competitors.</p>
+</dd>
+<dt>Raises:</dt><dd><dl class="simple">
+<dt>ValueError: If any outcome or score payload is invalid. Validation happens</dt><dd><p>before competitors or bouts are added.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="elote.arenas.lambda_arena.LambdaArena.set_competitor_class_var">
 <span class="sig-name descname"><span class="pre">set_competitor_class_var</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/arenas/lambda_arena.html#LambdaArena.set_competitor_class_var"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.arenas.lambda_arena.LambdaArena.set_competitor_class_var" title="Link to this definition">¶</a></dt>
 <dd><p>Set a class variable on the base competitor class.</p>
