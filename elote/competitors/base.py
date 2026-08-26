@@ -276,6 +276,54 @@ class BaseCompetitor(abc.ABC):
         """
         pass
 
+    @classmethod
+    def apply_rating_period(
+        cls,
+        results: Sequence[Tuple["BaseCompetitor", "BaseCompetitor", float, Optional[Sequence[float]]]],
+        *,
+        period_end: Optional[Any] = None,
+    ) -> None:
+        """Apply results that share one rating period.
+
+        The default implementation replays results in order through the pairwise
+        methods. Rating systems whose published update is period-native can override
+        this method to update the population simultaneously without changing the
+        existing pairwise API.
+
+        Args:
+            results: ``(competitor_a, competitor_b, outcome, scores)`` tuples. Outcomes
+                use ``1.0`` for an A win, ``0.0`` for a B win, and ``0.5`` for a draw;
+                scores follow the same optional caller-order contract as :meth:`beat`.
+
+            period_end: The shared activity time for time-aware competitors.
+
+        Raises:
+            ValueError: If an outcome is not ``1.0``, ``0.0``, or ``0.5``, or if a
+                score payload is invalid or inconsistent with its outcome.
+        """
+        for competitor_a, competitor_b, outcome, scores in results:
+            if outcome not in (1.0, 0.0, 0.5):
+                raise ValueError(f"outcome must be one of 1.0, 0.0 or 0.5, got {outcome!r}")
+
+            supports_time = hasattr(competitor_a, "_last_activity")
+            if outcome == 1.0:
+                if supports_time:
+                    competitor_a.beat(competitor_b, match_time=period_end, scores=scores)  # type: ignore[call-arg]
+                else:
+                    competitor_a.beat(competitor_b, scores=scores)
+            elif outcome == 0.0:
+                reversed_scores = None if scores is None else (scores[1], scores[0])
+                if supports_time:
+                    competitor_b.beat(  # type: ignore[call-arg]
+                        competitor_a, match_time=period_end, scores=reversed_scores
+                    )
+                else:
+                    competitor_b.beat(competitor_a, scores=reversed_scores)
+            elif supports_time:
+                competitor_a.tied(competitor_b, match_time=period_end, scores=scores)  # type: ignore[call-arg]
+            else:
+                competitor_a.tied(competitor_b, scores=scores)
+
     def export_state(self) -> Dict[str, Any]:
         """Export the current state of this competitor for serialization.
 
