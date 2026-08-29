@@ -3,6 +3,8 @@ Comparing Rating Systems
 
 This page provides a side-by-side comparison of the rating systems implemented in Elote, helping you choose the right system for your specific use case.
 
+For a reproducible, measured comparison across all of Elote's rating systems on one interface and one split, with the exact command to rerun it yourself, see :doc:`comparison_benchmark`.
+
 Overview Comparison
 ------------------
 

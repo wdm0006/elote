@@ -52,6 +52,7 @@ Elote makes implementing these systems simple and intuitive, with a clean API th
    rating_systems/whr
    rating_systems/ensemble
    rating_systems/comparison
+   rating_systems/comparison_benchmark
 
 .. toctree::
    :maxdepth: 1
