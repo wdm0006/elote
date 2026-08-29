@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Compare every rating system elote ships, on one interface, on one split.
 
-The point of this script is not to crown a winner. It is to make the comparison
-cheap enough to argue with: one dataset generator, one training loop, one
-evaluation loop, one metrics block, and a CSV you can regenerate.
+This script makes the comparison cheap enough to argue with: one dataset
+generator, one training loop, one evaluation loop, one metrics block, and a
+CSV you can regenerate. It does not crown a winner.
 
 Usage:
     python scripts/rating_system_comparison.py
