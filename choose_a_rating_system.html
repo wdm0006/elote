@@ -1,0 +1,932 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="Route from problem characteristics — uncertainty, draws, score margins, online updates, global fits, persistence — to a shortlist of rating systems, then measure them on your own data." name="description" />
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z43R9PWW0B"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-Z43R9PWW0B');
+    </script>
+    
+    <title>How to choose a rating system &#8212; elote 1.3.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=30d13653" />
+    <link rel="stylesheet" type="text/css" href="_static/css/wabi.css?v=501c8ac3" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=71d92741" />
+    <script src="_static/documentation_options.js?v=8ca9e7a0"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Arenas" href="arenas.html" />
+    <link rel="prev" title="Competitors" href="competitors.html" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+
+
+
+<meta name="description" content="How to choose a rating system - elote documentation">
+
+
+
+
+
+
+
+
+
+<meta property="og:title" content="How to choose a rating system">
+<meta property="og:description" content="How to choose a rating system - elote documentation">
+<meta property="og:type" content="website">
+
+<meta property="og:url" content="https://elote.mcginniscommawill.com/choose_a_rating_system.html">
+
+
+<meta property="og:site_name" content="elote">
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How to choose a rating system">
+<meta name="twitter:description" content="How to choose a rating system - elote documentation">
+
+<meta name="twitter:site" content="@willmcginniser">
+
+
+
+
+
+<link rel="canonical" href="https://elote.mcginniscommawill.com/choose_a_rating_system.html">
+
+
+ 
+
+  </head><body>
+<header class="header">
+  <div class="header__inner">
+    
+    <a href="https://mcginniscommawill.com" class="header__logo">
+      McGinnis, Will
+    </a>
+
+    
+    <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+      </svg>
+    </button>
+
+    
+    <nav class="nav" role="navigation">
+      
+      
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/guides/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Guides
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/topics/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Topics
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/posts/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Blog
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/about/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            About
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/coffee/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Free Coffee
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/oss/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            OSS
+          </a>
+        
+      
+
+      
+      
+      <a href="index.html" class="nav__link nav__link--active">
+        Docs
+      </a>
+      
+    </nav>
+  </div>
+</header>
+
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <div class="breadcrumbs__inner">
+    
+    <a href="https://mcginniscommawill.com">Home</a>
+    <span class="breadcrumbs__separator">/</span>
+    
+    <a href="index.html">Docs</a>
+    
+    
+    <span class="breadcrumbs__separator">/</span>
+    <span>How to choose a rating system</span>
+    
+  </div>
+</nav>
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="how-to-choose-a-rating-system">
+<h1>How to choose a rating system<a class="headerlink" href="#how-to-choose-a-rating-system" title="Link to this heading">¶</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The measured tables and code output below come from a snapshot verified on
+2026-08-09 against ten of Elote’s rating systems. The library has since
+added two more concrete systems, <a class="reference internal" href="rating_systems/pythagorean.html"><span class="doc">Pythagorean</span></a>
+and <a class="reference internal" href="rating_systems/whr.html"><span class="doc">Whole-History Rating</span></a>, which are not covered
+by this comparison. The runnable examples were re-checked against a current
+install and produce the same qualitative results; a handful of measured
+figures (noted inline) differ from this snapshot in later decimal places
+because the library has changed since. Treat every number here as a
+demonstration of the method, and use “Run it on your own data” below to get
+figures for your own history and current install.</p>
+</div>
+<p><strong>Route by what your problem looks like, not by which algorithm is famous.</strong> If
+you need a per-competitor confidence value, three of the ten systems here give
+you one. If your results carry real scores, two of them read the margin. If your
+ranking must not depend on the order games were played in, four of them fit the
+whole result set at once. Everything else is a preference until you measure it —
+and because every system in Elote answers the same four calls, measuring it on
+your own history is a loop over a dictionary, not a rewrite.</p>
+<p>No system on this page is the best one. The measured ordering changes with the
+data: on three generated scenarios run through the same split, no system won all
+three, and on one of them the system that ranked first on accuracy ranked
+seventh of ten on Brier score.</p>
+<section id="start-here">
+<h2>Start here<a class="headerlink" href="#start-here" title="Link to this heading">¶</a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 42.9%" />
+<col style="width: 21.4%" />
+<col style="width: 35.7%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>If your problem looks like this</p></th>
+<th class="head"><p>Start with</p></th>
+<th class="head"><p>Then read</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Two competitors, a win or a loss, results arriving continuously</p></td>
+<td><p>Elo</p></td>
+<td><p><a class="reference internal" href="rating_systems/elo.html"><span class="doc">Elo</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>The same, but you need to know how sure the rating is</p></td>
+<td><p>Glicko-1 or Glicko-2</p></td>
+<td><p><a class="reference internal" href="rating_systems/elo_vs_glicko_vs_trueskill.html"><span class="doc">Elo vs Glicko vs TrueSkill</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>Competitors appear, play a handful of games, and go quiet</p></td>
+<td><p>Glicko-2</p></td>
+<td><p><a class="reference internal" href="rating_systems/glicko2.html"><span class="doc">Glicko-2</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Teams, or more than two sides per result</p></td>
+<td><p>TrueSkill</p></td>
+<td><p><a class="reference internal" href="rating_systems/trueskill.html"><span class="doc">TrueSkill</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>Draws are common and carry information</p></td>
+<td><p>Glicko-1, Glicko-2, or TrueSkill</p></td>
+<td><p><a class="reference internal" href="#draws">Draws</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Results carry real scores and the margin matters</p></td>
+<td><p>Massey or Keener</p></td>
+<td><p><a class="reference internal" href="#score-margins">Score margins</a></p></td>
+</tr>
+<tr class="row-even"><td><p>A fixed season of results, ranked once, order must not matter</p></td>
+<td><p>Colley, Massey, Keener, or Bradley-Terry</p></td>
+<td><p><a class="reference internal" href="#incremental-updates-or-a-global-fit">Incremental updates or a global fit</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>You want predicted point spreads, not just probabilities</p></td>
+<td><p>Massey</p></td>
+<td><p><a class="reference internal" href="rating_systems/massey.html"><span class="doc">Massey</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>A national chess federation’s published formula</p></td>
+<td><p>ECF or DWZ</p></td>
+<td><p><a class="reference internal" href="rating_systems/ecf.html"><span class="doc">ECF</span></a>, <a class="reference internal" href="rating_systems/dwz.html"><span class="doc">DWZ</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>You genuinely do not know</p></td>
+<td><p>Any two rows above, then measure</p></td>
+<td><p><a class="reference internal" href="#run-it-on-your-own-data">Run it on your own data</a></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="the-ten-systems-by-decision-axis">
+<h2>The ten systems, by decision axis<a class="headerlink" href="#the-ten-systems-by-decision-axis" title="Link to this heading">¶</a></h2>
+<p>Every concrete system Elote exported at the time this page was measured.
+<code class="docutils literal notranslate"><span class="pre">Uncertainty</span></code> means the object publishes a per-competitor spread you can
+read. <code class="docutils literal notranslate"><span class="pre">Reads</span> <span class="pre">score</span> <span class="pre">margins</span></code> means supplying a score changes the rating; the
+systems marked no accept the score channel and ignore it. <code class="docutils literal notranslate"><span class="pre">Keeps</span> <span class="pre">your</span> <span class="pre">prior</span></code>
+means <code class="docutils literal notranslate"><span class="pre">initial_rating</span></code> still affects predictions after results exist.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15.7%" />
+<col style="width: 13.7%" />
+<col style="width: 13.7%" />
+<col style="width: 15.7%" />
+<col style="width: 13.7%" />
+<col style="width: 15.7%" />
+<col style="width: 11.8%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>System</p></th>
+<th class="head"><p>Update model</p></th>
+<th class="head"><p>Uncertainty</p></th>
+<th class="head"><p>Reads score margins</p></th>
+<th class="head"><p>Keeps your prior</p></th>
+<th class="head"><p>Rating scale</p></th>
+<th class="head"><p>Default start</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Elo</p></td>
+<td><p>Incremental</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+<td><p>Chess-like points</p></td>
+<td><p>400</p></td>
+</tr>
+<tr class="row-odd"><td><p>Glicko-1</p></td>
+<td><p>Incremental</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">rd</span></code></p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+<td><p>Chess-like points</p></td>
+<td><p>1500</p></td>
+</tr>
+<tr class="row-even"><td><p>Glicko-2</p></td>
+<td><p>Incremental</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">rd</span></code>, <code class="docutils literal notranslate"><span class="pre">volatility</span></code></p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+<td><p>Chess-like points</p></td>
+<td><p>1500</p></td>
+</tr>
+<tr class="row-odd"><td><p>TrueSkill</p></td>
+<td><p>Incremental</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sigma</span></code></p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">mu</span></code> / <code class="docutils literal notranslate"><span class="pre">sigma</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">mu</span></code> 25, <code class="docutils literal notranslate"><span class="pre">sigma</span></code> 8.333</p></td>
+</tr>
+<tr class="row-even"><td><p>ECF</p></td>
+<td><p>Incremental</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+<td><p>ECF grading points</p></td>
+<td><p>100</p></td>
+</tr>
+<tr class="row-odd"><td><p>DWZ</p></td>
+<td><p>Incremental</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>yes</p></td>
+<td><p>Chess-like points</p></td>
+<td><p>400</p></td>
+</tr>
+<tr class="row-even"><td><p>Colley Matrix</p></td>
+<td><p>Global fit</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>, sums to n/2</p></td>
+<td><p>0.5</p></td>
+</tr>
+<tr class="row-odd"><td><p>Massey</p></td>
+<td><p>Global fit</p></td>
+<td><p>no</p></td>
+<td><p><strong>yes</strong></p></td>
+<td><p>no</p></td>
+<td><p>Zero-mean margin</p></td>
+<td><p>0.0</p></td>
+</tr>
+<tr class="row-even"><td><p>Keener</p></td>
+<td><p>Global fit</p></td>
+<td><p>no</p></td>
+<td><p><strong>yes</strong></p></td>
+<td><p>no</p></td>
+<td><p>Positive, mean 1.0</p></td>
+<td><p>1.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>Bradley-Terry</p></td>
+<td><p>Global fit</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>no</p></td>
+<td><p>Elo-compatible points</p></td>
+<td><p>1500</p></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">BlendedCompetitor</span></code> is a weighted ensemble over any of the above rather than
+a rating system in its own right, so it has no row: its behaviour on every
+axis is whatever its components’ behaviour is. See
+<a class="reference internal" href="rating_systems/ensemble.html"><span class="doc">Ensemble</span></a>. <code class="docutils literal notranslate"><span class="pre">PythagoreanCompetitor</span></code> and
+<code class="docutils literal notranslate"><span class="pre">WholeHistoryRatingCompetitor</span></code> are newer additions not covered by this
+comparison; see their own pages for their axes.</p>
+<p>Two consequences of that table are worth stating before you read further,
+because both surprise people:</p>
+<ul class="simple">
+<li><p>The default starting rating is <strong>not</strong> the same across systems — it ranges
+from 100 to 1500. If you compare systems without passing <code class="docutils literal notranslate"><span class="pre">initial_rating</span></code>,
+part of what you measure is the difference between those defaults. Set it
+explicitly.</p></li>
+<li><p>For the four global-fit systems, <code class="docutils literal notranslate"><span class="pre">initial_rating</span></code> is a placeholder, not a
+prior. Started at 1600 against 1400, Bradley-Terry predicts 0.7597 for the
+favourite; after a single drawn game it predicts exactly 0.5000, with both
+ratings back at 1500. The fit sees results, not your beliefs about them.</p></li>
+</ul>
+</section>
+<section id="one-workflow-ten-systems">
+<h2>One workflow, ten systems<a class="headerlink" href="#one-workflow-ten-systems" title="Link to this heading">¶</a></h2>
+<p>The reason a comparison is cheap here is that the workflow does not change.
+Feed results to an arena; read a leaderboard and an expected score out of it.
+Swapping the rating system is one constructor argument:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span><span class="p">,</span> <span class="n">GlickoCompetitor</span><span class="p">,</span> <span class="n">LambdaArena</span>
+
+<span class="c1"># Your own results, always from a's point of view:</span>
+<span class="c1"># 1.0 means a won, 0.0 means b won, 0.5 means a draw.</span>
+<span class="n">results</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s2">"ann"</span><span class="p">,</span> <span class="s2">"bob"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"bob"</span><span class="p">,</span> <span class="s2">"cid"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"ann"</span><span class="p">,</span> <span class="s2">"cid"</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"dee"</span><span class="p">,</span> <span class="s2">"ann"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">"dee"</span><span class="p">,</span> <span class="s2">"bob"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+<span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">rate</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">system</span><span class="p">,</span> <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+        <span class="n">arena</span><span class="o">.</span><span class="n">matchup</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="n">outcome</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">arena</span>
+
+
+<span class="n">elo</span> <span class="o">=</span> <span class="n">rate</span><span class="p">(</span><span class="n">EloCompetitor</span><span class="p">,</span> <span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">elo</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">'competitor'</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;4</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">'rating'</span><span class="p">]</span><span class="si">:</span><span class="s2">8.1f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Elo    P(ann beats bob) = </span><span class="si">{</span><span class="n">elo</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="s1">'ann'</span><span class="p">,</span><span class="w"> </span><span class="s1">'bob'</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="c1"># Changing rating system is one argument. Nothing else about the loop changes.</span>
+<span class="n">glicko</span> <span class="o">=</span> <span class="n">rate</span><span class="p">(</span><span class="n">GlickoCompetitor</span><span class="p">,</span> <span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Glicko P(ann beats bob) = </span><span class="si">{</span><span class="n">glicko</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="s1">'ann'</span><span class="p">,</span><span class="w"> </span><span class="s1">'bob'</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span> dee   1531.9
+ ann   1497.8
+ bob   1485.5
+ cid   1484.8
+Elo    P(ann beats bob) = 0.518
+Glicko P(ann beats bob) = 0.508
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">lambda</span></code> is the arena’s fallback for deciding a result it was not given.
+It is never called here, because every call passes an explicit <code class="docutils literal notranslate"><span class="pre">outcome</span></code>.
+See <a class="reference internal" href="arenas.html"><span class="doc">Arenas</span></a> for the form where the arena decides outcomes
+itself.</p>
+</section>
+<section id="uncertainty">
+<h2>Uncertainty<a class="headerlink" href="#uncertainty" title="Link to this heading">¶</a></h2>
+<p>Three systems publish a per-competitor spread: Glicko-1 as <code class="docutils literal notranslate"><span class="pre">rd</span></code>, Glicko-2 as
+<code class="docutils literal notranslate"><span class="pre">rd</span></code> plus <code class="docutils literal notranslate"><span class="pre">volatility</span></code>, and TrueSkill as <code class="docutils literal notranslate"><span class="pre">sigma</span></code>. The other seven give
+you a number with no attached notion of how much evidence is behind it.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span><span class="p">,</span> <span class="n">GlickoCompetitor</span><span class="p">,</span> <span class="n">TrueSkillCompetitor</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">after</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">games</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">system</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">),</span> <span class="n">system</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">games</span><span class="p">):</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">a</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'games'</span><span class="si">:</span><span class="s2">&gt;6</span><span class="si">}{</span><span class="s1">'elo rating'</span><span class="si">:</span><span class="s2">&gt;12</span><span class="si">}{</span><span class="s1">'glicko rd'</span><span class="si">:</span><span class="s2">&gt;12</span><span class="si">}{</span><span class="s1">'trueskill sigma'</span><span class="si">:</span><span class="s2">&gt;18</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">games</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">20</span><span class="p">):</span>
+    <span class="n">elo</span> <span class="o">=</span> <span class="n">after</span><span class="p">(</span><span class="n">EloCompetitor</span><span class="p">,</span> <span class="n">games</span><span class="p">,</span> <span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
+    <span class="n">glicko</span> <span class="o">=</span> <span class="n">after</span><span class="p">(</span><span class="n">GlickoCompetitor</span><span class="p">,</span> <span class="n">games</span><span class="p">,</span> <span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
+    <span class="n">trueskill</span> <span class="o">=</span> <span class="n">after</span><span class="p">(</span><span class="n">TrueSkillCompetitor</span><span class="p">,</span> <span class="n">games</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">games</span><span class="si">:</span><span class="s2">&gt;6</span><span class="si">}{</span><span class="n">elo</span><span class="o">.</span><span class="n">rating</span><span class="si">:</span><span class="s2">&gt;12.1f</span><span class="si">}{</span><span class="n">glicko</span><span class="o">.</span><span class="n">rd</span><span class="si">:</span><span class="s2">&gt;12.2f</span><span class="si">}{</span><span class="n">trueskill</span><span class="o">.</span><span class="n">sigma</span><span class="si">:</span><span class="s2">&gt;18.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>games  elo rating   glicko rd   trueskill sigma
+    0      1500.0      350.00             8.333
+    1      1516.0      290.23             7.171
+    5      1566.8      223.26             5.585
+   20      1665.4      177.98             4.413
+</pre></div>
+</div>
+<p>Choose one of these three when a downstream decision depends on confidence:
+matchmaking that should not pair a settled competitor against an unknown one,
+a leaderboard that should hold back a new entrant, or any place you would
+otherwise hand-roll a “minimum games played” rule.</p>
+<p>One caveat specific to this library rather than to the algorithms. Glicko-1
+and Glicko-2 also inflate <code class="docutils literal notranslate"><span class="pre">rd</span></code> for competitors who have not played
+recently, but the arena rejects a match timestamp earlier than the
+competitor’s creation time, so that decay cannot be exercised through an
+arena on historical data. On a back-test it is inert.</p>
+</section>
+<section id="draws">
+<h2>Draws<a class="headerlink" href="#draws" title="Link to this heading">¶</a></h2>
+<p>All ten systems accept a drawn result. They disagree sharply about what one
+means. Starting a favourite at 1600 against 1400 and recording one draw, the
+favourite’s predicted score moves:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33.3%" />
+<col style="width: 33.3%" />
+<col style="width: 33.3%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>System</p></th>
+<th class="head"><p>Before</p></th>
+<th class="head"><p>After one draw</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Elo</p></td>
+<td><p>0.7597</p></td>
+<td><p>0.7418</p></td>
+</tr>
+<tr class="row-odd"><td><p>DWZ</p></td>
+<td><p>0.7597</p></td>
+<td><p>0.6797</p></td>
+</tr>
+<tr class="row-even"><td><p>Glicko-1</p></td>
+<td><p>0.6836</p></td>
+<td><p>0.5786</p></td>
+</tr>
+<tr class="row-odd"><td><p>Glicko-2</p></td>
+<td><p>0.6836</p></td>
+<td><p>0.5785</p></td>
+</tr>
+<tr class="row-even"><td><p>ECF</p></td>
+<td><p>0.7034</p></td>
+<td><p>0.5000</p></td>
+</tr>
+<tr class="row-odd"><td><p>Bradley-Terry</p></td>
+<td><p>0.7597</p></td>
+<td><p>0.5000</p></td>
+</tr>
+</tbody>
+</table>
+<p>Elo barely moves, because one result is one K-factor’s worth of evidence. ECF
+collapses to level, because an ECF rating is an average of recent
+performance grades and there is only one of them. Bradley-Terry collapses
+because it re-fits from the results alone and, with one drawn game on
+record, the maximum-likelihood answer is that the two are equal.</p>
+<p>None of those is wrong. They are different amounts of memory. If draws are a
+large share of your results, that difference stops being a detail. On a
+generated scenario carrying 26 drawn bouts in a 180-bout evaluation set,
+against 2 in the otherwise identically sized nearly draw-free scenario, each
+of Elo, Glicko-1, Glicko-2 and TrueSkill lost more than twenty points of
+accuracy. That scenario also raises the generator’s noise, so the drop is not
+attributable to draws alone — which is itself the point: draw-heavy data is
+harder in more than one way at once.</p>
+<p>Draws are also the one place where a scoring rule matters more than accuracy
+— see <a class="reference internal" href="#accuracy-is-not-enough">Accuracy is not enough</a>.</p>
+</section>
+<section id="score-margins">
+<h2>Score margins<a class="headerlink" href="#score-margins" title="Link to this heading">¶</a></h2>
+<p>Two systems read the optional score channel and change their ratings because
+of it: Massey and Keener. The other eight accept <code class="docutils literal notranslate"><span class="pre">scores=</span></code> and ignore it.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">KeenerCompetitor</span><span class="p">,</span> <span class="n">LambdaArena</span><span class="p">,</span> <span class="n">MasseyCompetitor</span>
+
+<span class="n">games</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">"ann"</span><span class="p">,</span> <span class="s2">"bob"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span> <span class="p">(</span><span class="s2">"bob"</span><span class="p">,</span> <span class="s2">"cid"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="p">(</span><span class="mi">17</span><span class="p">,</span> <span class="mi">14</span><span class="p">)),</span> <span class="p">(</span><span class="s2">"ann"</span><span class="p">,</span> <span class="s2">"cid"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="p">(</span><span class="mi">21</span><span class="p">,</span> <span class="mi">20</span><span class="p">))]</span>
+
+<span class="k">for</span> <span class="n">system</span> <span class="ow">in</span> <span class="p">(</span><span class="n">MasseyCompetitor</span><span class="p">,</span> <span class="n">KeenerCompetitor</span><span class="p">):</span>
+    <span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">system</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">scores</span> <span class="ow">in</span> <span class="n">games</span><span class="p">:</span>
+        <span class="n">arena</span><span class="o">.</span><span class="n">matchup</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="n">outcome</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="n">scores</span><span class="p">)</span>
+    <span class="n">board</span> <span class="o">=</span> <span class="p">{</span><span class="n">e</span><span class="p">[</span><span class="s2">"competitor"</span><span class="p">]:</span> <span class="n">e</span><span class="p">[</span><span class="s2">"rating"</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">()}</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">system</span><span class="o">.</span><span class="vm">__name__</span><span class="si">:</span><span class="s2">&lt;20</span><span class="si">}</span><span class="s2"> "</span> <span class="o">+</span> <span class="s2">"  "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">v</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">board</span><span class="o">.</span><span class="n">items</span><span class="p">())))</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>MasseyCompetitor     ann=11.000  bob=-9.667  cid=-1.333
+KeenerCompetitor     ann=1.350  bob=0.735  cid=0.915
+</pre></div>
+</div>
+<p>Massey’s rating differences are predicted margins on the same scale as the
+scores, so <code class="docutils literal notranslate"><span class="pre">ann</span></code> is rated about 20.7 points better than <code class="docutils literal notranslate"><span class="pre">bob</span></code>. Keener
+passes scores through a bounded, concave transform, so a blowout counts for
+more than a narrow win but cannot dominate the table.</p>
+<p>Prefer Massey when you want to predict a spread, Keener when you want scores
+to inform a ranking without letting one lopsided result decide it, and
+neither when your results are outcome-only — with no scores supplied, both
+fall back to unit margins and Keener in particular loses most of its input.</p>
+<p>The score channel shown here (<code class="docutils literal notranslate"><span class="pre">scores=</span></code> on <code class="docutils literal notranslate"><span class="pre">beat</span></code>/<code class="docutils literal notranslate"><span class="pre">lost_to</span></code>/<code class="docutils literal notranslate"><span class="pre">tied</span></code>,
+and through an arena) is present in the current published release; see
+<a class="reference internal" href="quickstart.html"><span class="doc">Quickstart</span></a> for the full contract, including validation
+rules and how dataset helpers read scores from row attributes.</p>
+</section>
+<section id="incremental-updates-or-a-global-fit">
+<h2>Incremental updates or a global fit<a class="headerlink" href="#incremental-updates-or-a-global-fit" title="Link to this heading">¶</a></h2>
+<p>This is the largest structural division in the table, and it decides more
+than the choice between two chess-derived formulas does.</p>
+<p><strong>Incremental</strong> systems (Elo, Glicko-1, Glicko-2, TrueSkill, ECF, DWZ) adjust
+two competitors per result and forget the result afterwards. Cost per result
+is constant, ratings are a running estimate, and the answer depends on the
+order results arrived.</p>
+<p><strong>Global-fit</strong> systems (Colley, Massey, Keener, Bradley-Terry) re-solve the
+whole connected group of competitors after every result. The answer does not
+depend on order, and the cost per result grows with the size of the group.</p>
+<p>You can watch the difference rather than take it on faith:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">BradleyTerryCompetitor</span><span class="p">,</span> <span class="n">EloCompetitor</span><span class="p">,</span> <span class="n">LambdaArena</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">"ann"</span><span class="p">,</span> <span class="s2">"bob"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="p">(</span><span class="s2">"bob"</span><span class="p">,</span> <span class="s2">"cid"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="p">(</span><span class="s2">"cid"</span><span class="p">,</span> <span class="s2">"ann"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="p">(</span><span class="s2">"ann"</span><span class="p">,</span> <span class="s2">"dee"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="p">(</span><span class="s2">"dee"</span><span class="p">,</span> <span class="s2">"bob"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">final_ratings</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">system</span><span class="p">,</span> <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="n">arena</span><span class="o">.</span><span class="n">matchup</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="n">outcome</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">e</span><span class="p">[</span><span class="s2">"competitor"</span><span class="p">]:</span> <span class="nb">round</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="s2">"rating"</span><span class="p">],</span> <span class="mi">6</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">arena</span><span class="o">.</span><span class="n">leaderboard</span><span class="p">()}</span>
+
+
+<span class="n">shuffled</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+<span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">(</span><span class="mi">20260809</span><span class="p">)</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">shuffled</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">system</span> <span class="ow">in</span> <span class="p">(</span><span class="n">EloCompetitor</span><span class="p">,</span> <span class="n">BradleyTerryCompetitor</span><span class="p">):</span>
+    <span class="n">same</span> <span class="o">=</span> <span class="n">final_ratings</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span> <span class="o">==</span> <span class="n">final_ratings</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">shuffled</span><span class="p">,</span> <span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">system</span><span class="o">.</span><span class="vm">__name__</span><span class="si">:</span><span class="s2">&lt;24</span><span class="si">}</span><span class="s2"> same ratings after reordering the same results: </span><span class="si">{</span><span class="n">same</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>EloCompetitor            same ratings after reordering the same results: False
+BradleyTerryCompetitor   same ratings after reordering the same results: True
+</pre></div>
+</div>
+<p>Order independence is the right property for a completed season ranked once.
+It is the wrong property for a ladder, where the whole point is that a
+result from last year should count for less than one from this morning.</p>
+<p>The cost is real and it is not small. On 420 training rows of one generated
+scenario, Bradley-Terry took about 9.3 seconds against Elo’s roughly a
+millisecond — a factor of several thousand — and accounted for most of a
+ten-system sweep on its own. Refit-per-result is a fine default for hundreds
+of competitors and a poor one for hundreds of thousands.</p>
+</section>
+<section id="how-much-data-you-have">
+<h2>How much data you have<a class="headerlink" href="#how-much-data-you-have" title="Link to this heading">¶</a></h2>
+<p>Global-fit systems need a <strong>connected</strong> schedule: competitors who have never
+met, directly or through a chain of shared opponents, are fitted in separate
+groups and cannot be meaningfully compared. Elote will still return a number
+for such a pair. With two never-meeting pairs on record, Bradley-Terry
+returns 0.6152 across the gap and Massey returns exactly 0.5000 — neither is
+evidence about that matchup, because there is none.</p>
+<p>Incremental systems degrade more gracefully here, but not for free: they
+simply carry each competitor’s prior further. On a generated sparse
+scenario, where 120 competitors share 600 matchups, Elo scored around 0.64
+accuracy against around 0.76 for both Glicko systems and TrueSkill. The
+uncertainty-tracking systems are worth their extra complexity exactly when
+data is thin, which is the case Glicko was designed for.</p>
+<p>If your schedule is thin <em>and</em> fragmented, prefer an incremental system with
+uncertainty and treat cross-group comparisons as unsupported rather than as
+predictions.</p>
+</section>
+<section id="persistence">
+<h2>Persistence<a class="headerlink" href="#persistence" title="Link to this heading">¶</a></h2>
+<p>All ten systems round-trip through <code class="docutils literal notranslate"><span class="pre">export_state()</span></code> and <code class="docutils literal notranslate"><span class="pre">from_state()</span></code>,
+and all ten restore the current rating exactly. See
+<a class="reference internal" href="serialization.html"><span class="doc">Serialization</span></a>.</p>
+<p>There is one caveat the serialization page does not cover, and it follows
+from the section above. The four global-fit systems persist aggregate
+counts, not the match graph, so a restored competitor no longer knows <em>who</em>
+it played. The restored object agrees with the live one about the present
+and disagrees about the next result.</p>
+<p>So: for an incremental system, saving state is a complete answer. For a
+global-fit system, keep the results themselves as the system of record and
+treat the fitted ratings as a derived artifact you can always recompute.</p>
+</section>
+<section id="run-it-on-your-own-data">
+<h2>Run it on your own data<a class="headerlink" href="#run-it-on-your-own-data" title="Link to this heading">¶</a></h2>
+<p>This is the part worth actually doing. Pick two or three candidates from the
+table above, train them on the same split, and score them on the same
+held-out results.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BradleyTerryCompetitor</span><span class="p">,</span>
+    <span class="n">EloCompetitor</span><span class="p">,</span>
+    <span class="n">Glicko2Competitor</span><span class="p">,</span>
+    <span class="n">GlickoCompetitor</span><span class="p">,</span>
+    <span class="n">LambdaArena</span><span class="p">,</span>
+    <span class="n">SyntheticDataset</span><span class="p">,</span>
+    <span class="n">TrueSkillCompetitor</span><span class="p">,</span>
+    <span class="n">train_and_evaluate_arena</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">SHORTLIST</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"Elo"</span><span class="p">:</span> <span class="p">(</span><span class="n">EloCompetitor</span><span class="p">,</span> <span class="p">{</span><span class="s2">"initial_rating"</span><span class="p">:</span> <span class="mi">1500</span><span class="p">}),</span>
+    <span class="s2">"Glicko-1"</span><span class="p">:</span> <span class="p">(</span><span class="n">GlickoCompetitor</span><span class="p">,</span> <span class="p">{</span><span class="s2">"initial_rating"</span><span class="p">:</span> <span class="mi">1500</span><span class="p">}),</span>
+    <span class="s2">"Glicko-2"</span><span class="p">:</span> <span class="p">(</span><span class="n">Glicko2Competitor</span><span class="p">,</span> <span class="p">{</span><span class="s2">"initial_rating"</span><span class="p">:</span> <span class="mi">1500</span><span class="p">}),</span>
+    <span class="s2">"TrueSkill"</span><span class="p">:</span> <span class="p">(</span><span class="n">TrueSkillCompetitor</span><span class="p">,</span> <span class="p">{}),</span>
+    <span class="s2">"Bradley-Terry"</span><span class="p">:</span> <span class="p">(</span><span class="n">BradleyTerryCompetitor</span><span class="p">,</span> <span class="p">{</span><span class="s2">"initial_rating"</span><span class="p">:</span> <span class="mi">1500</span><span class="p">}),</span>
+<span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">compare</span><span class="p">(</span><span class="n">split</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Train every shortlisted system on the same split and score it on the same held-out bouts."""</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span> <span class="ow">in</span> <span class="n">SHORTLIST</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># unused: outcomes come from the data</span>
+            <span class="n">base_competitor</span><span class="o">=</span><span class="n">system</span><span class="p">,</span>
+            <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">history</span> <span class="o">=</span> <span class="n">train_and_evaluate_arena</span><span class="p">(</span><span class="n">arena</span><span class="p">,</span> <span class="n">split</span><span class="p">)</span>
+        <span class="n">scored</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">history</span><span class="o">.</span><span class="n">bouts</span> <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="n">brier</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">((</span><span class="n">b</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">-</span> <span class="n">b</span><span class="o">.</span><span class="n">outcome</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">scored</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">scored</span><span class="p">)</span>
+        <span class="n">out_of_range</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">scored</span> <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">b</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">accuracy</span> <span class="o">=</span> <span class="n">history</span><span class="o">.</span><span class="n">calculate_metrics</span><span class="p">(</span><span class="mf">0.45</span><span class="p">,</span> <span class="mf">0.55</span><span class="p">)[</span><span class="s2">"accuracy"</span><span class="p">]</span>
+        <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">brier</span><span class="p">,</span> <span class="n">out_of_range</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">scored</span><span class="p">)))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'system'</span><span class="si">:</span><span class="s2">&lt;14</span><span class="si">}{</span><span class="s1">'accuracy'</span><span class="si">:</span><span class="s2">&gt;10</span><span class="si">}{</span><span class="s1">'brier'</span><span class="si">:</span><span class="s2">&gt;9</span><span class="si">}{</span><span class="s1">'outside [0,1]'</span><span class="si">:</span><span class="s2">&gt;15</span><span class="si">}{</span><span class="s1">'bouts'</span><span class="si">:</span><span class="s2">&gt;7</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">brier</span><span class="p">,</span> <span class="n">out_of_range</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">&lt;14</span><span class="si">}{</span><span class="n">accuracy</span><span class="si">:</span><span class="s2">&gt;10.4f</span><span class="si">}{</span><span class="n">brier</span><span class="si">:</span><span class="s2">&gt;9.4f</span><span class="si">}{</span><span class="n">out_of_range</span><span class="si">:</span><span class="s2">&gt;15d</span><span class="si">}{</span><span class="n">n</span><span class="si">:</span><span class="s2">&gt;7d</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="c1"># Replace this with your own rows: (a, b, outcome, timestamp, attributes),</span>
+    <span class="c1"># where outcome is 1.0 if a won, 0.0 if b won, and 0.5 for a draw.</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">SyntheticDataset</span><span class="p">(</span><span class="n">num_competitors</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">num_matchups</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">20260809</span><span class="p">)</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+    <span class="n">compare</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">time_split</span><span class="p">(</span><span class="n">test_ratio</span><span class="o">=</span><span class="mf">0.3</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>system          accuracy    brier  outside [0,1]  bouts
+Bradley-Terry     0.9222   0.0539              0    180
+TrueSkill         0.9111   0.0570              0    180
+Glicko-2          0.9167   0.0581              0    180
+Glicko-1          0.9167   0.0567              0    180
+Elo               0.8778   0.0900              0    180
+</pre></div>
+</div>
+<p>Three things about that harness are deliberate, and you should keep them
+when you swap in your own results:</p>
+<ul class="simple">
+<li><p><strong>The split is time-ordered, not random.</strong> A random split lets a system
+learn from a competitor’s future when predicting its past.</p></li>
+<li><p><strong>Every system sees the identical split</strong> and starts from the same rating
+where it accepts one, so what varies between rows is the algorithm.</p></li>
+<li><p><strong>Predictions outside</strong> <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code> <strong>are counted, not clipped away.</strong> A
+rating system returning an impossible probability is a defect, and a
+metric that quietly clips it hides that.</p></li>
+</ul>
+<p>To use your own history, replace the last three lines. <code class="docutils literal notranslate"><span class="pre">train_and_evaluate_arena</span></code>
+takes a <code class="docutils literal notranslate"><span class="pre">DataSplit</span></code>, and a <code class="docutils literal notranslate"><span class="pre">DataSplit</span></code> is two ordered lists of
+<code class="docutils literal notranslate"><span class="pre">(a,</span> <span class="pre">b,</span> <span class="pre">outcome,</span> <span class="pre">timestamp,</span> <span class="pre">attributes)</span></code> rows — no dataset class required:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataSplit</span><span class="p">,</span> <span class="n">EloCompetitor</span><span class="p">,</span> <span class="n">LambdaArena</span><span class="p">,</span> <span class="n">train_and_evaluate_arena</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">row</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">day</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2026</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">day</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+
+
+<span class="n">split</span> <span class="o">=</span> <span class="n">DataSplit</span><span class="p">(</span>
+    <span class="n">train</span><span class="o">=</span><span class="p">[</span><span class="n">row</span><span class="p">(</span><span class="s2">"ann"</span><span class="p">,</span> <span class="s2">"bob"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">row</span><span class="p">(</span><span class="s2">"bob"</span><span class="p">,</span> <span class="s2">"cid"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">row</span><span class="p">(</span><span class="s2">"ann"</span><span class="p">,</span> <span class="s2">"cid"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">row</span><span class="p">(</span><span class="s2">"dee"</span><span class="p">,</span> <span class="s2">"ann"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)],</span>
+    <span class="n">test</span><span class="o">=</span><span class="p">[</span><span class="n">row</span><span class="p">(</span><span class="s2">"ann"</span><span class="p">,</span> <span class="s2">"bob"</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">row</span><span class="p">(</span><span class="s2">"cid"</span><span class="p">,</span> <span class="s2">"dee"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">6</span><span class="p">)],</span>
+<span class="p">)</span>
+<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">base_competitor</span><span class="o">=</span><span class="n">EloCompetitor</span><span class="p">,</span>
+    <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">"initial_rating"</span><span class="p">:</span> <span class="mi">1500</span><span class="p">},</span>
+<span class="p">)</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">history</span> <span class="o">=</span> <span class="n">train_and_evaluate_arena</span><span class="p">(</span><span class="n">arena</span><span class="p">,</span> <span class="n">split</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">bouts</span><span class="p">),</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">predicted_outcome</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">history</span><span class="o">.</span><span class="n">bouts</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>2 [0.5178, 0.4305]
+</pre></div>
+</div>
+<p>Sort your rows by time before splitting them, and put the split point at a
+date rather than at a row count if your results arrive in bursts.</p>
+</section>
+<section id="accuracy-is-not-enough">
+<h2>Accuracy is not enough<a class="headerlink" href="#accuracy-is-not-enough" title="Link to this heading">¶</a></h2>
+<p>Accuracy answers “did the favourite win”. It is blind to any reshaping of a
+probability that keeps the ordering, so a system that says 0.99 when it
+should say 0.60 scores the same. A proper scoring rule — Brier score or log
+loss — is not blind to it, and Elote’s expected scores are numbers people
+use downstream.</p>
+<p>The two genuinely disagree. On a generated sparse scenario, one system
+ranked first of ten on accuracy and seventh of ten on Brier score. And in one
+measured case a version of a system with a known prediction defect scored
+<em>higher</em> on accuracy than the fixed version while being worse on Brier
+score, worse on log loss, and returning dozens of impossible probabilities.</p>
+<p>Report at least accuracy, one proper scoring rule, and a count of
+out-of-range predictions. If two candidates are close on all three, they are
+close, and you should pick on the other axes in this guide.</p>
+</section>
+<section id="what-this-page-does-not-tell-you">
+<h2>What this page does not tell you<a class="headerlink" href="#what-this-page-does-not-tell-you" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>The figures here come from a <strong>generated</strong> dataset that samples outcomes
+from a latent per-competitor strength — the model most of these systems
+assume. Their agreement with it is an upper bound, not evidence about
+messy data.</p></li>
+<li><p>Nothing here compares Elote to another library. Every runtime figure
+compares Elote’s own systems to each other.</p></li>
+<li><p>The comparison measures prediction on held-out results only: not recovery
+of a known true ordering, not convergence speed, not calibration after
+binning, and not behaviour under adversarial scheduling.</p></li>
+<li><p>The library’s own <code class="docutils literal notranslate"><span class="pre">benchmark_competitors</span></code> helper has had known issues
+running Massey in the past because of how it enforces a minimum rating.
+Drive the arena and dataset helpers directly, as above, if you hit that.</p></li>
+</ul>
+</section>
+<section id="where-to-go-next">
+<h2>Where to go next<a class="headerlink" href="#where-to-go-next" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="rating_systems/elo_vs_glicko_vs_trueskill.html"><span class="doc">Elo vs Glicko vs TrueSkill</span></a>
+— the three systems people name, compared with sourced mathematics and
+measured results.</p></li>
+<li><p><a class="reference internal" href="rating_systems/comparison.html"><span class="doc">Comparing rating systems</span></a> — the
+per-system reference: origins, formulas, parameters, strengths and
+weaknesses.</p></li>
+<li><p><a class="reference internal" href="quickstart.html"><span class="doc">Quickstart</span></a> — the shortest path from a list of results
+to a leaderboard.</p></li>
+<li><p><a class="reference internal" href="arenas.html"><span class="doc">Arenas</span></a> and <a class="reference internal" href="serialization.html"><span class="doc">Serialization</span></a> — running
+matchups and persisting state.</p></li>
+<li><p>The system pages: <a class="reference internal" href="rating_systems/elo.html"><span class="doc">Elo</span></a>,
+<a class="reference internal" href="rating_systems/glicko.html"><span class="doc">Glicko</span></a>,
+<a class="reference internal" href="rating_systems/glicko2.html"><span class="doc">Glicko-2</span></a>,
+<a class="reference internal" href="rating_systems/trueskill.html"><span class="doc">TrueSkill</span></a>,
+<a class="reference internal" href="rating_systems/ecf.html"><span class="doc">ECF</span></a>, <a class="reference internal" href="rating_systems/dwz.html"><span class="doc">DWZ</span></a>,
+<a class="reference internal" href="rating_systems/colley.html"><span class="doc">Colley</span></a>, <a class="reference internal" href="rating_systems/massey.html"><span class="doc">Massey</span></a>,
+<a class="reference internal" href="rating_systems/keener.html"><span class="doc">Keener</span></a>,
+<a class="reference internal" href="rating_systems/bradley_terry.html"><span class="doc">Bradley-Terry</span></a>,
+<a class="reference internal" href="rating_systems/pythagorean.html"><span class="doc">Pythagorean</span></a>,
+<a class="reference internal" href="rating_systems/whr.html"><span class="doc">Whole-History Rating</span></a>.</p></li>
+</ul>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Concepts</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="competitors.html">Competitors</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How to choose a rating system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arenas.html">Arenas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/elo.html">Elo Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/glicko2.html">Glicko-2 Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/trueskill.html">TrueSkill Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/ecf.html">ECF Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/dwz.html">DWZ Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/colley.html">Colley Matrix Method</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/massey.html">Massey Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/keener.html">Keener Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/pythagorean.html">Pythagorean Expectation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/whr.html">Whole-History Rating</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/ensemble.html">Ensemble Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/elo_vs_glicko_vs_trueskill.html">Elo vs Glicko vs TrueSkill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/comparison.html">Comparing Rating Systems</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advance_example.html">Advanced Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="use_cases/product_ranking.html">Product Ranking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="use_cases/matchmaking.html">Matchmaking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="use_cases/feature_prioritization.html">Feature Prioritization with Elote</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/competitors.html">Competitors API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/arenas.html">Arenas API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="blog_posts.html">Blog Posts</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to Elote</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <div class="footer__inner">
+    
+    
+    <div class="footer__links">
+      
+        <a href="https://github.com/wdm0006" class="footer__link" target="_blank" rel="noopener noreferrer">
+          GitHub
+        </a>
+      
+        <a href="https://www.linkedin.com/in/wmcginnis/" class="footer__link" target="_blank" rel="noopener noreferrer">
+          LinkedIn
+        </a>
+      
+        <a href="https://x.com/willmcginniser" class="footer__link" target="_blank" rel="noopener noreferrer">
+          Twitter
+        </a>
+      
+    </div>
+    
+
+    
+    <p class="footer__copy">
+      
+        &copy; 2020, Will McGinnis
+      
+    </p>
+  </div>
+</footer>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggle = document.querySelector('.nav-toggle');
+    const nav = document.querySelector('.nav');
+    if (toggle && nav) {
+      toggle.addEventListener('click', function() {
+        nav.classList.toggle('is-open');
+        const isOpen = nav.classList.contains('is-open');
+        toggle.setAttribute('aria-expanded', isOpen);
+      });
+    }
+  });
+</script>
+
+  </body>
+</html>
