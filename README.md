@@ -150,8 +150,9 @@ Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) and the
 git clone https://github.com/wdm0006/elote.git
 cd elote
 make install-dev
-make test
-make lint
+make test       # or: make test-cov
+make lint       # or: make lint-fix, make format
+make docs       # or: make build
 ```
 
 Elote is available under the [MIT License](LICENSE.md).
