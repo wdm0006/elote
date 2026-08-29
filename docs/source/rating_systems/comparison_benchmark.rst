@@ -1,16 +1,18 @@
 .. meta::
-   :description: A reproducible benchmark comparing every rating system Elote ships, on one interface, one split, and one command you can rerun yourself.
+   :description: A reproducible benchmark comparing every concrete rating system Elote ships, on one interface, one split, and one command you can rerun yourself.
 
 Rating-system comparison benchmark
 =====================================
 
-This page benchmarks every rating system Elote ships against every other one,
-on one fixed setup: the same seed, the same three synthetic scenarios, the
-same train/test split, and the same metrics for all of them. Run
-``make compare-systems`` (equivalently,
-``uv run python scripts/rating_system_comparison.py``) to reproduce every
-number below, or change a constant in that script and rerun it to check a
-specific conclusion yourself.
+This page benchmarks every concrete rating system Elote ships against every
+other one, on one fixed setup: the same seed, the same three synthetic
+scenarios, the same train/test split, and the same metrics for all of them.
+Run ``make compare-systems`` for a single pass that reproduces the accuracy,
+Brier score, and log-loss cells below, or
+``uv run python scripts/rating_system_comparison.py --repeats 3`` to also
+reproduce the runtime columns, which are medians of three runs. Change a
+constant in that script and rerun it to check a specific conclusion
+yourself.
 
 The scope is narrower than "benchmark" can imply: this compares Elote's own
 systems to each other, not to another library, and it measures prediction
