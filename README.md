@@ -122,6 +122,24 @@ exported dictionaries or JSON in the persistence system it owns.
 See the [full documentation](https://elote.mcginniscommawill.com/) and the
 [`examples/`](examples/) directory for more workflows.
 
+## Blog Posts
+
+Here are some blog posts about Elote:
+
+- [Elote: A Python Package for Rating Systems](https://mcginniscommawill.com/posts/2017-12-06-elote-python-package-rating-systems/) - Introduction to the library
+- [Using Cursor for Library Maintenance](https://mcginniscommawill.com/posts/2025-03-09-cursor-for-library-maintenance/#how-cursor-helps-with-maintenance) - How Cursor helps maintain Elote
+- [Year's End: Looking Back at 2017](https://mcginniscommawill.com/posts/2017-12-28-years-end-looking-back-2017/) - Reflections including Elote development
+
+## References
+
+1. [Glicko Rating System](http://www.glicko.net/glicko/glicko.pdf)
+2. [Glicko-2 Rating System](http://www.glicko.net/glicko/glicko2.pdf)
+3. [Massey Ratings](https://masseyratings.com)
+4. Elo, Arpad (1978). The Rating of Chessplayers, Past and Present. Arco. ISBN 0-668-04721-6.
+5. [ECF Grading System](http://www.ecfgrading.org.uk/new/help.php#elo)
+6. [Deutsche Wertungszahl](https://en.wikipedia.org/wiki/Deutsche_Wertungszahl)
+7. [TrueSkill: A Bayesian Skill Rating System](https://www.microsoft.com/en-us/research/publication/trueskilltm-a-bayesian-skill-rating-system/)
+
 ## Contributing
 
 Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) and the
