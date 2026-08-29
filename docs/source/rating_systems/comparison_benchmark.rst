@@ -4,18 +4,20 @@
 Rating-system comparison benchmark
 =====================================
 
-This page is the artifact behind the claim that a dozen rating systems answer
-the same four calls: it fixes the inputs, states the metrics, gives the exact
-command, and enumerates what the comparison does not show. If you disagree
-with a conclusion, change one constant in ``scripts/rating_system_comparison.py``
-in the repository root and rerun it.
+This page benchmarks every rating system Elote ships against every other one,
+on one fixed setup: the same seed, the same three synthetic scenarios, the
+same train/test split, and the same metrics for all of them. Run
+``make compare-systems`` (equivalently,
+``uv run python scripts/rating_system_comparison.py``) to reproduce every
+number below, or change a constant in that script and rerun it to check a
+specific conclusion yourself.
 
-It is **not** a cross-library benchmark. Nothing here compares Elote to
-another Python package; every runtime figure compares Elote's own systems to
-each other. It is **not** a ranking-quality study either: it measures
-prediction on held-out bouts, not recovery of a known true ordering,
-convergence speed, calibration after binning, or behaviour under adversarial
-scheduling.
+The scope is narrower than "benchmark" can imply: this compares Elote's own
+systems to each other, not to another library, and it measures prediction
+accuracy on held-out bouts rather than ranking quality — recovery of a known
+true ordering, convergence speed, calibration after binning, and behaviour
+under adversarial scheduling are all out of scope. See
+`What this page does not show`_ for the complete list.
 
 Run it yourself
 -------------------
