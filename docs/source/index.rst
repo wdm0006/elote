@@ -31,9 +31,10 @@ Elote makes implementing these systems simple and intuitive, with a clean API th
    :caption: Core Concepts
 
    competitors
+   choose_a_rating_system
    arenas
    serialization
-   
+
 .. toctree::
    :maxdepth: 1
    :caption: Rating Systems
@@ -51,6 +52,7 @@ Elote makes implementing these systems simple and intuitive, with a clean API th
    rating_systems/bradley_terry
    rating_systems/whr
    rating_systems/ensemble
+   rating_systems/elo_vs_glicko_vs_trueskill
    rating_systems/comparison
    rating_systems/comparison_benchmark
 

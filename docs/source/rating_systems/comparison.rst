@@ -3,7 +3,13 @@ Comparing Rating Systems
 
 This page provides a side-by-side comparison of the rating systems implemented in Elote, helping you choose the right system for your specific use case.
 
-For a reproducible, measured comparison across all of Elote's rating systems on one interface and one split, with the exact command to rerun it yourself, see :doc:`comparison_benchmark`.
+For a problem-first decision guide with a runnable comparison harness, see
+:doc:`How to choose a rating system <../choose_a_rating_system>`. For the
+three systems people ask about by name, see
+:doc:`Elo vs Glicko vs TrueSkill <elo_vs_glicko_vs_trueskill>`. For a
+reproducible, measured comparison across all of Elote's rating systems on
+one interface and one split, with the exact command to rerun it yourself,
+see :doc:`comparison_benchmark`.
 
 Overview Comparison
 ------------------

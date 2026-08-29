@@ -1,6 +1,8 @@
 Whole-History Rating
 ====================
 
+See :doc:`Elo vs Glicko vs TrueSkill <elo_vs_glicko_vs_trueskill>` for a measured, sourced head-to-head, or :doc:`How to choose a rating system <../choose_a_rating_system>` for a decision guide across every system.
+
 Whole-History Rating (WHR) is a time-aware Bradley-Terry model. It estimates one
 rating for each day on which a competitor played and links consecutive ratings with
 a Wiener-process prior. Later results can therefore revise earlier ratings while the
