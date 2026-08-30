@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 from elote import (
     EloCompetitor,
+    GlickoCompetitor,
     PythagoreanCompetitor,
     WholeHistoryRatingCompetitor,
     group_by_period,
@@ -39,6 +40,24 @@ def _season(weeks=6, teams=("A", "B", "C", "D")):
     return periods
 
 
+class PeriodNativeCompetitor(EloCompetitor):
+    period_calls = []
+    pairwise_calls = 0
+
+    def beat(self, competitor, *, scores=None):
+        type(self).pairwise_calls += 1
+        raise AssertionError("period-native training must not replay pairwise results")
+
+    @classmethod
+    def apply_rating_period(cls, results, period_end=None):
+        cls.period_calls.append((list(results), period_end))
+
+    @classmethod
+    def reset_calls(cls):
+        cls.period_calls = []
+        cls.pairwise_calls = 0
+
+
 class TestGroupByPeriod(unittest.TestCase):
     def test_groups_by_iso_week_in_order(self):
         rows = [
@@ -67,6 +86,9 @@ class TestGroupByPeriod(unittest.TestCase):
 
 
 class TestWalkForward(unittest.TestCase):
+    def setUp(self):
+        PeriodNativeCompetitor.reset_calls()
+
     def test_learns_a_separable_schedule(self):
         report = walk_forward(EloCompetitor, _season(), warmup=1)
         self.assertGreater(report.predictions, 0)
@@ -149,6 +171,50 @@ class TestWalkForward(unittest.TestCase):
             walk_forward(EloCompetitor, periods, warmup=2)
         with self.assertRaises(ValueError):
             walk_forward(EloCompetitor, periods, warmup=-1)
+
+    def test_period_native_system_uses_one_batch_call_per_period(self):
+        periods = _season(weeks=3)
+
+        walk_forward(PeriodNativeCompetitor, periods, warmup=1)
+
+        self.assertEqual(len(PeriodNativeCompetitor.period_calls), 3)
+        self.assertEqual(PeriodNativeCompetitor.pairwise_calls, 0)
+        self.assertEqual(
+            [period_end for _results, period_end in PeriodNativeCompetitor.period_calls],
+            [period[0][3] for period in periods],
+        )
+
+    def test_period_native_system_receives_scores_in_caller_order(self):
+        period = [
+            _row("A", "B", 1.0, datetime.datetime(2020, 1, 6), (21, 7)),
+            _row("B", "A", 0.0, datetime.datetime(2020, 1, 7), (3, 10)),
+            _row("A", "B", None, datetime.datetime(2020, 1, 8), (0, 0)),
+        ]
+
+        walk_forward(
+            PeriodNativeCompetitor,
+            [period],
+            score_keys=("home_score", "away_score"),
+        )
+
+        results, period_end = PeriodNativeCompetitor.period_calls[0]
+        self.assertEqual([result[3] for result in results], [(21.0, 7.0), (3.0, 10.0)])
+        self.assertEqual(period_end, datetime.datetime(2020, 1, 8))
+
+    def test_period_native_system_accepts_a_period_without_timestamps(self):
+        walk_forward(PeriodNativeCompetitor, [[_row("A", "B", 1.0, None)]])
+
+        self.assertIsNone(PeriodNativeCompetitor.period_calls[0][1])
+
+    def test_sequential_system_metrics_remain_pinned(self):
+        expected = {
+            EloCompetitor: (1.0, 0.4189136689010337, 0.12106875000089291),
+            GlickoCompetitor: (1.0, 0.129799282281943, 0.02092450055008762),
+        }
+        for competitor_class, metrics in expected.items():
+            with self.subTest(competitor_class=competitor_class.__name__):
+                report = walk_forward(competitor_class, _season(), warmup=1)
+                self.assertEqual((report.accuracy, report.log_loss, report.brier), metrics)
 
 
 class TestTune(unittest.TestCase):
