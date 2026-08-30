@@ -103,12 +103,11 @@ rows. Benchmark results retain the trained arena and history for further analysi
 The package also includes plotting helpers for rating-system comparisons,
 optimized accuracy, calibration, and accuracy by prior bouts.
 
-Curious how they stack up against each other? Run `make compare-systems` (or
-[`scripts/rating_system_comparison.py`](scripts/rating_system_comparison.py)
-directly) to train every system on the same split and compare accuracy, Brier
-score, and log loss — see
+To see how the rating models compare on the same split, run `make compare-systems`
+(or [`scripts/rating_system_comparison.py`](scripts/rating_system_comparison.py)
+directly) for accuracy, Brier score, and log loss — see
 [`docs/source/rating_systems/comparison_benchmark.rst`](docs/source/rating_systems/comparison_benchmark.rst)
-for the methodology and measured results.
+for methodology and measured results.
 
 ## Library boundaries
 
