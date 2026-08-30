@@ -1,0 +1,906 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="A reproducible benchmark comparing every concrete rating system Elote ships, on one interface, one split, and one command you can rerun yourself." name="description" />
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z43R9PWW0B"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-Z43R9PWW0B');
+    </script>
+    
+    <title>Rating-system comparison benchmark &#8212; elote 1.3.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=30d13653" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/wabi.css?v=501c8ac3" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=71d92741" />
+    <script src="../_static/documentation_options.js?v=8ca9e7a0"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Examples" href="../examples.html" />
+    <link rel="prev" title="Comparing Rating Systems" href="comparison.html" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+
+
+
+<meta name="description" content="Rating-system comparison benchmark - elote documentation">
+
+
+
+
+
+
+
+
+
+<meta property="og:title" content="Rating-system comparison benchmark">
+<meta property="og:description" content="Rating-system comparison benchmark - elote documentation">
+<meta property="og:type" content="website">
+
+<meta property="og:url" content="https://elote.mcginniscommawill.com/rating_systems/comparison_benchmark.html">
+
+
+<meta property="og:site_name" content="elote">
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Rating-system comparison benchmark">
+<meta name="twitter:description" content="Rating-system comparison benchmark - elote documentation">
+
+<meta name="twitter:site" content="@willmcginniser">
+
+
+
+
+
+<link rel="canonical" href="https://elote.mcginniscommawill.com/rating_systems/comparison_benchmark.html">
+
+
+ 
+
+  </head><body>
+<header class="header">
+  <div class="header__inner">
+    
+    <a href="https://mcginniscommawill.com" class="header__logo">
+      McGinnis, Will
+    </a>
+
+    
+    <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+      </svg>
+    </button>
+
+    
+    <nav class="nav" role="navigation">
+      
+      
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/guides/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Guides
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/topics/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Topics
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/posts/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Blog
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/about/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            About
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/coffee/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Free Coffee
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/oss/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            OSS
+          </a>
+        
+      
+
+      
+      
+      <a href="../index.html" class="nav__link nav__link--active">
+        Docs
+      </a>
+      
+    </nav>
+  </div>
+</header>
+
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <div class="breadcrumbs__inner">
+    
+    <a href="https://mcginniscommawill.com">Home</a>
+    <span class="breadcrumbs__separator">/</span>
+    
+    <a href="../index.html">Docs</a>
+    
+    
+    <span class="breadcrumbs__separator">/</span>
+    <span>Rating-system comparison benchmark</span>
+    
+  </div>
+</nav>
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="rating-system-comparison-benchmark">
+<h1>Rating-system comparison benchmark<a class="headerlink" href="#rating-system-comparison-benchmark" title="Link to this heading">¶</a></h1>
+<p>This page benchmarks every concrete rating system Elote ships against every
+other one, on one fixed setup: the same seed, the same three synthetic
+scenarios, the same train/test split, and the same metrics for all of them.
+Run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">compare-systems</span></code> for a single pass that reproduces the accuracy,
+Brier score, and log-loss cells below, or
+<code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">run</span> <span class="pre">python</span> <span class="pre">scripts/rating_system_comparison.py</span> <span class="pre">--repeats</span> <span class="pre">3</span></code> to also
+reproduce the runtime columns, which are medians of three runs. Change a
+constant in that script and rerun it to check a specific conclusion
+yourself.</p>
+<p>The scope is narrower than “benchmark” can imply: this compares Elote’s own
+systems to each other, not to another library, and it measures prediction
+accuracy on held-out bouts rather than ranking quality — recovery of a known
+true ordering, convergence speed, calibration after binning, and behaviour
+under adversarial scheduling are all out of scope. See
+<a class="reference internal" href="#what-this-page-does-not-show">What this page does not show</a> for the complete list.</p>
+<section id="run-it-yourself">
+<h2>Run it yourself<a class="headerlink" href="#run-it-yourself" title="Link to this heading">¶</a></h2>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">git clone https://github.com/wdm0006/elote &amp;&amp; cd elote</span>
+<span class="go">make compare-systems</span>
+
+<span class="gp"># </span>or,<span class="w"> </span>equivalently:
+<span class="go">uv run python scripts/rating_system_comparison.py</span>
+</pre></div>
+</div>
+<p>The command writes <code class="docutils literal notranslate"><span class="pre">rating_system_comparison.csv</span></code> (one row per run,
+scenario, and system) and <code class="docutils literal notranslate"><span class="pre">rating_system_comparison_env.json</span></code> (the
+environment block and scenario definitions) to the current directory. Both
+are in <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code>, so a local run never offers to commit its own output.
+Pass <code class="docutils literal notranslate"><span class="pre">--repeats</span> <span class="pre">3</span></code> to characterize run-to-run variation, or
+<code class="docutils literal notranslate"><span class="pre">--with-football</span></code> to also try the shipped college football adapter (opt-in:
+it needs the <code class="docutils literal notranslate"><span class="pre">datasets</span></code> extra and a network round trip, and this page does
+not report on it — see <a class="reference internal" href="#what-this-page-does-not-show">What this page does not show</a>).</p>
+</section>
+<section id="fixed-inputs">
+<h2>Fixed inputs<a class="headerlink" href="#fixed-inputs" title="Link to this heading">¶</a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 30.0%" />
+<col style="width: 45.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Input</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Why it is pinned</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Seed</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">20260809</span></code></p></td>
+<td><p>A module constant (<code class="docutils literal notranslate"><span class="pre">SEED</span></code>) in the runner. Change it in one place and every number below moves together.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Library under test</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">elote</span></code> 1.3.2, installed from PyPI</p></td>
+<td><p>The version this page’s figures were measured against; check <code class="docutils literal notranslate"><span class="pre">rating_system_comparison_env.json</span></code> for the version your own run used.</p></td>
+</tr>
+<tr class="row-even"><td><p>Python</p></td>
+<td><p>CPython 3.12.11</p></td>
+<td><p>Middle of the supported 3.10-3.12 range.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Machine</p></td>
+<td><p>Apple M4, arm64, macOS 26.2</p></td>
+<td><p>Runtime figures are machine-dependent and mean little without it.</p></td>
+</tr>
+<tr class="row-even"><td><p>Split</p></td>
+<td><p>Time-ordered, <code class="docutils literal notranslate"><span class="pre">test_ratio=0.3</span></code></p></td>
+<td><p>420 training rows and 180 evaluation rows per scenario.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Starting rating</p></td>
+<td><p>1500 for every system whose constructor accepts one</p></td>
+<td><p>Otherwise the comparison is partly a comparison of default starting points, which range from 100 to 1500 across the library.</p></td>
+</tr>
+<tr class="row-even"><td><p>Prediction thresholds</p></td>
+<td><p>Fixed at 0.45 / 0.55</p></td>
+<td><p>Threshold optimization is not used; see <a class="reference internal" href="#what-this-page-does-not-show">What this page does not show</a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Per-cell runtime budget</p></td>
+<td><p>300 seconds</p></td>
+<td><p>A cell over budget is recorded as <code class="docutils literal notranslate"><span class="pre">excluded_over_budget</span></code> in the CSV, never dropped silently. No cell reached it in the runs reported here; the slowest was under 13 seconds.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="scenario-matrix">
+<h2>Scenario matrix<a class="headerlink" href="#scenario-matrix" title="Link to this heading">¶</a></h2>
+<p>Three synthetic scenarios from one generator and one seed, moving one axis at
+a time.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 14.0%" />
+<col style="width: 12.0%" />
+<col style="width: 12.0%" />
+<col style="width: 22.0%" />
+<col style="width: 16.0%" />
+<col style="width: 24.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Competitors</p></th>
+<th class="head"><p>Matchups</p></th>
+<th class="head"><p>Generator settings</p></th>
+<th class="head"><p>Draws (train / test)</p></th>
+<th class="head"><p>What it probes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">balanced</span></code></p></td>
+<td><p>30</p></td>
+<td><p>600</p></td>
+<td><p>library defaults</p></td>
+<td><p>6 / 2</p></td>
+<td><p>dense schedule, nearly draw-free</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">draw_heavy</span></code></p></td>
+<td><p>30</p></td>
+<td><p>600</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">draw_probability=0.5</span></code>, <code class="docutils literal notranslate"><span class="pre">noise_std=200.0</span></code></p></td>
+<td><p>63 / 26</p></td>
+<td><p>whether draw handling costs anything</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sparse</span></code></p></td>
+<td><p>120</p></td>
+<td><p>600</p></td>
+<td><p>library defaults</p></td>
+<td><p>3 / 2</p></td>
+<td><p>most pairs have never met</p></td>
+</tr>
+</tbody>
+</table>
+<p>Raising <code class="docutils literal notranslate"><span class="pre">draw_probability</span></code> alone barely moves the draw rate, because the
+generator only draws when the skill gap is inside one noise standard
+deviation; <code class="docutils literal notranslate"><span class="pre">noise_std</span></code> has to rise with it, which is why <code class="docutils literal notranslate"><span class="pre">draw_heavy</span></code>
+moves two settings and not one.</p>
+</section>
+<section id="systems-compared">
+<h2>Systems compared<a class="headerlink" href="#systems-compared" title="Link to this heading">¶</a></h2>
+<p>Every concrete rating system Elote exports at the time of measurement: Elo,
+Glicko-1, Glicko-2, TrueSkill, ECF, DWZ, Colley Matrix, Massey, Keener,
+Pythagorean, Bradley-Terry, and Whole-History Rating.
+<code class="docutils literal notranslate"><span class="pre">BlendedCompetitor</span></code> is excluded — it is an ensemble that needs an explicit
+child configuration, so there is no default form comparable to a single
+system out of the box. The runner drives <code class="docutils literal notranslate"><span class="pre">LambdaArena</span></code> and the dataset
+helpers directly rather than the library’s <code class="docutils literal notranslate"><span class="pre">benchmark_competitors</span></code> helper,
+which keeps every system’s own defaults intact.</p>
+</section>
+<section id="metrics">
+<h2>Metrics<a class="headerlink" href="#metrics" title="Link to this heading">¶</a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 45.0%" />
+<col style="width: 35.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Metric</p></th>
+<th class="head"><p>Definition</p></th>
+<th class="head"><p>Why it is here</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Accuracy</p></td>
+<td><p>The library’s own <code class="docutils literal notranslate"><span class="pre">History.calculate_metrics</span></code> at fixed 0.45 / 0.55 thresholds; a drawn bout is correct when the prediction falls between them.</p></td>
+<td><p>It is what everyone reports, so it has to be present to be argued with.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Brier score</p></td>
+<td><p>Mean squared error between the predicted probability and the observed expected score, where a win is 1, a draw 0.5, a loss 0. Lower is better.</p></td>
+<td><p>Accuracy is blind to any monotone reshaping of the probability. A proper scoring rule is not, and the library’s expected scores are probabilities people use downstream.</p></td>
+</tr>
+<tr class="row-even"><td><p>Log loss</p></td>
+<td><p>Mean of <code class="docutils literal notranslate"><span class="pre">-(y</span> <span class="pre">log</span> <span class="pre">p</span> <span class="pre">+</span> <span class="pre">(1-y)</span> <span class="pre">log(1-p))</span></code>, with <code class="docutils literal notranslate"><span class="pre">p</span></code> clipped to <code class="docutils literal notranslate"><span class="pre">[1e-12,</span> <span class="pre">1-1e-12]</span></code>. Lower is better.</p></td>
+<td><p>It punishes confident errors, which is exactly the failure mode a broken prediction formula produces.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Predictions outside <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code></p></td>
+<td><p>A count, per cell.</p></td>
+<td><p>A rating system returning a negative probability is not a tuning question. This column is what makes the clipping above auditable rather than hidden.</p></td>
+</tr>
+<tr class="row-even"><td><p>Train seconds / predict seconds</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">time.perf_counter</span></code> around the training loop and the evaluation loop separately.</p></td>
+<td><p>Prediction cost and fitting cost differ by orders of magnitude between incremental and global-fit systems, and averaging them hides that.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The observed score for a draw is 0.5 because that is what the library’s own
+contract means: every <code class="docutils literal notranslate"><span class="pre">expected_score</span></code> returns an expected score on a
+win-1, draw-half, loss-0 scale, not a win probability.</p>
+</section>
+<section id="results">
+<h2>Results<a class="headerlink" href="#results" title="Link to this heading">¶</a></h2>
+<p>Every cell below is the median of three runs of
+<code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">run</span> <span class="pre">python</span> <span class="pre">scripts/rating_system_comparison.py</span> <span class="pre">--repeats</span> <span class="pre">3</span></code>
+(<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">compare-systems</span></code> runs the same script without repeats, for a quick
+single pass). Accuracy, Brier, and log loss were identical across all three
+runs for every system except Whole-History Rating, whose iterative fit
+differs by less than <code class="docutils literal notranslate"><span class="pre">1e-5</span></code> in Brier score between runs; see
+<a class="reference internal" href="#reproducibility">Reproducibility</a>. Every cell recorded zero predictions outside <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.
+Lower is better for Brier and log loss.</p>
+<p><code class="docutils literal notranslate"><span class="pre">balanced</span></code> — 30 competitors, 600 matchups, 420 train / 180 test, 6 / 2 draws:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 24.0%" />
+<col style="width: 14.0%" />
+<col style="width: 14.0%" />
+<col style="width: 14.0%" />
+<col style="width: 17.0%" />
+<col style="width: 17.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>System</p></th>
+<th class="head"><p>Accuracy</p></th>
+<th class="head"><p>Brier</p></th>
+<th class="head"><p>Log loss</p></th>
+<th class="head"><p>Train (s)</p></th>
+<th class="head"><p>Predict (s)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Elo</p></td>
+<td><p>0.8778</p></td>
+<td><p>0.0900</p></td>
+<td><p>0.3310</p></td>
+<td><p>0.001</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-odd"><td><p>Glicko-1</p></td>
+<td><p>0.9167</p></td>
+<td><p>0.0567</p></td>
+<td><p>0.2036</p></td>
+<td><p>0.002</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-even"><td><p>Glicko-2</p></td>
+<td><p>0.9167</p></td>
+<td><p>0.0581</p></td>
+<td><p>0.2123</p></td>
+<td><p>0.004</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-odd"><td><p>TrueSkill</p></td>
+<td><p>0.9111</p></td>
+<td><p>0.0570</p></td>
+<td><p>0.1996</p></td>
+<td><p>0.001</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-even"><td><p>ECF</p></td>
+<td><p>0.9056</p></td>
+<td><p>0.0706</p></td>
+<td><p>0.2586</p></td>
+<td><p>0.012</p></td>
+<td><p>0.001</p></td>
+</tr>
+<tr class="row-odd"><td><p>DWZ</p></td>
+<td><p>0.9000</p></td>
+<td><p>0.0806</p></td>
+<td><p>0.2991</p></td>
+<td><p>0.001</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-even"><td><p>Colley</p></td>
+<td><p>0.8889</p></td>
+<td><p>0.0845</p></td>
+<td><p>0.3126</p></td>
+<td><p>0.047</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-odd"><td><p>Massey</p></td>
+<td><p>0.9000</p></td>
+<td><p>0.0707</p></td>
+<td><p>0.2618</p></td>
+<td><p>0.045</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-even"><td><p>Keener</p></td>
+<td><p>0.7500</p></td>
+<td><p>0.1484</p></td>
+<td><p>0.4852</p></td>
+<td><p>0.135</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-odd"><td><p>Pythagorean</p></td>
+<td><p>0.9111</p></td>
+<td><p>0.0594</p></td>
+<td><p>0.2049</p></td>
+<td><p>0.000</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Bradley-Terry</strong></p></td>
+<td><p><strong>0.9222</strong></p></td>
+<td><p><strong>0.0539</strong></p></td>
+<td><p><strong>0.1859</strong></p></td>
+<td><p>9.924</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-odd"><td><p>Whole-History Rating</p></td>
+<td><p>0.9056</p></td>
+<td><p>0.0627</p></td>
+<td><p>0.2305</p></td>
+<td><p>1.144</p></td>
+<td><p>0.022</p></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">draw_heavy</span></code> — same size, higher noise, 63 / 26 draws:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 24.0%" />
+<col style="width: 14.0%" />
+<col style="width: 14.0%" />
+<col style="width: 14.0%" />
+<col style="width: 17.0%" />
+<col style="width: 17.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>System</p></th>
+<th class="head"><p>Accuracy</p></th>
+<th class="head"><p>Brier</p></th>
+<th class="head"><p>Log loss</p></th>
+<th class="head"><p>Train (s)</p></th>
+<th class="head"><p>Predict (s)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Elo</p></td>
+<td><p>0.6556</p></td>
+<td><p>0.1219</p></td>
+<td><p>0.4886</p></td>
+<td><p>0.001</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-odd"><td><p>Glicko-1</p></td>
+<td><p><strong>0.7000</strong></p></td>
+<td><p>0.1305</p></td>
+<td><p>0.4976</p></td>
+<td><p>0.002</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-even"><td><p>Glicko-2</p></td>
+<td><p>0.6889</p></td>
+<td><p>0.1105</p></td>
+<td><p>0.4436</p></td>
+<td><p>0.004</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-odd"><td><p>TrueSkill</p></td>
+<td><p>0.6944</p></td>
+<td><p><strong>0.1050</strong></p></td>
+<td><p><strong>0.4282</strong></p></td>
+<td><p>0.001</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-even"><td><p>ECF</p></td>
+<td><p><strong>0.7000</strong></p></td>
+<td><p>0.1077</p></td>
+<td><p>0.4454</p></td>
+<td><p>0.012</p></td>
+<td><p>0.001</p></td>
+</tr>
+<tr class="row-odd"><td><p>DWZ</p></td>
+<td><p>0.6667</p></td>
+<td><p>0.1144</p></td>
+<td><p>0.4670</p></td>
+<td><p>0.001</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-even"><td><p>Colley</p></td>
+<td><p>0.7111</p></td>
+<td><p>0.1134</p></td>
+<td><p>0.4667</p></td>
+<td><p>0.047</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-odd"><td><p>Massey</p></td>
+<td><p>0.7222</p></td>
+<td><p>0.1024</p></td>
+<td><p>0.4247</p></td>
+<td><p>0.044</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-even"><td><p>Keener</p></td>
+<td><p>0.5389</p></td>
+<td><p>0.1647</p></td>
+<td><p>0.5912</p></td>
+<td><p>0.129</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-odd"><td><p>Pythagorean</p></td>
+<td><p>0.6944</p></td>
+<td><p>0.1217</p></td>
+<td><p>0.4905</p></td>
+<td><p>0.001</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-even"><td><p>Bradley-Terry</p></td>
+<td><p>0.7278</p></td>
+<td><p>0.1003</p></td>
+<td><p>0.4192</p></td>
+<td><p>1.385</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-odd"><td><p>Whole-History Rating</p></td>
+<td><p>0.6778</p></td>
+<td><p>0.1165</p></td>
+<td><p>0.4592</p></td>
+<td><p>1.174</p></td>
+<td><p>0.025</p></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">sparse</span></code> — 120 competitors, 600 matchups, 420 train / 180 test, 3 / 2 draws:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 24.0%" />
+<col style="width: 14.0%" />
+<col style="width: 14.0%" />
+<col style="width: 14.0%" />
+<col style="width: 17.0%" />
+<col style="width: 17.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>System</p></th>
+<th class="head"><p>Accuracy</p></th>
+<th class="head"><p>Brier</p></th>
+<th class="head"><p>Log loss</p></th>
+<th class="head"><p>Train (s)</p></th>
+<th class="head"><p>Predict (s)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Elo</p></td>
+<td><p>0.6389</p></td>
+<td><p>0.1807</p></td>
+<td><p>0.5553</p></td>
+<td><p>0.001</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-odd"><td><p>Glicko-1</p></td>
+<td><p>0.7667</p></td>
+<td><p>0.1294</p></td>
+<td><p>0.3991</p></td>
+<td><p>0.002</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-even"><td><p>Glicko-2</p></td>
+<td><p>0.7667</p></td>
+<td><p>0.1254</p></td>
+<td><p>0.3931</p></td>
+<td><p>0.004</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-odd"><td><p>TrueSkill</p></td>
+<td><p>0.7611</p></td>
+<td><p><strong>0.1218</strong></p></td>
+<td><p><strong>0.3783</strong></p></td>
+<td><p>0.001</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-even"><td><p>ECF</p></td>
+<td><p>0.7611</p></td>
+<td><p>0.1278</p></td>
+<td><p>0.4033</p></td>
+<td><p>0.006</p></td>
+<td><p>0.001</p></td>
+</tr>
+<tr class="row-odd"><td><p>DWZ</p></td>
+<td><p>0.7000</p></td>
+<td><p>0.1527</p></td>
+<td><p>0.4882</p></td>
+<td><p>0.001</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-even"><td><p>Colley</p></td>
+<td><p>0.7500</p></td>
+<td><p>0.1307</p></td>
+<td><p>0.4255</p></td>
+<td><p>0.087</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-odd"><td><p>Massey</p></td>
+<td><p><strong>0.7944</strong></p></td>
+<td><p>0.1253</p></td>
+<td><p>0.3934</p></td>
+<td><p>0.081</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-even"><td><p>Keener</p></td>
+<td><p>0.6944</p></td>
+<td><p>0.1738</p></td>
+<td><p>0.5391</p></td>
+<td><p>1.504</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-odd"><td><p>Pythagorean</p></td>
+<td><p>0.7722</p></td>
+<td><p>0.1377</p></td>
+<td><p>0.4469</p></td>
+<td><p>0.001</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-even"><td><p>Bradley-Terry</p></td>
+<td><p><strong>0.8111</strong></p></td>
+<td><p>0.1373</p></td>
+<td><p>0.4885</p></td>
+<td><p>11.856</p></td>
+<td><p>0.000</p></td>
+</tr>
+<tr class="row-odd"><td><p>Whole-History Rating</p></td>
+<td><p>0.7278</p></td>
+<td><p>0.1457</p></td>
+<td><p>0.4593</p></td>
+<td><p>2.155</p></td>
+<td><p>0.050</p></td>
+</tr>
+</tbody>
+</table>
+<section id="what-the-tables-say">
+<h3>What the tables say<a class="headerlink" href="#what-the-tables-say" title="Link to this heading">¶</a></h3>
+<p><strong>No system wins everywhere.</strong> Bradley-Terry has the best accuracy on
+<code class="docutils literal notranslate"><span class="pre">balanced</span></code> and <code class="docutils literal notranslate"><span class="pre">sparse</span></code>; TrueSkill has the best Brier score and log loss
+on <code class="docutils literal notranslate"><span class="pre">draw_heavy</span></code> and <code class="docutils literal notranslate"><span class="pre">sparse</span></code>. Any copy that names a single winner is
+describing one column of one scenario.</p>
+<p><strong>Accuracy and Brier score can disagree about the ordering.</strong> On <code class="docutils literal notranslate"><span class="pre">sparse</span></code>,
+Massey and Bradley-Terry are first and second on accuracy but sit behind
+TrueSkill, Glicko-1, and Glicko-2 on Brier score. A reader who uses the
+predicted probability for anything beyond picking a winner should not choose
+a system on the accuracy column alone.</p>
+<p><strong>Fitting cost and prediction cost are different questions.</strong> Prediction is
+sub-millisecond for every system. Training separates them by up to four
+orders of magnitude: Bradley-Terry, which refits the whole match graph after
+every result, takes roughly 10-12 seconds on <code class="docutils literal notranslate"><span class="pre">balanced</span></code> and <code class="docutils literal notranslate"><span class="pre">sparse</span></code>
+where Elo takes about a millisecond, and accounts for the large majority of
+each scenario’s total sweep time. Whole-History Rating, the other system
+that maintains a full history rather than a single running number, is the
+next most expensive, at one to two seconds per scenario.</p>
+<p><strong>No prediction fell outside ``[0, 1]`` for any system on this release.</strong>
+Earlier development of this library found a TrueSkill defect that produced
+impossible probabilities on a fraction of predictions; that defect is fixed
+in the release this page measures. See <a class="reference internal" href="#a-version-note">A version note</a>.</p>
+</section>
+</section>
+<section id="reproducibility">
+<h2>Reproducibility<a class="headerlink" href="#reproducibility" title="Link to this heading">¶</a></h2>
+<p>Repeating the whole run three times reproduces every figure above exactly,
+with one exception: Whole-History Rating’s Brier and log-loss figures vary
+by less than <code class="docutils literal notranslate"><span class="pre">1e-5</span></code> between runs, because its iterative Newton fit’s
+stopping point is sensitive to floating-point order of operations at the
+level of its convergence tolerance. That is roughly four orders of magnitude
+below any digit reported here. Every other system, both global-fit and
+incremental, is byte-identical across the three runs. Runtime naturally is
+not; the runtime columns report the median of the three.</p>
+</section>
+<section id="a-version-note">
+<h2>A version note<a class="headerlink" href="#a-version-note" title="Link to this heading">¶</a></h2>
+<p>An earlier development snapshot of this comparison (see the source specs
+this page is adapted from) found that the then-published release returned
+probabilities outside <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code> for a large fraction of TrueSkill’s
+predictions — a since-fixed defect in how the draw correction combined with
+the win/loss probabilities. That fix, and the Massey and Keener systems
+which were development-branch-only at the time, are now part of the
+published release this page measures (<code class="docutils literal notranslate"><span class="pre">elote</span></code> 1.3.2): every cell above
+recorded zero out-of-range predictions, and both systems ran without special
+handling. If you are comparing against an older release, do not assume the
+numbers here apply — rerun the command above against the version you have.</p>
+</section>
+<section id="what-this-page-does-not-show">
+<h2>What this page does not show<a class="headerlink" href="#what-this-page-does-not-show" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p><strong>The synthetic generator is a friendly world.</strong> It samples outcomes from
+a latent per-competitor strength, which is the model most of these
+systems assume. Treat these numbers as an upper bound on how well the
+systems agree with each other, not as evidence about messy real data.</p></li>
+<li><p><strong>One seed.</strong> Three scenarios from one seed are enough to show that the
+ordering is scenario-dependent and not enough to put a confidence
+interval on any single figure. None is claimed anywhere on this page.</p></li>
+<li><p><strong>Glicko’s inactivity-driven RD growth is inert here.</strong> The arena rejects
+a match timestamp earlier than a competitor’s creation time, so neither
+Glicko system’s rating-deviation decay runs during this back-test.</p></li>
+<li><p><strong>Default parameters throughout.</strong> No system is tuned. A tuned Elo would
+beat an untuned anything, and a comparison of tuned systems is a
+different and much larger piece of work.</p></li>
+<li><p><strong>Accuracy uses one fixed threshold pair.</strong> 0.45 / 0.55 is a choice. A
+different pair reorders the accuracy column, which is part of why the
+Brier and log-loss columns are here at all.</p></li>
+<li><p><strong>Runtime is one machine.</strong> Absolute seconds are Apple M4 numbers. The
+<em>ratios</em> between systems are the portable part.</p></li>
+<li><p><strong>No cross-library comparison, and no real-data run in this page’s
+figures.</strong> The runner supports <code class="docutils literal notranslate"><span class="pre">--with-football</span></code> for a robustness check
+against the shipped college football adapter, but that scenario is not
+reported here; it is a much larger, uneven, real-world schedule and is
+left for a future revision of this page rather than measured on the same
+timeline as the synthetic scenarios above.</p></li>
+</ol>
+</section>
+<section id="see-also">
+<h2>See also<a class="headerlink" href="#see-also" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../choose_a_rating_system.html"><span class="doc">How to choose a rating system</span></a> — route from a requirement to a shortlist,
+then measure the shortlist on your own data with the same harness this page
+uses.</p></li>
+<li><p><a class="reference internal" href="elo_vs_glicko_vs_trueskill.html"><span class="doc">Elo vs Glicko vs TrueSkill</span></a> — the three most-asked-about systems,
+compared with sourced mathematics.</p></li>
+<li><p><a class="reference internal" href="comparison.html"><span class="doc">Comparing Rating Systems</span></a> — the per-system reference: origins, formulas,
+parameters, strengths and weaknesses.</p></li>
+</ul>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick Start Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../competitors.html">Competitors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../choose_a_rating_system.html">How to choose a rating system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../arenas.html">Arenas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../serialization.html">Serialization</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="elo.html">Elo Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glicko2.html">Glicko-2 Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="trueskill.html">TrueSkill Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ecf.html">ECF Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dwz.html">DWZ Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="colley.html">Colley Matrix Method</a></li>
+<li class="toctree-l1"><a class="reference internal" href="massey.html">Massey Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="keener.html">Keener Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pythagorean.html">Pythagorean Expectation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="whr.html">Whole-History Rating</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ensemble.html">Ensemble Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="elo_vs_glicko_vs_trueskill.html">Elo vs Glicko vs TrueSkill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="elote_vs_other_packages.html">Elote vs single-algorithm packages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comparison.html">Comparing Rating Systems</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Rating-system comparison benchmark</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advance_example.html">Advanced Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use_cases/product_ranking.html">Product Ranking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use_cases/matchmaking.html">Matchmaking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use_cases/feature_prioritization.html">Feature Prioritization with Elote</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/competitors.html">Competitors API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/arenas.html">Arenas API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../blog_posts.html">Blog Posts</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to Elote</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <div class="footer__inner">
+    
+    
+    <div class="footer__links">
+      
+        <a href="https://github.com/wdm0006" class="footer__link" target="_blank" rel="noopener noreferrer">
+          GitHub
+        </a>
+      
+        <a href="https://www.linkedin.com/in/wmcginnis/" class="footer__link" target="_blank" rel="noopener noreferrer">
+          LinkedIn
+        </a>
+      
+        <a href="https://x.com/willmcginniser" class="footer__link" target="_blank" rel="noopener noreferrer">
+          Twitter
+        </a>
+      
+    </div>
+    
+
+    
+    <p class="footer__copy">
+      
+        &copy; 2020, Will McGinnis
+      
+    </p>
+  </div>
+</footer>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggle = document.querySelector('.nav-toggle');
+    const nav = document.querySelector('.nav');
+    if (toggle && nav) {
+      toggle.addEventListener('click', function() {
+        nav.classList.toggle('is-open');
+        const isOpen = nav.classList.contains('is-open');
+        toggle.setAttribute('aria-expanded', isOpen);
+      });
+    }
+  });
+</script>
+
+  </body>
+</html>

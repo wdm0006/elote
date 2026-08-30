@@ -55,6 +55,7 @@ Elote makes implementing these systems simple and intuitive, with a clean API th
    rating_systems/elo_vs_glicko_vs_trueskill
    rating_systems/elote_vs_other_packages
    rating_systems/comparison
+   rating_systems/comparison_benchmark
 
 .. toctree::
    :maxdepth: 1
