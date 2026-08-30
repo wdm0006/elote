@@ -47,6 +47,7 @@ from elote.competitors.base import BaseCompetitor
 from elote.competitors.elo import EloCompetitor
 from elote.competitors.glicko import GlickoCompetitor
 from elote.competitors.glicko2 import Glicko2Competitor
+from elote.competitors.glicko_boost import GlickoBoostCompetitor
 from elote.competitors.trueskill import TrueSkillCompetitor
 from elote.competitors.ecf import ECFCompetitor
 from elote.competitors.dwz import DWZCompetitor
@@ -94,6 +95,7 @@ __all__ = [
     "EloCompetitor",
     "GlickoCompetitor",
     "Glicko2Competitor",
+    "GlickoBoostCompetitor",
     "TrueSkillCompetitor",
     "ECFCompetitor",
     "DWZCompetitor",
