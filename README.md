@@ -46,6 +46,13 @@ Currently implemented rating systems:
 
 You can also combine several systems into a single **Ensemble** (blended) competitor.
 
+Curious how they stack up against each other? Run `make compare-systems` (or
+[`scripts/rating_system_comparison.py`](scripts/rating_system_comparison.py)
+directly) to train every system on the same split and compare accuracy, Brier
+score, and log loss — see
+[`docs/source/rating_systems/comparison_benchmark.rst`](docs/source/rating_systems/comparison_benchmark.rst)
+for the methodology and measured results.
+
 ## Installation
 
 ### For Users
