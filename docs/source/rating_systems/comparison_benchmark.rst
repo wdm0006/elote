@@ -14,6 +14,12 @@ reproduce the runtime columns, which are medians of three runs. Change a
 constant in that script and rerun it to check a specific conclusion
 yourself.
 
+Glicko-Boost is the one shipped system this page does not cover. It postdates
+this run, and its update is defined over a rating period rather than over one
+bout, so the frozen-split harness here -- which trains bout by bout -- would
+measure its one-game fallback rather than the system. Comparing it fairly needs
+a period-grouped protocol.
+
 The scope is narrower than "benchmark" can imply: this compares Elote's own
 systems to each other, not to another library, and it measures prediction
 accuracy on held-out bouts rather than ranking quality — recovery of a known

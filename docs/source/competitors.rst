@@ -19,6 +19,12 @@ Glicko-2 Competitor
 .. autoclass:: elote.competitors.glicko2.Glicko2Competitor
     :members: export_state,expected_score,beat,tied,rating,to_json,from_json
 
+Glicko-Boost Competitor
+-----------------------
+
+.. autoclass:: elote.competitors.glicko_boost.GlickoBoostCompetitor
+    :members: export_state,expected_score,beat,tied,rating,to_json,from_json,apply_rating_period
+
 TrueSkill Competitor
 --------------------
 

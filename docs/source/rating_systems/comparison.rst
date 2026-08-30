@@ -42,6 +42,12 @@ Overview Comparison
      - Yes (RD + volatility)
      - No
      - Online chess, volatile skill
+   * - **Glicko-Boost**
+     - Chess (2011)
+     - High
+     - Yes (RD + boost)
+     - Within a rating period
+     - Monthly rating periods, colour
    * - **TrueSkill**
      - Microsoft (2007)
      - High
@@ -104,7 +110,9 @@ Overview Comparison
      - Complex domains
 
 Online systems (Elo, Glicko, Glicko-2, TrueSkill, ECF, DWZ, Pythagorean) update ratings
-incrementally after each result. Global-fit systems (Colley Matrix, Massey, Keener and
+incrementally after each result. Glicko-Boost is period-native: it rates every player in a
+rating period simultaneously through ``apply_rating_period``, so results inside a period do
+not depend on their order, though periods themselves are still applied in sequence. Global-fit systems (Colley Matrix, Massey, Keener and
 Bradley-Terry and Whole-History Rating) fit the whole connected group from the full set of results,
 which makes them order independent. Pythagorean is order independent too, for a different reason:
 its state is a running sum of points that ignores the opponent graph entirely. Massey, Keener and
@@ -125,6 +133,8 @@ Mathematical Formulation
      - :math:`E(A, B) = \frac{1}{1 + 10^{-g(RD_B) \times (r_A - r_B) / 400}}` where :math:`g(RD) = \frac{1}{\sqrt{1 + 3 \times RD^2 / \pi^2}}`
    * - **Glicko-2**
      - Same logistic form as Glicko, evaluated on an internal transformed scale with an added volatility term
+   * - **Glicko-Boost**
+     - :math:`E_A = \frac{1}{1 + 10^{-g\left(\sqrt{RD_A^2 + RD_B^2}\right)(r_A + \eta - r_B)/400}}` where :math:`\eta` is the advantage to white
    * - **TrueSkill**
      - :math:`E_A = \Phi\!\left(\frac{\mu_A - \mu_B}{\sqrt{2\beta^2 + \sigma_A^2 + \sigma_B^2}}\right)` where :math:`\Phi` is the normal CDF
    * - **ECF**
@@ -161,6 +171,8 @@ Key Parameters
      - Initial rating, Initial RD, Volatility, Tau
    * - **Glicko-2**
      - Initial rating, Initial RD, Initial volatility, Tau
+   * - **Glicko-Boost**
+     - Initial rating, Initial RD, White advantage (eta), Boost factors (B1, B2, k), RD-increase coefficients
    * - **TrueSkill**
      - Initial mu, Initial sigma, Beta, Tau, Draw probability
    * - **ECF**
@@ -229,6 +241,21 @@ Glicko-2
 - Sensitive to the tau system constant
 - Iterative volatility update adds computational cost
 - Designed around rating periods rather than single games
+
+Glicko-Boost
+^^^^^^^^^^^^
+
+**Strengths:**
+- Rates a whole period the way the published system does, with no within-period ordering effect
+- Second pass judges a player against how their opponents actually performed
+- RD boost lets a fast-improving player's rating move further than Glicko allows
+- Models the advantage of moving first, taken from the order of each result row
+
+**Weaknesses:**
+- Only pays off when results are grouped into rating periods
+- Twelve system constants, fitted on FIDE data
+- No persistent volatility between periods, unlike Glicko-2
+- Four Glicko passes over the population per period
 
 TrueSkill
 ^^^^^^^^^
@@ -429,6 +456,7 @@ Here's a quick comparison of how to use each system in Elote:
         EloCompetitor,
         GlickoCompetitor,
         Glicko2Competitor,
+        GlickoBoostCompetitor,
         TrueSkillCompetitor,
         ECFCompetitor,
         DWZCompetitor,
@@ -449,6 +477,9 @@ Here's a quick comparison of how to use each system in Elote:
 
     # Glicko-2
     glicko2_player = Glicko2Competitor(initial_rating=1500, initial_rd=350)
+
+    # Glicko-Boost (period-native; the first competitor of a row had white)
+    glicko_boost_player = GlickoBoostCompetitor(initial_rating=1500, initial_rd=250)
 
     # TrueSkill (mu/sigma scale)
     trueskill_player = TrueSkillCompetitor(initial_mu=25.0, initial_sigma=8.333)

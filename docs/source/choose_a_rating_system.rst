@@ -49,6 +49,9 @@ Start here
    * - Competitors appear, play a handful of games, and go quiet
      - Glicko-2
      - :doc:`Glicko-2 <rating_systems/glicko2>`
+   * - Results arrive in batches (a month, a season round) and you know who moved first
+     - Glicko-Boost
+     - :doc:`Glicko-Boost <rating_systems/glicko_boost>`
    * - Teams, or more than two sides per result
      - TrueSkill
      - :doc:`TrueSkill <rating_systems/trueskill>`
@@ -622,6 +625,7 @@ Where to go next
 - The system pages: :doc:`Elo <rating_systems/elo>`,
   :doc:`Glicko <rating_systems/glicko>`,
   :doc:`Glicko-2 <rating_systems/glicko2>`,
+  :doc:`Glicko-Boost <rating_systems/glicko_boost>`,
   :doc:`TrueSkill <rating_systems/trueskill>`,
   :doc:`ECF <rating_systems/ecf>`, :doc:`DWZ <rating_systems/dwz>`,
   :doc:`Colley <rating_systems/colley>`, :doc:`Massey <rating_systems/massey>`,
