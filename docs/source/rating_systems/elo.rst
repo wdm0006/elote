@@ -1,6 +1,8 @@
 Elo Rating System
 ================
 
+See :doc:`Elo vs Glicko vs TrueSkill <elo_vs_glicko_vs_trueskill>` for a measured, sourced head-to-head, or :doc:`How to choose a rating system <../choose_a_rating_system>` for a decision guide across every system.
+
 Overview
 --------
 

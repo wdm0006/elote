@@ -1,4 +1,4 @@
-.PHONY: help setup install install-dev install-datasets test test-cov lint format clean build docs lint-fix test-all benchmark run-example typecheck
+.PHONY: help setup install install-dev install-datasets test test-cov lint format clean build docs lint-fix test-all benchmark compare-systems run-example typecheck
 
 # Default target
 help:
@@ -11,6 +11,7 @@ help:
 	@echo "  make test-cov     - Run tests with coverage"
 	@echo "  make test-all     - Run tests on all supported Python versions using tox"
 	@echo "  make benchmark    - Run performance benchmarks"
+	@echo "  make compare-systems - Compare every rating system on one interface, one split"
 	@echo "  make lint         - Run linting checks"
 	@echo "  make lint-fix     - Run linting checks and fix auto-fixable issues"
 	@echo "  make typecheck    - Run mypy type checking"
@@ -112,7 +113,11 @@ test-all:
 
 # Run benchmarks
 benchmark:
-	uv run pytest tests/test_benchmarks.py -v --benchmark-enable $(PYTEST_ARGS) 
+	uv run pytest tests/test_benchmarks.py -v --benchmark-enable $(PYTEST_ARGS)
+
+# Compare every rating system elote ships, on one interface, on one split
+compare-systems:
+	uv run python scripts/rating_system_comparison.py
 
 # Run an example
 run-example:

@@ -17,3 +17,5 @@ htmlcov/
 .benchmarks/
 .coverage*
 .uv.lockbuild/
+rating_system_comparison*.csv
+rating_system_comparison*.json

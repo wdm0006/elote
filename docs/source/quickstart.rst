@@ -3,6 +3,10 @@ Quick Start Guide
 
 This guide will help you get up and running with Elote quickly. We'll cover the basics of creating competitors, recording match results, and using arenas for tournaments.
 
+Not sure which rating system fits your data? See
+:doc:`How to choose a rating system <choose_a_rating_system>` for a decision
+guide and a runnable comparison harness.
+
 Basic Usage
 ----------
 
