@@ -4,7 +4,8 @@
 <html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z43R9PWW0B"></script>
     <script>
@@ -14,7 +15,7 @@
         gtag('config', 'G-Z43R9PWW0B');
     </script>
     
-    <title>Overview: module code &#8212; elote 1.3.2 documentation</title>
+    <title>Elote vs single-algorithm packages &#8212; elote 1.3.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=30d13653" />
     <link rel="stylesheet" type="text/css" href="../_static/css/wabi.css?v=501c8ac3" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=71d92741" />
@@ -23,6 +24,8 @@
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Comparing Rating Systems" href="comparison.html" />
+    <link rel="prev" title="Elo vs Glicko vs TrueSkill" href="elo_vs_glicko_vs_trueskill.html" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,7 +33,7 @@
 
 
 
-<meta name="description" content="Overview: module code - elote documentation">
+<meta name="description" content="Elote vs single-algorithm packages - elote documentation">
 
 
 
@@ -40,19 +43,19 @@
 
 
 
-<meta property="og:title" content="Overview: module code">
-<meta property="og:description" content="Overview: module code - elote documentation">
+<meta property="og:title" content="Elote vs single-algorithm packages">
+<meta property="og:description" content="Elote vs single-algorithm packages - elote documentation">
 <meta property="og:type" content="website">
 
-<meta property="og:url" content="https://elote.mcginniscommawill.com/_modules/index.html">
+<meta property="og:url" content="https://elote.mcginniscommawill.com/rating_systems/elote_vs_other_packages.html">
 
 
 <meta property="og:site_name" content="elote">
 
 
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Overview: module code">
-<meta name="twitter:description" content="Overview: module code - elote documentation">
+<meta name="twitter:title" content="Elote vs single-algorithm packages">
+<meta name="twitter:description" content="Elote vs single-algorithm packages - elote documentation">
 
 <meta name="twitter:site" content="@willmcginniser">
 
@@ -60,7 +63,7 @@
 
 
 
-<link rel="canonical" href="https://elote.mcginniscommawill.com/_modules/index.html">
+<link rel="canonical" href="https://elote.mcginniscommawill.com/rating_systems/elote_vs_other_packages.html">
 
 
  
@@ -156,7 +159,7 @@
     
     
     <span class="breadcrumbs__separator">/</span>
-    <span>Overview: module code</span>
+    <span>Elote vs single-algorithm packages</span>
     
   </div>
 </nav>
@@ -168,24 +171,77 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>All modules for which code is available</h1>
-<ul><li><a href="elote/arenas/base.html">elote.arenas.base</a></li>
-<li><a href="elote/arenas/lambda_arena.html">elote.arenas.lambda_arena</a></li>
-<li><a href="elote/competitors/base.html">elote.competitors.base</a></li>
-<li><a href="elote/competitors/bradley_terry.html">elote.competitors.bradley_terry</a></li>
-<li><a href="elote/competitors/colley.html">elote.competitors.colley</a></li>
-<li><a href="elote/competitors/dwz.html">elote.competitors.dwz</a></li>
-<li><a href="elote/competitors/ecf.html">elote.competitors.ecf</a></li>
-<li><a href="elote/competitors/elo.html">elote.competitors.elo</a></li>
-<li><a href="elote/competitors/ensemble.html">elote.competitors.ensemble</a></li>
-<li><a href="elote/competitors/glicko.html">elote.competitors.glicko</a></li>
-<li><a href="elote/competitors/glicko2.html">elote.competitors.glicko2</a></li>
-<li><a href="elote/competitors/keener.html">elote.competitors.keener</a></li>
-<li><a href="elote/competitors/massey.html">elote.competitors.massey</a></li>
-<li><a href="elote/competitors/pythagorean.html">elote.competitors.pythagorean</a></li>
-<li><a href="elote/competitors/trueskill.html">elote.competitors.trueskill</a></li>
-<li><a href="elote/competitors/whr.html">elote.competitors.whr</a></li>
+  <section id="elote-vs-single-algorithm-packages">
+<h1>Elote vs single-algorithm packages<a class="headerlink" href="#elote-vs-single-algorithm-packages" title="Link to this heading">¶</a></h1>
+<p>Use Elote when the unresolved question is <em>which</em> rating system fits your
+history. Its narrow advantage is one rating loop across eleven systems, so an
+algorithm change does not require an application rewrite.</p>
+<p>Use another package when its narrower job is your actual job:</p>
+<ul class="simple">
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">openskill</span></code> for genuine multiplayer or team rating; the measurements
+below cover one-on-one updates only.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">whr</span></code> when Whole-History Rating fitting speed is the binding constraint.
+Its compiled core was 7.03 times faster on the published 500-game fixture.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">choix</span></code> when you want Bradley-Terry/Luce inference primitives rather
+than a stateful rating loop.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">trueskill</span></code> or <code class="docutils literal notranslate"><span class="pre">glicko2</span></code> when you have already selected that system
+and prefer its focused API.</p></li>
 </ul>
+<section id="measured-agreement">
+<h2>Measured agreement<a class="headerlink" href="#measured-agreement" title="Link to this heading">¶</a></h2>
+<p>The comparison uses native posterior outputs from each package, not reference
+formulas reconstructed from low-level primitives.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 18.0%" />
+<col style="width: 38.0%" />
+<col style="width: 20.0%" />
+<col style="width: 24.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Packages</p></th>
+<th class="head"><p>Quantity both compute</p></th>
+<th class="head"><p>Matched configuration</p></th>
+<th class="head"><p>Result</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Elote 1.3.2 / <code class="docutils literal notranslate"><span class="pre">trueskill</span></code> 0.4.5</p></td>
+<td><p>Posterior <code class="docutils literal notranslate"><span class="pre">mu</span></code> and <code class="docutils literal notranslate"><span class="pre">sigma</span></code> for both players after one 1v1 win</p></td>
+<td><p>Equal default priors and draw probability 0.1</p></td>
+<td><p>Maximum absolute delta 0.0003473759; agreement to 3 decimal places</p></td>
+</tr>
+<tr class="row-odd"><td><p>Elote 1.3.2 / <code class="docutils literal notranslate"><span class="pre">glicko2</span></code> 2.1.0</p></td>
+<td><p>Posterior rating, RD and volatility after one rating-period result</p></td>
+<td><p>Rating 1500, RD 350, volatility 0.06</p></td>
+<td><p>Maximum absolute delta 0.0000010698; agreement to 5 decimal places</p></td>
+</tr>
+<tr class="row-even"><td><p>Elote 1.3.2 / <code class="docutils literal notranslate"><span class="pre">choix</span></code> 0.4.1</p></td>
+<td><p>Centered native Bradley-Terry log-strengths on one connected graph</p></td>
+<td><p>Regularization 0, tolerance 1e-8, at most 10,000 iterations</p></td>
+<td><p>Maximum absolute delta 0.0000000073; agreement to 8 decimal places</p></td>
+</tr>
+<tr class="row-odd"><td><p>Elote 1.3.2 / <code class="docutils literal notranslate"><span class="pre">whr</span></code> 2.2.0</p></td>
+<td><p>Native per-day Elo rating curve</p></td>
+<td><p>No definition-matched setting: Gaussian initial-rating anchor versus
+virtual-game prior</p></td>
+<td><p>No delta quoted; the finding is tracked in <a class="reference external" href="https://github.com/wdm0006/elote/issues/173">issue 173</a></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="speed-footnote">
+<h2>Speed footnote<a class="headerlink" href="#speed-footnote" title="Link to this heading">¶</a></h2>
+<p>On one Apple M4 running CPython 3.12.11, <code class="docutils literal notranslate"><span class="pre">whr</span></code> completed construction and 20
+fit sweeps over a fixed 500-game fixture in 0.0110 seconds. Elote completed
+construction and its lazy fit in 0.0770 seconds: <strong>Elote was 7.03 times
+slower</strong> on this machine and protocol.</p>
+<p>These fixtures are evidence of agreement, not proof that either implementation
+is correct. They do not compare predictive accuracy, rank packages overall, or
+establish a general speed ordering.</p>
+</section>
+</section>
+
 
             <div class="clearer"></div>
           </div>
@@ -208,23 +264,23 @@
 <li class="toctree-l1"><a class="reference internal" href="../serialization.html">Serialization</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../rating_systems/elo.html">Elo Rating System</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rating_systems/glicko.html">Glicko Rating System</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rating_systems/glicko2.html">Glicko-2 Rating System</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rating_systems/trueskill.html">TrueSkill Rating System</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rating_systems/ecf.html">ECF Rating System</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rating_systems/dwz.html">DWZ Rating System</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rating_systems/colley.html">Colley Matrix Method</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rating_systems/massey.html">Massey Ratings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rating_systems/keener.html">Keener Ratings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rating_systems/pythagorean.html">Pythagorean Expectation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rating_systems/whr.html">Whole-History Rating</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rating_systems/ensemble.html">Ensemble Rating System</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rating_systems/elo_vs_glicko_vs_trueskill.html">Elo vs Glicko vs TrueSkill</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rating_systems/elote_vs_other_packages.html">Elote vs single-algorithm packages</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rating_systems/comparison.html">Comparing Rating Systems</a></li>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="elo.html">Elo Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glicko2.html">Glicko-2 Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="trueskill.html">TrueSkill Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ecf.html">ECF Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dwz.html">DWZ Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="colley.html">Colley Matrix Method</a></li>
+<li class="toctree-l1"><a class="reference internal" href="massey.html">Massey Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="keener.html">Keener Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pythagorean.html">Pythagorean Expectation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="whr.html">Whole-History Rating</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ensemble.html">Ensemble Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="elo_vs_glicko_vs_trueskill.html">Elo vs Glicko vs TrueSkill</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Elote vs single-algorithm packages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comparison.html">Comparing Rating Systems</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Examples</span></p>
 <ul>
