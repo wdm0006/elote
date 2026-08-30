@@ -25,7 +25,7 @@ from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tupl
 
 from elote.arenas.lambda_arena import LambdaArena
 from elote.competitors.base import BaseCompetitor, InvalidParameterException
-from elote.datasets.utils import train_arena_with_dataset
+from elote.datasets.utils import _scores_from_attributes, train_arena_with_dataset
 from elote.logging import logger
 
 __all__ = ["WalkForwardReport", "TuningResult", "group_by_period", "walk_forward", "tune"]
@@ -144,6 +144,13 @@ def walk_forward(
 ) -> WalkForwardReport:
     """Predict each period from everything before it, then learn that period.
 
+    Systems that override :meth:`BaseCompetitor.apply_rating_period` learn through
+    :meth:`LambdaArena.rating_period`; systems that inherit the default implementation keep
+    the existing sequential dataset-training path. A period-native system receives the
+    maximum usable row timestamp as ``period_end`` (or ``None`` when there is none), so time
+    is resolved per period rather than per row. Sequential systems continue to receive each
+    row's timestamp individually.
+
     Args:
         competitor_class: The rating system to evaluate.
         periods: Ordered periods of dataset rows, as produced by :func:`group_by_period`.
@@ -216,7 +223,21 @@ def walk_forward(
                     log_loss_total -= actual * math.log(probability) + (1.0 - actual) * math.log(1.0 - probability)
                     brier_total += (probability - actual) ** 2
 
-            train_arena_with_dataset(arena, list(period), score_keys=score_keys)
+            if competitor_class.apply_rating_period.__func__ is BaseCompetitor.apply_rating_period.__func__:
+                train_arena_with_dataset(arena, list(period), score_keys=score_keys)
+            else:
+                period_rows = [
+                    (
+                        a,
+                        b,
+                        outcome,
+                        None if score_keys is None else _scores_from_attributes(attributes, score_keys),
+                    )
+                    for a, b, outcome, _when, attributes in period
+                    if outcome is not None
+                ]
+                timestamps = [when for _a, _b, _outcome, when, _attributes in period if isinstance(when, datetime)]
+                arena.rating_period(period_rows, period_end=max(timestamps, default=None))
 
             if scored and period_count:
                 by_period.append((index, period_count, period_correct / period_count))
