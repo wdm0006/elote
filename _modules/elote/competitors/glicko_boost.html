@@ -1,0 +1,905 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z43R9PWW0B"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-Z43R9PWW0B');
+    </script>
+    
+    <title>elote.competitors.glicko_boost &#8212; elote 1.3.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=30d13653" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/wabi.css?v=501c8ac3" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=71d92741" />
+    <script src="../../../_static/documentation_options.js?v=8ca9e7a0"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+
+
+
+<meta name="description" content="elote.competitors.glicko_boost - elote documentation">
+
+
+
+
+
+
+
+
+
+<meta property="og:title" content="elote.competitors.glicko_boost">
+<meta property="og:description" content="elote.competitors.glicko_boost - elote documentation">
+<meta property="og:type" content="website">
+
+<meta property="og:url" content="https://elote.mcginniscommawill.com/_modules/elote/competitors/glicko_boost.html">
+
+
+<meta property="og:site_name" content="elote">
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="elote.competitors.glicko_boost">
+<meta name="twitter:description" content="elote.competitors.glicko_boost - elote documentation">
+
+<meta name="twitter:site" content="@willmcginniser">
+
+
+
+
+
+<link rel="canonical" href="https://elote.mcginniscommawill.com/_modules/elote/competitors/glicko_boost.html">
+
+
+ 
+
+  </head><body>
+<header class="header">
+  <div class="header__inner">
+    
+    <a href="https://mcginniscommawill.com" class="header__logo">
+      McGinnis, Will
+    </a>
+
+    
+    <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+      </svg>
+    </button>
+
+    
+    <nav class="nav" role="navigation">
+      
+      
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/guides/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Guides
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/topics/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Topics
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/posts/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Blog
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/about/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            About
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/coffee/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Free Coffee
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/oss/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            OSS
+          </a>
+        
+      
+
+      
+      
+      <a href="../../../index.html" class="nav__link nav__link--active">
+        Docs
+      </a>
+      
+    </nav>
+  </div>
+</header>
+
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <div class="breadcrumbs__inner">
+    
+    <a href="https://mcginniscommawill.com">Home</a>
+    <span class="breadcrumbs__separator">/</span>
+    
+    <a href="../../../index.html">Docs</a>
+    
+      
+      <span class="breadcrumbs__separator">/</span>
+      <a href="../../index.html">Module code</a>
+      
+    
+    
+    <span class="breadcrumbs__separator">/</span>
+    <span>elote.competitors.glicko_boost</span>
+    
+  </div>
+</nav>
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for elote.competitors.glicko_boost</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote.competitors.base</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BaseCompetitor</span><span class="p">,</span>
+    <span class="n">InvalidParameterException</span><span class="p">,</span>
+    <span class="n">InvalidRatingValueException</span><span class="p">,</span>
+    <span class="n">validate_scores</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">"GlickoBoostCompetitor"</span><span class="p">)</span>
+
+<span class="c1"># One participant's games in a period, as (opponent index, colour, score).</span>
+<span class="n">_Schedule</span> <span class="o">=</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span>
+
+
+<div class="viewcode-block" id="GlickoBoostCompetitor">
+<a class="viewcode-back" href="../../../competitors.html#elote.competitors.glicko_boost.GlickoBoostCompetitor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GlickoBoostCompetitor</span><span class="p">(</span><span class="n">BaseCompetitor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Glicko-Boost rating system competitor.</span>
+
+<span class="sd">    Glicko-Boost is Mark Glickman's extension of Glicko, described in</span>
+<span class="sd">    `Glicko-Boost &lt;https://www.glicko.net/glicko/glicko-boost.pdf&gt;`_. Unlike Elo or</span>
+<span class="sd">    Glicko it is defined over a whole rating period rather than over one game: the</span>
+<span class="sd">    population is updated twice from the same pre-period ratings, players whose</span>
+<span class="sd">    performance was exceptional have their pre-period RD boosted, and the pair of</span>
+<span class="sd">    updates is then repeated. This class therefore overrides</span>
+<span class="sd">    :meth:`~elote.competitors.base.BaseCompetitor.apply_rating_period` and is the</span>
+<span class="sd">    first shipped system whose period update is not a replay of pairwise results.</span>
+
+<span class="sd">    The six steps applied to one period are:</span>
+
+<span class="sd">    1. Glicko updating of every player from the pre-period ratings and RDs, with a</span>
+<span class="sd">       white-advantage term inside ``E()``.</span>
+
+<span class="sd">    2. The same update from the pre-period ratings, but against the opponents' step 1</span>
+<span class="sd">       ratings and RDs.</span>
+
+<span class="sd">    3. An RD boost for players whose performance z-score exceeds ``k``.</span>
+
+<span class="sd">    4. Step 1 again, using the boosted RDs.</span>
+
+<span class="sd">    5. Step 2 again, using the step 4 results. These are the period's final ratings.</span>
+
+<span class="sd">    6. An RD increase for the passage of time, applied when the competitor next takes</span>
+<span class="sd">       part in a period (the way :class:`~elote.competitors.glicko.GlickoCompetitor`</span>
+<span class="sd">       handles inactivity), so a competitor that sits out periods catches up on its</span>
+<span class="sd">       next appearance.</span>
+
+<span class="sd">    Colour is carried by argument order rather than by a new parameter: in a rating</span>
+<span class="sd">    period row ``(a, b, outcome, scores)`` -- and in ``a.beat(b)``, ``a.lost_to(b)`` or</span>
+<span class="sd">    ``a.tied(b)`` -- ``a`` is white. Callers with no colour information leave ``_eta`` at</span>
+<span class="sd">    its default of ``0.0``, which removes the white-advantage term entirely.</span>
+
+<span class="sd">    :meth:`elote.LambdaArena.matchup` is the exception: it dispatches a loss by calling</span>
+<span class="sd">    ``beat`` on the winner, so the losing row's colours are reversed relative to the same</span>
+<span class="sd">    row given to :meth:`apply_rating_period`. That only matters when ``_eta`` is non-zero;</span>
+<span class="sd">    drive colour-bearing data through :meth:`elote.LambdaArena.rating_period` instead.</span>
+
+<span class="sd">    ``beat``/``lost_to``/``tied`` apply the same algorithm to a one-game period, so a</span>
+<span class="sd">    single result is never a different formula from a batch. Because of the two-pass</span>
+<span class="sd">    structure a lone pairwise call is **not** identical to a Glicko update.</span>
+
+<span class="sd">    Class Attributes:</span>
+<span class="sd">        _q (float): ``ln(10)/400``, the Glicko scaling constant.</span>
+<span class="sd">        _eta (float): Rating advantage for playing white. Default: ``0.0``; Glickman's is ``30.0``.</span>
+<span class="sd">        _b1 (float): RD boost multiplicative factor. Default: 0.20139.</span>
+<span class="sd">        _b2 (float): RD boost additive factor. Default: 17.5.</span>
+<span class="sd">        _k (float): The z-score above which an RD is boosted. Default: 1.96.</span>
+<span class="sd">        _alpha0 .. _alpha4 (float): RD-increase-over-time coefficients, at Glickman's values.</span>
+<span class="sd">        _rd_unrated (float): The RD cap, ``RD_unr`` in the paper. Default: 250.0.</span>
+<span class="sd">        _rating_period_days (float): Days in one rating period. Default: 30.0 (a month).</span>
+<span class="sd">    """</span>
+
+    <span class="n">_q</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">/</span> <span class="mi">400</span>
+    <span class="n">_eta</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">_b1</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.20139</span>
+    <span class="n">_b2</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">17.5</span>
+    <span class="n">_k</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.96</span>
+    <span class="n">_alpha0</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5.83733</span>
+    <span class="n">_alpha1</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.75374e-04</span>
+    <span class="n">_alpha2</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">7.080124e-05</span>
+    <span class="n">_alpha3</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.001733792</span>
+    <span class="n">_alpha4</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.00026706</span>
+    <span class="n">_rd_unrated</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">250.0</span>
+    <span class="n">_rating_period_days</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">30.0</span>
+
+<div class="viewcode-block" id="GlickoBoostCompetitor.__init__">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.glicko_boost.GlickoBoostCompetitor.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_rating</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1500</span><span class="p">,</span> <span class="n">initial_rd</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">250</span><span class="p">,</span> <span class="n">initial_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Initialize a Glicko-Boost competitor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            initial_rating (float, optional): The initial rating of this competitor. Default: 1500.</span>
+<span class="sd">                Glickman's FIDE-specific default for an unrated player is 1946.25.</span>
+<span class="sd">            initial_rd (float, optional): The initial rating deviation. Default: 250, the</span>
+<span class="sd">                paper's ``RD_unr``.</span>
+<span class="sd">            initial_time (datetime, optional): The initial timestamp for this competitor. When</span>
+<span class="sd">                omitted the competitor has no recorded activity and adopts the time of its first</span>
+<span class="sd">                period, so historical results can be replayed through it.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidRatingValueException: If the initial rating is below the minimum rating.</span>
+<span class="sd">            InvalidParameterException: If the initial RD is not positive.</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">initial_rating</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Initial rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">"</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">initial_rd</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">"Initial RD must be positive"</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rd</span> <span class="o">=</span> <span class="n">initial_rd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="n">initial_rd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_time</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">"Initialized GlickoBoostCompetitor with rating=</span><span class="si">%.1f</span><span class="s2">, rd=</span><span class="si">%.1f</span><span class="s2">, time=</span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rd</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"&lt;GlickoBoostCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="si">}</span><span class="s2">, rd=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rd</span><span class="si">}</span><span class="s2">&gt;"</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"&lt;GlickoBoostCompetitor: rating=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="si">}</span><span class="s2">, rd=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rd</span><span class="si">}</span><span class="s2">&gt;"</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Get the current rating of this competitor.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The current rating.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span>
+
+    <span class="nd">@rating</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Set the current rating of this competitor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (float): The new rating value.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidRatingValueException: If the rating value is below the minimum rating.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_g</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">rd</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Calculate Glicko's g-function, the weight an opponent's RD gives its result."""</span>
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_q</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">rd</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_e</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">rating</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">colour</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">opponent_rating</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">opponent_rd</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Calculate the expected score of one game, including the advantage to white.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rating (float): The player's rating.</span>
+<span class="sd">            colour (int): ``1`` when the player had white, ``-1`` when black, ``0`` when unknown.</span>
+<span class="sd">            opponent_rating (float): The opponent's rating.</span>
+<span class="sd">            opponent_rd (float): The opponent's rating deviation.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The expected score of the game.</span>
+<span class="sd">        """</span>
+        <span class="n">exponent</span> <span class="o">=</span> <span class="o">-</span><span class="bp">cls</span><span class="o">.</span><span class="n">_g</span><span class="p">(</span><span class="n">opponent_rd</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">rating</span> <span class="o">+</span> <span class="n">colour</span> <span class="o">*</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_eta</span> <span class="o">-</span> <span class="n">opponent_rating</span><span class="p">)</span> <span class="o">/</span> <span class="mi">400</span>
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">10</span><span class="o">**</span><span class="n">exponent</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_glicko_update</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">rating</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">rd</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">games</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
+        <span class="n">opponents</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Apply one Glicko update with a white advantage (the paper's Section 2.1).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rating (float): The player's pre-update rating.</span>
+<span class="sd">            rd (float): The player's pre-update rating deviation.</span>
+<span class="sd">            games (sequence): ``(opponent index, colour, score)`` for each game played.</span>
+<span class="sd">            opponents (sequence): ``(rating, rd)`` per participant, indexed by the game's</span>
+<span class="sd">                opponent index.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple of float: The updated rating and rating deviation.</span>
+<span class="sd">        """</span>
+        <span class="n">numerator</span><span class="p">,</span> <span class="n">information</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_sufficient_statistics</span><span class="p">(</span><span class="n">rating</span><span class="p">,</span> <span class="n">games</span><span class="p">,</span> <span class="n">opponents</span><span class="p">)</span>
+        <span class="n">d_squared</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_q</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">information</span><span class="p">)</span>
+        <span class="n">new_rd</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">rd</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">d_squared</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">rating</span> <span class="o">+</span> <span class="n">new_rd</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_q</span> <span class="o">*</span> <span class="n">numerator</span><span class="p">,</span> <span class="n">new_rd</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sufficient_statistics</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">rating</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">games</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
+        <span class="n">opponents</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Accumulate the two sums every step of the algorithm is built from.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple of float: ``sum(g * (s - E))`` and ``sum(g**2 * E * (1 - E))``.</span>
+<span class="sd">        """</span>
+        <span class="n">numerator</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">information</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">opponent_index</span><span class="p">,</span> <span class="n">colour</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">games</span><span class="p">:</span>
+            <span class="n">opponent_rating</span><span class="p">,</span> <span class="n">opponent_rd</span> <span class="o">=</span> <span class="n">opponents</span><span class="p">[</span><span class="n">opponent_index</span><span class="p">]</span>
+            <span class="n">weight</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_g</span><span class="p">(</span><span class="n">opponent_rd</span><span class="p">)</span>
+            <span class="n">expected</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_e</span><span class="p">(</span><span class="n">rating</span><span class="p">,</span> <span class="n">colour</span><span class="p">,</span> <span class="n">opponent_rating</span><span class="p">,</span> <span class="n">opponent_rd</span><span class="p">)</span>
+            <span class="n">numerator</span> <span class="o">+=</span> <span class="n">weight</span> <span class="o">*</span> <span class="p">(</span><span class="n">score</span> <span class="o">-</span> <span class="n">expected</span><span class="p">)</span>
+            <span class="n">information</span> <span class="o">+=</span> <span class="n">weight</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">expected</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">expected</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">numerator</span><span class="p">,</span> <span class="n">information</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_performance_z_score</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">rating</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">games</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
+        <span class="n">opponents</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Calculate the standardized excess of the actual score over the expected score.</span>
+
+<span class="sd">        The player's own rating is its **pre-period** rating: the z-score measures how far</span>
+<span class="sd">        the period's results ran ahead of what that rating predicted. The opponents are the</span>
+<span class="sd">        step 2 population, as the paper's step 3 prescribes.</span>
+<span class="sd">        """</span>
+        <span class="n">numerator</span><span class="p">,</span> <span class="n">information</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_sufficient_statistics</span><span class="p">(</span><span class="n">rating</span><span class="p">,</span> <span class="n">games</span><span class="p">,</span> <span class="n">opponents</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">numerator</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">information</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_boosted_rd</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">rd</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">z_score</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Apply the RD boost of the paper's Section 2.2 to one pre-period RD."""</span>
+        <span class="k">if</span> <span class="n">z_score</span> <span class="o">&lt;=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_k</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">rd</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_rd_unrated</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">z_score</span> <span class="o">-</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_k</span><span class="p">)</span> <span class="o">*</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_b1</span><span class="p">)</span> <span class="o">*</span> <span class="n">rd</span> <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_b2</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_inflated_rd</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">rating</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">rd</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">periods</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Increase an RD for the passage of ``periods`` rating periods (Section 2.3).</span>
+
+<span class="sd">        The paper's formula adds one ``exp(...)`` term to ``RD**2`` per period; several</span>
+<span class="sd">        elapsed periods add that term once each, which reduces to the published formula</span>
+<span class="sd">        for a single period.</span>
+<span class="sd">        """</span>
+        <span class="n">scaled_rating</span> <span class="o">=</span> <span class="n">rating</span> <span class="o">/</span> <span class="mi">1000</span>
+        <span class="n">increase</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_alpha0</span>
+            <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_alpha1</span> <span class="o">*</span> <span class="n">rd</span>
+            <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_alpha2</span> <span class="o">*</span> <span class="n">rd</span> <span class="o">*</span> <span class="n">scaled_rating</span>
+            <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_alpha3</span> <span class="o">*</span> <span class="n">scaled_rating</span>
+            <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_alpha4</span> <span class="o">*</span> <span class="n">scaled_rating</span><span class="o">**</span><span class="mi">2</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_rd_unrated</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">rd</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">periods</span> <span class="o">*</span> <span class="n">increase</span><span class="p">))</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_solve_period</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">ratings</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">rds</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">schedule</span><span class="p">:</span> <span class="n">_Schedule</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">"""Run the five rating steps over one period and return every intermediate stage.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ratings (sequence of float): Pre-period ratings, one per participant.</span>
+<span class="sd">            rds (sequence of float): Pre-period rating deviations, one per participant.</span>
+<span class="sd">            schedule (list): Per participant, the ``(opponent index, colour, score)`` games.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: ``step1``, ``step2``, ``step4`` and ``final`` as ``(rating, rd)`` lists,</span>
+<span class="sd">            plus the ``z_score`` and boosted ``reset_rd`` lists behind them.</span>
+<span class="sd">        """</span>
+        <span class="n">pre</span> <span class="o">=</span> <span class="p">[(</span><span class="n">rating</span><span class="p">,</span> <span class="n">rd</span><span class="p">)</span> <span class="k">for</span> <span class="n">rating</span><span class="p">,</span> <span class="n">rd</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ratings</span><span class="p">,</span> <span class="n">rds</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
+
+        <span class="n">step1</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">_glicko_update</span><span class="p">(</span><span class="n">rating</span><span class="p">,</span> <span class="n">rd</span><span class="p">,</span> <span class="n">schedule</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">pre</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">rating</span><span class="p">,</span> <span class="n">rd</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pre</span><span class="p">)]</span>
+        <span class="n">step2</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">_glicko_update</span><span class="p">(</span><span class="n">rating</span><span class="p">,</span> <span class="n">rd</span><span class="p">,</span> <span class="n">schedule</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">step1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">rating</span><span class="p">,</span> <span class="n">rd</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pre</span><span class="p">)]</span>
+
+        <span class="n">z_scores</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">_performance_z_score</span><span class="p">(</span><span class="n">rating</span><span class="p">,</span> <span class="n">schedule</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">step2</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">rating</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pre</span><span class="p">)]</span>
+        <span class="n">reset_rd</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">_boosted_rd</span><span class="p">(</span><span class="n">rd</span><span class="p">,</span> <span class="n">z_scores</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">rd</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pre</span><span class="p">)]</span>
+
+        <span class="k">if</span> <span class="n">reset_rd</span> <span class="o">==</span> <span class="nb">list</span><span class="p">(</span><span class="n">rds</span><span class="p">):</span>
+            <span class="c1"># No RD was boosted, so steps 4 and 5 would reproduce steps 1 and 2 exactly.</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">"step1"</span><span class="p">:</span> <span class="n">step1</span><span class="p">,</span>
+                <span class="s2">"step2"</span><span class="p">:</span> <span class="n">step2</span><span class="p">,</span>
+                <span class="s2">"z_score"</span><span class="p">:</span> <span class="n">z_scores</span><span class="p">,</span>
+                <span class="s2">"reset_rd"</span><span class="p">:</span> <span class="n">reset_rd</span><span class="p">,</span>
+                <span class="s2">"step4"</span><span class="p">:</span> <span class="n">step1</span><span class="p">,</span>
+                <span class="s2">"final"</span><span class="p">:</span> <span class="n">step2</span><span class="p">,</span>
+            <span class="p">}</span>
+
+        <span class="n">boosted</span> <span class="o">=</span> <span class="p">[(</span><span class="n">rating</span><span class="p">,</span> <span class="n">reset_rd</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">rating</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pre</span><span class="p">)]</span>
+        <span class="n">step4</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">_glicko_update</span><span class="p">(</span><span class="n">rating</span><span class="p">,</span> <span class="n">rd</span><span class="p">,</span> <span class="n">schedule</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">boosted</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">rating</span><span class="p">,</span> <span class="n">rd</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">boosted</span><span class="p">)]</span>
+        <span class="n">step5</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">_glicko_update</span><span class="p">(</span><span class="n">rating</span><span class="p">,</span> <span class="n">rd</span><span class="p">,</span> <span class="n">schedule</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">step4</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">rating</span><span class="p">,</span> <span class="n">rd</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">boosted</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"step1"</span><span class="p">:</span> <span class="n">step1</span><span class="p">,</span>
+            <span class="s2">"step2"</span><span class="p">:</span> <span class="n">step2</span><span class="p">,</span>
+            <span class="s2">"z_score"</span><span class="p">:</span> <span class="n">z_scores</span><span class="p">,</span>
+            <span class="s2">"reset_rd"</span><span class="p">:</span> <span class="n">reset_rd</span><span class="p">,</span>
+            <span class="s2">"step4"</span><span class="p">:</span> <span class="n">step4</span><span class="p">,</span>
+            <span class="s2">"final"</span><span class="p">:</span> <span class="n">step5</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_period_schedule</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">results</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="s2">"BaseCompetitor"</span><span class="p">,</span> <span class="s2">"BaseCompetitor"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]]],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="s2">"GlickoBoostCompetitor"</span><span class="p">],</span> <span class="n">_Schedule</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Validate a period's rows and turn them into a participant list and schedule.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If an outcome is not ``1.0``, ``0.0`` or ``0.5``, or if a score</span>
+<span class="sd">                payload is invalid or inconsistent with its outcome.</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If a row contains another rating system.</span>
+<span class="sd">        """</span>
+        <span class="n">participants</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">GlickoBoostCompetitor</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">indices</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">schedule</span><span class="p">:</span> <span class="n">_Schedule</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">index_of</span><span class="p">(</span><span class="n">competitor</span><span class="p">:</span> <span class="s2">"GlickoBoostCompetitor"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+                <span class="n">indices</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">participants</span><span class="p">)</span>
+                <span class="n">participants</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+                <span class="n">schedule</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+            <span class="k">return</span> <span class="n">indices</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">competitor_a</span><span class="p">,</span> <span class="n">competitor_b</span><span class="p">,</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">scores</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">outcome</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"outcome must be one of 1.0, 0.0 or 0.5, got </span><span class="si">{</span><span class="n">outcome</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">competitor_a</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor_b</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">competitor_a</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">competitor_b</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.apply_rating_period only accepts </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> competitors"</span><span class="p">)</span>
+            <span class="n">validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">outcome</span><span class="p">)</span>
+
+            <span class="c1"># Argument order carries colour: the first competitor of a row played white.</span>
+            <span class="n">a_index</span><span class="p">,</span> <span class="n">b_index</span> <span class="o">=</span> <span class="n">index_of</span><span class="p">(</span><span class="n">competitor_a</span><span class="p">),</span> <span class="n">index_of</span><span class="p">(</span><span class="n">competitor_b</span><span class="p">)</span>
+            <span class="n">schedule</span><span class="p">[</span><span class="n">a_index</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">b_index</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">outcome</span><span class="p">))</span>
+            <span class="n">schedule</span><span class="p">[</span><span class="n">b_index</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">a_index</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">outcome</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">participants</span><span class="p">,</span> <span class="n">schedule</span>
+
+<div class="viewcode-block" id="GlickoBoostCompetitor.apply_rating_period">
+<a class="viewcode-back" href="../../../competitors.html#elote.competitors.glicko_boost.GlickoBoostCompetitor.apply_rating_period">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply_rating_period</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">results</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="s2">"BaseCompetitor"</span><span class="p">,</span> <span class="s2">"BaseCompetitor"</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]]],</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">period_end</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Apply results that share one rating period, using Glicko-Boost's own period update.</span>
+
+<span class="sd">        This is where the whole algorithm lives: the pairwise methods route a single result</span>
+<span class="sd">        through here as a one-game period, so every caller gets the same formulas.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            results: ``(white, black, outcome, scores)`` tuples. Outcomes use ``1.0`` for a</span>
+<span class="sd">                white win, ``0.0`` for a black win and ``0.5`` for a draw; scores follow the</span>
+<span class="sd">                usual optional caller-order contract and are validated but not consumed.</span>
+<span class="sd">            period_end: The shared activity time for the period. Elapsed rating periods since</span>
+<span class="sd">                each participant's last activity inflate its RD before the update.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If an outcome or score payload is invalid.</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If a row contains another rating system.</span>
+<span class="sd">        """</span>
+        <span class="n">participants</span><span class="p">,</span> <span class="n">schedule</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_period_schedule</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">participants</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">for</span> <span class="n">competitor</span> <span class="ow">in</span> <span class="n">participants</span><span class="p">:</span>
+            <span class="n">competitor</span><span class="o">.</span><span class="n">_advance_to</span><span class="p">(</span><span class="n">period_end</span><span class="p">)</span>
+
+        <span class="n">stages</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_solve_period</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">competitor</span><span class="o">.</span><span class="n">rating</span> <span class="k">for</span> <span class="n">competitor</span> <span class="ow">in</span> <span class="n">participants</span><span class="p">],</span>
+            <span class="p">[</span><span class="n">competitor</span><span class="o">.</span><span class="n">rd</span> <span class="k">for</span> <span class="n">competitor</span> <span class="ow">in</span> <span class="n">participants</span><span class="p">],</span>
+            <span class="n">schedule</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">competitor</span><span class="p">,</span> <span class="p">(</span><span class="n">rating</span><span class="p">,</span> <span class="n">rd</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">participants</span><span class="p">,</span> <span class="n">stages</span><span class="p">[</span><span class="s2">"final"</span><span class="p">],</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">competitor</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">,</span> <span class="n">rating</span><span class="p">)</span>
+            <span class="n">competitor</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="n">rd</span>
+            <span class="k">if</span> <span class="n">period_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">competitor</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="n">period_end</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Applied a Glicko-Boost rating period over </span><span class="si">%d</span><span class="s2"> competitors"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">participants</span><span class="p">))</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_advance_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Inflate this competitor's RD for the rating periods it has missed.</span>
+
+<span class="sd">        A competitor with no recorded activity adopts the supplied time as its first activity</span>
+<span class="sd">        instead of being inflated, so a historical replay stays possible.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidParameterException: If the time is before this competitor's last activity.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">current_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="n">current_time</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">current_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">current_time</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">"Period time cannot be before competitor's last activity time"</span><span class="p">)</span>
+
+        <span class="n">days</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span><span class="mi">24</span> <span class="o">*</span> <span class="mi">3600</span><span class="p">)</span>
+        <span class="n">periods</span> <span class="o">=</span> <span class="n">days</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating_period_days</span>
+        <span class="k">if</span> <span class="n">periods</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inflated_rd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rd</span><span class="p">,</span> <span class="n">periods</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GlickoBoostCompetitor.expected_score">
+<a class="viewcode-back" href="../../../competitors.html#elote.competitors.glicko_boost.GlickoBoostCompetitor.expected_score">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Calculate the expected score (probability of winning) against another competitor.</span>
+
+<span class="sd">        This uses the paper's own approximation, which combines the two rating deviations</span>
+<span class="sd">        rather than using only the opponent's. With ``_eta`` at its default of ``0.0`` the</span>
+<span class="sd">        result is exactly complementary: ``a.expected_score(b) + b.expected_score(a) == 1``.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            competitor (BaseCompetitor): The opponent competitor to compare against.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The probability of winning (between 0 and 1).</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don't match.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">combined_rd</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rd</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">competitor</span><span class="o">.</span><span class="n">rd</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">exponent</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_g</span><span class="p">(</span><span class="n">combined_rd</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eta</span> <span class="o">-</span> <span class="n">competitor</span><span class="o">.</span><span class="n">rating</span><span class="p">)</span> <span class="o">/</span> <span class="mi">400</span>
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">10</span><span class="o">**</span><span class="n">exponent</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GlickoBoostCompetitor.beat">
+<a class="viewcode-back" href="../../../competitors.html#elote.competitors.glicko_boost.GlickoBoostCompetitor.beat">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span>
+        <span class="n">match_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Update ratings after this competitor has won against the given competitor.</span>
+
+<span class="sd">        The result is applied as a one-game rating period in which this competitor had white.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            competitor (BaseCompetitor): The opponent competitor that lost.</span>
+<span class="sd">            match_time (datetime, optional): The time of the match, used as the period's end.</span>
+<span class="sd">            scores (sequence of float, optional): The two scores in caller order. Validated only.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don't match.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">apply_rating_period</span><span class="p">([(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">scores</span><span class="p">)],</span> <span class="n">period_end</span><span class="o">=</span><span class="n">match_time</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GlickoBoostCompetitor.lost_to">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.glicko_boost.GlickoBoostCompetitor.lost_to">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">lost_to</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span>
+        <span class="n">match_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Update ratings after this competitor has lost to the given competitor.</span>
+
+<span class="sd">        The result is applied as a one-game rating period in which this competitor had white,</span>
+<span class="sd">        so the colour convention still follows the caller's argument order.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            competitor (BaseCompetitor): The opponent competitor that won.</span>
+<span class="sd">            match_time (datetime, optional): The time of the match, used as the period's end.</span>
+<span class="sd">            scores (sequence of float, optional): The two scores in caller order.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don't match.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">apply_rating_period</span><span class="p">([(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">scores</span><span class="p">)],</span> <span class="n">period_end</span><span class="o">=</span><span class="n">match_time</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GlickoBoostCompetitor.tied">
+<a class="viewcode-back" href="../../../competitors.html#elote.competitors.glicko_boost.GlickoBoostCompetitor.tied">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tied</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span>
+        <span class="n">match_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Update ratings after this competitor has drawn with the given competitor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            competitor (BaseCompetitor): The opponent competitor that drew.</span>
+<span class="sd">            match_time (datetime, optional): The time of the match, used as the period's end.</span>
+<span class="sd">            scores (sequence of float, optional): The two scores in caller order. Must be equal.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don't match.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">apply_rating_period</span><span class="p">([(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">scores</span><span class="p">)],</span> <span class="n">period_end</span><span class="o">=</span><span class="n">match_time</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GlickoBoostCompetitor.reset">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.glicko_boost.GlickoBoostCompetitor.reset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Reset this competitor to its initial rating, RD and activity."""</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">"Resetting GlickoBoostCompetitor to initial state (rating=</span><span class="si">%.1f</span><span class="s2">, rd=</span><span class="si">%.1f</span><span class="s2">)"</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rd</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_export_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Export the parameters used to initialize this competitor."""</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"initial_rating"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">,</span> <span class="s2">"initial_rd"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rd</span><span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_export_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Export the current state variables of this competitor."""</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"rating"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="p">,</span>
+            <span class="s2">"rd"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">rd</span><span class="p">,</span>
+            <span class="s2">"last_activity"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_import_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Import parameters from a state dictionary.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidParameterException: If any parameter is invalid.</span>
+<span class="sd">        """</span>
+        <span class="n">initial_rating</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_rating"</span><span class="p">,</span> <span class="mi">1500</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">initial_rating</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Initial rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">"</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
+
+        <span class="n">initial_rd</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_rd"</span><span class="p">,</span> <span class="mi">250</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">initial_rd</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">"Initial RD must be positive"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rd</span> <span class="o">=</span> <span class="n">initial_rd</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_import_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Import current state variables from a state dictionary.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidParameterException: If any state variable is invalid.</span>
+<span class="sd">        """</span>
+        <span class="n">rating</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"rating"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rating</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">rating</span>
+
+        <span class="n">rd</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"rd"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rd</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rd</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">"RD must be positive"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rd</span> <span class="o">=</span> <span class="n">rd</span>
+
+        <span class="c1"># An explicit null means the competitor has never been active, while a missing key</span>
+        <span class="c1"># belongs to a state document written before that was representable.</span>
+        <span class="k">if</span> <span class="s2">"last_activity"</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+            <span class="n">last_activity</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">"last_activity"</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">last_activity</span><span class="p">)</span> <span class="k">if</span> <span class="n">last_activity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">"Last activity time missing from state, using current time: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_activity</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+            <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_from_parameters</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Create a new competitor instance from exported parameters."""</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">initial_rating</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_rating"</span><span class="p">,</span> <span class="mi">1500</span><span class="p">),</span>
+            <span class="n">initial_rd</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_rd"</span><span class="p">,</span> <span class="mi">250</span><span class="p">),</span>
+        <span class="p">)</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../competitors.html">Competitors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../choose_a_rating_system.html">How to choose a rating system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../arenas.html">Arenas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../serialization.html">Serialization</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/elo.html">Elo Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/glicko2.html">Glicko-2 Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/glicko_boost.html">Glicko-Boost Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/trueskill.html">TrueSkill Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/ecf.html">ECF Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/dwz.html">DWZ Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/colley.html">Colley Matrix Method</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/massey.html">Massey Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/keener.html">Keener Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/pythagorean.html">Pythagorean Expectation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/whr.html">Whole-History Rating</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/ensemble.html">Ensemble Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/elo_vs_glicko_vs_trueskill.html">Elo vs Glicko vs TrueSkill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/elote_vs_other_packages.html">Elote vs single-algorithm packages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/comparison.html">Comparing Rating Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/comparison_benchmark.html">Rating-system comparison benchmark</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advance_example.html">Advanced Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../use_cases/product_ranking.html">Product Ranking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../use_cases/matchmaking.html">Matchmaking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../use_cases/feature_prioritization.html">Feature Prioritization with Elote</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/competitors.html">Competitors API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/arenas.html">Arenas API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../blog_posts.html">Blog Posts</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to Elote</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <div class="footer__inner">
+    
+    
+    <div class="footer__links">
+      
+        <a href="https://github.com/wdm0006" class="footer__link" target="_blank" rel="noopener noreferrer">
+          GitHub
+        </a>
+      
+        <a href="https://www.linkedin.com/in/wmcginnis/" class="footer__link" target="_blank" rel="noopener noreferrer">
+          LinkedIn
+        </a>
+      
+        <a href="https://x.com/willmcginniser" class="footer__link" target="_blank" rel="noopener noreferrer">
+          Twitter
+        </a>
+      
+    </div>
+    
+
+    
+    <p class="footer__copy">
+      
+        &copy; 2020, Will McGinnis
+      
+    </p>
+  </div>
+</footer>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggle = document.querySelector('.nav-toggle');
+    const nav = document.querySelector('.nav');
+    if (toggle && nav) {
+      toggle.addEventListener('click', function() {
+        nav.classList.toggle('is-open');
+        const isOpen = nav.classList.contains('is-open');
+        toggle.setAttribute('aria-expanded', isOpen);
+      });
+    }
+  });
+</script>
+
+  </body>
+</html>

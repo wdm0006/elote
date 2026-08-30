@@ -592,6 +592,198 @@ InvalidParameterException: If the match time is before either competitor’s las
 </dd></dl>
 
 </section>
+<section id="glicko-boost-competitor">
+<h2>Glicko-Boost Competitor<a class="headerlink" href="#glicko-boost-competitor" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="elote.competitors.glicko_boost.GlickoBoostCompetitor">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">elote.competitors.glicko_boost.</span></span><span class="sig-name descname"><span class="pre">GlickoBoostCompetitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_rd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">250</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/elote/competitors/glicko_boost.html#GlickoBoostCompetitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko_boost.GlickoBoostCompetitor" title="Link to this definition">¶</a></dt>
+<dd><p>Glicko-Boost rating system competitor.</p>
+<p>Glicko-Boost is Mark Glickman’s extension of Glicko, described in
+<a class="reference external" href="https://www.glicko.net/glicko/glicko-boost.pdf">Glicko-Boost</a>. Unlike Elo or
+Glicko it is defined over a whole rating period rather than over one game: the
+population is updated twice from the same pre-period ratings, players whose
+performance was exceptional have their pre-period RD boosted, and the pair of
+updates is then repeated. This class therefore overrides
+<a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor.apply_rating_period" title="elote.competitors.base.BaseCompetitor.apply_rating_period"><code class="xref py py-meth docutils literal notranslate"><span class="pre">apply_rating_period()</span></code></a> and is the
+first shipped system whose period update is not a replay of pairwise results.</p>
+<p>The six steps applied to one period are:</p>
+<ol class="arabic simple">
+<li><p>Glicko updating of every player from the pre-period ratings and RDs, with a
+white-advantage term inside <code class="docutils literal notranslate"><span class="pre">E()</span></code>.</p></li>
+<li><p>The same update from the pre-period ratings, but against the opponents’ step 1
+ratings and RDs.</p></li>
+<li><p>An RD boost for players whose performance z-score exceeds <code class="docutils literal notranslate"><span class="pre">k</span></code>.</p></li>
+<li><p>Step 1 again, using the boosted RDs.</p></li>
+<li><p>Step 2 again, using the step 4 results. These are the period’s final ratings.</p></li>
+<li><p>An RD increase for the passage of time, applied when the competitor next takes
+part in a period (the way <a class="reference internal" href="#elote.competitors.glicko.GlickoCompetitor" title="elote.competitors.glicko.GlickoCompetitor"><code class="xref py py-class docutils literal notranslate"><span class="pre">GlickoCompetitor</span></code></a>
+handles inactivity), so a competitor that sits out periods catches up on its
+next appearance.</p></li>
+</ol>
+<p>Colour is carried by argument order rather than by a new parameter: in a rating
+period row <code class="docutils literal notranslate"><span class="pre">(a,</span> <span class="pre">b,</span> <span class="pre">outcome,</span> <span class="pre">scores)</span></code> – and in <code class="docutils literal notranslate"><span class="pre">a.beat(b)</span></code>, <code class="docutils literal notranslate"><span class="pre">a.lost_to(b)</span></code> or
+<code class="docutils literal notranslate"><span class="pre">a.tied(b)</span></code> – <code class="docutils literal notranslate"><span class="pre">a</span></code> is white. Callers with no colour information leave <code class="docutils literal notranslate"><span class="pre">_eta</span></code> at
+its default of <code class="docutils literal notranslate"><span class="pre">0.0</span></code>, which removes the white-advantage term entirely.</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">elote.LambdaArena.matchup()</span></code> is the exception: it dispatches a loss by calling
+<code class="docutils literal notranslate"><span class="pre">beat</span></code> on the winner, so the losing row’s colours are reversed relative to the same
+row given to <a class="reference internal" href="#elote.competitors.glicko_boost.GlickoBoostCompetitor.apply_rating_period" title="elote.competitors.glicko_boost.GlickoBoostCompetitor.apply_rating_period"><code class="xref py py-meth docutils literal notranslate"><span class="pre">apply_rating_period()</span></code></a>. That only matters when <code class="docutils literal notranslate"><span class="pre">_eta</span></code> is non-zero;
+drive colour-bearing data through <code class="xref py py-meth docutils literal notranslate"><span class="pre">elote.LambdaArena.rating_period()</span></code> instead.</p>
+<p><code class="docutils literal notranslate"><span class="pre">beat</span></code>/<code class="docutils literal notranslate"><span class="pre">lost_to</span></code>/<code class="docutils literal notranslate"><span class="pre">tied</span></code> apply the same algorithm to a one-game period, so a
+single result is never a different formula from a batch. Because of the two-pass
+structure a lone pairwise call is <strong>not</strong> identical to a Glicko update.</p>
+<dl class="simple">
+<dt>Class Attributes:</dt><dd><p>_q (float): <code class="docutils literal notranslate"><span class="pre">ln(10)/400</span></code>, the Glicko scaling constant.
+_eta (float): Rating advantage for playing white. Default: <code class="docutils literal notranslate"><span class="pre">0.0</span></code>; Glickman’s is <code class="docutils literal notranslate"><span class="pre">30.0</span></code>.
+_b1 (float): RD boost multiplicative factor. Default: 0.20139.
+_b2 (float): RD boost additive factor. Default: 17.5.
+_k (float): The z-score above which an RD is boosted. Default: 1.96.
+_alpha0 .. _alpha4 (float): RD-increase-over-time coefficients, at Glickman’s values.
+_rd_unrated (float): The RD cap, <code class="docutils literal notranslate"><span class="pre">RD_unr</span></code> in the paper. Default: 250.0.
+_rating_period_days (float): Days in one rating period. Default: 30.0 (a month).</p>
+</dd>
+</dl>
+<p>Initialize a Glicko-Boost competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>initial_rating (float, optional): The initial rating of this competitor. Default: 1500.</dt><dd><p>Glickman’s FIDE-specific default for an unrated player is 1946.25.</p>
+</dd>
+<dt>initial_rd (float, optional): The initial rating deviation. Default: 250, the</dt><dd><p>paper’s <code class="docutils literal notranslate"><span class="pre">RD_unr</span></code>.</p>
+</dd>
+<dt>initial_time (datetime, optional): The initial timestamp for this competitor. When</dt><dd><p>omitted the competitor has no recorded activity and adopts the time of its first
+period, so historical results can be replayed through it.</p>
+</dd>
+</dl>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidRatingValueException: If the initial rating is below the minimum rating.
+InvalidParameterException: If the initial RD is not positive.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko_boost.GlickoBoostCompetitor.apply_rating_period">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">apply_rating_period</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">period_end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/competitors/glicko_boost.html#GlickoBoostCompetitor.apply_rating_period"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko_boost.GlickoBoostCompetitor.apply_rating_period" title="Link to this definition">¶</a></dt>
+<dd><p>Apply results that share one rating period, using Glicko-Boost’s own period update.</p>
+<p>This is where the whole algorithm lives: the pairwise methods route a single result
+through here as a one-game period, so every caller gets the same formulas.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>results: <code class="docutils literal notranslate"><span class="pre">(white,</span> <span class="pre">black,</span> <span class="pre">outcome,</span> <span class="pre">scores)</span></code> tuples. Outcomes use <code class="docutils literal notranslate"><span class="pre">1.0</span></code> for a</dt><dd><p>white win, <code class="docutils literal notranslate"><span class="pre">0.0</span></code> for a black win and <code class="docutils literal notranslate"><span class="pre">0.5</span></code> for a draw; scores follow the
+usual optional caller-order contract and are validated but not consumed.</p>
+</dd>
+<dt>period_end: The shared activity time for the period. Elapsed rating periods since</dt><dd><p>each participant’s last activity inflate its RD before the update.</p>
+</dd>
+</dl>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If an outcome or score payload is invalid.
+MissMatchedCompetitorTypesException: If a row contains another rating system.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko_boost.GlickoBoostCompetitor.beat">
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/competitors/glicko_boost.html#GlickoBoostCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko_boost.GlickoBoostCompetitor.beat" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this competitor has won against the given competitor.</p>
+<p>The result is applied as a one-game rating period in which this competitor had white.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.
+match_time (datetime, optional): The time of the match, used as the period’s end.
+scores (sequence of float, optional): The two scores in caller order. Validated only.</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko_boost.GlickoBoostCompetitor.expected_score">
+<span class="sig-name descname"><span class="pre">expected_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/elote/competitors/glicko_boost.html#GlickoBoostCompetitor.expected_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko_boost.GlickoBoostCompetitor.expected_score" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the expected score (probability of winning) against another competitor.</p>
+<p>This uses the paper’s own approximation, which combines the two rating deviations
+rather than using only the opponent’s. With <code class="docutils literal notranslate"><span class="pre">_eta</span></code> at its default of <code class="docutils literal notranslate"><span class="pre">0.0</span></code> the
+result is exactly complementary: <code class="docutils literal notranslate"><span class="pre">a.expected_score(b)</span> <span class="pre">+</span> <span class="pre">b.expected_score(a)</span> <span class="pre">==</span> <span class="pre">1</span></code>.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor to compare against.</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: The probability of winning (between 0 and 1).</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko_boost.GlickoBoostCompetitor.export_state">
+<span class="sig-name descname"><span class="pre">export_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#elote.competitors.glicko_boost.GlickoBoostCompetitor.export_state" title="Link to this definition">¶</a></dt>
+<dd><p>Export the current state of this competitor for serialization.</p>
+<p>This method exports the competitor’s state in a standardized format that can be
+used to recreate the competitor with the same state. The format includes:
+- type: The class name of the competitor
+- version: The version of the serialization format
+- created_at: The timestamp when the state was exported
+- id: A unique identifier for this state export
+- parameters: The parameters used to initialize the competitor
+- state: The current state variables of the competitor</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>dict: A dictionary containing all necessary information to recreate</dt><dd><p>this competitor’s current state.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko_boost.GlickoBoostCompetitor.from_json">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="headerlink" href="#elote.competitors.glicko_boost.GlickoBoostCompetitor.from_json" title="Link to this definition">¶</a></dt>
+<dd><p>Create a new competitor from a JSON string.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>json_str (str): A JSON string representing a competitor’s state.</p>
+</dd>
+<dt>Returns:</dt><dd><p>BaseCompetitor: A new competitor with the state from the JSON string.</p>
+</dd>
+<dt>Raises:</dt><dd><p>InvalidStateException: If the JSON string is invalid or incompatible.
+InvalidParameterException: If any parameter in the state is invalid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="elote.competitors.glicko_boost.GlickoBoostCompetitor.rating">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rating</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#elote.competitors.glicko_boost.GlickoBoostCompetitor.rating" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current rating of this competitor.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>float: The current rating.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko_boost.GlickoBoostCompetitor.tied">
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/competitors/glicko_boost.html#GlickoBoostCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko_boost.GlickoBoostCompetitor.tied" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this competitor has drawn with the given competitor.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that drew.
+match_time (datetime, optional): The time of the match, used as the period’s end.
+scores (sequence of float, optional): The two scores in caller order. Must be equal.</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko_boost.GlickoBoostCompetitor.to_json">
+<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#elote.competitors.glicko_boost.GlickoBoostCompetitor.to_json" title="Link to this definition">¶</a></dt>
+<dd><p>Convert this competitor’s state to a JSON string.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>str: A JSON string representing this competitor’s state.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="trueskill-competitor">
 <h2>TrueSkill Competitor<a class="headerlink" href="#trueskill-competitor" title="Link to this heading">¶</a></h2>
 <dl class="py class">
@@ -2121,6 +2313,7 @@ The serialization format includes the following fields:</p>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/elo.html">Elo Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/glicko.html">Glicko Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/glicko2.html">Glicko-2 Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/glicko_boost.html">Glicko-Boost Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/trueskill.html">TrueSkill Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/ecf.html">ECF Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/dwz.html">DWZ Rating System</a></li>

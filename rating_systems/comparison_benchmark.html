@@ -183,6 +183,11 @@ Brier score, and log-loss cells below, or
 reproduce the runtime columns, which are medians of three runs. Change a
 constant in that script and rerun it to check a specific conclusion
 yourself.</p>
+<p>Glicko-Boost is the one shipped system this page does not cover. It postdates
+this run, and its update is defined over a rating period rather than over one
+bout, so the frozen-split harness here – which trains bout by bout – would
+measure its one-game fallback rather than the system. Comparing it fairly needs
+a period-grouped protocol.</p>
 <p>The scope is narrower than “benchmark” can imply: this compares Elote’s own
 systems to each other, not to another library, and it measures prediction
 accuracy on held-out bouts rather than ranking quality — recovery of a known
@@ -806,6 +811,7 @@ parameters, strengths and weaknesses.</p></li>
 <li class="toctree-l1"><a class="reference internal" href="elo.html">Elo Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glicko.html">Glicko Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glicko2.html">Glicko-2 Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glicko_boost.html">Glicko-Boost Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="trueskill.html">TrueSkill Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ecf.html">ECF Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dwz.html">DWZ Rating System</a></li>

@@ -225,31 +225,35 @@ seventh of ten on Brier score.</p>
 <td><p>Glicko-2</p></td>
 <td><p><a class="reference internal" href="rating_systems/glicko2.html"><span class="doc">Glicko-2</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p>Teams, or more than two sides per result</p></td>
+<tr class="row-odd"><td><p>Results arrive in batches (a month, a season round) and you know who moved first</p></td>
+<td><p>Glicko-Boost</p></td>
+<td><p><a class="reference internal" href="rating_systems/glicko_boost.html"><span class="doc">Glicko-Boost</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>Teams, or more than two sides per result</p></td>
 <td><p>TrueSkill</p></td>
 <td><p><a class="reference internal" href="rating_systems/trueskill.html"><span class="doc">TrueSkill</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p>Draws are common and carry information</p></td>
+<tr class="row-odd"><td><p>Draws are common and carry information</p></td>
 <td><p>Glicko-1, Glicko-2, or TrueSkill</p></td>
 <td><p><a class="reference internal" href="#draws">Draws</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>Results carry real scores and the margin matters</p></td>
+<tr class="row-even"><td><p>Results carry real scores and the margin matters</p></td>
 <td><p>Massey or Keener</p></td>
 <td><p><a class="reference internal" href="#score-margins">Score margins</a></p></td>
 </tr>
-<tr class="row-even"><td><p>A fixed season of results, ranked once, order must not matter</p></td>
+<tr class="row-odd"><td><p>A fixed season of results, ranked once, order must not matter</p></td>
 <td><p>Colley, Massey, Keener, or Bradley-Terry</p></td>
 <td><p><a class="reference internal" href="#incremental-updates-or-a-global-fit">Incremental updates or a global fit</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>You want predicted point spreads, not just probabilities</p></td>
+<tr class="row-even"><td><p>You want predicted point spreads, not just probabilities</p></td>
 <td><p>Massey</p></td>
 <td><p><a class="reference internal" href="rating_systems/massey.html"><span class="doc">Massey</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p>A national chess federation’s published formula</p></td>
+<tr class="row-odd"><td><p>A national chess federation’s published formula</p></td>
 <td><p>ECF or DWZ</p></td>
 <td><p><a class="reference internal" href="rating_systems/ecf.html"><span class="doc">ECF</span></a>, <a class="reference internal" href="rating_systems/dwz.html"><span class="doc">DWZ</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p>You genuinely do not know</p></td>
+<tr class="row-even"><td><p>You genuinely do not know</p></td>
 <td><p>Any two rows above, then measure</p></td>
 <td><p><a class="reference internal" href="#run-it-on-your-own-data">Run it on your own data</a></p></td>
 </tr>
@@ -797,6 +801,7 @@ matchups and persisting state.</p></li>
 <li><p>The system pages: <a class="reference internal" href="rating_systems/elo.html"><span class="doc">Elo</span></a>,
 <a class="reference internal" href="rating_systems/glicko.html"><span class="doc">Glicko</span></a>,
 <a class="reference internal" href="rating_systems/glicko2.html"><span class="doc">Glicko-2</span></a>,
+<a class="reference internal" href="rating_systems/glicko_boost.html"><span class="doc">Glicko-Boost</span></a>,
 <a class="reference internal" href="rating_systems/trueskill.html"><span class="doc">TrueSkill</span></a>,
 <a class="reference internal" href="rating_systems/ecf.html"><span class="doc">ECF</span></a>, <a class="reference internal" href="rating_systems/dwz.html"><span class="doc">DWZ</span></a>,
 <a class="reference internal" href="rating_systems/colley.html"><span class="doc">Colley</span></a>, <a class="reference internal" href="rating_systems/massey.html"><span class="doc">Massey</span></a>,
@@ -834,6 +839,7 @@ matchups and persisting state.</p></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/elo.html">Elo Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/glicko.html">Glicko Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/glicko2.html">Glicko-2 Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rating_systems/glicko_boost.html">Glicko-Boost Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/trueskill.html">TrueSkill Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/ecf.html">ECF Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rating_systems/dwz.html">DWZ Rating System</a></li>

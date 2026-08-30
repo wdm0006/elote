@@ -224,70 +224,77 @@ see <a class="reference internal" href="comparison_benchmark.html"><span class="
 <td><p>No</p></td>
 <td><p>Online chess, volatile skill</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>TrueSkill</strong></p></td>
+<tr class="row-odd"><td><p><strong>Glicko-Boost</strong></p></td>
+<td><p>Chess (2011)</p></td>
+<td><p>High</p></td>
+<td><p>Yes (RD + boost)</p></td>
+<td><p>Within a rating period</p></td>
+<td><p>Monthly rating periods, colour</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>TrueSkill</strong></p></td>
 <td><p>Microsoft (2007)</p></td>
 <td><p>High</p></td>
 <td><p>Yes (sigma)</p></td>
 <td><p>No</p></td>
 <td><p>Teams and multiplayer</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>ECF</strong></p></td>
+<tr class="row-odd"><td><p><strong>ECF</strong></p></td>
 <td><p>England (1950s)</p></td>
 <td><p>Low</p></td>
 <td><p>No</p></td>
 <td><p>No</p></td>
 <td><p>English chess</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>DWZ</strong></p></td>
+<tr class="row-even"><td><p><strong>DWZ</strong></p></td>
 <td><p>Germany (1990s)</p></td>
 <td><p>Medium</p></td>
 <td><p>Partial</p></td>
 <td><p>No</p></td>
 <td><p>Youth development</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Colley Matrix</strong></p></td>
+<tr class="row-odd"><td><p><strong>Colley Matrix</strong></p></td>
 <td><p>Sports (2002)</p></td>
 <td><p>Medium</p></td>
 <td><p>No</p></td>
 <td><p>Yes</p></td>
 <td><p>Bias-free sports ranking</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Massey</strong></p></td>
+<tr class="row-even"><td><p><strong>Massey</strong></p></td>
 <td><p>Sports (1997)</p></td>
 <td><p>Medium</p></td>
 <td><p>No</p></td>
 <td><p>Yes</p></td>
 <td><p>Margin-scale sports ranking</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Keener</strong></p></td>
+<tr class="row-odd"><td><p><strong>Keener</strong></p></td>
 <td><p>Sports (1993)</p></td>
 <td><p>Medium</p></td>
 <td><p>No</p></td>
 <td><p>Yes</p></td>
 <td><p>Score-based eigenvector ranking</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Pythagorean</strong></p></td>
+<tr class="row-even"><td><p><strong>Pythagorean</strong></p></td>
 <td><p>Baseball (1980s)</p></td>
 <td><p>Low</p></td>
 <td><p>No</p></td>
 <td><p>Yes</p></td>
 <td><p>Points-based win expectation</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Bradley-Terry</strong></p></td>
+<tr class="row-odd"><td><p><strong>Bradley-Terry</strong></p></td>
 <td><p>Statistics (1952)</p></td>
 <td><p>Medium</p></td>
 <td><p>No</p></td>
 <td><p>Yes</p></td>
 <td><p>Maximum-likelihood ranking</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Whole-History Rating</strong></p></td>
+<tr class="row-even"><td><p><strong>Whole-History Rating</strong></p></td>
 <td><p>Coulom (2008)</p></td>
 <td><p>High</p></td>
 <td><p>No</p></td>
 <td><p>Yes</p></td>
 <td><p>Time-varying strength curves</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Ensemble</strong></p></td>
+<tr class="row-odd"><td><p><strong>Ensemble</strong></p></td>
 <td><p>Meta-system</p></td>
 <td><p>High</p></td>
 <td><p>Depends on components</p></td>
@@ -297,7 +304,9 @@ see <a class="reference internal" href="comparison_benchmark.html"><span class="
 </tbody>
 </table>
 <p>Online systems (Elo, Glicko, Glicko-2, TrueSkill, ECF, DWZ, Pythagorean) update ratings
-incrementally after each result. Global-fit systems (Colley Matrix, Massey, Keener and
+incrementally after each result. Glicko-Boost is period-native: it rates every player in a
+rating period simultaneously through <code class="docutils literal notranslate"><span class="pre">apply_rating_period</span></code>, so results inside a period do
+not depend on their order, though periods themselves are still applied in sequence. Global-fit systems (Colley Matrix, Massey, Keener and
 Bradley-Terry and Whole-History Rating) fit the whole connected group from the full set of results,
 which makes them order independent. Pythagorean is order independent too, for a different reason:
 its state is a running sum of points that ignores the opponent graph entirely. Massey, Keener and
@@ -325,34 +334,37 @@ Pythagorean are the three that read the optional score payload; the rest use onl
 <tr class="row-even"><td><p><strong>Glicko-2</strong></p></td>
 <td><p>Same logistic form as Glicko, evaluated on an internal transformed scale with an added volatility term</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>TrueSkill</strong></p></td>
+<tr class="row-odd"><td><p><strong>Glicko-Boost</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(E_A = \frac{1}{1 + 10^{-g\left(\sqrt{RD_A^2 + RD_B^2}\right)(r_A + \eta - r_B)/400}}\)</span> where <span class="math notranslate nohighlight">\(\eta\)</span> is the advantage to white</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>TrueSkill</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(E_A = \Phi\!\left(\frac{\mu_A - \mu_B}{\sqrt{2\beta^2 + \sigma_A^2 + \sigma_B^2}}\right)\)</span> where <span class="math notranslate nohighlight">\(\Phi\)</span> is the normal CDF</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>ECF</strong></p></td>
+<tr class="row-odd"><td><p><strong>ECF</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(E_A = 0.5 + \frac{R_A - R_B}{F}\)</span> where F is typically 120</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>DWZ</strong></p></td>
+<tr class="row-even"><td><p><strong>DWZ</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(W_e = \frac{1}{1 + 10^{-(R_A - R_B) / 400}}\)</span></p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Colley Matrix</strong></p></td>
+<tr class="row-odd"><td><p><strong>Colley Matrix</strong></p></td>
 <td><p>Ratings solve <span class="math notranslate nohighlight">\(C r = b\)</span>; <span class="math notranslate nohighlight">\(E_A = \frac{1}{1 + e^{-4 (r_A - r_B)}}\)</span></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Massey</strong></p></td>
+<tr class="row-even"><td><p><strong>Massey</strong></p></td>
 <td><p>Ratings solve <span class="math notranslate nohighlight">\(M r = p\)</span> with <span class="math notranslate nohighlight">\(M = D - A\)</span>; <span class="math notranslate nohighlight">\(E_A = \frac{1}{1 + e^{-2 (r_A - r_B) / \sigma}}\)</span>, where <span class="math notranslate nohighlight">\(\sigma\)</span> is the fitted rating spread</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Keener</strong></p></td>
+<tr class="row-odd"><td><p><strong>Keener</strong></p></td>
 <td><p>Ratings are the dominant eigenvector of <span class="math notranslate nohighlight">\(H_{ij} = h(a_{ij}) / g_i + \varepsilon\)</span> with <span class="math notranslate nohighlight">\(a_{ij} = \frac{S_{ij} + 1}{S_{ij} + S_{ji} + 2}\)</span> and <span class="math notranslate nohighlight">\(h(x) = \frac{1}{2} + \frac{1}{2}\mathrm{sgn}(x - \frac{1}{2})\sqrt{|2x - 1|}\)</span>; <span class="math notranslate nohighlight">\(E_A = \frac{r_A}{r_A + r_B}\)</span></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Pythagorean</strong></p></td>
+<tr class="row-even"><td><p><strong>Pythagorean</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(w = \frac{PF^{k}}{PF^{k} + PA^{k}}\)</span> on prior-adjusted point totals; <span class="math notranslate nohighlight">\(E_A = \frac{w_A - w_A w_B}{w_A + w_B - 2 w_A w_B}\)</span> (log5)</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Bradley-Terry</strong></p></td>
+<tr class="row-odd"><td><p><strong>Bradley-Terry</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(P(A \text{ beats } B) = \frac{p_A}{p_A + p_B} = \frac{1}{1 + e^{-(\beta_A - \beta_B)}}\)</span></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Whole-History Rating</strong></p></td>
+<tr class="row-even"><td><p><strong>Whole-History Rating</strong></p></td>
 <td><p>Bradley-Terry likelihood per game plus <span class="math notranslate nohighlight">\(r_{t+1}-r_t \sim N(0, w^2\Delta t)\)</span></p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Ensemble</strong></p></td>
+<tr class="row-odd"><td><p><strong>Ensemble</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(E_{ensemble} = \sum_{i=1}^{n} w_i \times E_i\)</span> where <span class="math notranslate nohighlight">\(w_i\)</span> are weights</p></td>
 </tr>
 </tbody>
@@ -380,34 +392,37 @@ Pythagorean are the three that read the optional score payload; the rest use onl
 <tr class="row-even"><td><p><strong>Glicko-2</strong></p></td>
 <td><p>Initial rating, Initial RD, Initial volatility, Tau</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>TrueSkill</strong></p></td>
+<tr class="row-odd"><td><p><strong>Glicko-Boost</strong></p></td>
+<td><p>Initial rating, Initial RD, White advantage (eta), Boost factors (B1, B2, k), RD-increase coefficients</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>TrueSkill</strong></p></td>
 <td><p>Initial mu, Initial sigma, Beta, Tau, Draw probability</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>ECF</strong></p></td>
+<tr class="row-odd"><td><p><strong>ECF</strong></p></td>
 <td><p>Delta (max rating difference), Number of periods</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>DWZ</strong></p></td>
+<tr class="row-even"><td><p><strong>DWZ</strong></p></td>
 <td><p>Initial rating, Development coefficient (age-dependent)</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Colley Matrix</strong></p></td>
+<tr class="row-odd"><td><p><strong>Colley Matrix</strong></p></td>
 <td><p>Initial rating (default 0.5)</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Massey</strong></p></td>
+<tr class="row-even"><td><p><strong>Massey</strong></p></td>
 <td><p>Initial rating (default 0.0), Expected-score scale</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Keener</strong></p></td>
+<tr class="row-odd"><td><p><strong>Keener</strong></p></td>
 <td><p>Initial rating (default 1.0), Perturbation, Expected-score scale</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Pythagorean</strong></p></td>
+<tr class="row-even"><td><p><strong>Pythagorean</strong></p></td>
 <td><p>Exponent (default 2.37), Prior points (default 1.0); no initial rating</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Bradley-Terry</strong></p></td>
+<tr class="row-odd"><td><p><strong>Bradley-Terry</strong></p></td>
 <td><p>Initial rating, Scale, Regularization, Max iterations</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Whole-History Rating</strong></p></td>
+<tr class="row-even"><td><p><strong>Whole-History Rating</strong></p></td>
 <td><p>Per-day variance (w2), Initial rating, Max iterations, Precision</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Ensemble</strong></p></td>
+<tr class="row-odd"><td><p><strong>Ensemble</strong></p></td>
 <td><p>Component systems, Weights</p></td>
 </tr>
 </tbody>
@@ -453,6 +468,19 @@ Pythagorean are the three that read the optional score payload; the rest use onl
 - Sensitive to the tau system constant
 - Iterative volatility update adds computational cost
 - Designed around rating periods rather than single games</p>
+</section>
+<section id="glicko-boost">
+<h3>Glicko-Boost<a class="headerlink" href="#glicko-boost" title="Link to this heading">¶</a></h3>
+<p><strong>Strengths:</strong>
+- Rates a whole period the way the published system does, with no within-period ordering effect
+- Second pass judges a player against how their opponents actually performed
+- RD boost lets a fast-improving player’s rating move further than Glicko allows
+- Models the advantage of moving first, taken from the order of each result row</p>
+<p><strong>Weaknesses:</strong>
+- Only pays off when results are grouped into rating periods
+- Twelve system constants, fitted on FIDE data
+- No persistent volatility between periods, unlike Glicko-2
+- Four Glicko passes over the population per period</p>
 </section>
 <section id="trueskill">
 <h3>TrueSkill<a class="headerlink" href="#trueskill" title="Link to this heading">¶</a></h3>
@@ -630,6 +658,7 @@ Pythagorean are the three that read the optional score payload; the rest use onl
     <span class="n">EloCompetitor</span><span class="p">,</span>
     <span class="n">GlickoCompetitor</span><span class="p">,</span>
     <span class="n">Glicko2Competitor</span><span class="p">,</span>
+    <span class="n">GlickoBoostCompetitor</span><span class="p">,</span>
     <span class="n">TrueSkillCompetitor</span><span class="p">,</span>
     <span class="n">ECFCompetitor</span><span class="p">,</span>
     <span class="n">DWZCompetitor</span><span class="p">,</span>
@@ -650,6 +679,9 @@ Pythagorean are the three that read the optional score payload; the rest use onl
 
 <span class="c1"># Glicko-2</span>
 <span class="n">glicko2_player</span> <span class="o">=</span> <span class="n">Glicko2Competitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">initial_rd</span><span class="o">=</span><span class="mi">350</span><span class="p">)</span>
+
+<span class="c1"># Glicko-Boost (period-native; the first competitor of a row had white)</span>
+<span class="n">glicko_boost_player</span> <span class="o">=</span> <span class="n">GlickoBoostCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">initial_rd</span><span class="o">=</span><span class="mi">250</span><span class="p">)</span>
 
 <span class="c1"># TrueSkill (mu/sigma scale)</span>
 <span class="n">trueskill_player</span> <span class="o">=</span> <span class="n">TrueSkillCompetitor</span><span class="p">(</span><span class="n">initial_mu</span><span class="o">=</span><span class="mf">25.0</span><span class="p">,</span> <span class="n">initial_sigma</span><span class="o">=</span><span class="mf">8.333</span><span class="p">)</span>
@@ -741,6 +773,7 @@ Pythagorean are the three that read the optional score payload; the rest use onl
 <li class="toctree-l1"><a class="reference internal" href="elo.html">Elo Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glicko.html">Glicko Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glicko2.html">Glicko-2 Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glicko_boost.html">Glicko-Boost Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="trueskill.html">TrueSkill Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ecf.html">ECF Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dwz.html">DWZ Rating System</a></li>

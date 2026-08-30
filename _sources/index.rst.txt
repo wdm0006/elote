@@ -42,6 +42,7 @@ Elote makes implementing these systems simple and intuitive, with a clean API th
    rating_systems/elo
    rating_systems/glicko
    rating_systems/glicko2
+   rating_systems/glicko_boost
    rating_systems/trueskill
    rating_systems/ecf
    rating_systems/dwz

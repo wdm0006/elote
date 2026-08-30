@@ -39,6 +39,15 @@ Glicko-2 Competitor
    :show-inheritance:
    :special-members: __init__
 
+Glicko-Boost Competitor
+-----------------------
+
+.. automodule:: elote.competitors.glicko_boost
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :special-members: __init__
+
 TrueSkill Competitor
 -------------------
 
