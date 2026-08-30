@@ -148,6 +148,24 @@ class TestColourConvention(unittest.TestCase):
         for name in as_written:
             self.assertAlmostEqual(as_written[name], swapped[name], places=9)
 
+    def test_arena_matchup_reverses_a_losing_row_but_rating_period_does_not(self):
+        """LambdaArena.matchup dispatches a loss through the winner, so colours flip there."""
+        GlickoBoostCompetitor.configure_class(eta=30.0)
+
+        streaming = LambdaArena(lambda a, b: True, base_competitor=GlickoBoostCompetitor)
+        streaming.matchup("a", "b", outcome=0.0)
+
+        period = LambdaArena(lambda a, b: True, base_competitor=GlickoBoostCompetitor)
+        period.rating_period([("a", "b", 0.0, None)])
+
+        # Same result, same order, different colours: the arena's streaming path made "b"
+        # white, while the rating period kept "a" white.
+        self.assertNotAlmostEqual(streaming.competitors["a"].rating, period.competitors["a"].rating, places=3)
+
+        mirrored = LambdaArena(lambda a, b: True, base_competitor=GlickoBoostCompetitor)
+        mirrored.rating_period([("b", "a", 1.0, None)])
+        self.assertAlmostEqual(streaming.competitors["a"].rating, mirrored.competitors["a"].rating, places=9)
+
     def test_eta_defaults_to_no_colour_information(self):
         self.assertEqual(GlickoBoostCompetitor._eta, 0.0)
 

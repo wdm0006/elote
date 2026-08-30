@@ -10,11 +10,12 @@ Two of that table's columns are **not** reproducible from the paper's own formul
 the tests below say so where they apply:
 
 * Steps 1 and 2 come out within 1.9 rating points and 0.7 RD points of the published
-  columns rather than matching them at the tabulated precision. Every published RD is
-  reproduced to 0.1 if the white-advantage term is dropped from the ``d^2`` denominator
-  of Section 2.1, which suggests the table was produced by code that differs from the
-  paper's prose; this implementation follows the prose, which writes ``E(eta, w_j, ...)``
-  inside ``d^2``.
+  columns rather than matching them at the tabulated precision. Dropping the
+  white-advantage term from the ``d^2`` denominator of Section 2.1 brings 15 of the 16
+  published RDs within 0.05 and the sixteenth (C, step 1) within 0.15, against a worst
+  case of 0.63 with the term in, which suggests the table was produced by code that
+  differs from the paper's prose; this implementation follows the prose, which writes
+  ``E(eta, w_j, ...)`` inside ``d^2``.
 * The published RD reset for player H (120 -> 153.1) requires a z-score of 2.606. No
   reading of Section 2.2 produces it: sweeping the player's own rating and the opponents'
   ratings/RDs over the pre-period, step 1 and step 2 populations, with and without the

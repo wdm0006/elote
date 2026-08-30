@@ -70,9 +70,12 @@ SCENARIOS: List[Dict[str, Any]] = [
     },
 ]
 
-# Every concrete competitor the library exports, in the order it exports them.
+# The concrete competitors the library exports, in the order it exports them.
 # BlendedCompetitor is excluded: it is an ensemble and needs an explicit child
 # configuration, so it is not comparable to a single system out of the box.
+# GlickoBoostCompetitor is excluded too: its update is defined over a rating
+# period, and this harness trains bout by bout, so it would measure that
+# system's one-game fallback rather than the system.
 CANDIDATE_SYSTEMS: Tuple[str, ...] = (
     "EloCompetitor",
     "GlickoCompetitor",
