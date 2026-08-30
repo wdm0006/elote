@@ -1,252 +1,132 @@
-# Elote 🏆
+# Elote
 
-[![PyPI version](https://badge.fury.io/py/elote.svg)](https://badge.fury.io/py/elote)
-[![Python Versions](https://img.shields.io/pypi/pyversions/elote.svg)](https://pypi.org/project/elote/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PyPI version](https://badge.fury.io/py/elote.svg)](https://pypi.org/project/elote/)
+[![Python versions](https://img.shields.io/pypi/pyversions/elote.svg)](https://pypi.org/project/elote/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
 
-**Elote** is a powerful Python library for implementing and comparing rating systems. Whether you're ranking chess players, sports teams, or prioritizing features in your product backlog, Elote provides a simple, elegant API for all your competitive ranking needs.
+**The scikit-learn of rating algorithms: compare rating models behind one
+largely uniform Python interface, then keep the one that fits your data.**
 
-## Table of Contents
-- [Overview](#overview)
-- [Features](#features)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Usage Examples](#usage-examples)
-  - [Competitors](#competitors)
-  - [Arenas](#arenas)
-- [Development](#development)
-- [Contributing](#contributing)
-- [Blog Posts](#blog-posts)
-- [References](#references)
-
-## Overview
-
-Rating systems allow you to rank competitors based on their performance in head-to-head matchups. The most famous example is the Elo rating system used in chess, but these systems have applications far beyond sports:
-
-- Ranking products based on A/B comparisons
-- Prioritizing features through pairwise voting
-- Creating recommendation systems
-- Matchmaking in games and competitions
-- Collaborative filtering and ranking
-
-Elote makes implementing these systems simple and intuitive, with a clean API that handles all the mathematical complexity for you.
-
-## Features
-
-Currently implemented rating systems:
-
-- **Elo** - The classic chess rating system
-- **Glicko-1** - An improvement on Elo that accounts for rating reliability
-- **Glicko-2** - A further improvement on Glicko that adds volatility tracking
-- **TrueSkill** - Microsoft's Bayesian skill rating system for multiplayer games
-- **ECF** - The English Chess Federation rating system
-- **DWZ** - The Deutsche Wertungszahl (German evaluation number) system
-- **Colley Matrix** - A least-squares method that ranks competitors by solving a linear system
-- **Bradley-Terry** - A maximum-likelihood paired-comparison model on an Elo-compatible scale
-
-You can also combine several systems into a single **Ensemble** (blended) competitor.
-
-Curious how they stack up against each other? Run `make compare-systems` (or
-[`scripts/rating_system_comparison.py`](scripts/rating_system_comparison.py)
-directly) to train every system on the same split and compare accuracy, Brier
-score, and log loss — see
-[`docs/source/rating_systems/comparison_benchmark.rst`](docs/source/rating_systems/comparison_benchmark.rst)
-for the methodology and measured results.
-
-## Installation
-
-### For Users
+Use Elote to turn pairwise wins, losses, and draws into expected scores and
+rankings. Start with Elo, switch to Glicko, TrueSkill, Bradley-Terry, or another
+included model without rewriting the surrounding workflow, and evaluate the
+alternatives on the same match history.
 
 ```bash
-# Basic installation (core rating systems)
 pip install elote
+```
 
-# With optional dataset support
+## Compare and rank in 60 seconds
+
+The same matchups can drive different rating systems:
+
+```python
+from elote import EloCompetitor, GlickoCompetitor, LambdaArena
+
+winner_loser_pairs = [
+    ("Ada", "Grace"),
+    ("Grace", "Linus"),
+    ("Ada", "Linus"),
+    ("Grace", "Linus"),
+]
+
+for model in (EloCompetitor, GlickoCompetitor):
+    arena = LambdaArena(lambda winner, loser: True, base_competitor=model)
+    for winner, loser in winner_loser_pairs:
+        arena.matchup(winner, loser)
+
+    ranking = [row["competitor"] for row in arena.leaderboard()]
+    print(f"{model.__name__}: {' > '.join(ranking)}")
+```
+
+```text
+EloCompetitor: Ada > Grace > Linus
+GlickoCompetitor: Ada > Grace > Linus
+```
+
+`LambdaArena` owns the population, creates competitors as identifiers appear,
+records each bout, and returns the leaderboard best-first. Change
+`base_competitor` to compare another model with the same application code.
+
+## Choose your task
+
+| I want to... | Start with |
+|---|---|
+| Rate two competitors directly | Create two matching competitor objects; call `expected_score()`, then `beat()`, `lost_to()`, or `tied()`. See [Getting started](https://elote.mcginniscommawill.com/getting_started.html). |
+| Manage a changing population | Use `LambdaArena` with your identifiers and results, then read `leaderboard()` and `history`. See [Arenas](https://elote.mcginniscommawill.com/arenas.html). |
+| Compare models on held-out data | Build a `DataSplit`, then use `evaluate_competitor()` or `benchmark_competitors()` and the plotting helpers. See [`elote/benchmark.py`](elote/benchmark.py). |
+| Save and resume ratings | Call `export_state()` or `to_json()` and store the result yourself; restore with `from_state()`, `from_json()`, or `LambdaArena(initial_state=...)`. See [Serialization](https://elote.mcginniscommawill.com/serialization.html). |
+
+Install the dataset adapters when you want the Lichess chess or college-football
+loaders:
+
+```bash
 pip install "elote[datasets]"
 ```
 
-### Optional Dependencies
+`SyntheticDataset` is included in the base installation.
 
-Elote has optional dependencies for specific datasets:
+## Rating models
 
-- **Chess Dataset**: Requires `python-chess` and `pyzstd`
-  ```bash
-  pip install python-chess pyzstd
-  ```
+Every row below is exported from `elote` and supports the shared competitor
+workflow. Constructor parameters and algorithm-specific state still differ.
 
-- **College Football Dataset**: Requires `sportsdataverse`
-  ```bash
-  pip install "sportsdataverse[all]"
-  ```
+| Model | Class | Model shape |
+|---|---|---|
+| Elo | `EloCompetitor` | Incremental rating |
+| Glicko-1 | `GlickoCompetitor` | Incremental rating and rating deviation |
+| Glicko-2 | `Glicko2Competitor` | Incremental rating, deviation, and volatility |
+| TrueSkill | `TrueSkillCompetitor` | Bayesian mean and uncertainty |
+| ECF | `ECFCompetitor` | English Chess Federation rating |
+| DWZ | `DWZCompetitor` | German chess rating |
+| Colley Matrix | `ColleyMatrixCompetitor` | Global fit over the matchup graph |
+| Massey | `MasseyCompetitor` | Global least-squares fit using score margins |
+| Keener | `KeenerCompetitor` | Global eigenvector fit using scores |
+| Pythagorean | `PythagoreanCompetitor` | Points-based win expectation from points scored and allowed |
+| Bradley-Terry | `BradleyTerryCompetitor` | Global paired-comparison fit |
+| Whole-History Rating | `WholeHistoryRatingCompetitor` | Time-aware Bradley-Terry rating curve |
+| Blended ensemble | `BlendedCompetitor` | Composition of multiple competitor models |
 
-- **All Datasets**: Install all optional dependencies
-  ```bash
-  pip install "elote[datasets]"
-  ```
+The common surface covers expected scores, results, ratings, reset, configuration,
+and state serialization. It does not erase meaningful differences in parameters,
+uncertainty, rating scale, or whether a model updates incrementally or refits a
+connected population.
 
-### For Developers
+## Evaluation tools
 
-We use a modern Python packaging approach with `pyproject.toml`. Most things you need are in the `Makefile`:
+Elote keeps pre-result predictions in `History` objects so you can inspect
+accuracy, precision, recall, F1, draw-aware metrics, confusion counts, calibration
+data, optimized decision thresholds, and accuracy by prior bouts. Dataset helpers
+train on one split and evaluate on another without updating ratings on the held-out
+rows. Benchmark results retain the trained arena and history for further analysis.
 
-```bash
-# Using Make (recommended)
-make install-dev
+The package also includes plotting helpers for rating-system comparisons,
+optimized accuracy, calibration, and accuracy by prior bouts.
 
-# Or using pip
-pip install -e ".[dev]"
+To see how the rating models compare on the same split, run `make compare-systems`
+(or [`scripts/rating_system_comparison.py`](scripts/rating_system_comparison.py)
+directly) for accuracy, Brier score, and log loss — see
+[`docs/source/rating_systems/comparison_benchmark.rst`](docs/source/rating_systems/comparison_benchmark.rst)
+for methodology and measured results.
 
-# Or using uv
-uv pip install -e ".[dev]"
-```
+## Library boundaries
 
-### Requirements
+Elote is an in-process Python library. It does not provide a CLI, hosted API,
+server, user interface, accounts, authentication, or a database. Your application
+supplies identifiers and results, decides how a model is selected, and stores
+exported dictionaries or JSON in the persistence system it owns.
 
-- Python 3.10 or higher
+## Trust and project status
 
-## Quick Start
+- Python 3.10 or later
+- Typed-package marker (`py.typed`)
+- MIT licensed
+- Behavioral and known-value tests across the model catalog, plus tests for
+  serialization, datasets, benchmarking, histories, plots, and the shared interface
+- Published with an Alpha development classifier
 
-```python
-from elote import EloCompetitor
-
-# Create two competitors with different initial ratings
-player1 = EloCompetitor(initial_rating=1500)
-player2 = EloCompetitor(initial_rating=1600)
-
-# Get win probability
-print(f"Player 2 win probability: {player2.expected_score(player1):.2%}")
-
-# Record a match result
-player1.beat(player2)  # Player 1 won!
-
-# Ratings are automatically updated
-print(f"Player 1 new rating: {player1.rating}")
-print(f"Player 2 new rating: {player2.rating}")
-```
-
-### Check Available Features
-
-```python
-from elote import list_available_datasets, list_missing_datasets
-
-# See which datasets are available
-print("Available datasets:", list_available_datasets())
-
-# See which datasets require additional dependencies
-missing = list_missing_datasets()
-for dataset in missing:
-    print(f"Missing: {dataset['name']}")
-    print(f"Install with: {dataset['error']}")
-```
-
-## Usage Examples
-
-Elote is built around two main concepts: **Competitors** and **Arenas**.
-
-### Competitors
-
-Competitors represent the entities you're rating. Here's how to use them:
-
-```python
-from elote import EloCompetitor
-
-good = EloCompetitor(initial_rating=400)
-better = EloCompetitor(initial_rating=500)
-
-# Check win probabilities
-print(f"Probability of better beating good: {better.expected_score(good):.2%}")
-print(f"Probability of good beating better: {good.expected_score(better):.2%}")
-```
-
-Output:
-```
-Probability of better beating good: 64.01%
-Probability of good beating better: 35.99%
-```
-
-If a match occurs, updating ratings is simple:
-
-```python
-# If good wins (an upset!)
-good.beat(better)
-# OR
-better.lost_to(good)
-
-# Check updated probabilities
-print(f"Probability of better beating good: {better.expected_score(good):.2%}")
-print(f"Probability of good beating better: {good.expected_score(better):.2%}")
-```
-
-Output:
-```
-Probability of better beating good: 61.25%
-Probability of good beating better: 38.75%
-```
-
-### Arenas
-
-Arenas handle large numbers of matchups automatically. The `LambdaArena` takes a comparison function and manages all competitors for you:
-
-```python
-from elote import LambdaArena
-import json
-import random
-
-# Define a comparison function (returns True if a beats b)
-def comparison(a, b):
-    return a > b
-
-# Generate 1000 random matchups between numbers 1-10
-matchups = [(random.randint(1, 10), random.randint(1, 10)) for _ in range(1000)]
-
-# Create arena and run tournament
-arena = LambdaArena(comparison)
-arena.tournament(matchups)
-
-# Display final rankings
-print("Arena results:")
-print(json.dumps(arena.leaderboard(), indent=4))
-```
-
-This example effectively implements a sorting algorithm using a rating system - not efficient, but demonstrates how Elote works with any comparable objects!
-
-## Development
-
-The project includes a Makefile that simplifies common development tasks:
-
-```bash
-# Run tests
-make test
-
-# Run tests with coverage
-make test-cov
-
-# Lint code
-make lint
-
-# Auto-fix linting issues
-make lint-fix
-
-# Format code
-make format
-
-# Build package
-make build
-
-# Build documentation
-make docs
-```
-
-## Contributing
-
-Contributions are welcome! If you'd like to help improve Elote:
-
-1. Check the [issues](https://github.com/yourusername/elote/issues) for open tasks
-2. Fork the repository
-3. Create a feature branch
-4. Add your changes
-5. Submit a pull request
-
-For major changes, please open an issue first to discuss what you'd like to change.
+See the [full documentation](https://elote.mcginniscommawill.com/) and the
+[`examples/`](examples/) directory for more workflows.
 
 ## Blog Posts
 
@@ -265,3 +145,20 @@ Here are some blog posts about Elote:
 5. [ECF Grading System](http://www.ecfgrading.org.uk/new/help.php#elo)
 6. [Deutsche Wertungszahl](https://en.wikipedia.org/wiki/Deutsche_Wertungszahl)
 7. [TrueSkill: A Bayesian Skill Rating System](https://www.microsoft.com/en-us/research/publication/trueskilltm-a-bayesian-skill-rating-system/)
+
+## Contributing
+
+Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) and the
+[Code of Conduct](CODE_OF_CONDUCT.md), then open an
+[issue](https://github.com/wdm0006/elote/issues) or pull request.
+
+```bash
+git clone https://github.com/wdm0006/elote.git
+cd elote
+make install-dev
+make test       # or: make test-cov
+make lint       # or: make lint-fix, make format
+make docs       # or: make build
+```
+
+Elote is available under the [MIT License](LICENSE.md).
