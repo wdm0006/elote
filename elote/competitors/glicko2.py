@@ -698,6 +698,37 @@ class Glicko2Competitor(BaseCompetitor):
         logger.debug("%s beat %s (time=%s). Recording result.", self, competitor, match_time)
         self._compute_match_result(cast(Glicko2Competitor, competitor), s=1.0, match_time=match_time)
 
+    def lost_to(
+        self,
+        competitor: "Glicko2Competitor",
+        match_time: Optional[datetime] = None,
+        *,
+        scores: Optional[Sequence[float]] = None,
+    ) -> None:
+        """Update ratings after this competitor has lost to the given competitor.
+
+        This is a convenience method that calls :meth:`beat` on the winning competitor,
+        forwarding the match time so a loser-side result still records elapsed-time RD
+        inflation.
+
+        Args:
+            competitor (Glicko2Competitor): The opponent competitor that won.
+            match_time (datetime, optional): The time when the match occurred. Default: current time.
+            scores (sequence of float, optional): The two scores in caller order,
+                ``(self_score, competitor_score)``. They are reversed before being handed to
+                the winner's :meth:`beat`, so the caller never reorders them.
+
+        Raises:
+            MissMatchedCompetitorTypesException: If the competitor types don't match.
+        """
+        self.verify_competitor_types(competitor)
+        validated = self._validate_scores(scores, 0.0)
+        competitor.beat(
+            self,
+            match_time,
+            scores=None if validated is None else (validated[1], validated[0]),
+        )
+
     def tied(
         self,
         competitor: BaseCompetitor,
