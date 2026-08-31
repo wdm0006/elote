@@ -811,6 +811,27 @@ this rating system.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko.GlickoCompetitor.lost_to">
+<span class="sig-name descname"><span class="pre">lost_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../competitors.html#elote.competitors.glicko.GlickoCompetitor" title="elote.competitors.glicko.GlickoCompetitor"><span class="pre">GlickoCompetitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko.html#GlickoCompetitor.lost_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.lost_to" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this competitor has lost to the given competitor.</p>
+<p>This is a convenience method that calls <a class="reference internal" href="../competitors.html#elote.competitors.glicko.GlickoCompetitor.beat" title="elote.competitors.glicko.GlickoCompetitor.beat"><code class="xref py py-meth docutils literal notranslate"><span class="pre">beat()</span></code></a> on the winning competitor,
+forwarding the match time so a loser-side result still records elapsed-time RD
+inflation.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (GlickoCompetitor): The opponent competitor that won.
+match_time (datetime, optional): The time when the match occurred. Default: current time.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. They are reversed before being handed to
+the winner’s <a class="reference internal" href="../competitors.html#elote.competitors.glicko.GlickoCompetitor.beat" title="elote.competitors.glicko.GlickoCompetitor.beat"><code class="xref py py-meth docutils literal notranslate"><span class="pre">beat()</span></code></a>, so the caller never reorders them.</p>
+</div></blockquote>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="elote.competitors.glicko.GlickoCompetitor.rating">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rating</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#elote.competitors.glicko.GlickoCompetitor.rating" title="Link to this definition">¶</a></dt>
@@ -1012,6 +1033,27 @@ InvalidParameterException: If the match time is before either competitor’s las
 <dt>Returns:</dt><dd><p>Glicko2Competitor: A new competitor with the same state as the exported one.</p>
 </dd>
 <dt>Raises:</dt><dd><p>InvalidParameterException: If any parameter in the state is invalid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.glicko2.Glicko2Competitor.lost_to">
+<span class="sig-name descname"><span class="pre">lost_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../competitors.html#elote.competitors.glicko2.Glicko2Competitor" title="elote.competitors.glicko2.Glicko2Competitor"><span class="pre">Glicko2Competitor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/glicko2.html#Glicko2Competitor.lost_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.glicko2.Glicko2Competitor.lost_to" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this competitor has lost to the given competitor.</p>
+<p>This is a convenience method that calls <a class="reference internal" href="../competitors.html#elote.competitors.glicko2.Glicko2Competitor.beat" title="elote.competitors.glicko2.Glicko2Competitor.beat"><code class="xref py py-meth docutils literal notranslate"><span class="pre">beat()</span></code></a> on the winning competitor,
+forwarding the match time so a loser-side result still records elapsed-time RD
+inflation.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (Glicko2Competitor): The opponent competitor that won.
+match_time (datetime, optional): The time when the match occurred. Default: current time.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. They are reversed before being handed to
+the winner’s <a class="reference internal" href="../competitors.html#elote.competitors.glicko2.Glicko2Competitor.beat" title="elote.competitors.glicko2.Glicko2Competitor.beat"><code class="xref py py-meth docutils literal notranslate"><span class="pre">beat()</span></code></a>, so the caller never reorders them.</p>
+</div></blockquote>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>
 </dd>
 </dl>
 </dd></dl>

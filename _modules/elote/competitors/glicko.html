@@ -534,6 +534,40 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_compute_match_result</span><span class="p">(</span><span class="n">competitor</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">match_time</span><span class="o">=</span><span class="n">match_time</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="GlickoCompetitor.lost_to">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.glicko.GlickoCompetitor.lost_to">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">lost_to</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">competitor</span><span class="p">:</span> <span class="s2">"GlickoCompetitor"</span><span class="p">,</span>
+        <span class="n">match_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Update ratings after this competitor has lost to the given competitor.</span>
+
+<span class="sd">        This is a convenience method that calls :meth:`beat` on the winning competitor,</span>
+<span class="sd">        forwarding the match time so a loser-side result still records elapsed-time RD</span>
+<span class="sd">        inflation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            competitor (GlickoCompetitor): The opponent competitor that won.</span>
+<span class="sd">            match_time (datetime, optional): The time when the match occurred. Default: current time.</span>
+<span class="sd">            scores (sequence of float, optional): The two scores in caller order,</span>
+<span class="sd">                ``(self_score, competitor_score)``. They are reversed before being handed to</span>
+<span class="sd">                the winner's :meth:`beat`, so the caller never reorders them.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don't match.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">validated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">competitor</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">match_time</span><span class="p">,</span>
+            <span class="n">scores</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">validated</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="n">validated</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">validated</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+        <span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="GlickoCompetitor.tied">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.glicko.GlickoCompetitor.tied">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">tied</span><span class="p">(</span>
