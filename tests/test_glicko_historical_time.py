@@ -173,5 +173,112 @@ class TestHistoricalStateRoundTrip(unittest.TestCase):
                 self.assertLessEqual(restored._last_activity, after)
 
 
+ANNUAL = (datetime(2020, 1, 1), datetime(2021, 1, 1), datetime(2022, 1, 1))
+
+
+def _record(competitor_class, times, method):
+    """Replay one annual sequence of decisive results, returning ``(winner, loser)``."""
+    winner, loser = competitor_class(), competitor_class()
+    for match_time in times:
+        if method == "beat":
+            winner.beat(loser, match_time=match_time)
+        elif method == "lost_to":
+            loser.lost_to(winner, match_time=match_time)
+        elif method == "beat_untimed":
+            winner.beat(loser)
+        else:
+            loser.lost_to(winner)
+    return winner, loser
+
+
+class TestTimedLostTo(unittest.TestCase):
+    """``lost_to`` must be able to express a match time, like ``beat`` and ``tied``."""
+
+    def test_timed_lost_to_matches_timed_beat(self):
+        """The same annual results recorded from the loser's side land on the same ratings."""
+        for competitor_class in COMPETITOR_CLASSES:
+            with self.subTest(competitor=competitor_class.__name__):
+                won_winner, won_loser = _record(competitor_class, ANNUAL, "beat")
+                lost_winner, lost_loser = _record(competitor_class, ANNUAL, "lost_to")
+
+                for label, expected, actual in (
+                    ("winner", won_winner, lost_winner),
+                    ("loser", won_loser, lost_loser),
+                ):
+                    self.assertAlmostEqual(actual.rating, expected.rating, delta=1e-9, msg=label)
+                    self.assertAlmostEqual(actual.rd, expected.rd, delta=1e-9, msg=label)
+
+    def test_timed_lost_to_records_the_supplied_match_time(self):
+        """Activity is stamped with the match time, not wall-clock now()."""
+        for competitor_class in COMPETITOR_CLASSES:
+            with self.subTest(competitor=competitor_class.__name__):
+                winner, loser = _record(competitor_class, ANNUAL, "lost_to")
+
+                for competitor in (winner, loser):
+                    self.assertEqual(competitor._last_activity, ANNUAL[-1])
+
+    def test_untimed_lost_to_is_unchanged(self):
+        """Omitting match_time keeps the previous, inflation-free numbers."""
+        for competitor_class in COMPETITOR_CLASSES:
+            with self.subTest(competitor=competitor_class.__name__):
+                beat_winner, beat_loser = _record(competitor_class, ANNUAL, "beat_untimed")
+                lost_winner, lost_loser = _record(competitor_class, ANNUAL, "lost_to_untimed")
+
+                # Both sides stamp wall-clock now(), so the tolerance allows for the RD that a
+                # slow replay accrues between calls; the pinned literals below are the real guard.
+                for expected, actual in ((beat_winner, lost_winner), (beat_loser, lost_loser)):
+                    self.assertAlmostEqual(actual.rating, expected.rating, delta=1e-6)
+                    self.assertAlmostEqual(actual.rd, expected.rd, delta=1e-6)
+
+        # Both fixtures are pinned outright, so a silent change to the untimed path shows up.
+        for competitor_class, expected in (
+            (GlickoCompetitor, (1752.744, 1247.256, 243.231)),
+            (Glicko2Competitor, (1752.967, 1247.033, 243.596)),
+        ):
+            with self.subTest(competitor=competitor_class.__name__):
+                winner, loser = _record(competitor_class, ANNUAL, "lost_to_untimed")
+                winner_rating, loser_rating, rd = expected
+
+                self.assertAlmostEqual(winner.rating, winner_rating, places=3)
+                self.assertAlmostEqual(loser.rating, loser_rating, places=3)
+                self.assertAlmostEqual(winner.rd, rd, places=3)
+                self.assertAlmostEqual(loser.rd, rd, places=3)
+
+    def test_out_of_order_timed_lost_to_still_raises(self):
+        """A timed loss dated before the competitor's last activity is still rejected."""
+        for competitor_class in COMPETITOR_CLASSES:
+            with self.subTest(competitor=competitor_class.__name__):
+                winner, loser = competitor_class(), competitor_class()
+                loser.lost_to(winner, match_time=datetime(2024, 6, 1))
+
+                with self.assertRaises(InvalidParameterException):
+                    loser.lost_to(winner, match_time=datetime(2024, 5, 31))
+
+    def test_scores_reverse_through_a_timed_lost_to(self):
+        """A losing score payload is reversed onto the winner's beat, with the time intact."""
+        match_time = datetime(2024, 6, 1)
+
+        for competitor_class in COMPETITOR_CLASSES:
+            with self.subTest(competitor=competitor_class.__name__):
+                lost_winner, lost_loser = competitor_class(), competitor_class()
+                lost_loser.lost_to(lost_winner, match_time=match_time, scores=(1, 3))
+
+                beat_winner, beat_loser = competitor_class(), competitor_class()
+                beat_winner.beat(beat_loser, match_time=match_time, scores=(3, 1))
+
+                for expected, actual in ((beat_winner, lost_winner), (beat_loser, lost_loser)):
+                    self.assertAlmostEqual(actual.rating, expected.rating, delta=1e-9)
+                    self.assertAlmostEqual(actual.rd, expected.rd, delta=1e-9)
+                    self.assertEqual(actual._last_activity, match_time)
+
+    def test_timed_lost_to_rejects_a_winning_score_payload(self):
+        """Score validation still runs on the loser's side of a timed result."""
+        for competitor_class in COMPETITOR_CLASSES:
+            with self.subTest(competitor=competitor_class.__name__):
+                winner, loser = competitor_class(), competitor_class()
+
+                with self.assertRaises(ValueError):
+                    loser.lost_to(winner, match_time=datetime(2024, 6, 1), scores=(3, 1))
+
 if __name__ == "__main__":
     unittest.main()
