@@ -1,3 +1,14 @@
+v1.3.3
+======
+
+Bug fixes
+
+ * Legacy ``BlendedCompetitor`` state now restores sub-competitors through the shared
+   competitor registry. This adds support for every registered rating system, including
+   systems such as TrueSkill and Pythagorean that do not accept an ``initial_rating``
+   constructor argument. Previously, restoring those states could reject a valid competitor
+   type or fail during construction.
+
 v1.3.2
 ======
 
