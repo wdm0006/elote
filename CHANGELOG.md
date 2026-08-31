@@ -1,3 +1,86 @@
+v1.4.0
+======
+
+A new rating system, a uniform rating-period operation, and a reproducible cross-system comparison
+runner. Thirteen rating systems now ship, against twelve in v1.3.2.
+
+New rating systems
+
+ * Added `GlickoBoostCompetitor`, Glickman's Glicko-Boost extension of Glicko: it adds a
+   colour/first-mover advantage term, a boost that widens rating deviation for a competitor whose
+   period performance is far above what its rating predicted, and a between-period RD inflation that
+   grows with rating and inactivity. It is the first system Elote ships whose update is defined over
+   a rating period rather than over a single bout. `beat`, `lost_to` and `tied` route through
+   `apply_rating_period` as one-game periods, so there is exactly one copy of the mathematics
+   (#175, #178).
+   Two columns of the paper's own worked example are not reproducible from the formulas it
+   publishes, and Section 2.4 is ambiguous about whose ratings feed the boost z-score. Elote takes
+   the pre-period reading, the only one under which the paper's narrative holds; the deviations and
+   the sweep establishing them are recorded in the module docstring and in
+   `docs/source/rating_systems/glicko_boost.rst`, and the rest of the table is asserted as a
+   published oracle.
+ * `GlickoBoostCompetitor` is deliberately excluded from the comparison benchmark at
+   `docs/source/rating_systems/comparison_benchmark.rst`. That harness trains bout by bout on a
+   frozen split, so it would measure Glicko-Boost's one-game fallback rather than the system;
+   comparing it fairly needs a period-grouped protocol.
+
+New features
+
+ * Added a uniform rating-period operation. `BaseCompetitor.apply_rating_period(results,
+   period_end=None)` applies a batch of `(competitor_a, competitor_b, outcome, scores)` rows to a
+   whole population at once, and `LambdaArena.rating_period(results, period_end=None)` does the same
+   for arena identifiers, validating the batch atomically, recording every prediction from the
+   pre-period snapshot, then delegating one batch to the competitor class. The default
+   implementation replays the rows through the ordinary pairwise operations, so every existing
+   system gets the hook with no change to its numbers (#167).
+ * `BaseCompetitor` is now exported from the package root.
+ * `walk_forward` routes period-native systems through `apply_rating_period` instead of replaying a
+   period bout by bout, which is what a period-defined system's protocol actually is. This path is
+   reachable only for a class that overrides `apply_rating_period`; `GlickoBoostCompetitor` is the
+   only such class and is new in this release, so no existing user's numbers move (#177).
+ * Added `scripts/rating_system_comparison.py` and a `make compare-systems` target: a single-command
+   runner that trains every concrete rating system on the same seed, scenarios and split, and writes
+   accuracy, Brier score, log loss, out-of-range prediction counts, runtimes and an environment
+   manifest to CSV. The methodology and the measured results are documented at
+   `docs/source/rating_systems/comparison_benchmark.rst` (#171).
+
+Behaviour changes
+
+ * `walk_forward` and `tune` now reject a `competitor_params` name that is not an existing
+   underscored class variable, raising `InvalidParameterException` before any arena is built or any
+   grid point is evaluated. Such a name was previously set on the class, ignored by every instance,
+   and deleted, so a typo, or any constructor-only parameter, produced a clean-looking run and a
+   `tune` "best" value that meant nothing. Most competitor parameters are constructor-only
+   (`initial_rating`, `initial_rd`, `initial_mu`, WHR's `w2`/`max_iterations`/`precision`), so a
+   script that passed one of those through `competitor_params` now raises where it used to run.
+   Where a `_default_<name>` class variable exists the error names `default_<name>` as the tunable
+   spelling; otherwise it points at `base_competitor_kwargs` (#162, #168).
+
+Bug fixes
+
+ * `scores=` now accepts any non-boolean real number, including NumPy scalars such as `np.int64` and
+   `np.float32`, and normalizes the value to a built-in `float`. The gate previously admitted only
+   built-in `int`/`float`, so a score read straight out of a NumPy array or a pandas column was
+   rejected even though the dataset adapter's own extraction path already accepted it. `np.bool_`
+   and complex values are still rejected (#161, #165).
+ * `BlendedCompetitor.from_state` resolves sub-competitor class names through the competitor
+   registry rather than a hand-maintained type map. The map had fallen five classes behind, and its
+   restore path hardcoded `initial_rating`, so legacy blended state naming a newer system failed to
+   restore and TrueSkill failed even though it was in the map (#114, #164).
+
+Documentation
+
+ * Added a rating-system decision guide (`choose_a_rating_system`) and an Elo/Glicko/TrueSkill
+   comparison page (#170), a page recording where Elote's ratings agree with other libraries and
+   where they do not (`elote_vs_other_packages`, #174), and reworked the README around
+   cross-model comparison (#169).
+
+Known deviations
+
+ * `WholeHistoryRatingCompetitor` does not align with the `whr` reference package under the closest
+   exposed configuration (#173). This is unresolved and ships as a known deviation in v1.4.0; if you
+   need numbers that match that reference, track the issue.
+
 v1.3.2
 ======
 
