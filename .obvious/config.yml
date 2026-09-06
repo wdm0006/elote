@@ -1,0 +1,6 @@
+# Repo policy for obvious workers.
+# Detected from GitHub repo settings on 2026-09-06:
+#   default branch: master; squash merge only (merge commits and rebase disabled).
+defaultBranch: master
+mergeMethod: squash
+requireHumanMerge: true
