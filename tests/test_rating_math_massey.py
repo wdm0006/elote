@@ -140,6 +140,7 @@ class MasseyExpectedScoreTest(unittest.TestCase):
     def test_rating_scale_floored_for_degenerate_groups(self):
         a, b = MasseyCompetitor(), MasseyCompetitor()
         a.tied(b)
+        _ = a.rating  # public read triggers the deferred group fit that sets _rating_scale
         self.assertEqual(a._rating_scale, 1e-9)
         self.assertEqual(b._rating_scale, 1e-9)
 
