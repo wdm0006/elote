@@ -7,8 +7,9 @@ from elote import (
     BlendedCompetitor,
     ColleyMatrixCompetitor,
     BradleyTerryCompetitor,
+    OpenSkillCompetitor,
 )
-from elote.competitors.base import BaseCompetitor, InvalidStateException
+from elote.competitors.base import BaseCompetitor, InvalidStateException, InvalidParameterException
 
 
 class TestStandardizedSerialization(unittest.TestCase):
@@ -281,6 +282,76 @@ class TestStandardizedSerialization(unittest.TestCase):
         self.assertIsInstance(new_competitor, EloCompetitor)
         self.assertEqual(new_competitor.rating, 1200)
 
+    def test_openskill_serialization(self):
+        """Test serialization and deserialization of OpenSkillCompetitor."""
+        # Create a competitor with non-default parameters
+        competitor = OpenSkillCompetitor(initial_mu=30.0, initial_sigma=6.0, model="plackett_luce")
+
+        # Export the state
+        state = competitor.export_state()
+
+        # Check that the state has the required fields
+        self.assertIn("type", state)
+        self.assertIn("version", state)
+        self.assertIn("created_at", state)
+        self.assertIn("id", state)
+        self.assertIn("parameters", state)
+        self.assertIn("state", state)
+
+        # Check the type and version
+        self.assertEqual(state["type"], "OpenSkillCompetitor")
+        self.assertEqual(state["version"], 1)
+
+        # Check the parameters: init-time configuration, not mutable state
+        self.assertEqual(state["parameters"]["initial_mu"], 30.0)
+        self.assertEqual(state["parameters"]["initial_sigma"], 6.0)
+        self.assertEqual(state["parameters"]["model"], "plackett_luce")
+
+        # Check the state: the mutable mu/sigma beliefs
+        self.assertEqual(state["state"]["mu"], 30.0)
+        self.assertEqual(state["state"]["sigma"], 6.0)
+
+        # Create a new competitor from the state
+        new_competitor = BaseCompetitor.from_state(state)
+        self.assertIsInstance(new_competitor, OpenSkillCompetitor)
+        self.assertEqual(new_competitor.mu, 30.0)
+        self.assertEqual(new_competitor.sigma, 6.0)
+        self.assertEqual(new_competitor._model, "plackett_luce")
+
+        # Play a bout, then verify the updated state survives a round-trip
+        opponent = OpenSkillCompetitor(initial_mu=30.0, initial_sigma=6.0)
+        competitor.beat(opponent)
+
+        state = competitor.export_state()
+        self.assertEqual(state["state"]["mu"], competitor.mu)
+        self.assertEqual(state["state"]["sigma"], competitor.sigma)
+        self.assertNotEqual(state["state"]["mu"], 30.0)  # the bout moved the belief
+
+        new_competitor = BaseCompetitor.from_state(state)
+        self.assertEqual(new_competitor.mu, competitor.mu)
+        self.assertEqual(new_competitor.sigma, competitor.sigma)
+        self.assertEqual(new_competitor.rating, competitor.rating)
+
+        # import_state into an existing instance
+        competitor2 = OpenSkillCompetitor()
+        competitor2.import_state(state)
+        self.assertEqual(competitor2.mu, competitor.mu)
+        self.assertEqual(competitor2.sigma, competitor.sigma)
+        self.assertEqual(competitor2._model, "plackett_luce")
+
+        # JSON round-trip
+        json_str = competitor.to_json()
+        from_json = OpenSkillCompetitor.from_json(json_str)
+        self.assertIsInstance(from_json, OpenSkillCompetitor)
+        self.assertEqual(from_json.mu, competitor.mu)
+        self.assertEqual(from_json.sigma, competitor.sigma)
+
+        # Reject unknown model variants on import
+        bad_state = dict(state)
+        bad_state["parameters"] = dict(state["parameters"], model="not_a_model")
+        with self.assertRaises(InvalidParameterException):
+            OpenSkillCompetitor().import_state(bad_state)
+
     def test_invalid_state(self):
         """Test handling of invalid state dictionaries."""
         # Test missing required fields
@@ -307,6 +378,7 @@ class TestStandardizedSerialization(unittest.TestCase):
         self.assertIn("ECFCompetitor", competitor_types)
         self.assertIn("DWZCompetitor", competitor_types)
         self.assertIn("BlendedCompetitor", competitor_types)
+        self.assertIn("OpenSkillCompetitor", competitor_types)
 
         # Get a competitor class by name
         elo_class = BaseCompetitor.get_competitor_class("EloCompetitor")
