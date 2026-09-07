@@ -58,6 +58,7 @@ from elote.competitors.pythagorean import PythagoreanCompetitor
 from elote.competitors.bradley_terry import BradleyTerryCompetitor
 from elote.competitors.whr import WholeHistoryRatingCompetitor
 from elote.competitors.ensemble import BlendedCompetitor
+from elote.competitors.team import TeamCompetitor
 
 # Core arenas - always available
 from elote.arenas.lambda_arena import LambdaArena
@@ -101,6 +102,7 @@ __all__ = [
     "BradleyTerryCompetitor",
     "WholeHistoryRatingCompetitor",
     "BlendedCompetitor",
+    "TeamCompetitor",
     # Arenas
     "LambdaArena",
     # Core Datasets
