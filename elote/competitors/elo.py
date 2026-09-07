@@ -287,8 +287,10 @@ class EloCompetitor(BaseCompetitor):
         competitor_elo = cast(EloCompetitor, competitor)
         logger.debug("%s beat %s", self, competitor_elo)
 
+        # One 10 ** evaluation per update: both expected scores share one denominator, so
+        # the opponent's score is the complement of ours and the second pow is redundant.
         win_es = self.expected_score(competitor_elo)
-        lose_es = competitor_elo.expected_score(self)
+        lose_es = 1.0 - win_es
 
         my_new_rating = self._new_rating(1, win_es)
         opponent_new_rating = competitor_elo._new_rating(0, lose_es)
@@ -316,8 +318,10 @@ class EloCompetitor(BaseCompetitor):
         competitor_elo = cast(EloCompetitor, competitor)
         logger.debug("%s tied with %s", self, competitor_elo)
 
+        # One 10 ** evaluation per update: both expected scores share one denominator, so
+        # the opponent's score is the complement of ours and the second pow is redundant.
         win_es = self.expected_score(competitor_elo)
-        lose_es = competitor_elo.expected_score(self)
+        lose_es = 1.0 - win_es
 
         my_new_rating = self._new_rating(0.5, win_es)
         opponent_new_rating = competitor_elo._new_rating(0.5, lose_es)
