@@ -294,6 +294,55 @@ b: The second competitor or competitor identifier.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="elote.arenas.lambda_arena.LambdaArena.match_group">
+<span class="sig-name descname"><span class="pre">match_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">participants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ranks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/arenas/lambda_arena.html#LambdaArena.match_group"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.arenas.lambda_arena.LambdaArena.match_group" title="Link to this definition">¶</a></dt>
+<dd><p>Process a single bout between three or more sides (or two sides with rosters).</p>
+<p>This is the N-way analogue of <a class="reference internal" href="#elote.arenas.lambda_arena.LambdaArena.matchup" title="elote.arenas.lambda_arena.LambdaArena.matchup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">matchup()</span></code></a>: it creates missing
+competitors, captures every pre-update prediction, runs one bout-level
+update over the whole participant set, and records the result as a
+<a class="reference internal" href="#elote.arenas.base.MultiBout" title="elote.arenas.base.MultiBout"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiBout</span></code></a> on the same history the two-player
+entry points append to.</p>
+<p>The bout is updated natively – one closed-form pass over the whole
+participant set – not as a fan-out of pairwise results, which the
+Weng-Lin family (and any other bout-level model) treats differently.</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>participants (sequence): The sides, ordered by finish. Each entry is</dt><dd><p>either a competitor id, or an <code class="docutils literal notranslate"><span class="pre">(id,</span> <span class="pre">roster)</span></code> pair where roster
+is a list or tuple of member ids for a team side. A side is a
+roster side exactly when its entry is a list/tuple pair whose
+second item is a list or tuple. When <code class="docutils literal notranslate"><span class="pre">ranks</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code> the
+given order is taken as the finish order.</p>
+</dd>
+<dt>ranks (sequence of float, optional): Finishing ranks per participant,</dt><dd><p>lower is better, equal ranks are ties. Whole numbers are
+required. Defaults to <code class="docutils literal notranslate"><span class="pre">0..n-1</span></code> (the given order). When both
+<code class="docutils literal notranslate"><span class="pre">ranks</span></code> and <code class="docutils literal notranslate"><span class="pre">scores</span></code> are given, <code class="docutils literal notranslate"><span class="pre">ranks</span></code> defines the result
+and <code class="docutils literal notranslate"><span class="pre">scores</span></code> are recorded only.</p>
+</dd>
+<dt>scores (sequence of float, optional): One score per participant.</dt><dd><p>Validated and recorded with the bout; when <code class="docutils literal notranslate"><span class="pre">ranks</span></code> is omitted
+the scores define the finishing ranks (descending, ties share a
+rank). Not otherwise consumed by rank-based models.</p>
+</dd>
+</dl>
+<p>attributes (dict, optional): Additional attributes to record with this bout.
+match_time (datetime, optional): The time when the bout occurred.</p>
+</dd>
+<dt>Raises:</dt><dd><dl class="simple">
+<dt>NotImplementedError: If the arena’s rating system does not implement</dt><dd><p>a bout-level update (<code class="docutils literal notranslate"><span class="pre">apply_bout</span></code>). The first shipped consumer
+is <code class="xref py py-class docutils literal notranslate"><span class="pre">OpenSkillCompetitor</span></code>.</p>
+</dd>
+<dt>ValueError: If the participant list is malformed (fewer than two</dt><dd><p>sides, an empty roster, the same competitor on two sides), if
+<code class="docutils literal notranslate"><span class="pre">ranks</span></code> is not one whole number per participant, or if
+<code class="docutils literal notranslate"><span class="pre">scores</span></code> is not one finite, non-negative number per
+participant. Validation happens before any competitor is created
+or any history is recorded, so a bad bout leaves the arena
+unchanged.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="elote.arenas.lambda_arena.LambdaArena.matchup">
 <span class="sig-name descname"><span class="pre">matchup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outcome</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/arenas/lambda_arena.html#LambdaArena.matchup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.arenas.lambda_arena.LambdaArena.matchup" title="Link to this definition">¶</a></dt>
 <dd><p>Process a single matchup between two competitors.</p>
@@ -397,6 +446,46 @@ progress_bar (bool, optional): Whether to display a progress bar.</p>
 
 </section>
 </section>
+<section id="n-player-bouts">
+<h2>N-player bouts<a class="headerlink" href="#n-player-bouts" title="Link to this heading">¶</a></h2>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">match_group()</span></code> runs a single bout between three or more
+sides – or between two sides with rosters, i.e. a team bout. The participants
+are given in finishing order (or with explicit <code class="docutils literal notranslate"><span class="pre">ranks</span></code>), and the whole bout is
+updated natively with one bout-level pass rather than as a fan-out of pairwise
+results, which is not mathematically equivalent for bout-level models such as
+OpenSkill.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">LambdaArena</span><span class="p">,</span> <span class="n">OpenSkillCompetitor</span>
+
+<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">OpenSkillCompetitor</span><span class="p">)</span>
+<span class="c1"># Free-for-all: Ada finishes first, Linus last.</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">match_group</span><span class="p">([</span><span class="s2">"Ada"</span><span class="p">,</span> <span class="s2">"Grace"</span><span class="p">,</span> <span class="s2">"Linus"</span><span class="p">])</span>
+<span class="c1"># Team bout: the (ada, grace) roster ties the (linus, kurt) roster.</span>
+<span class="n">arena</span><span class="o">.</span><span class="n">match_group</span><span class="p">([</span>
+    <span class="p">(</span><span class="s2">"red"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"ada"</span><span class="p">,</span> <span class="s2">"grace"</span><span class="p">]),</span>
+    <span class="p">(</span><span class="s2">"blue"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"linus"</span><span class="p">,</span> <span class="s2">"kurt"</span><span class="p">]),</span>
+<span class="p">],</span> <span class="n">ranks</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">ranks</span></code> gives one finishing rank per participant (lower is better, equal
+ranks are ties); <code class="docutils literal notranslate"><span class="pre">scores</span></code> is one score per participant and defines the ranks
+when <code class="docutils literal notranslate"><span class="pre">ranks</span></code> is omitted. Every pre-update prediction is captured before any
+participant is updated, and the bout is recorded as a
+<a class="reference internal" href="#elote.arenas.base.MultiBout" title="elote.arenas.base.MultiBout"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiBout</span></code></a> entry.</p>
+<p>Only rating systems implementing a bout-level update (<code class="docutils literal notranslate"><span class="pre">apply_bout</span></code>) support
+N-way bouts; the first shipped consumer is
+<code class="xref py py-class docutils literal notranslate"><span class="pre">OpenSkillCompetitor</span></code>, including per-member team updates whose
+team strength aggregates the members’ beliefs.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>N-way bouts are excluded from the two-sided analytics –
+<code class="docutils literal notranslate"><span class="pre">History.report_results</span></code>, <code class="docutils literal notranslate"><span class="pre">confusion_matrix</span></code>, <code class="docutils literal notranslate"><span class="pre">calculate_metrics</span></code>,
+<code class="docutils literal notranslate"><span class="pre">calculate_metrics_with_draws</span></code>, <code class="docutils literal notranslate"><span class="pre">optimize_thresholds</span></code>, <code class="docutils literal notranslate"><span class="pre">random_search</span></code>,
+<code class="docutils literal notranslate"><span class="pre">accuracy_by_prior_bouts</span></code>, <code class="docutils literal notranslate"><span class="pre">get_calibration_data</span></code> and the calibration
+plot – because those are defined over a winner/drawer/loser comparison of
+exactly two competitors. They remain recorded in <code class="docutils literal notranslate"><span class="pre">History.bouts</span></code> for
+inspection.</p>
+</div>
+</section>
 <section id="helpers">
 <h2>Helpers<a class="headerlink" href="#helpers" title="Link to this heading">¶</a></h2>
 <dl class="py class">
@@ -405,6 +494,23 @@ progress_bar (bool, optional): Whether to display a progress bar.</p>
 <dd><p>Tracks the history of bouts (matchups) and provides analysis methods.</p>
 <p>This class stores the results of matchups and provides methods to analyze
 the performance of the rating system.</p>
+<p>Two bout types share the <code class="xref py py-attr docutils literal notranslate"><span class="pre">bouts</span></code> list:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#elote.arenas.base.Bout" title="elote.arenas.base.Bout"><code class="xref py py-class docutils literal notranslate"><span class="pre">Bout</span></code></a> – a two-sided bout between single competitors, recorded by
+every two-player arena entry point.</p></li>
+<li><p><a class="reference internal" href="#elote.arenas.base.MultiBout" title="elote.arenas.base.MultiBout"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiBout</span></code></a> – a bout between more than two sides (or between sides
+with rosters), recorded by <a class="reference internal" href="#elote.arenas.lambda_arena.LambdaArena.match_group" title="elote.arenas.lambda_arena.LambdaArena.match_group"><code class="xref py py-meth docutils literal notranslate"><span class="pre">LambdaArena.match_group</span></code></a>.</p></li>
+</ul>
+<p><strong>N-way analytics note.</strong> Every two-sided analysis in this class –
+<a class="reference internal" href="#elote.arenas.base.History.report_results" title="elote.arenas.base.History.report_results"><code class="xref py py-meth docutils literal notranslate"><span class="pre">report_results()</span></code></a>, <a class="reference internal" href="#elote.arenas.base.History.confusion_matrix" title="elote.arenas.base.History.confusion_matrix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">confusion_matrix()</span></code></a>, <a class="reference internal" href="#elote.arenas.base.History.calculate_metrics" title="elote.arenas.base.History.calculate_metrics"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_metrics()</span></code></a>,
+<a class="reference internal" href="#elote.arenas.base.History.calculate_metrics_with_draws" title="elote.arenas.base.History.calculate_metrics_with_draws"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_metrics_with_draws()</span></code></a>, <a class="reference internal" href="#elote.arenas.base.History.optimize_thresholds" title="elote.arenas.base.History.optimize_thresholds"><code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize_thresholds()</span></code></a>,
+<a class="reference internal" href="#elote.arenas.base.History.random_search" title="elote.arenas.base.History.random_search"><code class="xref py py-meth docutils literal notranslate"><span class="pre">random_search()</span></code></a>, <a class="reference internal" href="#elote.arenas.base.History.accuracy_by_prior_bouts" title="elote.arenas.base.History.accuracy_by_prior_bouts"><code class="xref py py-meth docutils literal notranslate"><span class="pre">accuracy_by_prior_bouts()</span></code></a> and
+<a class="reference internal" href="#elote.arenas.base.History.get_calibration_data" title="elote.arenas.base.History.get_calibration_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_calibration_data()</span></code></a> – is defined over a winner/drawer/loser
+comparison of exactly two competitors. N-way bouts have no a/b winner
+semantics, so they are deliberately <strong>excluded</strong> from all of them (they are
+still recorded and remain available for inspection). Generalizing the
+confusion-matrix machinery to ranked outcomes is a separate, follow-up
+feature, not something these methods approximate today.</p>
 <p>Initialize an empty history of bouts.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.arenas.base.History.accuracy_by_prior_bouts">
@@ -428,10 +534,10 @@ bouts it holds.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.arenas.base.History.add_bout">
-<span class="sig-name descname"><span class="pre">add_bout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.arenas.base.Bout" title="elote.arenas.base.Bout"><span class="pre">Bout</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/arenas/base.html#History.add_bout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.arenas.base.History.add_bout" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_bout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.arenas.base.Bout" title="elote.arenas.base.Bout"><span class="pre">Bout</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#elote.arenas.base.MultiBout" title="elote.arenas.base.MultiBout"><span class="pre">MultiBout</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/arenas/base.html#History.add_bout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.arenas.base.History.add_bout" title="Link to this definition">¶</a></dt>
 <dd><p>Add a bout to the history.</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>bout (Bout): The bout object to add to the history.</p>
+<dt>Args:</dt><dd><p>bout (Bout | MultiBout): The bout object to add to the history.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -665,6 +771,58 @@ upper_threshold (float): The upper probability threshold for predictions.</p>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="elote.arenas.base.MultiBout">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">elote.arenas.base.</span></span><span class="sig-name descname"><span class="pre">MultiBout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">participants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ranks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_ranks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/elote/arenas/base.html#MultiBout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.arenas.base.MultiBout" title="Link to this definition">¶</a></dt>
+<dd><p>A single bout between more than two sides, or between sides with rosters.</p>
+<p>Recorded by <a class="reference internal" href="#elote.arenas.lambda_arena.LambdaArena.match_group" title="elote.arenas.lambda_arena.LambdaArena.match_group"><code class="xref py py-meth docutils literal notranslate"><span class="pre">LambdaArena.match_group</span></code></a> and appended to the same
+<a class="reference internal" href="#elote.arenas.base.History" title="elote.arenas.base.History"><code class="xref py py-attr docutils literal notranslate"><span class="pre">History.bouts</span></code></a> list as two-sided <a class="reference internal" href="#elote.arenas.base.Bout" title="elote.arenas.base.Bout"><code class="xref py py-class docutils literal notranslate"><span class="pre">Bout</span></code></a> entries.</p>
+<p>Unlike a <a class="reference internal" href="#elote.arenas.base.Bout" title="elote.arenas.base.Bout"><code class="xref py py-class docutils literal notranslate"><span class="pre">Bout</span></code></a>, an N-way bout has no a/b winner semantics: the
+outcome is a ranking of the participants (with possible ties), not a
+winner/loser/draw triple. For that reason MultiBout entries are excluded
+from every two-sided analysis in <a class="reference internal" href="#elote.arenas.base.History" title="elote.arenas.base.History"><code class="xref py py-class docutils literal notranslate"><span class="pre">History</span></code></a> (see the note on that
+class) and carry their own prediction record:</p>
+<ul class="simple">
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">participants</span></code> – the side identifiers, in the finishing order the
+caller supplied (which is only the true finish order when <code class="docutils literal notranslate"><span class="pre">ranks</span></code> is
+<code class="docutils literal notranslate"><span class="pre">None</span></code>).</p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">predicted_ranks</span></code> – the pre-update prediction: the side identifiers
+ordered by pre-bout strength (descending, ties keep input order). This is
+the N-way analogue of <code class="xref py py-attr docutils literal notranslate"><span class="pre">Bout.predicted_outcome</span></code>; every strength read
+happened before any participant was updated.</p></li>
+</ul>
+<dl>
+<dt>Attributes:</dt><dd><p>participants (list): The side identifiers in caller (finishing) order.
+ranks (list | None): The finishing ranks per participant, lower is</p>
+<blockquote>
+<div><p>better, equal ranks are ties. <code class="docutils literal notranslate"><span class="pre">None</span></code> when the caller supplied
+neither ranks nor scores, in which case the participant order was
+taken as the finish order.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>predicted_ranks (list): The side identifiers ordered by pre-bout</dt><dd><p>strength, strongest first.</p>
+</dd>
+</dl>
+<p>scores (list | None): The per-side scores the caller supplied, if any.
+attributes (dict): Optional additional attributes recorded with the bout.
+match_time (datetime | None): The time the bout occurred, if supplied.</p>
+</dd>
+</dl>
+<p>Initialize a multi-way bout record.</p>
+<dl>
+<dt>Args:</dt><dd><p>participants: The side identifiers in caller (finishing) order.
+ranks: The finishing ranks per participant, lower is better, equal</p>
+<blockquote>
+<div><p>ranks are ties. <code class="docutils literal notranslate"><span class="pre">None</span></code> when no ranking was given.</p>
+</div></blockquote>
+<p>predicted_ranks: The side identifiers ordered by pre-bout strength.
+scores: The per-side scores, if the caller supplied them.
+attributes: Optional additional attributes recorded with the bout.
+match_time: The time the bout occurred, if supplied.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>

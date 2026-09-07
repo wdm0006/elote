@@ -178,7 +178,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numbers</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 
@@ -273,27 +273,58 @@
 
 <span class="sd">    This class stores the results of matchups and provides methods to analyze</span>
 <span class="sd">    the performance of the rating system.</span>
+
+<span class="sd">    Two bout types share the :attr:`bouts` list:</span>
+
+<span class="sd">    - :class:`Bout` -- a two-sided bout between single competitors, recorded by</span>
+<span class="sd">      every two-player arena entry point.</span>
+<span class="sd">    - :class:`MultiBout` -- a bout between more than two sides (or between sides</span>
+<span class="sd">      with rosters), recorded by :meth:`LambdaArena.match_group</span>
+<span class="sd">      &lt;elote.arenas.lambda_arena.LambdaArena.match_group&gt;`.</span>
+
+<span class="sd">    **N-way analytics note.** Every two-sided analysis in this class --</span>
+<span class="sd">    :meth:`report_results`, :meth:`confusion_matrix`, :meth:`calculate_metrics`,</span>
+<span class="sd">    :meth:`calculate_metrics_with_draws`, :meth:`optimize_thresholds`,</span>
+<span class="sd">    :meth:`random_search`, :meth:`accuracy_by_prior_bouts` and</span>
+<span class="sd">    :meth:`get_calibration_data` -- is defined over a winner/drawer/loser</span>
+<span class="sd">    comparison of exactly two competitors. N-way bouts have no a/b winner</span>
+<span class="sd">    semantics, so they are deliberately **excluded** from all of them (they are</span>
+<span class="sd">    still recorded and remain available for inspection). Generalizing the</span>
+<span class="sd">    confusion-matrix machinery to ranked outcomes is a separate, follow-up</span>
+<span class="sd">    feature, not something these methods approximate today.</span>
 <span class="sd">    """</span>
 
 <div class="viewcode-block" id="History.__init__">
 <a class="viewcode-back" href="../../../api/arenas.html#elote.arenas.base.History.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Initialize an empty history of bouts."""</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Bout</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Bout</span><span class="p">,</span> <span class="s2">"MultiBout"</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"History initialized."</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="History.add_bout">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.History.add_bout">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">add_bout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bout</span><span class="p">:</span> <span class="s2">"Bout"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_bout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bout</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">"Bout"</span><span class="p">,</span> <span class="s2">"MultiBout"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Add a bout to the history.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            bout (Bout): The bout object to add to the history.</span>
+<span class="sd">            bout (Bout | MultiBout): The bout object to add to the history.</span>
 <span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bout</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Added bout between </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">bout</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">bout</span><span class="o">.</span><span class="n">b</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bout</span><span class="p">,</span> <span class="n">MultiBout</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Added N-way bout among </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">bout</span><span class="o">.</span><span class="n">participants</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Added bout between </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">bout</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">bout</span><span class="o">.</span><span class="n">b</span><span class="p">)</span></div>
 
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_pairwise_bouts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="s2">"Bout"</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""The two-sided bouts in this history, in recorded order.</span>
+
+<span class="sd">        N-way bouts (:class:`MultiBout`) have no a/b winner semantics, so every</span>
+<span class="sd">        two-sided analysis reads through this filter rather than the raw</span>
+<span class="sd">        :attr:`bouts` list.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">bout</span> <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bout</span><span class="p">,</span> <span class="n">Bout</span><span class="p">)]</span>
 
 <div class="viewcode-block" id="History.report_results">
 <a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.History.report_results">[docs]</a>
@@ -308,8 +339,9 @@
 <span class="sd">            list: A list of dictionaries containing the results of each bout.</span>
 <span class="sd">        """</span>
         <span class="n">report</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Generating results report for </span><span class="si">%d</span><span class="s2"> bouts"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">:</span>
+        <span class="n">pairwise_bouts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pairwise_bouts</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Generating results report for </span><span class="si">%d</span><span class="s2"> pairwise bouts"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">pairwise_bouts</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="n">pairwise_bouts</span><span class="p">:</span>
             <span class="n">predicted_winner</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_winner</span><span class="p">(</span><span class="n">lower_threshold</span><span class="p">,</span> <span class="n">upper_threshold</span><span class="p">)</span>
             <span class="n">actual_winner</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">actual_winner</span><span class="p">()</span>
             <span class="n">actual_winner_id</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">a</span> <span class="k">if</span> <span class="n">actual_winner</span> <span class="o">==</span> <span class="s2">"a"</span> <span class="k">else</span> <span class="n">bout</span><span class="o">.</span><span class="n">b</span> <span class="k">if</span> <span class="n">actual_winner</span> <span class="o">==</span> <span class="s2">"b"</span> <span class="k">else</span> <span class="kc">None</span>
@@ -350,14 +382,15 @@
         <span class="n">false_negatives</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">skipped_bouts</span> <span class="o">=</span> <span class="mi">0</span>
 
+        <span class="n">pairwise_bouts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pairwise_bouts</span><span class="p">()</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="s2">"Calculating confusion matrix for </span><span class="si">%d</span><span class="s2"> bouts with thresholds: [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">]"</span><span class="p">,</span>
-            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">),</span>
+            <span class="s2">"Calculating confusion matrix for </span><span class="si">%d</span><span class="s2"> pairwise bouts with thresholds: [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">]"</span><span class="p">,</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">pairwise_bouts</span><span class="p">),</span>
             <span class="n">lower_threshold</span><span class="p">,</span>
             <span class="n">upper_threshold</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="n">pairwise_bouts</span><span class="p">:</span>
             <span class="c1"># Extract the actual winner and predicted probability</span>
             <span class="n">actual_winner</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">_normalized_outcome</span><span class="p">()</span>
             <span class="n">predicted_prob</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span>
@@ -438,7 +471,8 @@
 <span class="sd">        """</span>
         <span class="n">best_accuracy</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">best_thresholds</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>  <span class="c1"># Initialize with default values</span>
-        <span class="n">num_bouts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">)</span>
+        <span class="n">pairwise_bouts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pairwise_bouts</span><span class="p">()</span>
+        <span class="n">num_bouts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pairwise_bouts</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Performing random search for optimal thresholds with </span><span class="si">%d</span><span class="s2"> trials on </span><span class="si">%d</span><span class="s2"> bouts."</span><span class="p">,</span> <span class="n">trials</span><span class="p">,</span> <span class="n">num_bouts</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">num_bouts</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -448,7 +482,7 @@
         <span class="n">rng</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">random</span> <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
 
         <span class="c1"># Find min and max predicted outcomes in history</span>
-        <span class="n">predicted_outcomes</span> <span class="o">=</span> <span class="p">[</span><span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span> <span class="k">if</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="n">predicted_outcomes</span> <span class="o">=</span> <span class="p">[</span><span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="n">pairwise_bouts</span> <span class="k">if</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
         <span class="n">min_outcome</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">predicted_outcomes</span><span class="p">)</span> <span class="k">if</span> <span class="n">predicted_outcomes</span> <span class="k">else</span> <span class="mi">0</span>
         <span class="n">max_outcome</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">predicted_outcomes</span><span class="p">)</span> <span class="k">if</span> <span class="n">predicted_outcomes</span> <span class="k">else</span> <span class="mi">1</span>
 
@@ -491,7 +525,7 @@
 <span class="sd">            list: A list of ``(probability, label)`` tuples where label is 'a', 'b' or 'draw'.</span>
 <span class="sd">        """</span>
         <span class="n">pairs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pairwise_bouts</span><span class="p">():</span>
             <span class="n">actual</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">_normalized_outcome</span><span class="p">()</span>
             <span class="n">predicted_prob</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span>
             <span class="k">if</span> <span class="n">actual</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">predicted_prob</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -703,12 +737,12 @@
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
             <span class="s2">"Calculating metrics with draws for </span><span class="si">%d</span><span class="s2"> bouts using thresholds [</span><span class="si">%.2f</span><span class="s2">, </span><span class="si">%.2f</span><span class="s2">]"</span><span class="p">,</span>
-            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">),</span>
+            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pairwise_bouts</span><span class="p">()),</span>
             <span class="n">lower_threshold</span><span class="p">,</span>
             <span class="n">upper_threshold</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pairwise_bouts</span><span class="p">():</span>
             <span class="n">actual</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">_normalized_outcome</span><span class="p">()</span>
 
             <span class="c1"># Skip if we don't have both actual and predicted values</span>
@@ -811,10 +845,12 @@
         <span class="c1"># Track the number of bouts for each competitor</span>
         <span class="n">competitor_bout_counts</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="c1"># Count all bouts from arena's history (which includes training data)</span>
+        <span class="c1"># Count all bouts from arena's history (which includes training data).</span>
+        <span class="c1"># N-way bouts are excluded: they have no a/b pair to attribute the count to.</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">arena</span><span class="p">,</span> <span class="s2">"history"</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">history</span><span class="p">,</span> <span class="s2">"bouts"</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Populating initial bout counts from arena history (</span><span class="si">%d</span><span class="s2"> bouts)"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">arena</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">bouts</span><span class="p">))</span>
-            <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="n">arena</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">bouts</span><span class="p">:</span>
+            <span class="n">pairwise_history</span> <span class="o">=</span> <span class="n">arena</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">_pairwise_bouts</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Populating initial bout counts from arena history (</span><span class="si">%d</span><span class="s2"> bouts)"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">pairwise_history</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="n">pairwise_history</span><span class="p">:</span>
                 <span class="n">competitor_bout_counts</span><span class="p">[</span><span class="n">bout</span><span class="o">.</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">competitor_bout_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bout</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
                 <span class="n">competitor_bout_counts</span><span class="p">[</span><span class="n">bout</span><span class="o">.</span><span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="n">competitor_bout_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bout</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="k">else</span><span class="p">:</span>
@@ -826,7 +862,7 @@
 
         <span class="c1"># Process each bout in the evaluation history</span>
         <span class="n">skipped_bouts</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pairwise_bouts</span><span class="p">():</span>
             <span class="c1"># Get the current bout count for each competitor</span>
             <span class="n">a_count</span> <span class="o">=</span> <span class="n">competitor_bout_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bout</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
             <span class="n">b_count</span> <span class="o">=</span> <span class="n">competitor_bout_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bout</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -926,9 +962,10 @@
         <span class="n">y_prob</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">y_true</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">skipped_bouts</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Extracting calibration data for </span><span class="si">%d</span><span class="s2"> bouts."</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">))</span>
+        <span class="n">pairwise_bouts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pairwise_bouts</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Extracting calibration data for </span><span class="si">%d</span><span class="s2"> pairwise bouts."</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">pairwise_bouts</span><span class="p">))</span>
 
-        <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">bout</span> <span class="ow">in</span> <span class="n">pairwise_bouts</span><span class="p">:</span>
             <span class="n">label</span> <span class="o">=</span> <span class="n">bout</span><span class="o">.</span><span class="n">_normalized_outcome</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">bout</span><span class="o">.</span><span class="n">predicted_outcome</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">skipped_bouts</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -1140,6 +1177,82 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span></div>
 </div>
+
+
+
+<div class="viewcode-block" id="MultiBout">
+<a class="viewcode-back" href="../../../arenas.html#elote.arenas.base.MultiBout">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MultiBout</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""A single bout between more than two sides, or between sides with rosters.</span>
+
+<span class="sd">    Recorded by :meth:`LambdaArena.match_group</span>
+<span class="sd">    &lt;elote.arenas.lambda_arena.LambdaArena.match_group&gt;` and appended to the same</span>
+<span class="sd">    :attr:`History.bouts &lt;History&gt;` list as two-sided :class:`Bout` entries.</span>
+
+<span class="sd">    Unlike a :class:`Bout`, an N-way bout has no a/b winner semantics: the</span>
+<span class="sd">    outcome is a ranking of the participants (with possible ties), not a</span>
+<span class="sd">    winner/loser/draw triple. For that reason MultiBout entries are excluded</span>
+<span class="sd">    from every two-sided analysis in :class:`History` (see the note on that</span>
+<span class="sd">    class) and carry their own prediction record:</span>
+
+<span class="sd">    - :attr:`participants` -- the side identifiers, in the finishing order the</span>
+<span class="sd">      caller supplied (which is only the true finish order when ``ranks`` is</span>
+<span class="sd">      ``None``).</span>
+<span class="sd">    - :attr:`predicted_ranks` -- the pre-update prediction: the side identifiers</span>
+<span class="sd">      ordered by pre-bout strength (descending, ties keep input order). This is</span>
+<span class="sd">      the N-way analogue of :attr:`Bout.predicted_outcome`; every strength read</span>
+<span class="sd">      happened before any participant was updated.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        participants (list): The side identifiers in caller (finishing) order.</span>
+<span class="sd">        ranks (list | None): The finishing ranks per participant, lower is</span>
+<span class="sd">            better, equal ranks are ties. ``None`` when the caller supplied</span>
+<span class="sd">            neither ranks nor scores, in which case the participant order was</span>
+<span class="sd">            taken as the finish order.</span>
+<span class="sd">        predicted_ranks (list): The side identifiers ordered by pre-bout</span>
+<span class="sd">            strength, strongest first.</span>
+<span class="sd">        scores (list | None): The per-side scores the caller supplied, if any.</span>
+<span class="sd">        attributes (dict): Optional additional attributes recorded with the bout.</span>
+<span class="sd">        match_time (datetime | None): The time the bout occurred, if supplied.</span>
+<span class="sd">    """</span>
+
+<div class="viewcode-block" id="MultiBout.__init__">
+<a class="viewcode-back" href="../../../api/arenas.html#elote.arenas.base.MultiBout.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">participants</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">ranks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+        <span class="n">predicted_ranks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">attributes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">match_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Initialize a multi-way bout record.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            participants: The side identifiers in caller (finishing) order.</span>
+<span class="sd">            ranks: The finishing ranks per participant, lower is better, equal</span>
+<span class="sd">                ranks are ties. ``None`` when no ranking was given.</span>
+<span class="sd">            predicted_ranks: The side identifiers ordered by pre-bout strength.</span>
+<span class="sd">            scores: The per-side scores, if the caller supplied them.</span>
+<span class="sd">            attributes: Optional additional attributes recorded with the bout.</span>
+<span class="sd">            match_time: The time the bout occurred, if supplied.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">participants</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">participants</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ranks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ranks</span><span class="p">)</span> <span class="k">if</span> <span class="n">ranks</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">predicted_ranks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">predicted_ranks</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span> <span class="k">if</span> <span class="n">scores</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span> <span class="o">=</span> <span class="n">attributes</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">match_time</span> <span class="o">=</span> <span class="n">match_time</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Return a debug representation of this bout.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: A string representation of this bout.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"&lt;MultiBout: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">participants</span><span class="p">)</span><span class="si">}</span><span class="s2"> participants&gt;"</span></div>
 
 </pre></div>
 

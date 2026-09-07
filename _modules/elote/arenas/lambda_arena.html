@@ -175,13 +175,125 @@
             
   <h1>Source code for elote.arenas.lambda_arena</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numbers</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">elote.arenas.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseArena</span><span class="p">,</span> <span class="n">Bout</span><span class="p">,</span> <span class="n">History</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">elote.competitors.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCompetitor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote.arenas.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseArena</span><span class="p">,</span> <span class="n">Bout</span><span class="p">,</span> <span class="n">History</span><span class="p">,</span> <span class="n">MultiBout</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote.competitors.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="n">MissMatchedCompetitorTypesException</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_sides</span><span class="p">(</span><span class="n">participants</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]]:</span>
+<span class="w">    </span><span class="sd">"""Split match_group participants into ``(side id, roster or None)`` pairs.</span>
+
+<span class="sd">    An entry is a roster side exactly when it is a list/tuple pair of two items</span>
+<span class="sd">    whose second item is itself a list or tuple; every other entry is a plain</span>
+<span class="sd">    competitor id. Rosters are copied, and a side's id is only a label -- no</span>
+<span class="sd">    competitor is created for it.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        participants (sequence): The bout's sides, as given by the caller.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list of (side id, roster or None): One entry per side, in given order.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If a roster side is empty or its roster is not a list/tuple.</span>
+<span class="sd">    """</span>
+    <span class="n">sides</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">participants</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span>
+            <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span>
+        <span class="p">):</span>
+            <span class="n">side_id</span><span class="p">,</span> <span class="n">roster</span> <span class="o">=</span> <span class="n">entry</span>
+            <span class="n">roster_members</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">roster</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">roster_members</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"side '</span><span class="si">{</span><span class="n">side_id</span><span class="si">}</span><span class="s2">' has an empty roster"</span><span class="p">)</span>
+            <span class="n">sides</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">side_id</span><span class="p">,</span> <span class="n">roster_members</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sides</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">entry</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">sides</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_group_ranks</span><span class="p">(</span><span class="n">ranks</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">n_sides</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Validate match_group ranks: one whole number per side.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ranks (sequence): The finishing ranks, lower is better, ties repeat.</span>
+<span class="sd">        n_sides (int): The number of sides the ranks must describe.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list of int: The validated ranks as ints.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the count does not match the side list or any rank is not</span>
+<span class="sd">            a whole number.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ranks</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_sides</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"ranks must have one entry per participant, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ranks</span><span class="p">)</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">n_sides</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">validated</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">rank</span> <span class="ow">in</span> <span class="n">ranks</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Real</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"ranks must contain only numbers, got </span><span class="si">{</span><span class="n">rank</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">float</span><span class="p">(</span><span class="n">rank</span><span class="p">)</span><span class="o">.</span><span class="n">is_integer</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"ranks must be whole numbers, got </span><span class="si">{</span><span class="n">rank</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">validated</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">rank</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">validated</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_group_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">n_sides</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Validate match_group scores: one finite, non-negative number per side.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        scores (sequence): One score per side, in the order given.</span>
+<span class="sd">        n_sides (int): The number of sides the scores must describe.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list of float: The validated scores, normalized to built-in floats.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the count does not match the side list or any score is</span>
+<span class="sd">            negative, non-finite, or not a number.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_sides</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"scores must have one entry per participant, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">n_sides</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">validated</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">scores</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Real</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"scores must contain only numbers, got </span><span class="si">{</span><span class="n">score</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">score</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"scores must be finite numbers, got </span><span class="si">{</span><span class="n">score</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">score</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"scores must be non-negative, got </span><span class="si">{</span><span class="n">score</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">validated</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">score</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">validated</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_ranks_from_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Derive finishing ranks from per-side scores.</span>
+
+<span class="sd">    Higher scores finish better; equal scores tie and share the earliest rank</span>
+<span class="sd">    they reach (so 3.0, 3.0, 1.0 maps to ranks 0, 0, 2).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        scores (list of float): The validated per-side scores.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list of int: One rank per score, aligned with the input order.</span>
+<span class="sd">    """</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">scores</span><span class="p">)),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="o">-</span><span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="n">ranks</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
+    <span class="n">rank</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">position</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">order</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">position</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">scores</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">!=</span> <span class="n">scores</span><span class="p">[</span><span class="n">order</span><span class="p">[</span><span class="n">position</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]]:</span>
+            <span class="n">rank</span> <span class="o">=</span> <span class="n">position</span>
+        <span class="n">ranks</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">rank</span>
+    <span class="k">return</span> <span class="n">ranks</span>
 
 
 <div class="viewcode-block" id="LambdaArena">
@@ -379,6 +491,132 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">],</span> <span class="n">scores</span><span class="o">=</span><span class="n">reversed_scores</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">add_bout</span><span class="p">(</span><span class="n">Bout</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">predicted_outcome</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="s2">"loss"</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="n">attributes</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="LambdaArena.match_group">
+<a class="viewcode-back" href="../../../arenas.html#elote.arenas.lambda_arena.LambdaArena.match_group">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">match_group</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">participants</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">ranks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">attributes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">match_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Process a single bout between three or more sides (or two sides with rosters).</span>
+
+<span class="sd">        This is the N-way analogue of :meth:`matchup`: it creates missing</span>
+<span class="sd">        competitors, captures every pre-update prediction, runs one bout-level</span>
+<span class="sd">        update over the whole participant set, and records the result as a</span>
+<span class="sd">        :class:`~elote.arenas.base.MultiBout` on the same history the two-player</span>
+<span class="sd">        entry points append to.</span>
+
+<span class="sd">        The bout is updated natively -- one closed-form pass over the whole</span>
+<span class="sd">        participant set -- not as a fan-out of pairwise results, which the</span>
+<span class="sd">        Weng-Lin family (and any other bout-level model) treats differently.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            participants (sequence): The sides, ordered by finish. Each entry is</span>
+<span class="sd">                either a competitor id, or an ``(id, roster)`` pair where roster</span>
+<span class="sd">                is a list or tuple of member ids for a team side. A side is a</span>
+<span class="sd">                roster side exactly when its entry is a list/tuple pair whose</span>
+<span class="sd">                second item is a list or tuple. When ``ranks`` is ``None`` the</span>
+<span class="sd">                given order is taken as the finish order.</span>
+<span class="sd">            ranks (sequence of float, optional): Finishing ranks per participant,</span>
+<span class="sd">                lower is better, equal ranks are ties. Whole numbers are</span>
+<span class="sd">                required. Defaults to ``0..n-1`` (the given order). When both</span>
+<span class="sd">                ``ranks`` and ``scores`` are given, ``ranks`` defines the result</span>
+<span class="sd">                and ``scores`` are recorded only.</span>
+<span class="sd">            scores (sequence of float, optional): One score per participant.</span>
+<span class="sd">                Validated and recorded with the bout; when ``ranks`` is omitted</span>
+<span class="sd">                the scores define the finishing ranks (descending, ties share a</span>
+<span class="sd">                rank). Not otherwise consumed by rank-based models.</span>
+<span class="sd">            attributes (dict, optional): Additional attributes to record with this bout.</span>
+<span class="sd">            match_time (datetime, optional): The time when the bout occurred.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NotImplementedError: If the arena's rating system does not implement</span>
+<span class="sd">                a bout-level update (``apply_bout``). The first shipped consumer</span>
+<span class="sd">                is :class:`~elote.OpenSkillCompetitor`.</span>
+<span class="sd">            ValueError: If the participant list is malformed (fewer than two</span>
+<span class="sd">                sides, an empty roster, the same competitor on two sides), if</span>
+<span class="sd">                ``ranks`` is not one whole number per participant, or if</span>
+<span class="sd">                ``scores`` is not one finite, non-negative number per</span>
+<span class="sd">                participant. Validation happens before any competitor is created</span>
+<span class="sd">                or any history is recorded, so a bad bout leaves the arena</span>
+<span class="sd">                unchanged.</span>
+<span class="sd">        """</span>
+        <span class="c1"># The bout-level hook is the only supported update path: fan-out of</span>
+        <span class="c1"># pairwise results would double-count every bout.</span>
+        <span class="n">apply_bout</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_competitor</span><span class="p">,</span> <span class="s2">"apply_bout"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">apply_bout</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_competitor</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> does not implement a bout-level update "</span>
+                <span class="s2">"(apply_bout); N-way bouts are not supported for this rating system"</span>
+            <span class="p">)</span>
+
+        <span class="n">sides</span> <span class="o">=</span> <span class="n">_parse_sides</span><span class="p">(</span><span class="n">participants</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sides</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"a bout needs at least two sides, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">sides</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+        <span class="c1"># Validate everything -- ranks, scores, participant shape, and</span>
+        <span class="c1"># competitor identity -- before creating any competitor or recording any</span>
+        <span class="c1"># history, so a malformed bout leaves the arena unchanged.</span>
+        <span class="n">side_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">side_id</span> <span class="k">for</span> <span class="n">side_id</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">sides</span><span class="p">]</span>
+        <span class="n">all_member_ids</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">side_id</span><span class="p">,</span> <span class="n">roster</span> <span class="ow">in</span> <span class="n">sides</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">roster</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">all_member_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">side_id</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">all_member_ids</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">roster</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">all_member_ids</span><span class="p">))</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_member_ids</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"the same competitor cannot appear on two sides of one bout"</span><span class="p">)</span>
+
+        <span class="n">n_sides</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sides</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ranks</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">bout_ranks</span> <span class="o">=</span> <span class="n">_validate_group_ranks</span><span class="p">(</span><span class="n">ranks</span><span class="p">,</span> <span class="n">n_sides</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">scores</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">bout_ranks</span> <span class="o">=</span> <span class="n">_ranks_from_scores</span><span class="p">(</span><span class="n">_validate_group_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">n_sides</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">bout_ranks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_sides</span><span class="p">))</span>
+        <span class="n">validated_scores</span> <span class="o">=</span> <span class="n">_validate_group_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">n_sides</span><span class="p">)</span> <span class="k">if</span> <span class="n">scores</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="c1"># Competitors seeded through initial_state may belong to another rating</span>
+        <span class="c1"># system; catch that before creating anything new.</span>
+        <span class="k">for</span> <span class="n">member_id</span> <span class="ow">in</span> <span class="n">all_member_ids</span><span class="p">:</span>
+            <span class="n">existing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">member_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">existing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">existing</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_competitor</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">MissMatchedCompetitorTypesException</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"competitor '</span><span class="si">{</span><span class="n">member_id</span><span class="si">}</span><span class="s2">' is a </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">existing</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, but this arena rates "</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_competitor</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> competitors"</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Create missing competitors, then collect each side's members.</span>
+        <span class="n">bout_sides</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">BaseCompetitor</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">side_id</span><span class="p">,</span> <span class="n">roster</span> <span class="ow">in</span> <span class="n">sides</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">roster</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">bout_sides</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_competitor</span><span class="p">(</span><span class="n">side_id</span><span class="p">)])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">bout_sides</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_competitor</span><span class="p">(</span><span class="n">member_id</span><span class="p">)</span> <span class="k">for</span> <span class="n">member_id</span> <span class="ow">in</span> <span class="n">roster</span><span class="p">])</span>
+
+        <span class="c1"># Pre-update prediction: order the sides by pre-bout strength (strongest</span>
+        <span class="c1"># first, ties keep the given order). Every strength is read before any</span>
+        <span class="c1"># participant is updated. Team strength is the members' mean rating.</span>
+        <span class="n">strengths</span> <span class="o">=</span> <span class="p">[</span><span class="nb">sum</span><span class="p">(</span><span class="n">member</span><span class="o">.</span><span class="n">rating</span> <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">side</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">side</span><span class="p">)</span> <span class="k">for</span> <span class="n">side</span> <span class="ow">in</span> <span class="n">bout_sides</span><span class="p">]</span>
+        <span class="n">predicted_ranks</span> <span class="o">=</span> <span class="p">[</span><span class="n">side_ids</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_sides</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="o">-</span><span class="n">strengths</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span>
+
+        <span class="n">apply_bout</span><span class="p">(</span><span class="n">bout_sides</span><span class="p">,</span> <span class="n">ranks</span><span class="o">=</span><span class="n">bout_ranks</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">add_bout</span><span class="p">(</span>
+            <span class="n">MultiBout</span><span class="p">(</span>
+                <span class="n">participants</span><span class="o">=</span><span class="n">side_ids</span><span class="p">,</span>
+                <span class="n">ranks</span><span class="o">=</span><span class="n">bout_ranks</span><span class="p">,</span>
+                <span class="n">predicted_ranks</span><span class="o">=</span><span class="n">predicted_ranks</span><span class="p">,</span>
+                <span class="n">scores</span><span class="o">=</span><span class="n">validated_scores</span><span class="p">,</span>
+                <span class="n">attributes</span><span class="o">=</span><span class="n">attributes</span><span class="p">,</span>
+                <span class="n">match_time</span><span class="o">=</span><span class="n">match_time</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="LambdaArena.rating_period">
