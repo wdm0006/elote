@@ -1202,8 +1202,8 @@ _default_initial_rating (float): Default initial rating for all competitors. Def
 <dt class="sig sig-object py" id="elote.competitors.colley.ColleyMatrixCompetitor.beat">
 <span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/competitors/colley.html#ColleyMatrixCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.colley.ColleyMatrixCompetitor.beat" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has won against the given competitor.</p>
-<p>In Colley Matrix Method, we store the match result and recalculate ratings for all
-related competitors.</p>
+<p>In Colley Matrix Method, we store the match result and the ratings of all related
+competitors are re-fit lazily, on the next rating read.</p>
 <dl>
 <dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.
 scores (sequence of float, optional): The two scores in caller order,</p>
@@ -1263,6 +1263,8 @@ InvalidParameterException: If any parameter in the state is invalid.</p>
 <dt class="sig sig-object py" id="elote.competitors.colley.ColleyMatrixCompetitor.rating">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rating</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#elote.competitors.colley.ColleyMatrixCompetitor.rating" title="Link to this definition">¶</a></dt>
 <dd><p>Get the current rating of this competitor.</p>
+<p>Reading the rating is where deferred matrix solves happen: if games have been
+recorded since the last read, the connected group is re-fit first.</p>
 <dl class="simple">
 <dt>Returns:</dt><dd><p>float: The current rating.</p>
 </dd>
@@ -1356,7 +1358,8 @@ under Colley’s <code class="docutils literal notranslate"><span class="pre">1<
 <dt class="sig sig-object py" id="elote.competitors.massey.MasseyCompetitor.beat">
 <span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/competitors/massey.html#MasseyCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.massey.MasseyCompetitor.beat" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has won against the given competitor.</p>
-<p>The result is recorded in the match graph and the whole connected group is re-fit.</p>
+<p>The result is recorded in the match graph and the whole connected group is re-fit
+lazily, on the next rating read.</p>
 <dl>
 <dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.
 scores (sequence of float, optional): The two scores in caller order,</p>
@@ -1434,6 +1437,8 @@ InvalidParameterException: If any parameter in the state is invalid.</p>
 <dt class="sig sig-object py" id="elote.competitors.massey.MasseyCompetitor.rating">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rating</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#elote.competitors.massey.MasseyCompetitor.rating" title="Link to this definition">¶</a></dt>
 <dd><p>Get the current rating of this competitor.</p>
+<p>Reading the rating is where deferred least-squares solves happen: if games have
+been recorded since the last read, the connected group is re-fit first.</p>
 <dl class="simple">
 <dt>Returns:</dt><dd><p>float: The current rating.</p>
 </dd>
@@ -1531,7 +1536,8 @@ five orders of magnitude below the rounding grid.</p>
 <dt class="sig sig-object py" id="elote.competitors.keener.KeenerCompetitor.beat">
 <span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/elote/competitors/keener.html#KeenerCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.keener.KeenerCompetitor.beat" title="Link to this definition">¶</a></dt>
 <dd><p>Update ratings after this competitor has won against the given competitor.</p>
-<p>The scores are recorded in the match graph and the whole connected group is re-fit.</p>
+<p>The scores are recorded in the match graph and the whole connected group is re-fit
+lazily, on the next rating read.</p>
 <dl>
 <dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.
 scores (sequence of float, optional): The two scores in caller order,</p>
@@ -1605,6 +1611,8 @@ InvalidParameterException: If any parameter in the state is invalid.</p>
 <dt class="sig sig-object py" id="elote.competitors.keener.KeenerCompetitor.rating">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rating</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#elote.competitors.keener.KeenerCompetitor.rating" title="Link to this definition">¶</a></dt>
 <dd><p>Get the current rating of this competitor.</p>
+<p>Reading the rating is where deferred eigenvector fits happen: if games have been
+recorded since the last read, the connected group is re-fit first.</p>
 <dl class="simple">
 <dt>Returns:</dt><dd><p>float: The current rating.</p>
 </dd>

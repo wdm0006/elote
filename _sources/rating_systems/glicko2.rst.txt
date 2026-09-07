@@ -90,6 +90,26 @@ Key parameters:
 The class-level ``tau`` system constant (default 0.5) constrains how much volatility can change
 between rating periods and can be adjusted with ``Glicko2Competitor.configure_class(tau=...)``.
 
+
+Update cost model
+-----------------
+
+Each pairwise result method (``beat``, ``lost_to``, ``tied``) records the match and then
+immediately runs the full Glicko-2 update for both competitors, so every game pays one
+complete update: inactivity-driven RD growth plus the iterative volatility solve. The
+per-game cost is therefore O(1) with a heavy constant (the volatility iteration), not a
+function of the number of competitors.
+
+``update_ratings`` is public and is the batch entry point: it processes every result
+recorded since the competitor's last update in O(m) over the pending matches and performs
+the volatility solve exactly once per call. With the pairwise API the update fires after
+each match (one pending result per call); a caller that accumulates several results per
+competitor within a rating period amortizes the expensive volatility step across the whole
+batch instead of paying it per bout.
+
+Reading ``.rating``, ``.rd``, or ``.volatility``, or calling ``expected_score``, is O(1):
+the update runs at record time, not on read.
+
 Real-World Applications
 ---------------------
 

@@ -242,6 +242,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">"ColleyMatrixCompetitor"</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Opponent -&gt; num games</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_head_to_head</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="s2">"ColleyMatrixCompetitor"</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Opponent -&gt; wins against</span>
+        <span class="c1"># True when recorded games are not yet reflected in _rating: the matrix solve is</span>
+        <span class="c1"># deferred to the first rating read that needs it (dirty-flag caching).</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ratings_dirty</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="c1"># Add a unique ID for hashing</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Initialized ColleyMatrixCompetitor </span><span class="si">%d</span><span class="s2"> with initial rating </span><span class="si">%.3f</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">)</span></div>
@@ -251,9 +254,13 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Get the current rating of this competitor.</span>
 
+<span class="sd">        Reading the rating is where deferred matrix solves happen: if games have been</span>
+<span class="sd">        recorded since the last read, the connected group is re-fit first.</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            float: The current rating.</span>
 <span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_current_ratings</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span>
 
     <span class="nd">@rating</span><span class="o">.</span><span class="n">setter</span>
@@ -283,6 +290,26 @@
 <span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ensure_current_ratings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Re-fit the connected group's ratings if recorded games are not yet reflected.</span>
+
+<span class="sd">        Recording a game only marks the fit stale; the O(n^3) solve runs once on the first</span>
+<span class="sd">        read that needs it, so repeated reads with no new games are O(1) amortized.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ratings_dirty</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_recalculate_ratings</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_mark_group_stale</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Mark every competitor in the connected group stale after a recorded game.</span>
+
+<span class="sd">        A new game changes the Colley fit of the whole connected component, not just the</span>
+<span class="sd">        two endpoints' cached ratings: endpoint-only flags would let a clean member serve a</span>
+<span class="sd">        rating that predates the game whenever it is read first, making output depend on</span>
+<span class="sd">        read order. One O(component) walk per recorded game keeps every later read O(1).</span>
+<span class="sd">        """</span>
+        <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_connected_competitors</span><span class="p">():</span>
+            <span class="n">comp</span><span class="o">.</span><span class="n">_ratings_dirty</span> <span class="o">=</span> <span class="kc">True</span>
+
 <div class="viewcode-block" id="ColleyMatrixCompetitor.expected_score">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.colley.ColleyMatrixCompetitor.expected_score">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="s2">"BaseCompetitor"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -304,8 +331,8 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Update ratings after this competitor has won against the given competitor.</span>
 
-<span class="sd">        In Colley Matrix Method, we store the match result and recalculate ratings for all</span>
-<span class="sd">        related competitors.</span>
+<span class="sd">        In Colley Matrix Method, we store the match result and the ratings of all related</span>
+<span class="sd">        competitors are re-fit lazily, on the next rating read.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            competitor (BaseCompetitor): The opponent competitor that lost.</span>
@@ -334,8 +361,9 @@
         <span class="n">competitor_typed</span><span class="o">.</span><span class="n">_opponents</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="n">competitor_typed</span><span class="o">.</span><span class="n">_opponents</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Recorded win for </span><span class="si">%d</span><span class="s2">, loss for </span><span class="si">%d</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">competitor_typed</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
-        <span class="c1"># Recalculate ratings for all connected competitors</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_recalculate_ratings</span><span class="p">()</span></div>
+        <span class="c1"># The whole connected group's fit is stale now; the re-fit is deferred to the first</span>
+        <span class="c1"># rating read that needs it. The opponent is already in self's group.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mark_group_stale</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="ColleyMatrixCompetitor.tied">
@@ -369,8 +397,7 @@
         <span class="n">competitor_typed</span><span class="o">.</span><span class="n">_head_to_head</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="n">competitor_typed</span><span class="o">.</span><span class="n">_head_to_head</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Recorded tie for </span><span class="si">%d</span><span class="s2"> and </span><span class="si">%d</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">,</span> <span class="n">competitor_typed</span><span class="o">.</span><span class="n">_id</span><span class="p">)</span>
-        <span class="c1"># Recalculate ratings for all connected competitors</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_recalculate_ratings</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mark_group_stale</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="ColleyMatrixCompetitor.lost_to">
@@ -434,6 +461,7 @@
         <span class="c1"># If there's only one competitor, no need to recalculate</span>
         <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Only one competitor in network, skipping recalculation."</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ratings_dirty</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">return</span>
 
         <span class="c1"># Build the Colley Matrix C and vector b</span>
@@ -498,6 +526,10 @@
             <span class="c1"># If the matrix is singular, fall back to a simpler approach</span>
             <span class="c1"># This can happen with certain network structures</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_fallback_rating_calculation</span><span class="p">(</span><span class="n">competitors</span><span class="p">)</span>
+
+        <span class="c1"># Either path above is a completed fit: every connected competitor is current.</span>
+        <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">competitors</span><span class="p">:</span>
+            <span class="n">comp</span><span class="o">.</span><span class="n">_ratings_dirty</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_fallback_rating_calculation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">"ColleyMatrixCompetitor"</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
@@ -602,6 +634,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Dict[str, Any]: A dictionary of the current state.</span>
 <span class="sd">        """</span>
+        <span class="c1"># Never export a rating older than the recorded games.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_current_ratings</span><span class="p">()</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">"rating"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span><span class="p">,</span>
             <span class="s2">"wins"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wins</span><span class="p">,</span>
@@ -630,6 +664,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ties"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Cannot restore opponent references from serialization</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_head_to_head</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># The imported rating is current for the imported (edge-less) state; reset the</span>
+        <span class="c1"># deferred-fit cache rather than marking it stale.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ratings_dirty</span> <span class="o">=</span> <span class="kc">False</span>
 
 <div class="viewcode-block" id="ColleyMatrixCompetitor.from_state">
 <a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.colley.ColleyMatrixCompetitor.from_state">[docs]</a>
@@ -699,7 +736,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ties</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_opponents</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_head_to_head</span> <span class="o">=</span> <span class="p">{}</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_head_to_head</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ratings_dirty</span> <span class="o">=</span> <span class="kc">False</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>

@@ -256,6 +256,22 @@ every single game.</p></li>
 <p>The class-level <code class="docutils literal notranslate"><span class="pre">tau</span></code> system constant (default 0.5) constrains how much volatility can change
 between rating periods and can be adjusted with <code class="docutils literal notranslate"><span class="pre">Glicko2Competitor.configure_class(tau=...)</span></code>.</p>
 </section>
+<section id="update-cost-model">
+<h2>Update cost model<a class="headerlink" href="#update-cost-model" title="Link to this heading">¶</a></h2>
+<p>Each pairwise result method (<code class="docutils literal notranslate"><span class="pre">beat</span></code>, <code class="docutils literal notranslate"><span class="pre">lost_to</span></code>, <code class="docutils literal notranslate"><span class="pre">tied</span></code>) records the match and then
+immediately runs the full Glicko-2 update for both competitors, so every game pays one
+complete update: inactivity-driven RD growth plus the iterative volatility solve. The
+per-game cost is therefore O(1) with a heavy constant (the volatility iteration), not a
+function of the number of competitors.</p>
+<p><code class="docutils literal notranslate"><span class="pre">update_ratings</span></code> is public and is the batch entry point: it processes every result
+recorded since the competitor’s last update in O(m) over the pending matches and performs
+the volatility solve exactly once per call. With the pairwise API the update fires after
+each match (one pending result per call); a caller that accumulates several results per
+competitor within a rating period amortizes the expensive volatility step across the whole
+batch instead of paying it per bout.</p>
+<p>Reading <code class="docutils literal notranslate"><span class="pre">.rating</span></code>, <code class="docutils literal notranslate"><span class="pre">.rd</span></code>, or <code class="docutils literal notranslate"><span class="pre">.volatility</span></code>, or calling <code class="docutils literal notranslate"><span class="pre">expected_score</span></code>, is O(1):
+the update runs at record time, not on read.</p>
+</section>
 <section id="real-world-applications">
 <h2>Real-World Applications<a class="headerlink" href="#real-world-applications" title="Link to this heading">¶</a></h2>
 <ul class="simple">
