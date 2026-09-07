@@ -267,3 +267,147 @@ def test_legacy_from_state_rebuilds_members_from_flat_specs():
 
     assert rebuilt.sub_competitors[0].rating == 1500
     assert rebuilt.sub_competitors[1].rating == 1450
+
+
+def test_blended_beat_rejects_scores_contradicting_a_win():
+    """The blended win validator checks the payload against the declared win."""
+
+    a = BlendedCompetitor(competitors=[{"type": "EloCompetitor"}])
+    b = BlendedCompetitor(competitors=[{"type": "EloCompetitor"}])
+
+    with pytest.raises(ValueError, match="do not describe a win"):
+        a.beat(b, scores=(0.2, 0.7))
+
+
+def test_blended_tied_rejects_scores_contradicting_a_draw():
+    """The blended tie validator checks the payload against the declared draw."""
+
+    a = BlendedCompetitor(competitors=[{"type": "EloCompetitor"}])
+    b = BlendedCompetitor(competitors=[{"type": "EloCompetitor"}])
+
+    with pytest.raises(ValueError, match="do not describe a draw"):
+        a.tied(b, scores=(0.6, 0.4))
+
+
+def test_modern_from_state_defaults_missing_parameter_keys():
+    """Modern-format restore falls back to mean blending and an empty spec list."""
+
+    state = {"type": "BlendedCompetitor", "version": 1, "parameters": {}, "state": {}}
+
+    blended = BlendedCompetitor.from_state(state)
+
+    assert blended.blend_mode == "mean"
+    assert blended._initial_competitors == []
+    assert blended.sub_competitors == []
+
+
+def test_modern_from_state_restores_initial_competitor_specs():
+    """Modern-format restore keeps the exact initial competitor specification."""
+
+    spec = [{"type": "EloCompetitor", "competitor_kwargs": {"initial_rating": 1700}}]
+    state = {
+        "type": "BlendedCompetitor",
+        "version": 1,
+        "parameters": {"blend_mode": "mean", "competitors": spec},
+        "state": {},
+    }
+
+    blended = BlendedCompetitor.from_state(state)
+
+    assert blended.blend_mode == "mean"
+    assert blended._initial_competitors == spec
+
+
+def test_import_state_defaults_missing_parameter_and_state_keys():
+    """import_state falls back to mean blending and empty sections on sparse input."""
+
+    blended = BlendedCompetitor(competitors=[{"type": "EloCompetitor"}])
+    envelope = {"type": "BlendedCompetitor", "version": 1, "parameters": {}, "state": {}}
+
+    blended.import_state(envelope)
+
+    assert blended.blend_mode == "mean"
+    assert blended._initial_competitors == []
+    assert blended.sub_competitors == []
+
+
+def test_import_state_restores_blend_mode_and_initial_specs():
+    """import_state restores the blend mode and the initial specification list."""
+
+    spec = [{"type": "EloCompetitor", "competitor_kwargs": {"initial_rating": 1700}}]
+    blended = BlendedCompetitor(competitors=[{"type": "EloCompetitor"}])
+    envelope = {
+        "type": "BlendedCompetitor",
+        "version": 1,
+        "parameters": {"blend_mode": "mean", "competitors": spec},
+        "state": {},
+    }
+
+    blended.import_state(envelope)
+
+    assert blended.blend_mode == "mean"
+    assert blended._initial_competitors == spec
+
+
+def test_legacy_from_state_defaults_for_missing_spec_keys():
+    """Legacy entries without type or kwargs rebuild default Elo members."""
+
+    legacy = {"competitors": [{"competitor_kwargs": {}}]}
+
+    blended = BlendedCompetitor.from_state(legacy)
+
+    assert [type(c).__name__ for c in blended.sub_competitors] == ["EloCompetitor"]
+    assert blended.blend_mode == "mean"
+    assert blended.sub_competitors[0].rating == 400
+
+
+def test_legacy_from_state_without_competitors_constructs_empty():
+    """Legacy state without a competitors section rebuilds an empty ensemble."""
+
+    blended = BlendedCompetitor.from_state({"blend_mode": "mean"})
+
+    assert blended.sub_competitors == []
+
+
+def test_legacy_from_state_restores_explicit_member_specifications():
+    """Legacy entries with explicit types and kwargs rebuild those exact members."""
+
+    legacy = {
+        "blend_mode": "mean",
+        "competitors": [
+            {"type": "GlickoCompetitor", "competitor_kwargs": {"initial_rating": 1600}},
+            {"type": "EloCompetitor", "competitor_kwargs": {}},
+        ],
+    }
+
+    blended = BlendedCompetitor.from_state(legacy)
+
+    assert [type(c).__name__ for c in blended.sub_competitors] == ["GlickoCompetitor", "EloCompetitor"]
+    assert blended.sub_competitors[0].rating == 1600
+    assert blended.sub_competitors[1].rating == 400
+    assert blended._initial_competitors == legacy["competitors"]
+
+
+def test_legacy_from_state_wraps_sub_state_update_failures():
+    """A member spec that builds but fails state import is wrapped and named."""
+
+    legacy = {
+        "competitors": [
+            {"type": "EloCompetitor", "competitor_kwargs": {"initial_rating": 1200, "k_factor": "oops"}}
+        ]
+    }
+
+    with pytest.raises(InvalidStateException, match="Failed to update sub-competitor"):
+        BlendedCompetitor.from_state(legacy)
+
+
+def test_expected_score_rejects_unsupported_blend_mode():
+    """The blend guard raises a named NotImplementedError with the mode in it."""
+
+    a = BlendedCompetitor(competitors=[{"type": "EloCompetitor"}])
+    b = BlendedCompetitor(competitors=[{"type": "EloCompetitor"}])
+    a.blend_mode = "sum"
+
+    with pytest.raises(NotImplementedError, match="not supported"):
+        a.expected_score(b)
+

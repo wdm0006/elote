@@ -12,8 +12,8 @@ from datetime import datetime, timezone
 
 import pytest
 
-from elote import EloCompetitor, GlickoCompetitor, Glicko2Competitor, PythagoreanCompetitor
-from elote.competitors.base import InvalidParameterException
+from elote import EloCompetitor, GlickoCompetitor, Glicko2Competitor, MasseyCompetitor, PythagoreanCompetitor
+from elote.competitors.base import BaseCompetitor, InvalidParameterException
 
 PERIOD = datetime(2026, 3, 1, tzinfo=timezone.utc)
 
@@ -195,3 +195,34 @@ def test_glicko2_period_updates_rating():
     Glicko2Competitor.apply_rating_period([(a, b, 1.0, None)], period_end=PERIOD)
 
     assert a.rating != 1500.0
+
+
+def test_apply_rating_period_forwards_margin_scores_to_the_winner_path():
+    """A-win replay forwards the score payload so margin-sensitive systems see it.
+
+    Massey consumes the margin (2.0 here); dropping or defaulting the scores
+    would fall back to the unit margin and produce different ratings.
+    """
+
+    ref_a, ref_b = MasseyCompetitor(), MasseyCompetitor()
+    ref_a.beat(ref_b, scores=(2.5, 0.5))
+
+    a, b = MasseyCompetitor(), MasseyCompetitor()
+    BaseCompetitor.apply_rating_period([(a, b, 1.0, (2.5, 0.5))])
+
+    assert a.rating == ref_a.rating
+    assert b.rating == ref_b.rating
+
+
+def test_apply_rating_period_forwards_reversed_margin_scores_on_b_wins():
+    """B-win replay reverses the payload before handing it to the winner."""
+
+    ref_a, ref_b = MasseyCompetitor(), MasseyCompetitor()
+    ref_b.beat(ref_a, scores=(2.5, 0.5))
+
+    a, b = MasseyCompetitor(), MasseyCompetitor()
+    BaseCompetitor.apply_rating_period([(a, b, 0.0, (0.5, 2.5))])
+
+    assert a.rating == ref_a.rating
+    assert b.rating == ref_b.rating
+

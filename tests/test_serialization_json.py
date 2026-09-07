@@ -15,7 +15,7 @@ import json
 
 import pytest
 
-from elote import BlendedCompetitor, GlickoCompetitor
+from elote import BlendedCompetitor, EloCompetitor, GlickoCompetitor
 from elote.competitors.base import InvalidStateException
 
 CONCRETE = [
@@ -148,3 +148,11 @@ def test_blended_state_round_trip():
     rebuilt = BlendedCompetitor.from_state(state)
 
     assert rebuilt.rating == blended.rating
+
+
+def test_from_json_rejects_malformed_json_with_decode_message():
+    """Undecodable JSON raises the named decode error, not a bare exception."""
+
+    with pytest.raises(InvalidStateException, match="Invalid JSON"):
+        EloCompetitor.from_json("{not json")
+

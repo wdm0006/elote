@@ -294,3 +294,18 @@ def test_export_state_carries_class_vars():
     assert state["class_vars"]["base_rating"] == EloCompetitor._base_rating
     assert state["class_vars"]["k_factor"] == EloCompetitor._k_factor
     assert state["class_vars"]["minimum_rating"] == EloCompetitor._minimum_rating
+
+
+def test_export_state_class_vars_key_set_and_values():
+    """class_vars carries exactly the JSON-safe class attributes, with live values.
+
+    Guards the dunder/callable/_abc_ filter in export_state: any leak or a
+    clobbered value shows up as a changed key set or a None entry.
+    """
+
+    class_vars = EloCompetitor().export_state()["class_vars"]
+
+    assert set(class_vars) == {"k_factor", "base_rating", "minimum_rating"}
+    assert class_vars["k_factor"] == 32
+    assert not [k for k in class_vars if k.startswith("__") or k.startswith("_abc_")]
+
