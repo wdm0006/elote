@@ -133,6 +133,16 @@ class BradleyTerryGuardsTest(unittest.TestCase):
         self.assertAlmostEqual(played.rating, 1739.400869, places=6)
         self.assertAlmostEqual(idle.rating, 1260.599131, places=6)
 
+    def test_lone_competitor_direct_recalc_is_noop(self):
+        """A one-node network refit (white-box) must not move the rating.
+
+        The n <= 1 guard keeps a vacuous MM fit from pulling a lone
+        competitor's custom initial rating back to the 1500 anchor.
+        """
+        lone = BradleyTerryCompetitor(initial_rating=1600)
+        lone._recalculate_ratings()
+        self.assertAlmostEqual(lone.rating, 1600.0, places=9)
+
 
 class BradleyTerryStateTest(unittest.TestCase):
     def test_state_round_trip_preserves_math(self):

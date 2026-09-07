@@ -96,6 +96,22 @@ class ColleyAssemblyTest(unittest.TestCase):
         self.assertAlmostEqual(c.rating, 13.0 / 28.0, places=12)
         self.assertAlmostEqual(d.rating, 9.0 / 28.0, places=12)
 
+    def test_cycle_network_connectivity_pin(self):
+        """Cycles in the match graph must not truncate the connected set."""
+        a, b, c, d = (
+            ColleyMatrixCompetitor(),
+            ColleyMatrixCompetitor(),
+            ColleyMatrixCompetitor(),
+            ColleyMatrixCompetitor(),
+        )
+        a.beat(b)
+        a.beat(c)
+        a.beat(d)
+        c.beat(d)  # cross edge: duplicate pop must not stop the traversal
+        self.assertEqual(len(a._get_connected_competitors()), 4)
+        for player in (a, b, c, d):
+            self.assertNotEqual(player.rating, player._initial_rating)
+
     def test_ratings_sum_to_n_over_two(self):
         a, b, c = ColleyMatrixCompetitor(), ColleyMatrixCompetitor(), ColleyMatrixCompetitor()
         a.beat(b)

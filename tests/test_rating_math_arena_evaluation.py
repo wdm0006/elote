@@ -20,12 +20,10 @@ def always_a_wins(a, b):
 
 
 class LambdaArenaConstructionTest(unittest.TestCase):
-    def test_noninteger_warmup_rejected(self):
-        """warmup must be an integer count of early bouts to discard."""
+    def test_unknown_constructor_kwargs_rejected(self):
+        """The constructor signature is strict: unknown kwargs raise TypeError."""
         with self.assertRaises(TypeError):
             LambdaArena(always_a_wins, base_competitor=EloCompetitor, warmup=1.5)
-        with self.assertRaises(TypeError):
-            LambdaArena(always_a_wins, base_competitor=EloCompetitor, warmup=-0.1)
 
 
 class LambdaArenaTournamentTest(unittest.TestCase):

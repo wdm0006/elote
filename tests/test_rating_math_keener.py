@@ -157,6 +157,26 @@ class KeenerChainTest(unittest.TestCase):
         # c is only connected to b; if traversal stopped early its rating would stay flat.
         self.assertNotEqual(c.rating, c._initial_rating)
 
+    def test_cycle_network_connectivity_pin(self):
+        """Cycles in the match graph must not truncate the connected set.
+
+        The traversal's visited-check is a continue; a break mutant drops every
+        node still stacked behind a duplicate pop whenever a cycle pushes one.
+        """
+        a, b, c, d = (
+            KeenerCompetitor(),
+            KeenerCompetitor(),
+            KeenerCompetitor(),
+            KeenerCompetitor(),
+        )
+        a.beat(b)
+        a.beat(c)
+        a.beat(d)
+        c.beat(d)  # cross edge: duplicate pop must not stop the traversal
+        self.assertEqual(len(a._get_connected_competitors()), 4)
+        for player in (a, b, c, d):
+            self.assertNotEqual(player.rating, player._initial_rating)
+
 
 class KeenerExpectedScoreTest(unittest.TestCase):
     def test_fresh_equal_is_half(self):

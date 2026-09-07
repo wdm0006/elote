@@ -113,6 +113,36 @@ class GlickoInactivityTest(unittest.TestCase):
         self.assertAlmostEqual(winner.rating, ref_winner[0], places=9)
         self.assertAlmostEqual(winner.rd, ref_winner[1], places=9)
 
+    def test_nondefault_rating_period_divides_elapsed_days(self):
+        """The period count must divide elapsed days, not multiply them.
+
+        With the default 1-day period, days == periods and a / -> * mutant is
+        equivalent; a 7-day period makes the two operations diverge sharply.
+        """
+        original = GlickoCompetitor._rating_period_days
+        try:
+            GlickoCompetitor.configure_class(rating_period_days=7.0)
+            t0 = datetime(2020, 1, 1)
+            t30 = t0 + timedelta(days=30)
+            winner = GlickoCompetitor(initial_rating=1500, initial_rd=200)
+            loser = GlickoCompetitor(initial_rating=1400, initial_rd=30)
+            winner.beat(loser, match_time=t0)
+
+            rd_w0 = winner.rd
+            rating_w0 = winner.rating
+            rd_l0 = loser.rd
+            rating_l0 = loser.rating
+
+            winner.beat(loser, match_time=t30)
+
+            rd_w = inflate_rd(rd_w0, 30.0 / 7.0, GlickoCompetitor._c)
+            rd_l = inflate_rd(rd_l0, 30.0 / 7.0, GlickoCompetitor._c)
+            ref = independent_update(rating_w0, rd_w, rating_l0, rd_l, 1.0)
+            self.assertAlmostEqual(winner.rating, ref[0], places=9)
+            self.assertAlmostEqual(winner.rd, ref[1], places=9)
+        finally:
+            GlickoCompetitor.configure_class(rating_period_days=original)
+
     def test_longer_gap_inflates_more(self):
         """Off-by-one in the period count shows up as a monotonicity break."""
         results = []
