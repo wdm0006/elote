@@ -109,17 +109,19 @@ class TestExamples(unittest.TestCase):
             "bout_with_initialization.py", expected_output_contains=["Starting ratings:", "After matches"]
         )
 
-        # Test colley_matrix_example.py
-        self._test_specific_example(
-            "colley_matrix_example.py",
-            expected_output_contains=["Initial ratings:", "Final ratings:", "Sum of all ratings"],
-        )
+        # Test colley_matrix_example.py - skip if in skip_examples (needs matplotlib)
+        if "colley_matrix_example.py" not in self.skip_examples:
+            self._test_specific_example(
+                "colley_matrix_example.py",
+                expected_output_contains=["Initial ratings:", "Final ratings:", "Sum of all ratings"],
+            )
 
-        # Test colley_matrix_comparison.py
-        self._test_specific_example(
-            "colley_matrix_comparison.py",
-            expected_output_contains=["Simulating tournament", "Colley Matrix Method is not sensitive to match order"],
-        )
+        # Test colley_matrix_comparison.py - skip if in skip_examples (needs matplotlib)
+        if "colley_matrix_comparison.py" not in self.skip_examples:
+            self._test_specific_example(
+                "colley_matrix_comparison.py",
+                expected_output_contains=["Simulating tournament", "Colley Matrix Method is not sensitive to match order"],
+            )
 
     def _test_specific_example(self, example_file, expected_output_contains):
         """Helper method to test a specific example with expected output."""
