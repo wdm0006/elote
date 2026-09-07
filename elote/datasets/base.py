@@ -7,11 +7,13 @@ for evaluating different rating algorithms.
 
 import abc
 from dataclasses import dataclass
-from typing import List, Tuple, Dict, Any, Optional, Sequence, Set, Iterator
+from typing import TYPE_CHECKING, List, Tuple, Dict, Any, Optional, Sequence, Set, Iterator
 import datetime
-import pandas as pd
 import numpy as np
 import gc
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 
 @dataclass
@@ -35,13 +37,23 @@ class DataSplit:
         """Return a string representation of the data split."""
         return f"DataSplit(train={len(self.train)}, test={len(self.test)})"
 
-    def to_dataframe(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    def to_dataframe(self) -> Tuple["pd.DataFrame", "pd.DataFrame"]:
         """
         Convert the train and test sets to pandas DataFrames.
 
         Returns:
             Tuple of (train_df, test_df)
         """
+        # pandas is an optional dependency (elote[datasets]); import lazily so the
+        # core dataset interfaces stay usable on a base install
+        try:
+            import pandas as pd
+        except ImportError as e:
+            raise ImportError(
+                "DataSplit.to_dataframe() requires pandas, which is not installed. "
+                "Install it with: pip install 'elote[datasets]' or pip install pandas"
+            ) from e
+
         columns = ["competitor_a", "competitor_b", "outcome", "timestamp", "attributes"]
         train_df = pd.DataFrame(self.train, columns=columns)
         test_df = pd.DataFrame(self.test, columns=columns)

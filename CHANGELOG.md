@@ -1,3 +1,17 @@
+Unreleased
+==========
+
+Packaging
+
+ * The publish workflow builds wheels alongside the source distribution.
+ * Visualization and dataset dependencies moved into extras: matplotlib now lives in
+   `elote[viz]`, and pandas and requests joined `elote[datasets]`. A base install imports
+   and runs every core competitor without them; optional-dependency tests skip themselves
+   when their extras are absent, and CI gained a base-install job that asserts the core
+   surface imports without pandas, matplotlib, or requests.
+ * `tqdm` is range-pinned (`>=4.66,<5`) instead of exact-pinned to 4.66.3.
+ * Development status refreshed from Alpha to Beta.
+
 v1.4.0
 ======
 

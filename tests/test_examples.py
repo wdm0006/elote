@@ -1,3 +1,4 @@
+import importlib.util
 import unittest
 import os
 import subprocess
@@ -24,6 +25,17 @@ class TestExamples(unittest.TestCase):
             # "bout_with_initialization.py",  # Added to prevent timeout
             # "prediction.py",  # Added to prevent timeout
         ]
+
+        # Skip examples that need optional dependencies when those are absent, so
+        # a base install (no extras) still exercises the rest of the suite
+        if importlib.util.find_spec("matplotlib") is None:
+            self.skip_examples.extend(
+                [
+                    "bradley_terry_example.py",  # Requires matplotlib
+                    "colley_matrix_comparison.py",  # Requires matplotlib
+                    "colley_matrix_example.py",  # Requires matplotlib
+                ]
+            )
 
     def test_example_scripts(self):
         """Test that all example scripts run without errors."""

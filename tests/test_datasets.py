@@ -8,12 +8,13 @@ import os
 import random
 import tempfile
 import numpy as np
-import pandas as pd
 from unittest.mock import patch, MagicMock
 import shutil
 import pytest
 
-from elote import (
+pd = pytest.importorskip("pandas")
+
+from elote import (  # noqa: E402
     DataSplit,
     SyntheticDataset,
     LambdaArena,
@@ -24,7 +25,7 @@ from elote import (
     list_available_datasets,
     WholeHistoryRatingCompetitor,
 )
-from elote.arenas.base import Bout, History
+from elote.arenas.base import Bout, History  # noqa: E402
 
 # Conditionally import optional datasets
 try:
@@ -48,7 +49,10 @@ except Exception:
 
 # The adapter class itself imports fine without sportsdataverse (that extra is only needed to
 # download), so the identifier/cache tests below run unconditionally against a local fixture.
-from elote.datasets.football import CACHE_SCHEMA_VERSION, CollegeFootballDataset as FootballDataset
+from elote.datasets.football import (  # noqa: E402
+    CACHE_SCHEMA_VERSION,
+    CollegeFootballDataset as FootballDataset,
+)
 
 
 class TestDataSplit(unittest.TestCase):

@@ -2,12 +2,14 @@ import unittest
 import os
 import tempfile
 
-import matplotlib.pyplot as plt
 import numpy as np
+import pytest
 
-from elote import LambdaArena
-from elote.arenas.base import History, Bout
-from elote.visualization import (
+plt = pytest.importorskip("matplotlib.pyplot")
+
+from elote import LambdaArena  # noqa: E402
+from elote.arenas.base import History, Bout  # noqa: E402
+from elote.visualization import (  # noqa: E402
     compute_calibration_data,
     plot_calibration_curve,
     plot_calibration_comparison,

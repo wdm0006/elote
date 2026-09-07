@@ -64,7 +64,13 @@ loaders:
 pip install "elote[datasets]"
 ```
 
-`SyntheticDataset` is included in the base installation.
+Install the plotting helpers when you want the visualization functions:
+
+```bash
+pip install "elote[viz]"
+```
+
+`SyntheticDataset` and the core rating systems are included in the base installation.
 
 ## Rating models
 
