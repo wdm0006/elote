@@ -32,7 +32,9 @@ Advantages
 ---------
 
 - **Uncertainty Aware**: models both skill and confidence, like Glicko.
-- **Team and Multiplayer Support**: naturally extends to games with more than two participants.
+- **Team Bouts via Wrappers**: wrap TrueSkill competitors in
+  :class:`~elote.competitors.team.TeamCompetitor` for team-vs-team play; member-level team
+  updates arrive with the OpenSkill N-way bout support.
 - **Fast Convergence**: new players' ratings settle quickly as sigma shrinks.
 - **Principled**: grounded in Bayesian inference over factor graphs.
 

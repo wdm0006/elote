@@ -1,0 +1,695 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z43R9PWW0B"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-Z43R9PWW0B');
+    </script>
+    
+    <title>elote.competitors.team &#8212; elote 1.4.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=30d13653" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/wabi.css?v=501c8ac3" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=71d92741" />
+    <script src="../../../_static/documentation_options.js?v=9172181d"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+
+
+
+<meta name="description" content="elote.competitors.team - elote documentation">
+
+
+
+
+
+
+
+
+
+<meta property="og:title" content="elote.competitors.team">
+<meta property="og:description" content="elote.competitors.team - elote documentation">
+<meta property="og:type" content="website">
+
+<meta property="og:url" content="https://elote.mcginniscommawill.com/_modules/elote/competitors/team.html">
+
+
+<meta property="og:site_name" content="elote">
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="elote.competitors.team">
+<meta name="twitter:description" content="elote.competitors.team - elote documentation">
+
+<meta name="twitter:site" content="@willmcginniser">
+
+
+
+
+
+<link rel="canonical" href="https://elote.mcginniscommawill.com/_modules/elote/competitors/team.html">
+
+
+ 
+
+  </head><body>
+<header class="header">
+  <div class="header__inner">
+    
+    <a href="https://mcginniscommawill.com" class="header__logo">
+      McGinnis, Will
+    </a>
+
+    
+    <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+      </svg>
+    </button>
+
+    
+    <nav class="nav" role="navigation">
+      
+      
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/guides/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Guides
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/topics/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Topics
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/posts/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Blog
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/about/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            About
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/coffee/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Free Coffee
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/oss/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            OSS
+          </a>
+        
+      
+
+      
+      
+      <a href="../../../index.html" class="nav__link nav__link--active">
+        Docs
+      </a>
+      
+    </nav>
+  </div>
+</header>
+
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <div class="breadcrumbs__inner">
+    
+    <a href="https://mcginniscommawill.com">Home</a>
+    <span class="breadcrumbs__separator">/</span>
+    
+    <a href="../../../index.html">Docs</a>
+    
+      
+      <span class="breadcrumbs__separator">/</span>
+      <a href="../../index.html">Module code</a>
+      
+    
+    
+    <span class="breadcrumbs__separator">/</span>
+    <span>elote.competitors.team</span>
+    
+  </div>
+</nav>
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for elote.competitors.team</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote.competitors.base</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BaseCompetitor</span><span class="p">,</span>
+    <span class="n">InvalidParameterException</span><span class="p">,</span>
+    <span class="n">InvalidStateException</span><span class="p">,</span>
+    <span class="n">MissMatchedCompetitorTypesException</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"T"</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">"TeamCompetitor"</span><span class="p">)</span>
+
+<span class="n">_VALID_AGGREGATION_MODES</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"mean"</span><span class="p">,</span> <span class="s2">"sum"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="TeamCompetitor">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.team.TeamCompetitor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TeamCompetitor</span><span class="p">(</span><span class="n">BaseCompetitor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Composite competitor that rates a roster of members as a single side.</span>
+
+<span class="sd">    A ``TeamCompetitor`` wraps a roster of :class:`~elote.competitors.base.BaseCompetitor`</span>
+<span class="sd">    instances and exposes the usual competitor interface for the team as a whole. Bouts</span>
+<span class="sd">    between two teams delegate to the members **positionally**: member ``i`` of one roster</span>
+<span class="sd">    is paired against member ``i`` of the other, and each pair updates through the member</span>
+<span class="sd">    rating system's own ``beat``/``tied`` math. The wrapper keeps no rating state of its</span>
+<span class="sd">    own -- the team rating is derived from the members on every read, so rating history</span>
+<span class="sd">    follows the member objects.</span>
+
+<span class="sd">    Because both endpoints of such a bout are ``TeamCompetitor`` instances, team-vs-team</span>
+<span class="sd">    play works in existing arenas (e.g. :class:`~elote.LambdaArena`) with no arena</span>
+<span class="sd">    changes: seed the arena with the teams -- for example through ``initial_state`` with</span>
+<span class="sd">    exported team state documents -- and run ``matchup`` as usual.</span>
+
+<span class="sd">    Aggregation modes</span>
+<span class="sd">    -----------------</span>
+
+<span class="sd">    The ``aggregate`` flag selects how member ratings combine into the single number the</span>
+<span class="sd">    :attr:`rating` property exposes -- the team's entry on any leaderboard:</span>
+
+<span class="sd">    ``"mean"``</span>
+<span class="sd">        Arithmetic mean of the member ratings. The team's rating lives on the same scale</span>
+<span class="sd">        as the members' own rating system, so team entries and individual competitors can</span>
+<span class="sd">        share one leaderboard and be compared directly. Adding or swapping a member moves</span>
+<span class="sd">        the aggregate toward that member's rating; a weak member dilutes a strong roster.</span>
+
+<span class="sd">    ``"sum"``</span>
+<span class="sd">        Sum of the member ratings -- the roster's total rating mass. The value grows with</span>
+<span class="sd">        roster size, so it is only meaningful between rosters of the same size: on a</span>
+<span class="sd">        shared leaderboard a larger roster outranks a smaller one regardless of per-member</span>
+<span class="sd">        strength. Choose ``sum`` when the combined mass is the quantity of interest, and</span>
+<span class="sd">        compare sum-mode teams only against rosters of the same size.</span>
+
+<span class="sd">    In both modes :meth:`expected_score` pairs members positionally and returns the mean</span>
+<span class="sd">    of the members' own model probabilities, so predictions are valid probabilities either</span>
+<span class="sd">    way; the flag governs the exposed rating aggregate only.</span>
+
+<span class="sd">    A note on members: aggregation consumes the ``.rating`` scalar each member exposes.</span>
+<span class="sd">    For Bayesian systems (TrueSkill, Whole-History Rating) that scalar is a derived</span>
+<span class="sd">    ordinal, so an aggregate of ordinals is a convenience figure, not a fusion of the</span>
+<span class="sd">    underlying belief distributions. Member-level team updates -- a single result</span>
+<span class="sd">    distributed across a roster natively inside the rating model -- arrive with the</span>
+<span class="sd">    OpenSkill N-way bout support.</span>
+
+<span class="sd">    Serialization is nested: the exported parameters carry the roster as ``(type, init</span>
+<span class="sd">    parameters)`` specifications, and the exported state carries each member's full</span>
+<span class="sd">    exported state document. Membership identity is preserved by roster position and</span>
+<span class="sd">    concrete type, so a restored team has the same members, in the same roles, with their</span>
+<span class="sd">    rating histories intact. :meth:`reset` delegates to the members, restoring each to</span>
+<span class="sd">    its own initial state.</span>
+<span class="sd">    """</span>
+
+<div class="viewcode-block" id="TeamCompetitor.__init__">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.team.TeamCompetitor.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">members</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">BaseCompetitor</span><span class="p">],</span> <span class="n">aggregate</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"mean"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Initialize a TeamCompetitor from a roster of member competitors.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            members (sequence of BaseCompetitor): The roster. Order defines the pairing</span>
+<span class="sd">                used for bouts and the membership identity preserved by serialization;</span>
+<span class="sd">                copy the roster rather than aliasing the caller's list.</span>
+<span class="sd">            aggregate (str, optional): The aggregation mode for the exposed team rating.</span>
+<span class="sd">                ``"mean"`` or ``"sum"``. Default: ``"mean"``.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidParameterException: If ``aggregate`` is not a supported mode, the</span>
+<span class="sd">                roster is empty, or any roster entry is not a ``BaseCompetitor``.</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>  <span class="c1"># Call base class constructor</span>
+
+        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_VALID_AGGREGATION_MODES</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"Unsupported team aggregation mode specified: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Aggregation mode </span><span class="si">{</span><span class="n">aggregate</span><span class="si">}</span><span class="s2"> not supported; use one of </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">_VALID_AGGREGATION_MODES</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+            <span class="p">)</span>
+
+        <span class="n">roster</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">members</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">roster</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"TeamCompetitor requires at least one member competitor"</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">"TeamCompetitor requires a non-empty roster of member competitors"</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">member</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">roster</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">BaseCompetitor</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"Team member </span><span class="si">%d</span><span class="s2"> is not a BaseCompetitor: </span><span class="si">%r</span><span class="s2">"</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">member</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Team member </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> must be a BaseCompetitor instance, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">member</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">"</span>
+                <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BaseCompetitor</span><span class="p">]</span> <span class="o">=</span> <span class="n">roster</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aggregate</span> <span class="o">=</span> <span class="n">aggregate</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Initializing TeamCompetitor with mode '</span><span class="si">%s</span><span class="s2">' and </span><span class="si">%d</span><span class="s2"> members"</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">roster</span><span class="p">))</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Return a string representation of this competitor.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: A string representation of this competitor.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"&lt;TeamCompetitor: aggregate=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">aggregate</span><span class="si">}</span><span class="s2">, members=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">)</span><span class="si">}</span><span class="s2">&gt;"</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Return a string representation of this competitor.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: A string representation of this competitor.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"&lt;TeamCompetitor: aggregate=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">aggregate</span><span class="si">}</span><span class="s2">&gt;"</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Get the aggregate rating of the team.</span>
+
+<span class="sd">        The value is derived from the members on every read according to the</span>
+<span class="sd">        ``aggregate`` mode: the mean of the member ratings, or their sum. See the class</span>
+<span class="sd">        docstring for the semantics of each mode and its leaderboard implications.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The aggregate team rating.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregate</span> <span class="o">==</span> <span class="s2">"mean"</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">member</span><span class="o">.</span><span class="n">rating</span> <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">member</span><span class="o">.</span><span class="n">rating</span> <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">))</span>
+
+    <span class="nd">@rating</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Set the rating of this competitor.</span>
+
+<span class="sd">        This method is not supported by TeamCompetitor, as the team rating is derived</span>
+<span class="sd">        from the member competitors. Set the members' ratings instead.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (float): The new rating value.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NotImplementedError: Always, as setting the rating directly is not supported.</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Attempted to set rating directly on TeamCompetitor, which is not supported."</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Cannot directly set the rating of a TeamCompetitor; set the members' ratings"</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_member_specs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">"""Describe the roster as ``(type, init parameters)`` specifications."""</span>
+        <span class="k">return</span> <span class="p">[{</span><span class="s2">"type"</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">member</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="s2">"parameters"</span><span class="p">:</span> <span class="n">member</span><span class="o">.</span><span class="n">_export_parameters</span><span class="p">()}</span> <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_export_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Export the parameters used to initialize this competitor.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: A dictionary containing the initialization parameters, including the</span>
+<span class="sd">                roster described as ``(type, init parameters)`` specifications.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"aggregate"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregate</span><span class="p">,</span>
+            <span class="s2">"members"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_member_specs</span><span class="p">(),</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_export_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Export the current state variables of this competitor.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: A dictionary containing the current state variables, including each</span>
+<span class="sd">                member's full exported state document in roster order.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"members"</span><span class="p">:</span> <span class="p">[</span><span class="n">member</span><span class="o">.</span><span class="n">export_state</span><span class="p">()</span> <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">],</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_import_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Import parameters from a state dictionary.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            parameters (dict): A dictionary containing parameters.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidParameterException: If any parameter is invalid.</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Importing parameters for TeamCompetitor: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+        <span class="n">aggregate</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"aggregate"</span><span class="p">,</span> <span class="s2">"mean"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_VALID_AGGREGATION_MODES</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"Invalid aggregate mode in state: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">aggregate</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Aggregation mode </span><span class="si">{</span><span class="n">aggregate</span><span class="si">}</span><span class="s2"> not supported; use one of </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">_VALID_AGGREGATION_MODES</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aggregate</span> <span class="o">=</span> <span class="n">aggregate</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_import_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Import current state variables from a state dictionary.</span>
+
+<span class="sd">        Rebuilds the roster from the nested member state documents, preserving member</span>
+<span class="sd">        order (and therefore membership identity).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            state (dict): A dictionary containing state variables.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidStateException: If any member state is invalid.</span>
+<span class="sd">        """</span>
+        <span class="n">members_state</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"members"</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Importing current state for TeamCompetitor (</span><span class="si">%d</span><span class="s2"> members)"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">members_state</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">members</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">member_state</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">members_state</span><span class="p">):</span>
+            <span class="n">member_type_name</span> <span class="o">=</span> <span class="n">member_state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"type"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">member_type_name</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"Missing type for team member </span><span class="si">%d</span><span class="s2"> in state during import."</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">InvalidStateException</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Missing type for team member </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> in state"</span><span class="p">)</span>
+
+            <span class="n">member_class</span> <span class="o">=</span> <span class="n">BaseCompetitor</span><span class="o">.</span><span class="n">get_competitor_class</span><span class="p">(</span><span class="n">member_type_name</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">member_class</span><span class="o">.</span><span class="n">from_state</span><span class="p">(</span><span class="n">member_state</span><span class="p">))</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Successfully imported state for team member </span><span class="si">%d</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)"</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">member_type_name</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"Failed to import state for team member </span><span class="si">%d</span><span class="s2"> ('</span><span class="si">%s</span><span class="s2">'): </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">member_type_name</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">InvalidStateException</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to import state for team member </span><span class="si">{</span><span class="n">member_type_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_from_parameters</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Create a new competitor instance from parameters.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            parameters (dict): A dictionary containing parameters, including the roster</span>
+<span class="sd">                described as ``(type, init parameters)`` specifications.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            TeamCompetitor: A new competitor instance.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidParameterException: If any parameter is invalid.</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Creating TeamCompetitor instance from parameters: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+
+        <span class="n">members</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BaseCompetitor</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">spec</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"members"</span><span class="p">,</span> <span class="p">[])):</span>
+            <span class="n">member_type_name</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"type"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">member_type_name</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"Missing type for team member </span><span class="si">%d</span><span class="s2"> in parameters during creation."</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Missing type for team member </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> in parameters"</span><span class="p">)</span>
+
+            <span class="n">member_class</span> <span class="o">=</span> <span class="n">BaseCompetitor</span><span class="o">.</span><span class="n">get_competitor_class</span><span class="p">(</span><span class="n">member_type_name</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">member_class</span><span class="o">.</span><span class="n">_create_from_parameters</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"parameters"</span><span class="p">,</span> <span class="p">{})))</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"Failed to create team member </span><span class="si">%d</span><span class="s2"> ('</span><span class="si">%s</span><span class="s2">'): </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">member_type_name</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Failed to initialize team member </span><span class="si">{</span><span class="n">member_type_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">members</span><span class="o">=</span><span class="n">members</span><span class="p">,</span>
+            <span class="n">aggregate</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"aggregate"</span><span class="p">,</span> <span class="s2">"mean"</span><span class="p">),</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="TeamCompetitor.verify_competitor_types">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.team.TeamCompetitor.verify_competitor_types">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">verify_competitor_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Verify that both competitors are teams with matching roster composition.</span>
+
+<span class="sd">        Two teams can only bout when both are ``TeamCompetitor`` instances and their</span>
+<span class="sd">        rosters have the same composition: the same member types in the same roster</span>
+<span class="sd">        order, which also implies the same roster size. Member *states* may differ</span>
+<span class="sd">        (that is what a bout updates); the composition may not.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            competitor (BaseCompetitor): The competitor to verify.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the competitor is not a</span>
+<span class="sd">                ``TeamCompetitor``, or its roster composition differs.</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+
+        <span class="n">self_composition</span> <span class="o">=</span> <span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">member</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">]</span>
+        <span class="n">competitor_composition</span> <span class="o">=</span> <span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">member</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">competitor</span><span class="o">.</span><span class="n">members</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">self_composition</span> <span class="o">!=</span> <span class="n">competitor_composition</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Team roster composition mismatch: </span><span class="si">%s</span><span class="s2"> vs </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">self_composition</span><span class="p">,</span> <span class="n">competitor_composition</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">MissMatchedCompetitorTypesException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"TeamCompetitor rosters </span><span class="si">{</span><span class="n">self_composition</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">competitor_composition</span><span class="si">}</span><span class="s2"> cannot be co-mingled"</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TeamCompetitor.expected_score">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.team.TeamCompetitor.expected_score">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">expected_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Calculate the expected score (probability of winning) against another team.</span>
+
+<span class="sd">        Members are paired positionally and the result is the mean of the members' own</span>
+<span class="sd">        model probabilities. This is independent of the ``aggregate`` mode: predictions</span>
+<span class="sd">        are probabilities in both modes; the flag governs the exposed rating only.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            competitor (BaseCompetitor): The opponent team to compare against.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The probability of winning (between 0 and 1).</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the roster compositions don't match.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Calculating team expected score (mode='</span><span class="si">%s</span><span class="s2">') between </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregate</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">)</span>
+
+        <span class="n">expected_scores</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">member</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">opponent_member</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">member</span><span class="p">,</span> <span class="n">opponent_member</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">,</span> <span class="n">competitor</span><span class="o">.</span><span class="n">members</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">expected_scores</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">expected_scores</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Team mean expected score: </span><span class="si">%.4f</span><span class="s2">"</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="TeamCompetitor.beat">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.team.TeamCompetitor.beat">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">beat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Update ratings after this team has won against the given team.</span>
+
+<span class="sd">        Members are paired positionally: member ``i`` of this team beats member ``i`` of</span>
+<span class="sd">        the opposing team through the members' own rating math.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            competitor (BaseCompetitor): The opponent team that lost.</span>
+<span class="sd">            scores (sequence of float, optional): The two scores in caller order,</span>
+<span class="sd">                ``(self_score, competitor_score)``. Forwarded unchanged to every</span>
+<span class="sd">                member pair.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the roster compositions don't match.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">validated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"</span><span class="si">%s</span><span class="s2"> beat </span><span class="si">%s</span><span class="s2">. Updating </span><span class="si">%d</span><span class="s2"> member pairs."</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">member</span><span class="p">,</span> <span class="n">opponent_member</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">,</span> <span class="n">competitor</span><span class="o">.</span><span class="n">members</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Updating member pair via beat: </span><span class="si">%s</span><span class="s2"> vs </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">member</span><span class="p">,</span> <span class="n">opponent_member</span><span class="p">)</span>
+            <span class="n">member</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">opponent_member</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="n">validated</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TeamCompetitor.tied">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.team.TeamCompetitor.tied">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tied</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">:</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Update ratings after this team has tied with the given team.</span>
+
+<span class="sd">        Members are paired positionally: member ``i`` of this team ties member ``i`` of</span>
+<span class="sd">        the opposing team through the members' own rating math.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            competitor (BaseCompetitor): The opponent team that tied.</span>
+<span class="sd">            scores (sequence of float, optional): The two scores in caller order,</span>
+<span class="sd">                ``(self_score, competitor_score)``. Must be equal. Forwarded unchanged to</span>
+<span class="sd">                every member pair.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            MissMatchedCompetitorTypesException: If the roster compositions don't match.</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify_competitor_types</span><span class="p">(</span><span class="n">competitor</span><span class="p">)</span>
+        <span class="n">validated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"</span><span class="si">%s</span><span class="s2"> tied with </span><span class="si">%s</span><span class="s2">. Updating </span><span class="si">%d</span><span class="s2"> member pairs."</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">competitor</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">member</span><span class="p">,</span> <span class="n">opponent_member</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">,</span> <span class="n">competitor</span><span class="o">.</span><span class="n">members</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Updating member pair via tied: </span><span class="si">%s</span><span class="s2"> vs </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">member</span><span class="p">,</span> <span class="n">opponent_member</span><span class="p">)</span>
+            <span class="n">member</span><span class="o">.</span><span class="n">tied</span><span class="p">(</span><span class="n">opponent_member</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="n">validated</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TeamCompetitor.reset">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.team.TeamCompetitor.reset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Reset this team to its initial state.</span>
+
+<span class="sd">        Delegates to each member, restoring every member to its own initial rating. The</span>
+<span class="sd">        roster composition itself never changes.</span>
+<span class="sd">        """</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Resetting TeamCompetitor members to their initial states."</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Resetting team member: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">member</span><span class="p">)</span>
+            <span class="n">member</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../index.html">Table of Contents</a></h3>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../competitors.html">Competitors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../choose_a_rating_system.html">How to choose a rating system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../arenas.html">Arenas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../serialization.html">Serialization</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/elo.html">Elo Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/glicko2.html">Glicko-2 Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/glicko_boost.html">Glicko-Boost Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/trueskill.html">TrueSkill Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/ecf.html">ECF Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/dwz.html">DWZ Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/colley.html">Colley Matrix Method</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/massey.html">Massey Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/keener.html">Keener Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/pythagorean.html">Pythagorean Expectation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/whr.html">Whole-History Rating</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/ensemble.html">Ensemble Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/elo_vs_glicko_vs_trueskill.html">Elo vs Glicko vs TrueSkill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/elote_vs_other_packages.html">Elote vs single-algorithm packages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/comparison.html">Comparing Rating Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rating_systems/comparison_benchmark.html">Rating-system comparison benchmark</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advance_example.html">Advanced Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../use_cases/product_ranking.html">Product Ranking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../use_cases/matchmaking.html">Matchmaking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../use_cases/feature_prioritization.html">Feature Prioritization with Elote</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/competitors.html">Competitors API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/arenas.html">Arenas API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../blog_posts.html">Blog Posts</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to Elote</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <div class="footer__inner">
+    
+    
+    <div class="footer__links">
+      
+        <a href="https://github.com/wdm0006" class="footer__link" target="_blank" rel="noopener noreferrer">
+          GitHub
+        </a>
+      
+        <a href="https://www.linkedin.com/in/wmcginnis/" class="footer__link" target="_blank" rel="noopener noreferrer">
+          LinkedIn
+        </a>
+      
+        <a href="https://x.com/willmcginniser" class="footer__link" target="_blank" rel="noopener noreferrer">
+          Twitter
+        </a>
+      
+    </div>
+    
+
+    
+    <p class="footer__copy">
+      
+        &copy; 2020, Will McGinnis
+      
+    </p>
+  </div>
+</footer>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggle = document.querySelector('.nav-toggle');
+    const nav = document.querySelector('.nav');
+    if (toggle && nav) {
+      toggle.addEventListener('click', function() {
+        nav.classList.toggle('is-open');
+        const isOpen = nav.classList.contains('is-open');
+        toggle.setAttribute('aria-expanded', isOpen);
+      });
+    }
+  });
+</script>
+
+  </body>
+</html>

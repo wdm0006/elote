@@ -52,9 +52,11 @@ Start here
    * - Results arrive in batches (a month, a season round) and you know who moved first
      - Glicko-Boost
      - :doc:`Glicko-Boost <rating_systems/glicko_boost>`
-   * - Teams, or more than two sides per result
-     - TrueSkill
-     - :doc:`TrueSkill <rating_systems/trueskill>`
+   * - Teams facing teams, or more than two sides per result
+     - Team-vs-team: any system wrapped in ``TeamCompetitor``. More than two sides in one
+       result: not yet supported -- member-level team updates arrive with the planned
+       OpenSkill N-way bouts.
+     - :class:`~elote.competitors.team.TeamCompetitor`
    * - Draws are common and carry information
      - Glicko-1, Glicko-2, or TrueSkill
      - `Draws`_

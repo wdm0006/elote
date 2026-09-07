@@ -200,7 +200,9 @@ uncertainty over time so that skill can drift.</p>
 <h2>Advantages<a class="headerlink" href="#advantages" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><strong>Uncertainty Aware</strong>: models both skill and confidence, like Glicko.</p></li>
-<li><p><strong>Team and Multiplayer Support</strong>: naturally extends to games with more than two participants.</p></li>
+<li><p><strong>Team Bouts via Wrappers</strong>: wrap TrueSkill competitors in
+<a class="reference internal" href="../api/competitors.html#elote.competitors.team.TeamCompetitor" title="elote.competitors.team.TeamCompetitor"><code class="xref py py-class docutils literal notranslate"><span class="pre">TeamCompetitor</span></code></a> for team-vs-team play; member-level team
+updates arrive with the OpenSkill N-way bout support.</p></li>
 <li><p><strong>Fast Convergence</strong>: new players’ ratings settle quickly as sigma shrinks.</p></li>
 <li><p><strong>Principled</strong>: grounded in Bayesian inference over factor graphs.</p></li>
 </ul>

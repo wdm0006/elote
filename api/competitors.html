@@ -3208,6 +3208,192 @@ to every sub-competitor.</p>
 </dd></dl>
 
 </section>
+<section id="module-elote.competitors.team">
+<span id="team-competitor"></span><h2>Team Competitor<a class="headerlink" href="#module-elote.competitors.team" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="elote.competitors.team.TeamCompetitor">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">elote.competitors.team.</span></span><span class="sig-name descname"><span class="pre">TeamCompetitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">members</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/competitors/team.html#TeamCompetitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.team.TeamCompetitor" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCompetitor</span></code></a></p>
+<p>Composite competitor that rates a roster of members as a single side.</p>
+<p>A <code class="docutils literal notranslate"><span class="pre">TeamCompetitor</span></code> wraps a roster of <a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCompetitor</span></code></a>
+instances and exposes the usual competitor interface for the team as a whole. Bouts
+between two teams delegate to the members <strong>positionally</strong>: member <code class="docutils literal notranslate"><span class="pre">i</span></code> of one roster
+is paired against member <code class="docutils literal notranslate"><span class="pre">i</span></code> of the other, and each pair updates through the member
+rating system’s own <code class="docutils literal notranslate"><span class="pre">beat</span></code>/<code class="docutils literal notranslate"><span class="pre">tied</span></code> math. The wrapper keeps no rating state of its
+own – the team rating is derived from the members on every read, so rating history
+follows the member objects.</p>
+<p>Because both endpoints of such a bout are <code class="docutils literal notranslate"><span class="pre">TeamCompetitor</span></code> instances, team-vs-team
+play works in existing arenas (e.g. <code class="xref py py-class docutils literal notranslate"><span class="pre">LambdaArena</span></code>) with no arena
+changes: seed the arena with the teams – for example through <code class="docutils literal notranslate"><span class="pre">initial_state</span></code> with
+exported team state documents – and run <code class="docutils literal notranslate"><span class="pre">matchup</span></code> as usual.</p>
+<section id="aggregation-modes">
+<h3>Aggregation modes<a class="headerlink" href="#aggregation-modes" title="Link to this heading">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">aggregate</span></code> flag selects how member ratings combine into the single number the
+<a class="reference internal" href="#elote.competitors.team.TeamCompetitor.rating" title="elote.competitors.team.TeamCompetitor.rating"><code class="xref py py-attr docutils literal notranslate"><span class="pre">rating</span></code></a> property exposes – the team’s entry on any leaderboard:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code></dt><dd><p>Arithmetic mean of the member ratings. The team’s rating lives on the same scale
+as the members’ own rating system, so team entries and individual competitors can
+share one leaderboard and be compared directly. Adding or swapping a member moves
+the aggregate toward that member’s rating; a weak member dilutes a strong roster.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;sum&quot;</span></code></dt><dd><p>Sum of the member ratings – the roster’s total rating mass. The value grows with
+roster size, so it is only meaningful between rosters of the same size: on a
+shared leaderboard a larger roster outranks a smaller one regardless of per-member
+strength. Choose <code class="docutils literal notranslate"><span class="pre">sum</span></code> when the combined mass is the quantity of interest, and
+compare sum-mode teams only against rosters of the same size.</p>
+</dd>
+</dl>
+<p>In both modes <a class="reference internal" href="#elote.competitors.team.TeamCompetitor.expected_score" title="elote.competitors.team.TeamCompetitor.expected_score"><code class="xref py py-meth docutils literal notranslate"><span class="pre">expected_score()</span></code></a> pairs members positionally and returns the mean
+of the members’ own model probabilities, so predictions are valid probabilities either
+way; the flag governs the exposed rating aggregate only.</p>
+<p>A note on members: aggregation consumes the <code class="docutils literal notranslate"><span class="pre">.rating</span></code> scalar each member exposes.
+For Bayesian systems (TrueSkill, Whole-History Rating) that scalar is a derived
+ordinal, so an aggregate of ordinals is a convenience figure, not a fusion of the
+underlying belief distributions. Member-level team updates – a single result
+distributed across a roster natively inside the rating model – arrive with the
+OpenSkill N-way bout support.</p>
+<p>Serialization is nested: the exported parameters carry the roster as <code class="docutils literal notranslate"><span class="pre">(type,</span> <span class="pre">init</span>
+<span class="pre">parameters)</span></code> specifications, and the exported state carries each member’s full
+exported state document. Membership identity is preserved by roster position and
+concrete type, so a restored team has the same members, in the same roles, with their
+rating histories intact. <a class="reference internal" href="#elote.competitors.team.TeamCompetitor.reset" title="elote.competitors.team.TeamCompetitor.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code></a> delegates to the members, restoring each to
+its own initial state.</p>
+<p>Initialize a TeamCompetitor from a roster of member competitors.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>members (sequence of BaseCompetitor): The roster. Order defines the pairing</dt><dd><p>used for bouts and the membership identity preserved by serialization;
+copy the roster rather than aliasing the caller’s list.</p>
+</dd>
+<dt>aggregate (str, optional): The aggregation mode for the exposed team rating.</dt><dd><p><code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;sum&quot;</span></code>. Default: <code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code>.</p>
+</dd>
+</dl>
+</dd>
+<dt>Raises:</dt><dd><dl class="simple">
+<dt>InvalidParameterException: If <code class="docutils literal notranslate"><span class="pre">aggregate</span></code> is not a supported mode, the</dt><dd><p>roster is empty, or any roster entry is not a <code class="docutils literal notranslate"><span class="pre">BaseCompetitor</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.team.TeamCompetitor.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">members</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/team.html#TeamCompetitor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.team.TeamCompetitor.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialize a TeamCompetitor from a roster of member competitors.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>members (sequence of BaseCompetitor): The roster. Order defines the pairing</dt><dd><p>used for bouts and the membership identity preserved by serialization;
+copy the roster rather than aliasing the caller’s list.</p>
+</dd>
+<dt>aggregate (str, optional): The aggregation mode for the exposed team rating.</dt><dd><p><code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;sum&quot;</span></code>. Default: <code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code>.</p>
+</dd>
+</dl>
+</dd>
+<dt>Raises:</dt><dd><dl class="simple">
+<dt>InvalidParameterException: If <code class="docutils literal notranslate"><span class="pre">aggregate</span></code> is not a supported mode, the</dt><dd><p>roster is empty, or any roster entry is not a <code class="docutils literal notranslate"><span class="pre">BaseCompetitor</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.team.TeamCompetitor.beat">
+<span class="sig-name descname"><span class="pre">beat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/team.html#TeamCompetitor.beat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.team.TeamCompetitor.beat" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this team has won against the given team.</p>
+<p>Members are paired positionally: member <code class="docutils literal notranslate"><span class="pre">i</span></code> of this team beats member <code class="docutils literal notranslate"><span class="pre">i</span></code> of
+the opposing team through the members’ own rating math.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent team that lost.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Forwarded unchanged to every
+member pair.</p>
+</div></blockquote>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the roster compositions don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.team.TeamCompetitor.expected_score">
+<span class="sig-name descname"><span class="pre">expected_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/elote/competitors/team.html#TeamCompetitor.expected_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.team.TeamCompetitor.expected_score" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the expected score (probability of winning) against another team.</p>
+<p>Members are paired positionally and the result is the mean of the members’ own
+model probabilities. This is independent of the <code class="docutils literal notranslate"><span class="pre">aggregate</span></code> mode: predictions
+are probabilities in both modes; the flag governs the exposed rating only.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent team to compare against.</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: The probability of winning (between 0 and 1).</p>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the roster compositions don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="elote.competitors.team.TeamCompetitor.rating">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rating</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#elote.competitors.team.TeamCompetitor.rating" title="Link to this definition">¶</a></dt>
+<dd><p>Get the aggregate rating of the team.</p>
+<p>The value is derived from the members on every read according to the
+<code class="docutils literal notranslate"><span class="pre">aggregate</span></code> mode: the mean of the member ratings, or their sum. See the class
+docstring for the semantics of each mode and its leaderboard implications.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>float: The aggregate team rating.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.team.TeamCompetitor.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/team.html#TeamCompetitor.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.team.TeamCompetitor.reset" title="Link to this definition">¶</a></dt>
+<dd><p>Reset this team to its initial state.</p>
+<p>Delegates to each member, restoring every member to its own initial rating. The
+roster composition itself never changes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.team.TeamCompetitor.tied">
+<span class="sig-name descname"><span class="pre">tied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/team.html#TeamCompetitor.tied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.team.TeamCompetitor.tied" title="Link to this definition">¶</a></dt>
+<dd><p>Update ratings after this team has tied with the given team.</p>
+<p>Members are paired positionally: member <code class="docutils literal notranslate"><span class="pre">i</span></code> of this team ties member <code class="docutils literal notranslate"><span class="pre">i</span></code> of
+the opposing team through the members’ own rating math.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent team that tied.
+scores (sequence of float, optional): The two scores in caller order,</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Must be equal. Forwarded unchanged to
+every member pair.</p>
+</div></blockquote>
+</dd>
+<dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the roster compositions don’t match.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.team.TeamCompetitor.verify_competitor_types">
+<span class="sig-name descname"><span class="pre">verify_competitor_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/team.html#TeamCompetitor.verify_competitor_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.team.TeamCompetitor.verify_competitor_types" title="Link to this definition">¶</a></dt>
+<dd><p>Verify that both competitors are teams with matching roster composition.</p>
+<p>Two teams can only bout when both are <code class="docutils literal notranslate"><span class="pre">TeamCompetitor</span></code> instances and their
+rosters have the same composition: the same member types in the same roster
+order, which also implies the same roster size. Member <em>states</em> may differ
+(that is what a bout updates); the composition may not.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor (BaseCompetitor): The competitor to verify.</p>
+</dd>
+<dt>Raises:</dt><dd><dl class="simple">
+<dt>MissMatchedCompetitorTypesException: If the competitor is not a</dt><dd><p><code class="docutils literal notranslate"><span class="pre">TeamCompetitor</span></code>, or its roster composition differs.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
 </section>
 
 

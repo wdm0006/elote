@@ -229,9 +229,11 @@ seventh of ten on Brier score.</p>
 <td><p>Glicko-Boost</p></td>
 <td><p><a class="reference internal" href="rating_systems/glicko_boost.html"><span class="doc">Glicko-Boost</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p>Teams, or more than two sides per result</p></td>
-<td><p>TrueSkill</p></td>
-<td><p><a class="reference internal" href="rating_systems/trueskill.html"><span class="doc">TrueSkill</span></a></p></td>
+<tr class="row-even"><td><p>Teams facing teams, or more than two sides per result</p></td>
+<td><p>Team-vs-team: any system wrapped in <code class="docutils literal notranslate"><span class="pre">TeamCompetitor</span></code>. More than two sides in one
+result: not yet supported – member-level team updates arrive with the planned
+OpenSkill N-way bouts.</p></td>
+<td><p><a class="reference internal" href="api/competitors.html#elote.competitors.team.TeamCompetitor" title="elote.competitors.team.TeamCompetitor"><code class="xref py py-class docutils literal notranslate"><span class="pre">TeamCompetitor</span></code></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>Draws are common and carry information</p></td>
 <td><p>Glicko-1, Glicko-2, or TrueSkill</p></td>
