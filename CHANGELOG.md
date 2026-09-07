@@ -10,6 +10,7 @@ Packaging
    when their extras are absent, and CI gained a base-install job that asserts the core
    surface imports without pandas, matplotlib, or requests.
  * `tqdm` is range-pinned (`>=4.66,<5`) instead of exact-pinned to 4.66.3.
+ * CI, tox, and classifiers extended to Python 3.13 and 3.14.
  * Development status refreshed from Alpha to Beta.
 
 v1.4.0
