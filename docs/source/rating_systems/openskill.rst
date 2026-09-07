@@ -34,7 +34,9 @@ over the whole bout: the collective skill-plus-chance scale
 
    c = \\sqrt{\\sum_i (\\sigma_i^2 + \\tau^2) + k \\beta^2}
 
-the Plackett-Luce win expectation ``exp(mu_i / c) / sum_q``, and the number of teams
+the likelihood model's win expectation ``exp(mu_i / c) / sum_q`` for the default
+Plackett-Luce pairing (the other models swap in their own likelihood, see
+`Model variants`_), and the number of teams
 sharing each rank. The closed-form update then shifts every ``mu`` by its expected
 surplus and shrinks every ``sigma`` in one step. Uncertainty is inflated by an
 additive dynamics parameter ``tau`` before every update so beliefs never fully
@@ -46,6 +48,36 @@ tied participants share the average rank change. Elote exposes this through the
 unified competitor interface: pairwise methods route a single result through the
 period hook as a one-bout period, so every caller gets the same formulas, and the
 walk-forward evaluation machinery applies results period-by-period as usual.
+
+Model variants
+--------------
+
+The Weng-Lin paper derives one update skeleton for four likelihood models, and
+``OpenSkillCompetitor`` implements all of them behind the ``model`` constructor
+selector. All four share the same Gaussian beliefs, the same ordinal, and the same
+bout-native surface; they differ only in the pairwise win model that drives the
+update terms.
+
+- ``plackett_luce`` (default) -- Algorithm 4. The full ranking is read as a
+  Plackett-Luce distribution over orderings; every participant is compared against
+  the whole field above it. The usual choice, and the richest model for wide fields.
+- ``bradley_terry_full`` -- Algorithm 1. Every participant is compared against
+  every other participant once (winner-vs-loser pairs share one logistic term),
+  using the Bradley-Terry logistic likelihood.
+- ``bradley_terry_partial`` -- Algorithm 2. Instead of the all-pairs comparison,
+  each participant is compared only against nearby ranks within a bounded window,
+  with the comparisons averaged over the pair set. Cheaper on very wide fields,
+  and less sensitive to rank noise far away in the field.
+- ``thurstone`` -- Algorithm 3. Thurstone-Mosteller full pairing: win probabilities
+  come from the Gaussian CDF (via a draw margin ``epsilon``) rather than the
+  logistic, which some prefer when outcome noise feels more Gaussian than
+  Gumbel-like.
+
+All four were verified to 1e-6 against the ``openskill.py`` dev extra over 1v1,
+N-way, tie and 12-player bouts; see the notes below. Pick the default unless you
+have a reason: ``bradley_terry_full`` and ``thurstone`` mostly differ in tail
+behaviour, and ``bradley_terry_partial`` trades a little accuracy for bounded
+work on very large fields.
 
 Advantages
 ----------
@@ -106,9 +138,9 @@ Constructor parameters:
 
 - ``initial_mu`` -- prior mean skill value (default ``25.0``).
 - ``initial_sigma`` -- prior skill standard deviation (default ``25/3``).
-- ``model`` -- Weng-Lin variant selector, defaulting to ``plackett_luce``. Only the
-  Plackett-Luce update is implemented; the Bradley-Terry and Thurstone-Mosteller
-  variants of the family will join this selector later.
+- ``model`` -- Weng-Lin variant selector: ``plackett_luce`` (default),
+  ``bradley_terry_full``, ``bradley_terry_partial``, or ``thurstone``; see
+  `Model variants`_ above. Bouts and rating periods refuse to mix variants.
 
 Class-level constants (``_beta``, ``_tau``, ``_kappa``) can be tuned with
 ``configure_class``: ``beta`` is the skill-vs-chance deviation baked into every
@@ -119,13 +151,25 @@ Notes on the reference implementation
 -------------------------------------
 
 Elote's implementation follows the Weng-Lin update as documented for the
-``openskill.py`` reference package. In ``openskill.py`` 6.2.0 the mu tie adjustment
-is a no-op (upstream `issue #201 <https://github.com/vivekjoshy/openskill.py/issues/201>`_,
-fix in `PR #203 <https://github.com/vivekjoshy/openskill.py/pull/203>`_): tied
-players keep their raw per-player changes instead of the documented average. Elote
-implements the documented rule -- every tied player receives the average mu change of
-its rank group, preserving each player's own prior -- and the reference-value test
-suite pins both the agreement and this documented deviation.
+``openskill.py`` reference package, for every variant in the ``model`` selector.
+Two fidelity notes, both pinned in the reference-value test suite
+(``tests/test_OpenSkillCompetitor_known_values.py``, which runs the full battery
+for all four variants against the installed ``openskill.py``):
+
+- In ``openskill.py`` 6.2.0 the mu tie adjustment is a no-op (upstream
+  `issue #201 <https://github.com/vivekjoshy/openskill.py/issues/201>`_,
+  fix in `PR #203 <https://github.com/vivekjoshy/openskill.py/pull/203>`_): tied
+  players keep their raw per-player changes instead of the documented average.
+  Elote implements the documented rule -- every tied player receives the average mu
+  change of its rank group, preserving each player's own prior -- and the tests
+  pin both the agreement (sigmas and untied mus to 1e-6) and this documented
+  deviation.
+- For ``bradley_terry_partial``, elote follows ``openskill.py`` 6.2.0's
+  implementation rather than the paper's literal Algorithm 2: a stable rank-sorted
+  window of four positions on each side, with the pairwise terms averaged over
+  comparison counts. On fields of up to nine participants this coincides with the
+  paper's adjacent-rank summation; on wider fields the window bounds the work.
+  The reference battery exercises the window on 12-player fields.
 
 Real-World Applications
 -----------------------

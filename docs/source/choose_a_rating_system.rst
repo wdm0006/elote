@@ -8,8 +8,9 @@ How to choose a rating system
 
    The measured tables and code output below come from a snapshot verified on
    2026-08-09 against ten of Elote's rating systems. The library has since
-   added two more concrete systems, :doc:`Pythagorean <rating_systems/pythagorean>`
-   and :doc:`Whole-History Rating <rating_systems/whr>`, which are not covered
+   added three more concrete systems, :doc:`Pythagorean <rating_systems/pythagorean>`,
+   :doc:`Whole-History Rating <rating_systems/whr>`, and
+   :doc:`OpenSkill <rating_systems/openskill>`, which are not covered
    by this comparison. The runnable examples were re-checked against a current
    install and produce the same qualitative results; a handful of measured
    figures (noted inline) differ from this snapshot in later decimal places
@@ -52,11 +53,16 @@ Start here
    * - Results arrive in batches (a month, a season round) and you know who moved first
      - Glicko-Boost
      - :doc:`Glicko-Boost <rating_systems/glicko_boost>`
+   * - Three or more sides settle in one result and you want the field ranked without
+       TrueSkill's cost
+     - OpenSkill
+     - :doc:`OpenSkill <rating_systems/openskill>`
    * - Teams facing teams, or more than two sides per result
      - Team-vs-team: any system wrapped in ``TeamCompetitor``. More than two sides in one
-       result: not yet supported -- member-level team updates arrive with the planned
-       OpenSkill N-way bouts.
-     - :class:`~elote.competitors.team.TeamCompetitor`
+       result: :doc:`OpenSkill <rating_systems/openskill>` ranks the whole field in one bout
+       (single-member rosters; member-level team updates remain planned).
+     - :class:`~elote.competitors.team.TeamCompetitor`,
+       :doc:`OpenSkill <rating_systems/openskill>`
    * - Draws are common and carry information
      - Glicko-1, Glicko-2, or TrueSkill
      - `Draws`_
