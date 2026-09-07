@@ -14,6 +14,7 @@ from elote import (
     KeenerCompetitor,
     PythagoreanCompetitor,
     WholeHistoryRatingCompetitor,
+    OpenSkillCompetitor,
 )
 from elote.competitors.base import (
     MissMatchedCompetitorTypesException,
@@ -466,6 +467,7 @@ class TestExpectedScoreBounds(unittest.TestCase):
         KeenerCompetitor,
         PythagoreanCompetitor,
         WholeHistoryRatingCompetitor,
+        OpenSkillCompetitor,
     )
 
     # A lopsided run: long enough that a one-sided rating gap opens up, with

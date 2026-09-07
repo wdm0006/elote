@@ -51,6 +51,10 @@ dev = [
     "types-requests",
     "pandas-stubs",
     "scipy-stubs",
+    # Test oracle for the native OpenSkill (Weng-Lin) implementation. Dev-only on
+    # purpose: the reference-value battery compares elote's mu/sigma against the
+    # canonical implementation to ~1e-6.
+    "openskill>=6.2,<7; python_version >= '3.10'",
 ]
 viz = [
     "matplotlib>=3.5.0",

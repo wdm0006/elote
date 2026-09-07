@@ -29,6 +29,7 @@ Available rating systems:
 - Keener: A score-based rating system built on the dominant eigenvector of a preference matrix
 - Pythagorean: A points-based win expectation derived from points scored and allowed
 - Bradley-Terry: A maximum-likelihood paired-comparison model
+- OpenSkill: A native Weng-Lin Bayesian family (Plackett-Luce) with N-player ranked updates
 - Whole-History Rating: A time-aware Bradley-Terry model that estimates rating curves
 - Ensemble: A meta-rating system that combines multiple rating systems
 
@@ -56,6 +57,7 @@ from elote.competitors.massey import MasseyCompetitor
 from elote.competitors.keener import KeenerCompetitor
 from elote.competitors.pythagorean import PythagoreanCompetitor
 from elote.competitors.bradley_terry import BradleyTerryCompetitor
+from elote.competitors.openskill import OpenSkillCompetitor
 from elote.competitors.whr import WholeHistoryRatingCompetitor
 from elote.competitors.ensemble import BlendedCompetitor
 
@@ -99,6 +101,7 @@ __all__ = [
     "KeenerCompetitor",
     "PythagoreanCompetitor",
     "BradleyTerryCompetitor",
+    "OpenSkillCompetitor",
     "WholeHistoryRatingCompetitor",
     "BlendedCompetitor",
     # Arenas
