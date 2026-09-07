@@ -2,7 +2,7 @@ import abc
 import math
 import numbers
 import random
-from typing import Dict, Any, List, Tuple, Optional
+from typing import Dict, Any, List, Tuple, Optional, Union
 
 from elote.logging import logger
 
@@ -77,21 +77,52 @@ class History:
 
     This class stores the results of matchups and provides methods to analyze
     the performance of the rating system.
+
+    Two bout types share the :attr:`bouts` list:
+
+    - :class:`Bout` -- a two-sided bout between single competitors, recorded by
+      every two-player arena entry point.
+    - :class:`MultiBout` -- a bout between more than two sides (or between sides
+      with rosters), recorded by :meth:`LambdaArena.match_group
+      <elote.arenas.lambda_arena.LambdaArena.match_group>`.
+
+    **N-way analytics note.** Every two-sided analysis in this class --
+    :meth:`report_results`, :meth:`confusion_matrix`, :meth:`calculate_metrics`,
+    :meth:`calculate_metrics_with_draws`, :meth:`optimize_thresholds`,
+    :meth:`random_search`, :meth:`accuracy_by_prior_bouts` and
+    :meth:`get_calibration_data` -- is defined over a winner/drawer/loser
+    comparison of exactly two competitors. N-way bouts have no a/b winner
+    semantics, so they are deliberately **excluded** from all of them (they are
+    still recorded and remain available for inspection). Generalizing the
+    confusion-matrix machinery to ranked outcomes is a separate, follow-up
+    feature, not something these methods approximate today.
     """
 
     def __init__(self) -> None:
         """Initialize an empty history of bouts."""
-        self.bouts: List[Bout] = []
+        self.bouts: List[Union[Bout, "MultiBout"]] = []
         logger.debug("History initialized.")
 
-    def add_bout(self, bout: "Bout") -> None:
+    def add_bout(self, bout: Union["Bout", "MultiBout"]) -> None:
         """Add a bout to the history.
 
         Args:
-            bout (Bout): The bout object to add to the history.
+            bout (Bout | MultiBout): The bout object to add to the history.
         """
         self.bouts.append(bout)
-        logger.debug("Added bout between %s and %s", bout.a, bout.b)
+        if isinstance(bout, MultiBout):
+            logger.debug("Added N-way bout among %s", bout.participants)
+        else:
+            logger.debug("Added bout between %s and %s", bout.a, bout.b)
+
+    def _pairwise_bouts(self) -> List["Bout"]:
+        """The two-sided bouts in this history, in recorded order.
+
+        N-way bouts (:class:`MultiBout`) have no a/b winner semantics, so every
+        two-sided analysis reads through this filter rather than the raw
+        :attr:`bouts` list.
+        """
+        return [bout for bout in self.bouts if isinstance(bout, Bout)]
 
     def report_results(self, lower_threshold: float = 0.5, upper_threshold: float = 0.5) -> List[Dict[str, Any]]:
         """Generate a report of the results in this history.
@@ -104,8 +135,9 @@ class History:
             list: A list of dictionaries containing the results of each bout.
         """
         report = list()
-        logger.info("Generating results report for %d bouts", len(self.bouts))
-        for bout in self.bouts:
+        pairwise_bouts = self._pairwise_bouts()
+        logger.info("Generating results report for %d pairwise bouts", len(pairwise_bouts))
+        for bout in pairwise_bouts:
             predicted_winner = bout.predicted_winner(lower_threshold, upper_threshold)
             actual_winner = bout.actual_winner()
             actual_winner_id = bout.a if actual_winner == "a" else bout.b if actual_winner == "b" else None
@@ -143,14 +175,15 @@ class History:
         false_negatives = 0
         skipped_bouts = 0
 
+        pairwise_bouts = self._pairwise_bouts()
         logger.info(
-            "Calculating confusion matrix for %d bouts with thresholds: [%.2f, %.2f]",
-            len(self.bouts),
+            "Calculating confusion matrix for %d pairwise bouts with thresholds: [%.2f, %.2f]",
+            len(pairwise_bouts),
             lower_threshold,
             upper_threshold,
         )
 
-        for bout in self.bouts:
+        for bout in pairwise_bouts:
             # Extract the actual winner and predicted probability
             actual_winner = bout._normalized_outcome()
             predicted_prob = bout.predicted_outcome
@@ -228,7 +261,8 @@ class History:
         """
         best_accuracy = 0
         best_thresholds = [0.5, 0.5]  # Initialize with default values
-        num_bouts = len(self.bouts)
+        pairwise_bouts = self._pairwise_bouts()
+        num_bouts = len(pairwise_bouts)
         logger.info("Performing random search for optimal thresholds with %d trials on %d bouts.", trials, num_bouts)
 
         if num_bouts == 0:
@@ -238,7 +272,7 @@ class History:
         rng: Any = random if seed is None else random.Random(seed)
 
         # Find min and max predicted outcomes in history
-        predicted_outcomes = [bout.predicted_outcome for bout in self.bouts if bout.predicted_outcome is not None]
+        predicted_outcomes = [bout.predicted_outcome for bout in pairwise_bouts if bout.predicted_outcome is not None]
         min_outcome = min(predicted_outcomes) if predicted_outcomes else 0
         max_outcome = max(predicted_outcomes) if predicted_outcomes else 1
 
@@ -280,7 +314,7 @@ class History:
             list: A list of ``(probability, label)`` tuples where label is 'a', 'b' or 'draw'.
         """
         pairs: List[Tuple[float, str]] = []
-        for bout in self.bouts:
+        for bout in self._pairwise_bouts():
             actual = bout._normalized_outcome()
             predicted_prob = bout.predicted_outcome
             if actual is None or predicted_prob is None:
@@ -484,12 +518,12 @@ class History:
 
         logger.info(
             "Calculating metrics with draws for %d bouts using thresholds [%.2f, %.2f]",
-            len(self.bouts),
+            len(self._pairwise_bouts()),
             lower_threshold,
             upper_threshold,
         )
 
-        for bout in self.bouts:
+        for bout in self._pairwise_bouts():
             actual = bout._normalized_outcome()
 
             # Skip if we don't have both actual and predicted values
@@ -589,10 +623,12 @@ class History:
         # Track the number of bouts for each competitor
         competitor_bout_counts: Dict[Any, int] = {}
 
-        # Count all bouts from arena's history (which includes training data)
+        # Count all bouts from arena's history (which includes training data).
+        # N-way bouts are excluded: they have no a/b pair to attribute the count to.
         if hasattr(arena, "history") and hasattr(arena.history, "bouts"):
-            logger.debug("Populating initial bout counts from arena history (%d bouts)", len(arena.history.bouts))
-            for bout in arena.history.bouts:
+            pairwise_history = arena.history._pairwise_bouts()
+            logger.debug("Populating initial bout counts from arena history (%d bouts)", len(pairwise_history))
+            for bout in pairwise_history:
                 competitor_bout_counts[bout.a] = competitor_bout_counts.get(bout.a, 0) + 1
                 competitor_bout_counts[bout.b] = competitor_bout_counts.get(bout.b, 0) + 1
         else:
@@ -604,7 +640,7 @@ class History:
 
         # Process each bout in the evaluation history
         skipped_bouts = 0
-        for bout in self.bouts:
+        for bout in self._pairwise_bouts():
             # Get the current bout count for each competitor
             a_count = competitor_bout_counts.get(bout.a, 0)
             b_count = competitor_bout_counts.get(bout.b, 0)
@@ -701,9 +737,10 @@ class History:
         y_prob = []
         y_true = []
         skipped_bouts = 0
-        logger.info("Extracting calibration data for %d bouts.", len(self.bouts))
+        pairwise_bouts = self._pairwise_bouts()
+        logger.info("Extracting calibration data for %d pairwise bouts.", len(pairwise_bouts))
 
-        for bout in self.bouts:
+        for bout in pairwise_bouts:
             label = bout._normalized_outcome()
             if bout.predicted_outcome is None or label is None:
                 skipped_bouts += 1
@@ -887,3 +924,73 @@ class Bout:
             return self.a.lower() if isinstance(self.a, str) else self.a
         else:
             return None
+
+
+class MultiBout:
+    """A single bout between more than two sides, or between sides with rosters.
+
+    Recorded by :meth:`LambdaArena.match_group
+    <elote.arenas.lambda_arena.LambdaArena.match_group>` and appended to the same
+    :attr:`History.bouts <History>` list as two-sided :class:`Bout` entries.
+
+    Unlike a :class:`Bout`, an N-way bout has no a/b winner semantics: the
+    outcome is a ranking of the participants (with possible ties), not a
+    winner/loser/draw triple. For that reason MultiBout entries are excluded
+    from every two-sided analysis in :class:`History` (see the note on that
+    class) and carry their own prediction record:
+
+    - :attr:`participants` -- the side identifiers, in the finishing order the
+      caller supplied (which is only the true finish order when ``ranks`` is
+      ``None``).
+    - :attr:`predicted_ranks` -- the pre-update prediction: the side identifiers
+      ordered by pre-bout strength (descending, ties keep input order). This is
+      the N-way analogue of :attr:`Bout.predicted_outcome`; every strength read
+      happened before any participant was updated.
+
+    Attributes:
+        participants (list): The side identifiers in caller (finishing) order.
+        ranks (list | None): The finishing ranks per participant, lower is
+            better, equal ranks are ties. ``None`` when the caller supplied
+            neither ranks nor scores, in which case the participant order was
+            taken as the finish order.
+        predicted_ranks (list): The side identifiers ordered by pre-bout
+            strength, strongest first.
+        scores (list | None): The per-side scores the caller supplied, if any.
+        attributes (dict): Optional additional attributes recorded with the bout.
+        match_time (datetime | None): The time the bout occurred, if supplied.
+    """
+
+    def __init__(
+        self,
+        participants: List[Any],
+        ranks: Optional[List[float]],
+        predicted_ranks: List[Any],
+        scores: Optional[List[float]] = None,
+        attributes: Optional[Dict[str, Any]] = None,
+        match_time: Optional[Any] = None,
+    ) -> None:
+        """Initialize a multi-way bout record.
+
+        Args:
+            participants: The side identifiers in caller (finishing) order.
+            ranks: The finishing ranks per participant, lower is better, equal
+                ranks are ties. ``None`` when no ranking was given.
+            predicted_ranks: The side identifiers ordered by pre-bout strength.
+            scores: The per-side scores, if the caller supplied them.
+            attributes: Optional additional attributes recorded with the bout.
+            match_time: The time the bout occurred, if supplied.
+        """
+        self.participants = list(participants)
+        self.ranks = list(ranks) if ranks is not None else None
+        self.predicted_ranks = list(predicted_ranks)
+        self.scores = list(scores) if scores is not None else None
+        self.attributes = attributes or {}
+        self.match_time = match_time
+
+    def __repr__(self) -> str:
+        """Return a debug representation of this bout.
+
+        Returns:
+            str: A string representation of this bout.
+        """
+        return f"<MultiBout: {len(self.participants)} participants>"

@@ -380,8 +380,9 @@ def plot_calibration_comparison(
                 linewidth=2,
             )
 
-        # Extract predicted probabilities for histogram
-        y_prob = [bout.predicted_outcome for bout in history.bouts]
+        # Extract predicted probabilities for histogram. N-way bouts have no
+        # scalar win probability, so only two-sided bouts enter the histogram.
+        y_prob = [bout.predicted_outcome for bout in history._pairwise_bouts()]
 
         if len(y_prob) > 0:
             # Plot histogram of predicted probabilities
