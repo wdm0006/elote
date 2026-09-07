@@ -137,3 +137,12 @@ Blended Competitor
    :undoc-members:
    :show-inheritance:
    :special-members: __init__
+
+Team Competitor
+---------------
+
+.. automodule:: elote.competitors.team
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :special-members: __init__

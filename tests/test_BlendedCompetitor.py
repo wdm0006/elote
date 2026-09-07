@@ -169,7 +169,11 @@ class TestBlendedCompetitorLegacyState(unittest.TestCase):
         self.assertAlmostEqual(restored.expected_score(restored), 0.5)
 
     def test_accepts_every_registered_competitor_type(self):
-        names = [n for n in BaseCompetitor.list_competitor_types() if n != "BlendedCompetitor"]
+        # Concrete rating systems only: the composites cannot be built from the
+        # generic kwargs this helper constructs -- BlendedCompetitor is the
+        # subject of this suite, and TeamCompetitor requires a member roster.
+        composites = {"BlendedCompetitor", "TeamCompetitor"}
+        names = [n for n in BaseCompetitor.list_competitor_types() if n not in composites]
         self.assertIn("BradleyTerryCompetitor", names)
 
         for name in names:
