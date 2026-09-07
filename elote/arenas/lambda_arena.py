@@ -1,11 +1,123 @@
 import datetime
+import math
+import numbers
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Type
 
 from tqdm import tqdm
 from elote import EloCompetitor
-from elote.arenas.base import BaseArena, Bout, History
-from elote.competitors.base import BaseCompetitor
+from elote.arenas.base import BaseArena, Bout, History, MultiBout
+from elote.competitors.base import BaseCompetitor, MissMatchedCompetitorTypesException
 from elote.logging import logger
+
+
+def _parse_sides(participants: Sequence[Any]) -> List[Tuple[Any, Optional[List[Any]]]]:
+    """Split match_group participants into ``(side id, roster or None)`` pairs.
+
+    An entry is a roster side exactly when it is a list/tuple pair of two items
+    whose second item is itself a list or tuple; every other entry is a plain
+    competitor id. Rosters are copied, and a side's id is only a label -- no
+    competitor is created for it.
+
+    Args:
+        participants (sequence): The bout's sides, as given by the caller.
+
+    Returns:
+        list of (side id, roster or None): One entry per side, in given order.
+
+    Raises:
+        ValueError: If a roster side is empty or its roster is not a list/tuple.
+    """
+    sides: List[Tuple[Any, Optional[List[Any]]]] = []
+    for entry in participants:
+        if (
+            isinstance(entry, (list, tuple))
+            and len(entry) == 2
+            and isinstance(entry[1], (list, tuple))
+        ):
+            side_id, roster = entry
+            roster_members = list(roster)
+            if not roster_members:
+                raise ValueError(f"side '{side_id}' has an empty roster")
+            sides.append((side_id, roster_members))
+        else:
+            sides.append((entry, None))
+    return sides
+
+
+def _validate_group_ranks(ranks: Sequence[float], n_sides: int) -> List[int]:
+    """Validate match_group ranks: one whole number per side.
+
+    Args:
+        ranks (sequence): The finishing ranks, lower is better, ties repeat.
+        n_sides (int): The number of sides the ranks must describe.
+
+    Returns:
+        list of int: The validated ranks as ints.
+
+    Raises:
+        ValueError: If the count does not match the side list or any rank is not
+            a whole number.
+    """
+    if len(ranks) != n_sides:
+        raise ValueError(f"ranks must have one entry per participant, got {len(ranks)} for {n_sides}")
+    validated: List[int] = []
+    for rank in ranks:
+        if isinstance(rank, bool) or not isinstance(rank, numbers.Real):
+            raise ValueError(f"ranks must contain only numbers, got {rank!r}")
+        if not float(rank).is_integer():
+            raise ValueError(f"ranks must be whole numbers, got {rank!r}")
+        validated.append(int(rank))
+    return validated
+
+
+def _validate_group_scores(scores: Sequence[float], n_sides: int) -> List[float]:
+    """Validate match_group scores: one finite, non-negative number per side.
+
+    Args:
+        scores (sequence): One score per side, in the order given.
+        n_sides (int): The number of sides the scores must describe.
+
+    Returns:
+        list of float: The validated scores, normalized to built-in floats.
+
+    Raises:
+        ValueError: If the count does not match the side list or any score is
+            negative, non-finite, or not a number.
+    """
+    if len(scores) != n_sides:
+        raise ValueError(f"scores must have one entry per participant, got {len(scores)} for {n_sides}")
+    validated: List[float] = []
+    for score in scores:
+        if isinstance(score, bool) or not isinstance(score, numbers.Real):
+            raise ValueError(f"scores must contain only numbers, got {score!r}")
+        if not math.isfinite(float(score)):
+            raise ValueError(f"scores must be finite numbers, got {score!r}")
+        if score < 0:
+            raise ValueError(f"scores must be non-negative, got {score!r}")
+        validated.append(float(score))
+    return validated
+
+
+def _ranks_from_scores(scores: List[float]) -> List[int]:
+    """Derive finishing ranks from per-side scores.
+
+    Higher scores finish better; equal scores tie and share the earliest rank
+    they reach (so 3.0, 3.0, 1.0 maps to ranks 0, 0, 2).
+
+    Args:
+        scores (list of float): The validated per-side scores.
+
+    Returns:
+        list of int: One rank per score, aligned with the input order.
+    """
+    order = sorted(range(len(scores)), key=lambda i: -scores[i])
+    ranks = [0] * len(scores)
+    rank = 0
+    for position, index in enumerate(order):
+        if position > 0 and scores[index] != scores[order[position - 1]]:
+            rank = position
+        ranks[index] = rank
+    return ranks
 
 
 class LambdaArena(BaseArena):
@@ -187,6 +299,129 @@ class LambdaArena(BaseArena):
             else:
                 self.competitors[b].beat(self.competitors[a], scores=reversed_scores)
             self.history.add_bout(Bout(a, b, predicted_outcome, outcome="loss", attributes=attributes))
+
+    def match_group(
+        self,
+        participants: Sequence[Any],
+        ranks: Optional[Sequence[float]] = None,
+        scores: Optional[Sequence[float]] = None,
+        attributes: Optional[Dict[str, Any]] = None,
+        match_time: Optional[datetime.datetime] = None,
+    ) -> None:
+        """Process a single bout between three or more sides (or two sides with rosters).
+
+        This is the N-way analogue of :meth:`matchup`: it creates missing
+        competitors, captures every pre-update prediction, runs one bout-level
+        update over the whole participant set, and records the result as a
+        :class:`~elote.arenas.base.MultiBout` on the same history the two-player
+        entry points append to.
+
+        The bout is updated natively -- one closed-form pass over the whole
+        participant set -- not as a fan-out of pairwise results, which the
+        Weng-Lin family (and any other bout-level model) treats differently.
+
+        Args:
+            participants (sequence): The sides, ordered by finish. Each entry is
+                either a competitor id, or an ``(id, roster)`` pair where roster
+                is a list or tuple of member ids for a team side. A side is a
+                roster side exactly when its entry is a list/tuple pair whose
+                second item is a list or tuple. When ``ranks`` is ``None`` the
+                given order is taken as the finish order.
+            ranks (sequence of float, optional): Finishing ranks per participant,
+                lower is better, equal ranks are ties. Whole numbers are
+                required. Defaults to ``0..n-1`` (the given order). When both
+                ``ranks`` and ``scores`` are given, ``ranks`` defines the result
+                and ``scores`` are recorded only.
+            scores (sequence of float, optional): One score per participant.
+                Validated and recorded with the bout; when ``ranks`` is omitted
+                the scores define the finishing ranks (descending, ties share a
+                rank). Not otherwise consumed by rank-based models.
+            attributes (dict, optional): Additional attributes to record with this bout.
+            match_time (datetime, optional): The time when the bout occurred.
+
+        Raises:
+            NotImplementedError: If the arena's rating system does not implement
+                a bout-level update (``apply_bout``). The first shipped consumer
+                is :class:`~elote.OpenSkillCompetitor`.
+            ValueError: If the participant list is malformed (fewer than two
+                sides, an empty roster, the same competitor on two sides), if
+                ``ranks`` is not one whole number per participant, or if
+                ``scores`` is not one finite, non-negative number per
+                participant. Validation happens before any competitor is created
+                or any history is recorded, so a bad bout leaves the arena
+                unchanged.
+        """
+        # The bout-level hook is the only supported update path: fan-out of
+        # pairwise results would double-count every bout.
+        apply_bout = getattr(self.base_competitor, "apply_bout", None)
+        if not callable(apply_bout):
+            raise NotImplementedError(
+                f"{self.base_competitor.__name__} does not implement a bout-level update "
+                "(apply_bout); N-way bouts are not supported for this rating system"
+            )
+
+        sides = _parse_sides(participants)
+        if len(sides) < 2:
+            raise ValueError(f"a bout needs at least two sides, got {len(sides)}")
+
+        # Validate everything -- ranks, scores, participant shape, and
+        # competitor identity -- before creating any competitor or recording any
+        # history, so a malformed bout leaves the arena unchanged.
+        side_ids = [side_id for side_id, _ in sides]
+        all_member_ids: List[Any] = []
+        for side_id, roster in sides:
+            if roster is None:
+                all_member_ids.append(side_id)
+            else:
+                all_member_ids.extend(roster)
+        if len(set(all_member_ids)) != len(all_member_ids):
+            raise ValueError("the same competitor cannot appear on two sides of one bout")
+
+        n_sides = len(sides)
+        if ranks is not None:
+            bout_ranks = _validate_group_ranks(ranks, n_sides)
+        elif scores is not None:
+            bout_ranks = _ranks_from_scores(_validate_group_scores(scores, n_sides))
+        else:
+            bout_ranks = list(range(n_sides))
+        validated_scores = _validate_group_scores(scores, n_sides) if scores is not None else None
+
+        # Competitors seeded through initial_state may belong to another rating
+        # system; catch that before creating anything new.
+        for member_id in all_member_ids:
+            existing = self.competitors.get(member_id)
+            if existing is not None and not isinstance(existing, self.base_competitor):
+                raise MissMatchedCompetitorTypesException(
+                    f"competitor '{member_id}' is a {type(existing).__name__}, but this arena rates "
+                    f"{self.base_competitor.__name__} competitors"
+                )
+
+        # Create missing competitors, then collect each side's members.
+        bout_sides: List[List[BaseCompetitor]] = []
+        for side_id, roster in sides:
+            if roster is None:
+                bout_sides.append([self._get_or_create_competitor(side_id)])
+            else:
+                bout_sides.append([self._get_or_create_competitor(member_id) for member_id in roster])
+
+        # Pre-update prediction: order the sides by pre-bout strength (strongest
+        # first, ties keep the given order). Every strength is read before any
+        # participant is updated. Team strength is the members' mean rating.
+        strengths = [sum(member.rating for member in side) / len(side) for side in bout_sides]
+        predicted_ranks = [side_ids[i] for i in sorted(range(n_sides), key=lambda i: -strengths[i])]
+
+        apply_bout(bout_sides, ranks=bout_ranks)
+
+        self.history.add_bout(
+            MultiBout(
+                participants=side_ids,
+                ranks=bout_ranks,
+                predicted_ranks=predicted_ranks,
+                scores=validated_scores,
+                attributes=attributes,
+                match_time=match_time,
+            )
+        )
 
     def rating_period(
         self,

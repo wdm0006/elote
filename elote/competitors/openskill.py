@@ -318,51 +318,76 @@ class OpenSkillCompetitor(BaseCompetitor):
     # ------------------------------------------------------------------
 
     @classmethod
-    def apply_bout(cls, participants: Sequence["OpenSkillCompetitor"], *, ranks: Optional[Sequence[float]] = None) -> None:
+    def apply_bout(cls, participants: Sequence[Any], *, ranks: Optional[Sequence[float]] = None) -> None:
         """Apply one bout over an ordered participant set.
 
         This is the update shape the Weng-Lin math is defined over: every
-        participant's belief is updated once, in closed form, from the whole
-        bout's outcome. Pairwise results are the two-participant special case;
-        genuine N-way bouts enter here.
+        side's belief is updated once, in closed form, from the whole bout's
+        outcome. Pairwise results are the two-side special case; genuine N-way
+        bouts enter here.
+
+        Each entry of ``participants`` is one side:
+
+        - a single :class:`OpenSkillCompetitor` (a one-player team), or
+        - a sequence (roster) of :class:`OpenSkillCompetitor` members, whose
+          team strength aggregates the members' summed beliefs and whose update
+          is distributed back to the members natively -- team play on the
+          member level, with no wrapper object created.
 
         Args:
-            participants (sequence of OpenSkillCompetitor): The bout's
-                participants, in any order (``ranks`` carries the outcome).
-            ranks (sequence of float, optional): Finishing ranks, lower is
-                better, equal ranks are ties. Defaults to ``0..n-1``, i.e. the
-                participants given in finishing order.
+            participants (sequence): The bout's sides, in any order (``ranks``
+                carries the outcome). Each side is an ``OpenSkillCompetitor`` or
+                a sequence of them.
+            ranks (sequence of float, optional): Finishing ranks per side, lower
+                is better, equal ranks are ties. Defaults to ``0..n-1``, i.e.
+                the sides given in finishing order.
 
         Raises:
-            ValueError: If the bout has fewer than two participants, a
-                participant appears twice, or ``ranks`` does not match the
-                participant list.
+            ValueError: If the bout has fewer than two sides, a side is empty, a
+                competitor appears on more than one side, or ``ranks`` does not
+                match the side list.
             MissMatchedCompetitorTypesException: If a participant is not an
                 ``OpenSkillCompetitor``.
         """
-        bout = list(participants)
-        if len(bout) < 2:
-            raise ValueError(f"a bout needs at least two participants, got {len(bout)}")
-        if len({id(competitor) for competitor in bout}) != len(bout):
-            raise ValueError("the same competitor cannot appear twice in one bout")
-        for competitor in bout:
-            if not isinstance(competitor, cls):
+        sides: List[List["OpenSkillCompetitor"]] = []
+        for entry in participants:
+            if isinstance(entry, cls):
+                sides.append([entry])
+            elif isinstance(entry, (list, tuple)):
+                roster = list(entry)
+                if not roster:
+                    raise ValueError("a bout side must have at least one member")
+                for member in roster:
+                    if not isinstance(member, cls):
+                        raise MissMatchedCompetitorTypesException(
+                            f"{cls.__name__}.apply_bout only accepts {cls.__name__} competitors, "
+                            f"got {type(member).__name__} in a roster"
+                        )
+                sides.append(roster)
+            else:
                 raise MissMatchedCompetitorTypesException(
-                    f"{cls.__name__}.apply_bout only accepts {cls.__name__} competitors, got {type(competitor).__name__}"
+                    f"{cls.__name__}.apply_bout only accepts {cls.__name__} competitors or rosters of them, "
+                    f"got {type(entry).__name__}"
                 )
-        cls._check_model_homogeneity(bout)
+        if len(sides) < 2:
+            raise ValueError(f"a bout needs at least two sides, got {len(sides)}")
+
+        members = [member for side in sides for member in side]
+        if len({id(member) for member in members}) != len(members):
+            raise ValueError("the same competitor cannot appear on two sides of one bout")
+        cls._check_model_homogeneity(members)
 
         if ranks is None:
-            bout_ranks: List[int] = list(range(len(bout)))
+            bout_ranks: List[int] = list(range(len(sides)))
         else:
-            if len(ranks) != len(bout):
-                raise ValueError(f"ranks must have one entry per participant, got {len(ranks)} for {len(bout)}")
+            if len(ranks) != len(sides):
+                raise ValueError(f"ranks must have one entry per side, got {len(ranks)} for {len(sides)}")
             for rank in ranks:
                 if isinstance(rank, bool) or not isinstance(rank, numbers.Real):
                     raise ValueError(f"ranks must contain only numbers, got {rank!r}")
             bout_ranks = [int(rank) for rank in ranks]
 
-        cls._solve_bout(bout, bout_ranks)
+        cls._solve_bout(sides, bout_ranks)
 
     @classmethod
     def _check_model_homogeneity(cls, bout: List["OpenSkillCompetitor"]) -> None:
@@ -380,40 +405,96 @@ class OpenSkillCompetitor(BaseCompetitor):
             raise ValueError(f"a bout cannot mix Weng-Lin model variants, got {sorted(models)!r}")
 
     @staticmethod
-    def _average_tied_mu_changes(ranks: Sequence[int], mus: Sequence[float], updates: List[Tuple[float, float]]) -> List[Tuple[float, float]]:
-        """Apply the documented tie rule: every participant tied at a rank
-        receives the average mu change of its rank group, preserving each
-        participant's own prior.
+    def _write_side_updates(
+        participants: List[List["OpenSkillCompetitor"]],
+        updates: List[List[Tuple[float, float]]],
+    ) -> None:
+        """Write one bout's per-member updates back through direct assignment.
+
+        Never through the ``rating`` property: ``_minimum_rating`` clamping
+        (built for 1000+-scale Elo systems) must not clip the mu-approx-25
+        scale this family uses.
+        """
+        for side, side_updates in zip(participants, updates, strict=True):
+            for member, (new_mu, new_sigma) in zip(side, side_updates, strict=True):
+                member._mu = new_mu
+                member._sigma = new_sigma
+
+    @classmethod
+    def _distribute_side_update(
+        cls,
+        side_index: int,
+        mus: List[List[float]],
+        inflated_sigmas: List[List[float]],
+        team_sigma_squares: List[float],
+        omega: float,
+        delta: float,
+    ) -> List[Tuple[float, float]]:
+        """Distribute one side's team-level ``omega``/``delta`` to its members.
+
+        Each member receives its share of the team update, proportional to its
+        share of the side's inflated variance. For a one-member side that
+        share is exactly 1, so the member receives the full team update and
+        every formula reduces to the single-competitor case.
+        """
+        side_updates: List[Tuple[float, float]] = []
+        for member_index, member_sigma in enumerate(inflated_sigmas[side_index]):
+            member_variance = member_sigma**2
+            share = member_variance / team_sigma_squares[side_index]
+            new_mu = mus[side_index][member_index] + omega * share
+            new_sigma = member_sigma * math.sqrt(max(1 - delta * share, cls._kappa))
+            side_updates.append((new_mu, new_sigma))
+        return side_updates
+
+    @classmethod
+    def _average_tied_side_mu_changes(
+        cls,
+        ranks: Sequence[int],
+        mus: List[List[float]],
+        updates: List[List[Tuple[float, float]]],
+        inflated_sigmas: List[List[float]],
+        team_sigma_squares: List[float],
+    ) -> List[List[Tuple[float, float]]]:
+        """Apply the documented tie rule to sides: every member of every side
+        tied at a rank receives the average team mu change of its rank group,
+        distributed by variance share, preserving each member's own prior.
 
         The reference ``openskill.py`` 6.2.0 implementation intends this rule
         but its mu adjustment is a no-op (upstream issue #201, fix in PR #203);
-        see the module notes. Sigma is always per-participant.
+        see the module notes. Sigma is always per-member.
         """
         rank_groups: Dict[float, List[int]] = {}
         for i, rank in enumerate(ranks):
             rank_groups.setdefault(rank, []).append(i)
-        averaged = list(updates)
+        averaged = [list(side) for side in updates]
         for indices in rank_groups.values():
             if len(indices) > 1:
-                average_change = sum(updates[i][0] - mus[i] for i in indices) / len(indices)
+                team_mu_changes = [
+                    sum(updates[i][j][0] - mus[i][j] for j in range(len(updates[i]))) for i in indices
+                ]
+                average_change = sum(team_mu_changes) / len(indices)
                 for i in indices:
-                    averaged[i] = (mus[i] + average_change, updates[i][1])
+                    for j in range(len(updates[i])):
+                        share = inflated_sigmas[i][j] ** 2 / team_sigma_squares[i]
+                        averaged[i][j] = (mus[i][j] + average_change * share, updates[i][j][1])
         return averaged
 
     @classmethod
-    def _solve_bout(cls, participants: List["OpenSkillCompetitor"], ranks: Sequence[int]) -> None:
+    def _solve_bout(cls, participants: List[List["OpenSkillCompetitor"]], ranks: Sequence[int]) -> None:
         """Dispatch one bout to the closed-form update of its model variant.
 
-        Every variant of the family shares the bout shape, the belief state
-        and the writeback discipline; only the per-participant update
+        Every entry of ``participants`` is one side -- a list of member
+        competitors. Every variant of the family shares the bout shape, the
+        belief state and the writeback discipline; only the per-side update
         equations differ (Weng-Lin 2011, Algorithms 1-4).
 
         Args:
-            participants (list of OpenSkillCompetitor): The bout's participants.
-            ranks (sequence of int): Finishing ranks per participant, lower is
-                better, equal ranks are ties.
+            participants (list of lists of OpenSkillCompetitor): The bout's
+                sides, each a list of member competitors.
+            ranks (sequence of int): Finishing ranks per side, lower is better,
+                equal ranks are ties.
         """
-        model = participants[0]._model
+        model = participants[0][0]._model
         if model == "plackett_luce":
             cls._solve_bout_plackett_luce(participants, ranks)
         elif model == "bradley_terry_full":
@@ -426,43 +507,49 @@ class OpenSkillCompetitor(BaseCompetitor):
             raise InvalidParameterException(f"unknown model variant: {model!r}")
 
     @classmethod
-    def _solve_bout_plackett_luce(cls, participants: List["OpenSkillCompetitor"], ranks: Sequence[int]) -> None:
-        """Run the Plackett-Luce update (Weng-Lin 2011, Algorithm 4).
+    def _solve_bout_plackett_luce(cls, participants: List[List["OpenSkillCompetitor"]], ranks: Sequence[int]) -> None:
+        """Run the Plackett-Luce update (Weng-Lin 2011, Algorithm 4) over one bout's sides.
 
-        Single-player teams only: each participant is its own team, so team
-        strength aggregates reduce to the member's own belief. Every factor of
-        the update reads a pre-update snapshot of the beliefs; the results are
-        written back afterwards through direct ``_mu``/``_sigma`` assignment --
-        never through the ``rating`` property, so ``_minimum_rating`` clamping
-        (built for 1000+-scale Elo systems) can never clip the mu-approx-25
-        scale this family uses.
+        Each entry of ``participants`` is one side -- a list of member
+        competitors. Team strength aggregates the members' summed means and
+        summed variances, and the team's update is distributed back to the
+        members in proportion to each member's share of the team variance (for
+        a one-member team that share is exactly 1, which reduces every formula
+        to the single-competitor case). Every factor of the update reads a
+        pre-update snapshot of the beliefs; the results are written back
+        afterwards through direct ``_mu``/``_sigma`` assignment -- never through
+        the ``rating`` property, so ``_minimum_rating`` clamping (built for
+        1000+-scale Elo systems) can never clip the mu-approx-25 scale this
+        family uses.
 
         Args:
-            participants (list of OpenSkillCompetitor): The bout's participants.
-            ranks (sequence of int): Finishing ranks per participant, lower is
-                better, equal ranks are ties.
+            participants (list of lists of OpenSkillCompetitor): The bout's
+                sides, each a list of member competitors.
+            ranks (sequence of int): Finishing ranks per side, lower is better,
+                equal ranks are ties.
         """
         k = len(participants)
 
         # Pre-update snapshot: the whole update is computed from the beliefs as
         # of the start of the bout.
-        mus = [competitor._mu for competitor in participants]
-        sigmas = [competitor._sigma for competitor in participants]
+        mus = [[member._mu for member in side] for side in participants]
+        inflated_sigmas = [
+            [math.sqrt(member._sigma**2 + cls._tau**2) for member in side] for side in participants
+        ]
 
-        # Additive dynamics: inflate uncertainty by tau first. The inflated
-        # sigma is what the update consumes and what the posterior builds on,
+        # Additive dynamics: uncertainty is inflated by tau before the update,
         # so dynamics compound across bouts exactly as in the reference
         # implementation.
-        inflated_sigmas = [math.sqrt(sigma**2 + cls._tau**2) for sigma in sigmas]
-
-        # One-player teams: team strength is the member's own belief.
-        team_mus = list(mus)
-        team_sigma_squares = [sigma**2 for sigma in inflated_sigmas]
+        #
+        # Team strength: summed member means and summed member variances (the
+        # one-member case is the member's own belief).
+        team_mus = [sum(side_mus) for side_mus in mus]
+        team_sigma_squares = [sum(member_sigma**2 for member_sigma in side_sigmas) for side_sigmas in inflated_sigmas]
 
         # Square root of the collective skill-plus-chance variance.
         c = math.sqrt(sum(sigma_squared + cls._beta**2 for sigma_squared in team_sigma_squares))
 
-        # sum_q[q]: sum of exp(mu/c) over every team ranked at or below team q.
+        # sum_q[q]: sum of exp(mu/c) over every side ranked at or below side q.
         sum_q = [0.0] * k
         for i in range(k):
             exp_mu_over_c = math.exp(team_mus[i] / c)
@@ -470,10 +557,10 @@ class OpenSkillCompetitor(BaseCompetitor):
                 if ranks[i] >= ranks[q]:
                     sum_q[q] += exp_mu_over_c
 
-        # a[q]: how many teams share team q's rank.
+        # a[q]: how many sides share side q's rank.
         a = [sum(1 for rank in ranks if rank == ranks[q]) for q in range(k)]
 
-        updates: List[Tuple[float, float]] = []
+        updates: List[List[Tuple[float, float]]] = []
         for i in range(k):
             omega = 0.0
             delta = 0.0
@@ -493,39 +580,38 @@ class OpenSkillCompetitor(BaseCompetitor):
             # Default Plackett-Luce gamma: sqrt(team variance) / c.
             delta *= math.sqrt(team_sigma_squares[i]) / c
 
-            # One-player teams distribute the full team update to the member.
-            new_mu = mus[i] + omega
-            new_sigma = inflated_sigmas[i] * math.sqrt(max(1 - delta, cls._kappa))
-            updates.append((new_mu, new_sigma))
+            updates.append(cls._distribute_side_update(i, mus, inflated_sigmas, team_sigma_squares, omega, delta))
 
-        # Tied teams share an outcome, so their average mu change is applied to
-        # every member of every tied team; sigma stays per-team.
-        updates = cls._average_tied_mu_changes(ranks, mus, updates)
+        # Tied sides share an outcome, so their average mu change is applied to
+        # every member of every tied side; sigma stays per-member.
+        updates = cls._average_tied_side_mu_changes(ranks, mus, updates, inflated_sigmas, team_sigma_squares)
 
-        for participant, (new_mu, new_sigma) in zip(participants, updates, strict=True):
-            participant._mu = new_mu
-            participant._sigma = new_sigma
+        cls._write_side_updates(participants, updates)
 
     @classmethod
-    def _solve_bout_bradley_terry_full(cls, participants: List["OpenSkillCompetitor"], ranks: Sequence[int]) -> None:
-        """Run the Bradley-Terry full-pairing update (Weng-Lin 2011, Algorithm 1).
+    def _solve_bout_bradley_terry_full(cls, participants: List[List["OpenSkillCompetitor"]], ranks: Sequence[int]) -> None:
+        """Run the Bradley-Terry full-pairing update (Weng-Lin 2011, Algorithm 1) over one bout's sides.
 
-        Every participant is compared against every other participant: the
-        pairwise logistic expectation and its variance contribution are summed
-        over the whole bout. Writeback discipline matches the Plackett-Luce
-        solver (pre-update snapshot, direct ``_mu``/``_sigma`` assignment).
+        Every side is compared against every other side: the pairwise logistic
+        expectation and its variance contribution are summed over the whole
+        bout. Writeback discipline matches the Plackett-Luce solver
+        (pre-update snapshot, direct ``_mu``/``_sigma`` assignment).
 
         Args:
-            participants (list of OpenSkillCompetitor): The bout's participants.
-            ranks (sequence of int): Finishing ranks per participant, lower is
-                better, equal ranks are ties.
+            participants (list of lists of OpenSkillCompetitor): The bout's
+                sides, each a list of member competitors.
+            ranks (sequence of int): Finishing ranks per side, lower is better,
+                equal ranks are ties.
         """
         # Pre-update snapshot; additive dynamics inflate sigma by tau first.
-        mus = [competitor._mu for competitor in participants]
-        inflated_sigmas = [math.sqrt(competitor._sigma**2 + cls._tau**2) for competitor in participants]
-        team_sigma_squares = [sigma**2 for sigma in inflated_sigmas]
+        mus = [[member._mu for member in side] for side in participants]
+        inflated_sigmas = [
+            [math.sqrt(member._sigma**2 + cls._tau**2) for member in side] for side in participants
+        ]
+        team_mus = [sum(side_mus) for side_mus in mus]
+        team_sigma_squares = [sum(member_sigma**2 for member_sigma in side_sigmas) for side_sigmas in inflated_sigmas]
 
-        updates: List[Tuple[float, float]] = []
+        updates: List[List[Tuple[float, float]]] = []
         for i in range(len(participants)):
             omega = 0.0
             delta = 0.0
@@ -534,9 +620,9 @@ class OpenSkillCompetitor(BaseCompetitor):
                     continue
                 c_iq = math.sqrt(team_sigma_squares[i] + team_sigma_squares[q] + 2 * cls._beta**2)
                 sigma_squared_to_ciq = team_sigma_squares[i] / c_iq
-                # Logistic win expectation of i against q (paper eq. 41),
+                # Logistic win expectation of side i against q (paper eq. 41),
                 # algebraically exp(mu_i/c)/[exp(mu_i/c)+exp(mu_q/c)].
-                p_iq = 1.0 / (1.0 + math.exp((mus[q] - mus[i]) / c_iq))
+                p_iq = 1.0 / (1.0 + math.exp((team_mus[q] - team_mus[i]) / c_iq))
                 if ranks[q] > ranks[i]:
                     score = 1.0
                 elif ranks[q] == ranks[i]:
@@ -548,21 +634,16 @@ class OpenSkillCompetitor(BaseCompetitor):
                 gamma = math.sqrt(team_sigma_squares[i]) / c_iq
                 delta += (gamma * sigma_squared_to_ciq / c_iq) * p_iq * (1.0 - p_iq)
 
-            # One-player teams distribute the full team update to the member.
-            new_mu = mus[i] + omega
-            new_sigma = inflated_sigmas[i] * math.sqrt(max(1.0 - delta, cls._kappa))
-            updates.append((new_mu, new_sigma))
+            updates.append(cls._distribute_side_update(i, mus, inflated_sigmas, team_sigma_squares, omega, delta))
 
-        updates = cls._average_tied_mu_changes(ranks, mus, updates)
-        for participant, (new_mu, new_sigma) in zip(participants, updates, strict=True):
-            participant._mu = new_mu
-            participant._sigma = new_sigma
+        updates = cls._average_tied_side_mu_changes(ranks, mus, updates, inflated_sigmas, team_sigma_squares)
+        cls._write_side_updates(participants, updates)
 
     @classmethod
-    def _solve_bout_bradley_terry_partial(cls, participants: List["OpenSkillCompetitor"], ranks: Sequence[int]) -> None:
-        """Run the Bradley-Terry partial-pairing update (Weng-Lin 2011, Algorithm 2).
+    def _solve_bout_bradley_terry_partial(cls, participants: List[List["OpenSkillCompetitor"]], ranks: Sequence[int]) -> None:
+        """Run the Bradley-Terry partial-pairing update (Weng-Lin 2011, Algorithm 2) over one bout's sides.
 
-        Each participant is compared only against neighbours within
+        Each side is compared only against neighbours within
         ``_partial_pairing_window`` finishing positions on either side of the
         rank-sorted bout, and the pairwise contributions are averaged over the
         comparisons instead of summed. This follows the reference
@@ -571,14 +652,18 @@ class OpenSkillCompetitor(BaseCompetitor):
         update for every bout no larger than the window.
 
         Args:
-            participants (list of OpenSkillCompetitor): The bout's participants.
-            ranks (sequence of int): Finishing ranks per participant, lower is
-                better, equal ranks are ties.
+            participants (list of lists of OpenSkillCompetitor): The bout's
+                sides, each a list of member competitors.
+            ranks (sequence of int): Finishing ranks per side, lower is better,
+                equal ranks are ties.
         """
         # Pre-update snapshot; additive dynamics inflate sigma by tau first.
-        mus = [competitor._mu for competitor in participants]
-        inflated_sigmas = [math.sqrt(competitor._sigma**2 + cls._tau**2) for competitor in participants]
-        team_sigma_squares = [sigma**2 for sigma in inflated_sigmas]
+        mus = [[member._mu for member in side] for side in participants]
+        inflated_sigmas = [
+            [math.sqrt(member._sigma**2 + cls._tau**2) for member in side] for side in participants
+        ]
+        team_mus = [sum(side_mus) for side_mus in mus]
+        team_sigma_squares = [sum(member_sigma**2 for member_sigma in side_sigmas) for side_sigmas in inflated_sigmas]
 
         # Window positions follow the rank-sorted bout (stable within ties),
         # matching the reference implementation's partial-pairing pass.
@@ -587,7 +672,7 @@ class OpenSkillCompetitor(BaseCompetitor):
         position_of = {index: position for position, index in enumerate(order)}
         window = cls._partial_pairing_window
 
-        updates = []
+        updates: List[List[Tuple[float, float]]] = []
         for i in range(count):
             start = max(0, position_of[i] - window)
             end = min(count, position_of[i] + window + 1)
@@ -600,7 +685,7 @@ class OpenSkillCompetitor(BaseCompetitor):
                     continue
                 c_iq = math.sqrt(team_sigma_squares[i] + team_sigma_squares[q] + 2 * cls._beta**2)
                 sigma_squared_to_ciq = team_sigma_squares[i] / c_iq
-                p_iq = 1.0 / (1.0 + math.exp((mus[q] - mus[i]) / c_iq))
+                p_iq = 1.0 / (1.0 + math.exp((team_mus[q] - team_mus[i]) / c_iq))
                 if ranks[q] > ranks[i]:
                     score = 1.0
                 elif ranks[q] == ranks[i]:
@@ -620,18 +705,13 @@ class OpenSkillCompetitor(BaseCompetitor):
                 omega = 0.0
                 delta = 0.0
 
-            new_mu = mus[i] + omega
-            new_sigma = inflated_sigmas[i] * math.sqrt(max(1.0 - delta, cls._kappa))
-            updates.append((new_mu, new_sigma))
+            updates.append(cls._distribute_side_update(i, mus, inflated_sigmas, team_sigma_squares, omega, delta))
 
-        updates = cls._average_tied_mu_changes(ranks, mus, updates)
-        for participant, (new_mu, new_sigma) in zip(participants, updates, strict=True):
-            participant._mu = new_mu
-            participant._sigma = new_sigma
-
+        updates = cls._average_tied_side_mu_changes(ranks, mus, updates, inflated_sigmas, team_sigma_squares)
+        cls._write_side_updates(participants, updates)
     @classmethod
-    def _solve_bout_thurstone(cls, participants: List["OpenSkillCompetitor"], ranks: Sequence[int]) -> None:
-        """Run the Thurstone-Mosteller update (Weng-Lin 2011, Algorithm 3).
+    def _solve_bout_thurstone(cls, participants: List[List["OpenSkillCompetitor"]], ranks: Sequence[int]) -> None:
+        """Run the Thurstone-Mosteller update (Weng-Lin 2011, Algorithm 3) over one bout's sides.
 
         A Gaussian (Thurstone-Mosteller) performance model with an explicit
         draw margin: decisive pairwise results use the truncated-normal
@@ -640,16 +720,20 @@ class OpenSkillCompetitor(BaseCompetitor):
         the reference implementation's numerics).
 
         Args:
-            participants (list of OpenSkillCompetitor): The bout's participants.
-            ranks (sequence of int): Finishing ranks per participant, lower is
-                better, equal ranks are ties.
+            participants (list of lists of OpenSkillCompetitor): The bout's
+                sides, each a list of member competitors.
+            ranks (sequence of int): Finishing ranks per side, lower is better,
+                equal ranks are ties.
         """
         # Pre-update snapshot; additive dynamics inflate sigma by tau first.
-        mus = [competitor._mu for competitor in participants]
-        inflated_sigmas = [math.sqrt(competitor._sigma**2 + cls._tau**2) for competitor in participants]
-        team_sigma_squares = [sigma**2 for sigma in inflated_sigmas]
+        mus = [[member._mu for member in side] for side in participants]
+        inflated_sigmas = [
+            [math.sqrt(member._sigma**2 + cls._tau**2) for member in side] for side in participants
+        ]
+        team_mus = [sum(side_mus) for side_mus in mus]
+        team_sigma_squares = [sum(member_sigma**2 for member_sigma in side_sigmas) for side_sigmas in inflated_sigmas]
 
-        updates = []
+        updates: List[List[Tuple[float, float]]] = []
         for i in range(len(participants)):
             omega = 0.0
             delta = 0.0
@@ -657,8 +741,8 @@ class OpenSkillCompetitor(BaseCompetitor):
                 if q == i:
                     continue
                 c_iq = math.sqrt(team_sigma_squares[i] + team_sigma_squares[q] + 2 * cls._beta**2)
-                delta_mu = (mus[i] - mus[q]) / c_iq
                 sigma_squared_to_ciq = team_sigma_squares[i] / c_iq
+                delta_mu = (team_mus[i] - team_mus[q]) / c_iq
                 gamma = math.sqrt(team_sigma_squares[i]) / c_iq
                 draw_margin_over_c = cls._epsilon / c_iq
 
@@ -675,14 +759,10 @@ class OpenSkillCompetitor(BaseCompetitor):
                     omega += sigma_squared_to_ciq * _truncated_v_tie(delta_mu, draw_margin_over_c)
                     delta += (gamma * sigma_squared_to_ciq / c_iq) * _truncated_w_tie(delta_mu, draw_margin_over_c)
 
-            new_mu = mus[i] + omega
-            new_sigma = inflated_sigmas[i] * math.sqrt(max(1.0 - delta, cls._kappa))
-            updates.append((new_mu, new_sigma))
+            updates.append(cls._distribute_side_update(i, mus, inflated_sigmas, team_sigma_squares, omega, delta))
 
-        updates = cls._average_tied_mu_changes(ranks, mus, updates)
-        for participant, (new_mu, new_sigma) in zip(participants, updates, strict=True):
-            participant._mu = new_mu
-            participant._sigma = new_sigma
+        updates = cls._average_tied_side_mu_changes(ranks, mus, updates, inflated_sigmas, team_sigma_squares)
+        cls._write_side_updates(participants, updates)
 
     # ------------------------------------------------------------------
     # Period update (the batch hook the arenas call)
@@ -692,7 +772,7 @@ class OpenSkillCompetitor(BaseCompetitor):
     def _validate_period(
         cls,
         results: Sequence[Tuple[BaseCompetitor, BaseCompetitor, float, Optional[Sequence[float]]]],
-    ) -> List[Tuple[List["OpenSkillCompetitor"], Tuple[int, ...]]]:
+    ) -> List[Tuple[List[List["OpenSkillCompetitor"]], Tuple[int, ...]]]:
         """Validate every row of a period up front and turn rows into bouts.
 
         Mirrors the up-front validation of the Glicko-Boost period schedule: a
@@ -705,7 +785,7 @@ class OpenSkillCompetitor(BaseCompetitor):
                 if a row contains another rating system.
             MissMatchedCompetitorTypesException: If a row mixes rating systems.
         """
-        bouts: List[Tuple[List["OpenSkillCompetitor"], Tuple[int, ...]]] = []
+        bouts: List[Tuple[List[List["OpenSkillCompetitor"]], Tuple[int, ...]]] = []
         for competitor_a, competitor_b, outcome, scores in results:
             if outcome not in (1.0, 0.0, 0.5):
                 raise ValueError(f"outcome must be one of 1.0, 0.0 or 0.5, got {outcome!r}")
@@ -727,7 +807,7 @@ class OpenSkillCompetitor(BaseCompetitor):
                 ranks = (1, 0)
             else:
                 ranks = (0, 0)
-            bouts.append(([competitor_a, competitor_b], ranks))
+            bouts.append(([[competitor_a], [competitor_b]], ranks))
         return bouts
 
     @classmethod

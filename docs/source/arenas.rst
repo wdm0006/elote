@@ -28,6 +28,51 @@ simultaneously while keeping the pairwise API intact.
     :members:
 
 
+N-player bouts
+--------------
+
+:meth:`~elote.LambdaArena.match_group` runs a single bout between three or more
+sides -- or between two sides with rosters, i.e. a team bout. The participants
+are given in finishing order (or with explicit ``ranks``), and the whole bout is
+updated natively with one bout-level pass rather than as a fan-out of pairwise
+results, which is not mathematically equivalent for bout-level models such as
+OpenSkill.
+
+.. code-block:: python
+
+    from elote import LambdaArena, OpenSkillCompetitor
+
+    arena = LambdaArena(lambda *args: None, base_competitor=OpenSkillCompetitor)
+    # Free-for-all: Ada finishes first, Linus last.
+    arena.match_group(["Ada", "Grace", "Linus"])
+    # Team bout: the (ada, grace) roster ties the (linus, kurt) roster.
+    arena.match_group([
+        ("red", ["ada", "grace"]),
+        ("blue", ["linus", "kurt"]),
+    ], ranks=[0, 0])
+
+``ranks`` gives one finishing rank per participant (lower is better, equal
+ranks are ties); ``scores`` is one score per participant and defines the ranks
+when ``ranks`` is omitted. Every pre-update prediction is captured before any
+participant is updated, and the bout is recorded as a
+:class:`~elote.arenas.base.MultiBout` entry.
+
+Only rating systems implementing a bout-level update (``apply_bout``) support
+N-way bouts; the first shipped consumer is
+:class:`~elote.OpenSkillCompetitor`, including per-member team updates whose
+team strength aggregates the members' beliefs.
+
+.. note::
+
+   N-way bouts are excluded from the two-sided analytics --
+   ``History.report_results``, ``confusion_matrix``, ``calculate_metrics``,
+   ``calculate_metrics_with_draws``, ``optimize_thresholds``, ``random_search``,
+   ``accuracy_by_prior_bouts``, ``get_calibration_data`` and the calibration
+   plot -- because those are defined over a winner/drawer/loser comparison of
+   exactly two competitors. They remain recorded in ``History.bouts`` for
+   inspection.
+
+
 Helpers
 -------
 
@@ -35,5 +80,8 @@ Helpers
     :members:
 
 .. autoclass:: elote.arenas.base.Bout
+    :members:
+
+.. autoclass:: elote.arenas.base.MultiBout
     :members:
 
