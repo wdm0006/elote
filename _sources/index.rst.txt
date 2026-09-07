@@ -51,6 +51,7 @@ Elote makes implementing these systems simple and intuitive, with a clean API th
    rating_systems/keener
    rating_systems/pythagorean
    rating_systems/bradley_terry
+   rating_systems/openskill
    rating_systems/whr
    rating_systems/ensemble
    rating_systems/elo_vs_glicko_vs_trueskill

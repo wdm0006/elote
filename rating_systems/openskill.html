@@ -15,7 +15,7 @@
         gtag('config', 'G-Z43R9PWW0B');
     </script>
     
-    <title>Bradley-Terry Model &#8212; elote 1.4.0 documentation</title>
+    <title>OpenSkill (Weng-Lin Plackett-Luce) &#8212; elote 1.4.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=30d13653" />
     <link rel="stylesheet" type="text/css" href="../_static/css/wabi.css?v=501c8ac3" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=71d92741" />
@@ -25,8 +25,8 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="OpenSkill (Weng-Lin Plackett-Luce)" href="openskill.html" />
-    <link rel="prev" title="Pythagorean Expectation" href="pythagorean.html" />
+    <link rel="next" title="Whole-History Rating" href="whr.html" />
+    <link rel="prev" title="Bradley-Terry Model" href="bradley_terry.html" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,7 +34,7 @@
 
 
 
-<meta name="description" content="Bradley-Terry Model - elote documentation">
+<meta name="description" content="OpenSkill (Weng-Lin Plackett-Luce) - elote documentation">
 
 
 
@@ -44,19 +44,19 @@
 
 
 
-<meta property="og:title" content="Bradley-Terry Model">
-<meta property="og:description" content="Bradley-Terry Model - elote documentation">
+<meta property="og:title" content="OpenSkill (Weng-Lin Plackett-Luce)">
+<meta property="og:description" content="OpenSkill (Weng-Lin Plackett-Luce) - elote documentation">
 <meta property="og:type" content="website">
 
-<meta property="og:url" content="https://elote.mcginniscommawill.com/rating_systems/bradley_terry.html">
+<meta property="og:url" content="https://elote.mcginniscommawill.com/rating_systems/openskill.html">
 
 
 <meta property="og:site_name" content="elote">
 
 
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Bradley-Terry Model">
-<meta name="twitter:description" content="Bradley-Terry Model - elote documentation">
+<meta name="twitter:title" content="OpenSkill (Weng-Lin Plackett-Luce)">
+<meta name="twitter:description" content="OpenSkill (Weng-Lin Plackett-Luce) - elote documentation">
 
 <meta name="twitter:site" content="@willmcginniser">
 
@@ -64,7 +64,7 @@
 
 
 
-<link rel="canonical" href="https://elote.mcginniscommawill.com/rating_systems/bradley_terry.html">
+<link rel="canonical" href="https://elote.mcginniscommawill.com/rating_systems/openskill.html">
 
 
  
@@ -160,7 +160,7 @@
     
     
     <span class="breadcrumbs__separator">/</span>
-    <span>Bradley-Terry Model</span>
+    <span>OpenSkill (Weng-Lin Plackett-Luce)</span>
     
   </div>
 </nav>
@@ -172,117 +172,137 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="bradley-terry-model">
-<h1>Bradley-Terry Model<a class="headerlink" href="#bradley-terry-model" title="Link to this heading">¶</a></h1>
+  <section id="openskill-weng-lin-plackett-luce">
+<h1>OpenSkill (Weng-Lin Plackett-Luce)<a class="headerlink" href="#openskill-weng-lin-plackett-luce" title="Link to this heading">¶</a></h1>
 <p>See <a class="reference internal" href="elo_vs_glicko_vs_trueskill.html"><span class="doc">Elo vs Glicko vs TrueSkill</span></a> for a measured, sourced head-to-head, or <a class="reference internal" href="../choose_a_rating_system.html"><span class="doc">How to choose a rating system</span></a> for a decision guide across every system.</p>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
-<p>The Bradley-Terry model is a probabilistic model for paired comparisons, introduced by
-Ralph Bradley and Milton Terry in 1952. Each competitor is assigned a single latent
-<em>strength</em>, and the outcome of any head-to-head matchup is modeled as a function of the two
-competitors’ strengths. It is one of the most widely used models for analyzing paired
-comparison data across sports analytics, ranking systems, and preference learning.</p>
-<p>Unlike Elo, which nudges ratings incrementally after every game, Bradley-Terry estimates the
-strengths by <strong>maximum likelihood</strong> over the full set of observed comparisons. In Elote this
-is done the same way as the Colley Matrix method: results are recorded as they happen, and the
-strengths of the entire connected group of competitors are re-fit after each result.</p>
+<p>OpenSkill is a family of online Bayesian rating algorithms published by Weng and Lin
+(2011) as a computationally lighter alternative to TrueSkill. Where TrueSkill relies
+on iterative approximate message passing and factor graphs, the Weng-Lin update is a
+single closed-form step, and where Elo can only compare two competitors at a time,
+the Weng-Lin update is defined over an <em>ordered participant set of any size</em>: one
+computation ranks a whole bout, ties included.</p>
+<p>Each competitor carries a Gaussian belief about its own skill: a mean <code class="docutils literal notranslate"><span class="pre">mu</span></code> and a
+standard deviation <code class="docutils literal notranslate"><span class="pre">sigma</span></code>. The displayed rating is the conservative ordinal</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\\text{rating} = \\mu - 3 \\sigma\end{split}\]</div>
+<p>which underestimates true skill with roughly 99.7% confidence, so it only rises as
+demonstrated results shrink <code class="docutils literal notranslate"><span class="pre">sigma</span></code>.</p>
 </section>
 <section id="how-it-works">
 <h2>How It Works<a class="headerlink" href="#how-it-works" title="Link to this heading">¶</a></h2>
-<p>Each competitor <code class="docutils literal notranslate"><span class="pre">i</span></code> has a positive strength <code class="docutils literal notranslate"><span class="pre">p_i</span></code>. The probability that <code class="docutils literal notranslate"><span class="pre">i</span></code> beats <code class="docutils literal notranslate"><span class="pre">j</span></code> is</p>
+<p>A bout is an ordered set of participants with finishing ranks (lower is better, equal
+ranks are ties). For participant <code class="docutils literal notranslate"><span class="pre">i</span></code> the update combines three quantities computed
+over the whole bout: the collective skill-plus-chance scale</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}P(i \\text{ beats } j) = \\frac{p_i}{p_i + p_j}\end{split}\]</div>
-<p>Writing the strengths in the log domain as <code class="docutils literal notranslate"><span class="pre">p_i</span> <span class="pre">=</span> <span class="pre">e^{\\beta_i}</span></code> turns this into the logistic
-function</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}P(i \\text{ beats } j) = \\frac{1}{1 + e^{-(\\beta_i - \\beta_j)}}\end{split}\]</div>
-<p>which is exactly the functional form of the Elo expected score. Elote reports Bradley-Terry
-ratings on an Elo-like scale, <code class="docutils literal notranslate"><span class="pre">rating</span> <span class="pre">=</span> <span class="pre">1500</span> <span class="pre">+</span> <span class="pre">s</span> <span class="pre">\\cdot</span> <span class="pre">\\beta</span></code> with <code class="docutils literal notranslate"><span class="pre">s</span> <span class="pre">=</span> <span class="pre">400</span> <span class="pre">/</span> <span class="pre">\\ln(10)</span></code>,
-so that the expected score is numerically identical to Elo’s and the ratings are directly
-comparable to Elo ratings.</p>
-<p>The strengths are fit with the minorization-maximization (MM) update of Hunter (2004). Writing
-<code class="docutils literal notranslate"><span class="pre">W_i</span></code> for the total number of wins by <code class="docutils literal notranslate"><span class="pre">i</span></code> and <code class="docutils literal notranslate"><span class="pre">n_{ij}</span></code> for the number of games between <code class="docutils literal notranslate"><span class="pre">i</span></code>
-and <code class="docutils literal notranslate"><span class="pre">j</span></code>, each iteration applies</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}p_i' = \\frac{W_i}{\\sum_j n_{ij} / (p_i + p_j)}\end{split}\]</div>
-<p>followed by normalization by the geometric mean of the strengths. This update is guaranteed to
-increase the likelihood at every step and converges to the unique regularized maximum. Because the strengths are
-only identified up to an overall scale, Elote re-centers them so that the mean log-strength of
-a connected group is zero.</p>
-<p>A small amount of <strong>regularization</strong> (a virtual win and loss against an average phantom
-opponent) is added so that a unique, finite maximum-likelihood estimate exists even when a
-competitor is undefeated or winless within its group – a case where the unregularized estimate
-would diverge to infinity.</p>
-<p>Ties are counted as half a win for each side.</p>
+\[\begin{split}c = \\sqrt{\\sum_i (\\sigma_i^2 + \\tau^2) + k \\beta^2}\end{split}\]</div>
+<p>the Plackett-Luce win expectation <code class="docutils literal notranslate"><span class="pre">exp(mu_i</span> <span class="pre">/</span> <span class="pre">c)</span> <span class="pre">/</span> <span class="pre">sum_q</span></code>, and the number of teams
+sharing each rank. The closed-form update then shifts every <code class="docutils literal notranslate"><span class="pre">mu</span></code> by its expected
+surplus and shrinks every <code class="docutils literal notranslate"><span class="pre">sigma</span></code> in one step. Uncertainty is inflated by an
+additive dynamics parameter <code class="docutils literal notranslate"><span class="pre">tau</span></code> before every update so beliefs never fully
+converge, and a <code class="docutils literal notranslate"><span class="pre">kappa</span></code> floor keeps <code class="docutils literal notranslate"><span class="pre">sigma</span></code> strictly positive.</p>
+<p>Unlike Elo or Glicko, whose updates are defined pairwise, this update is <em>bout-native</em>:
+genuine 3-way and N-way results enter the same formula as a head-to-head match, and
+tied participants share the average rank change. Elote exposes this through the
+unified competitor interface: pairwise methods route a single result through the
+period hook as a one-bout period, so every caller gets the same formulas, and the
+walk-forward evaluation machinery applies results period-by-period as usual.</p>
 </section>
 <section id="advantages">
 <h2>Advantages<a class="headerlink" href="#advantages" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>Order independent</strong>: the fit depends only on the set of results, not the order they were
-played.</p></li>
-<li><p><strong>Statistically principled</strong>: produces the maximum-likelihood strengths given the data.</p></li>
-<li><p><strong>Elo-compatible scale</strong>: expected scores match Elo, so ratings are easy to interpret.</p></li>
+<li><p><strong>N-player native</strong>: one closed-form update covers a whole ranked field with ties;
+no inner convergence loop and no pairwise decomposition.</p></li>
+<li><p><strong>Calibrated confidence</strong>: the <code class="docutils literal notranslate"><span class="pre">mu</span> <span class="pre">-</span> <span class="pre">3*sigma</span></code> ordinal is conservative by
+construction, which suits matchmaking and exploration.</p></li>
+<li><p><strong>Fast</strong>: closed-form update per bout, no matrix refactorization (Colley, Massey,
+Keener) and no iterative inference (TrueSkill).</p></li>
 </ul>
 </section>
 <section id="limitations">
 <h2>Limitations<a class="headerlink" href="#limitations" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>Recomputes globally</strong>: like Colley, every result re-fits the whole connected group, which
-is more expensive than Elo’s constant-time update for very large populations.</p></li>
-<li><p><strong>No margin of victory</strong>: only win/loss/tie outcomes are used.</p></li>
-<li><p><strong>Serialization</strong>: the match graph (opponent references) cannot be serialized, so a
-competitor restored from state keeps its rating and aggregate win/loss/tie counts but not the
-live links to its opponents.</p></li>
+<li><p><strong>Different rating scale</strong>: beliefs live around <code class="docutils literal notranslate"><span class="pre">mu</span> <span class="pre">=</span> <span class="pre">25</span></code> with <code class="docutils literal notranslate"><span class="pre">sigma</span> <span class="pre">=</span> <span class="pre">25/3</span></code>,
+not the Elo 1500 scale; ordinals are not comparable to Elo numbers.</p></li>
+<li><p><strong>Rating writes are refused</strong>: the rating is derived from <code class="docutils literal notranslate"><span class="pre">mu</span></code>/<code class="docutils literal notranslate"><span class="pre">sigma</span></code>; write
+those (or use the serializable state) instead.</p></li>
+<li><p><strong>Score margins are not consumed</strong>: like TrueSkill, the update is rank-based; score
+payloads are validated for consistency with the outcome but do not change the result.</p></li>
 </ul>
 </section>
 <section id="implementation-in-elote">
 <h2>Implementation in Elote<a class="headerlink" href="#implementation-in-elote" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">BradleyTerryCompetitor</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenSkillCompetitor</span>
 
-<span class="n">player_a</span> <span class="o">=</span> <span class="n">BradleyTerryCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
-<span class="n">player_b</span> <span class="o">=</span> <span class="n">BradleyTerryCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">)</span>
+<span class="n">player_a</span> <span class="o">=</span> <span class="n">OpenSkillCompetitor</span><span class="p">()</span>                    <span class="c1"># mu=25, sigma=25/3</span>
+<span class="n">player_b</span> <span class="o">=</span> <span class="n">OpenSkillCompetitor</span><span class="p">(</span><span class="n">initial_mu</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span> <span class="n">initial_sigma</span><span class="o">=</span><span class="mf">6.0</span><span class="p">)</span>
 
-<span class="c1"># Record results; strengths are re-fit after each one.</span>
-<span class="n">player_a</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">player_b</span><span class="p">)</span>
+<span class="c1"># Record results; beliefs update in one closed-form step.</span>
 <span class="n">player_a</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">player_b</span><span class="p">)</span>
 <span class="n">player_b</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">player_a</span><span class="p">)</span>
+<span class="n">player_a</span><span class="o">.</span><span class="n">tied</span><span class="p">(</span><span class="n">player_b</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">player_a</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">player_b</span><span class="o">.</span><span class="n">rating</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">player_a</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player_b</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">player_a</span><span class="o">.</span><span class="n">rating</span><span class="p">,</span> <span class="n">player_b</span><span class="o">.</span><span class="n">rating</span><span class="p">)</span>             <span class="c1"># mu - 3*sigma ordinals</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">player_a</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">player_b</span><span class="p">))</span>            <span class="c1"># 1v1 win probability</span>
+
+<span class="c1"># Genuine N-way bouts with ties, updated in one step.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenSkillCompetitor</span> <span class="k">as</span> <span class="n">OSC</span>
+
+<span class="n">trio</span> <span class="o">=</span> <span class="p">[</span><span class="n">OSC</span><span class="p">(),</span> <span class="n">OSC</span><span class="p">(),</span> <span class="n">OSC</span><span class="p">()]</span>
+<span class="n">OSC</span><span class="o">.</span><span class="n">apply_bout</span><span class="p">(</span><span class="n">trio</span><span class="p">,</span> <span class="n">ranks</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>               <span class="c1"># first two tied for the win</span>
 </pre></div>
 </div>
 <p>It also plugs directly into an arena:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">LambdaArena</span><span class="p">,</span> <span class="n">BradleyTerryCompetitor</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">LambdaArena</span><span class="p">,</span> <span class="n">OpenSkillCompetitor</span>
 
-<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">comparison_func</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">BradleyTerryCompetitor</span><span class="p">)</span>
+<span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span><span class="n">comparison_func</span><span class="p">,</span> <span class="n">base_competitor</span><span class="o">=</span><span class="n">OpenSkillCompetitor</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="customization">
 <h2>Customization<a class="headerlink" href="#customization" title="Link to this heading">¶</a></h2>
-<p>Class-level parameters can be tuned with <code class="docutils literal notranslate"><span class="pre">configure_class</span></code>:</p>
+<p>Constructor parameters:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">anchor_rating</span></code> – the rating assigned to the mean log-strength (default <code class="docutils literal notranslate"><span class="pre">1500</span></code>).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">scale</span></code> – points per unit of log-strength (default <code class="docutils literal notranslate"><span class="pre">400</span> <span class="pre">/</span> <span class="pre">ln(10)</span></code>).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">reg</span></code> – regularization strength (default <code class="docutils literal notranslate"><span class="pre">0.1</span></code>).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">max_iter</span></code> / <code class="docutils literal notranslate"><span class="pre">tol</span></code> – iteration budget and convergence tolerance for the fit.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">initial_mu</span></code> – prior mean skill value (default <code class="docutils literal notranslate"><span class="pre">25.0</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">initial_sigma</span></code> – prior skill standard deviation (default <code class="docutils literal notranslate"><span class="pre">25/3</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">model</span></code> – Weng-Lin variant selector, defaulting to <code class="docutils literal notranslate"><span class="pre">plackett_luce</span></code>. Only the
+Plackett-Luce update is implemented; the Bradley-Terry and Thurstone-Mosteller
+variants of the family will join this selector later.</p></li>
 </ul>
+<p>Class-level constants (<code class="docutils literal notranslate"><span class="pre">_beta</span></code>, <code class="docutils literal notranslate"><span class="pre">_tau</span></code>, <code class="docutils literal notranslate"><span class="pre">_kappa</span></code>) can be tuned with
+<code class="docutils literal notranslate"><span class="pre">configure_class</span></code>: <code class="docutils literal notranslate"><span class="pre">beta</span></code> is the skill-vs-chance deviation baked into every
+comparison, <code class="docutils literal notranslate"><span class="pre">tau</span></code> the per-update uncertainty inflation, and <code class="docutils literal notranslate"><span class="pre">kappa</span></code> the floor on
+the posterior variance multiplier.</p>
+</section>
+<section id="notes-on-the-reference-implementation">
+<h2>Notes on the reference implementation<a class="headerlink" href="#notes-on-the-reference-implementation" title="Link to this heading">¶</a></h2>
+<p>Elote’s implementation follows the Weng-Lin update as documented for the
+<code class="docutils literal notranslate"><span class="pre">openskill.py</span></code> reference package. In <code class="docutils literal notranslate"><span class="pre">openskill.py</span></code> 6.2.0 the mu tie adjustment
+is a no-op (upstream <a class="reference external" href="https://github.com/vivekjoshy/openskill.py/issues/201">issue #201</a>,
+fix in <a class="reference external" href="https://github.com/vivekjoshy/openskill.py/pull/203">PR #203</a>): tied
+players keep their raw per-player changes instead of the documented average. Elote
+implements the documented rule – every tied player receives the average mu change of
+its rank group, preserving each player’s own prior – and the reference-value test
+suite pins both the agreement and this documented deviation.</p>
 </section>
 <section id="real-world-applications">
 <h2>Real-World Applications<a class="headerlink" href="#real-world-applications" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Ranking sports teams or players from head-to-head results.</p></li>
-<li><p>Aggregating pairwise human preferences (e.g. A/B choices) into a single ranking.</p></li>
-<li><p>Any setting where you want a maximum-likelihood ranking rather than an online estimate.</p></li>
+<li><p>Multi-player leaderboards (racing, battle-royale, tournaments) where results are
+full ranked fields rather than pairwise matches.</p></li>
+<li><p>Matchmaking where a conservative ordinal keeps uncertain newcomers out of lopsided
+matches.</p></li>
+<li><p>Any setting where TrueSkill’s quality is wanted without its computational cost.</p></li>
 </ul>
 </section>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Bradley, R. A., &amp; Terry, M. E. (1952). Rank Analysis of Incomplete Block Designs: I. The
-Method of Paired Comparisons. <em>Biometrika</em>, 39(3/4), 324-345.</p></li>
-<li><p>Hunter, D. R. (2004). MM Algorithms for Generalized Bradley-Terry Models. <em>The Annals of
-Statistics</em>, 32(1), 384-406.</p></li>
+<li><p>Weng, R. C., &amp; Lin, C.-J. (2011). A Bayesian Approximation Method for Online
+Ranking. <em>Journal of Machine Learning Research</em>, 12, 267-300.</p></li>
+<li><p><a class="reference external" href="https://github.com/vivekjoshy/openskill.py">openskill.py</a> – the reference
+Python implementation of the family.</p></li>
 </ul>
 </section>
 </section>
@@ -321,8 +341,8 @@ Statistics</em>, 32(1), 384-406.</p></li>
 <li class="toctree-l1"><a class="reference internal" href="massey.html">Massey Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="keener.html">Keener Ratings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pythagorean.html">Pythagorean Expectation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Bradley-Terry Model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="openskill.html">OpenSkill (Weng-Lin Plackett-Luce)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">OpenSkill (Weng-Lin Plackett-Luce)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="whr.html">Whole-History Rating</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ensemble.html">Ensemble Rating System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="elo_vs_glicko_vs_trueskill.html">Elo vs Glicko vs TrueSkill</a></li>
