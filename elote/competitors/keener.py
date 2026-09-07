@@ -144,6 +144,9 @@ class KeenerCompetitor(BaseCompetitor):
         # Opponent -> total points this competitor has scored against that opponent. This is
         # the S_ij the preference matrix is built from.
         self._scores_for: Dict["KeenerCompetitor", float] = {}
+        # True when recorded games are not yet reflected in _rating: the eigenvector fit is
+        # deferred to the first rating read that needs it (dirty-flag caching).
+        self._ratings_dirty = False
         # Unique ID for hashing (instances are used as dict keys in the match graph).
         self._id = id(self)
         logger.debug("Initialized KeenerCompetitor %d with initial rating %.6f", self._id, self._initial_rating)
@@ -152,9 +155,13 @@ class KeenerCompetitor(BaseCompetitor):
     def rating(self) -> float:
         """Get the current rating of this competitor.
 
+        Reading the rating is where deferred eigenvector fits happen: if games have been
+        recorded since the last read, the connected group is re-fit first.
+
         Returns:
             float: The current rating.
         """
+        self._ensure_current_ratings()
         return self._rating
 
     @rating.setter
@@ -183,6 +190,26 @@ class KeenerCompetitor(BaseCompetitor):
         """
         return self._wins + self._losses + self._ties
 
+    def _ensure_current_ratings(self) -> None:
+        """Re-fit the connected group's ratings if recorded games are not yet reflected.
+
+        Recording a game only marks the fit stale; the eigenvector computation runs once on
+        the first read that needs it, so repeated reads with no new games are O(1) amortized.
+        """
+        if self._ratings_dirty:
+            self._recalculate_ratings()
+
+    def _mark_group_stale(self) -> None:
+        """Mark every competitor in the connected group stale after a recorded game.
+
+        A new game changes the eigenvector fit of the whole connected component, not just
+        the two endpoints' cached ratings: endpoint-only flags would let a clean member
+        serve a rating that predates the game whenever it is read first, making output
+        depend on read order. One O(component) walk per recorded game keeps reads O(1).
+        """
+        for comp in self._get_connected_competitors():
+            comp._ratings_dirty = True
+
     def expected_score(self, competitor: "BaseCompetitor") -> float:
         """Calculate the expected score against another competitor.
 
@@ -210,7 +237,8 @@ class KeenerCompetitor(BaseCompetitor):
     def beat(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has won against the given competitor.
 
-        The scores are recorded in the match graph and the whole connected group is re-fit.
+        The scores are recorded in the match graph and the whole connected group is re-fit
+        lazily, on the next rating read.
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that lost.
@@ -233,7 +261,6 @@ class KeenerCompetitor(BaseCompetitor):
         self._record_game(opponent, mine, theirs)
 
         logger.debug("Recorded win for %d (%.3f-%.3f), loss for %d", self._id, mine, theirs, opponent._id)
-        self._recalculate_ratings()
 
     def tied(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has tied with the given competitor.
@@ -259,7 +286,6 @@ class KeenerCompetitor(BaseCompetitor):
         self._record_game(opponent, mine, theirs)
 
         logger.debug("Recorded tie for %d and %d (%.3f-%.3f)", self._id, opponent._id, mine, theirs)
-        self._recalculate_ratings()
 
     def lost_to(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has lost to the given competitor.
@@ -296,6 +322,9 @@ class KeenerCompetitor(BaseCompetitor):
         opponent._points_against += mine
         opponent._opponents[self] = opponent._opponents.get(self, 0) + 1
         opponent._scores_for[self] = opponent._scores_for.get(self, 0.0) + theirs
+        # The whole connected group's eigenvector fit is stale now; the re-fit is deferred
+        # to the first rating read that needs it. The opponent is in self's group.
+        self._mark_group_stale()
 
     def _get_connected_competitors(self) -> List["KeenerCompetitor"]:
         """Get all competitors connected to this competitor in the match graph.
@@ -377,6 +406,7 @@ class KeenerCompetitor(BaseCompetitor):
         n = len(competitors)
         if n <= 1:
             logger.debug("Only one competitor in network, skipping recalculation.")
+            self._ratings_dirty = False
             return
 
         idx = {comp: i for i, comp in enumerate(competitors)}
@@ -433,6 +463,10 @@ class KeenerCompetitor(BaseCompetitor):
         for i, comp in enumerate(competitors):
             comp.rating = float(ratings[i])
 
+        # The eigensolve above is a completed fit: every connected competitor is current.
+        for comp in competitors:
+            comp._ratings_dirty = False
+
     def _fallback_rating_calculation(self, competitors: List["KeenerCompetitor"], matrix: "np.ndarray") -> None:
         """Assign mean-preference ratings when the eigenvector cannot be computed.
 
@@ -450,6 +484,10 @@ class KeenerCompetitor(BaseCompetitor):
         for comp, value in zip(competitors, values, strict=True):
             comp.rating = float(max(value, self._probability_floor))
 
+        # The fallback is itself a completed fit: every connected competitor is current.
+        for comp in competitors:
+            comp._ratings_dirty = False
+
     def _export_parameters(self) -> Dict[str, Any]:
         """Export the parameters used to initialize this competitor.
 
@@ -466,6 +504,8 @@ class KeenerCompetitor(BaseCompetitor):
         Returns:
             dict: A dictionary containing the current state variables.
         """
+        # Never export a rating older than the recorded games.
+        self._ensure_current_ratings()
         return {
             "rating": self._rating,
             "wins": self._wins,
@@ -501,6 +541,9 @@ class KeenerCompetitor(BaseCompetitor):
         self._points_against = state.get("points_against", 0.0)
         self._opponents = {}
         self._scores_for = {}
+        # The imported rating is current for the imported (edge-less) state; reset the
+        # deferred-fit cache rather than marking it stale.
+        self._ratings_dirty = False
 
     @classmethod
     def _create_from_parameters(cls: Type[T], parameters: Dict[str, Any]) -> T:
@@ -525,6 +568,7 @@ class KeenerCompetitor(BaseCompetitor):
         self._points_against = 0.0
         self._opponents = {}
         self._scores_for = {}
+        self._ratings_dirty = False
 
     @classmethod
     def configure_class(cls, **kwargs: Any) -> None:

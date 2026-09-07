@@ -62,6 +62,9 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         self._ties = 0
         self._opponents: Dict["ColleyMatrixCompetitor", int] = {}  # Opponent -> num games
         self._head_to_head: Dict["ColleyMatrixCompetitor", float] = {}  # Opponent -> wins against
+        # True when recorded games are not yet reflected in _rating: the matrix solve is
+        # deferred to the first rating read that needs it (dirty-flag caching).
+        self._ratings_dirty = False
         # Add a unique ID for hashing
         self._id = id(self)
         logger.debug("Initialized ColleyMatrixCompetitor %d with initial rating %.3f", self._id, self._initial_rating)
@@ -70,9 +73,13 @@ class ColleyMatrixCompetitor(BaseCompetitor):
     def rating(self) -> float:
         """Get the current rating of this competitor.
 
+        Reading the rating is where deferred matrix solves happen: if games have been
+        recorded since the last read, the connected group is re-fit first.
+
         Returns:
             float: The current rating.
         """
+        self._ensure_current_ratings()
         return self._rating
 
     @rating.setter
@@ -102,6 +109,26 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         """
         return self._wins + self._losses + self._ties
 
+    def _ensure_current_ratings(self) -> None:
+        """Re-fit the connected group's ratings if recorded games are not yet reflected.
+
+        Recording a game only marks the fit stale; the O(n^3) solve runs once on the first
+        read that needs it, so repeated reads with no new games are O(1) amortized.
+        """
+        if self._ratings_dirty:
+            self._recalculate_ratings()
+
+    def _mark_group_stale(self) -> None:
+        """Mark every competitor in the connected group stale after a recorded game.
+
+        A new game changes the Colley fit of the whole connected component, not just the
+        two endpoints' cached ratings: endpoint-only flags would let a clean member serve a
+        rating that predates the game whenever it is read first, making output depend on
+        read order. One O(component) walk per recorded game keeps every later read O(1).
+        """
+        for comp in self._get_connected_competitors():
+            comp._ratings_dirty = True
+
     def expected_score(self, competitor: "BaseCompetitor") -> float:
         """Calculate the expected score against another competitor.
 
@@ -118,8 +145,8 @@ class ColleyMatrixCompetitor(BaseCompetitor):
     def beat(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has won against the given competitor.
 
-        In Colley Matrix Method, we store the match result and recalculate ratings for all
-        related competitors.
+        In Colley Matrix Method, we store the match result and the ratings of all related
+        competitors are re-fit lazily, on the next rating read.
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that lost.
@@ -148,8 +175,9 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         competitor_typed._opponents[self] = competitor_typed._opponents.get(self, 0) + 1
 
         logger.debug("Recorded win for %d, loss for %d", self._id, competitor_typed._id)
-        # Recalculate ratings for all connected competitors
-        self._recalculate_ratings()
+        # The whole connected group's fit is stale now; the re-fit is deferred to the first
+        # rating read that needs it. The opponent is already in self's group.
+        self._mark_group_stale()
 
     def tied(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has tied with the given competitor.
@@ -180,8 +208,7 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         competitor_typed._head_to_head[self] = competitor_typed._head_to_head.get(self, 0) + 0.5
 
         logger.debug("Recorded tie for %d and %d", self._id, competitor_typed._id)
-        # Recalculate ratings for all connected competitors
-        self._recalculate_ratings()
+        self._mark_group_stale()
 
     def lost_to(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has lost to the given competitor.
@@ -241,6 +268,7 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         # If there's only one competitor, no need to recalculate
         if n <= 1:
             logger.debug("Only one competitor in network, skipping recalculation.")
+            self._ratings_dirty = False
             return
 
         # Build the Colley Matrix C and vector b
@@ -305,6 +333,10 @@ class ColleyMatrixCompetitor(BaseCompetitor):
             # If the matrix is singular, fall back to a simpler approach
             # This can happen with certain network structures
             self._fallback_rating_calculation(competitors)
+
+        # Either path above is a completed fit: every connected competitor is current.
+        for comp in competitors:
+            comp._ratings_dirty = False
 
     def _fallback_rating_calculation(self, competitors: List["ColleyMatrixCompetitor"]) -> None:
         """
@@ -406,6 +438,8 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         Returns:
             Dict[str, Any]: A dictionary of the current state.
         """
+        # Never export a rating older than the recorded games.
+        self._ensure_current_ratings()
         return {
             "rating": self._rating,
             "wins": self._wins,
@@ -434,6 +468,9 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         self._ties = state.get("ties", 0)
         self._opponents = {}  # Cannot restore opponent references from serialization
         self._head_to_head = {}
+        # The imported rating is current for the imported (edge-less) state; reset the
+        # deferred-fit cache rather than marking it stale.
+        self._ratings_dirty = False
 
     @classmethod
     def from_state(cls: Type[T], state: Dict[str, Any]) -> T:
@@ -499,6 +536,7 @@ class ColleyMatrixCompetitor(BaseCompetitor):
         self._ties = 0
         self._opponents = {}
         self._head_to_head = {}
+        self._ratings_dirty = False
 
     def __repr__(self) -> str:
         """Return a string representation of this competitor.
