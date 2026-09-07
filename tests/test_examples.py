@@ -1,3 +1,4 @@
+import importlib.util
 import unittest
 import os
 import subprocess
@@ -24,6 +25,17 @@ class TestExamples(unittest.TestCase):
             # "bout_with_initialization.py",  # Added to prevent timeout
             # "prediction.py",  # Added to prevent timeout
         ]
+
+        # Skip examples that need optional dependencies when those are absent, so
+        # a base install (no extras) still exercises the rest of the suite
+        if importlib.util.find_spec("matplotlib") is None:
+            self.skip_examples.extend(
+                [
+                    "bradley_terry_example.py",  # Requires matplotlib
+                    "colley_matrix_comparison.py",  # Requires matplotlib
+                    "colley_matrix_example.py",  # Requires matplotlib
+                ]
+            )
 
     def test_example_scripts(self):
         """Test that all example scripts run without errors."""
@@ -97,17 +109,19 @@ class TestExamples(unittest.TestCase):
             "bout_with_initialization.py", expected_output_contains=["Starting ratings:", "After matches"]
         )
 
-        # Test colley_matrix_example.py
-        self._test_specific_example(
-            "colley_matrix_example.py",
-            expected_output_contains=["Initial ratings:", "Final ratings:", "Sum of all ratings"],
-        )
+        # Test colley_matrix_example.py - skip if in skip_examples (needs matplotlib)
+        if "colley_matrix_example.py" not in self.skip_examples:
+            self._test_specific_example(
+                "colley_matrix_example.py",
+                expected_output_contains=["Initial ratings:", "Final ratings:", "Sum of all ratings"],
+            )
 
-        # Test colley_matrix_comparison.py
-        self._test_specific_example(
-            "colley_matrix_comparison.py",
-            expected_output_contains=["Simulating tournament", "Colley Matrix Method is not sensitive to match order"],
-        )
+        # Test colley_matrix_comparison.py - skip if in skip_examples (needs matplotlib)
+        if "colley_matrix_comparison.py" not in self.skip_examples:
+            self._test_specific_example(
+                "colley_matrix_comparison.py",
+                expected_output_contains=["Simulating tournament", "Colley Matrix Method is not sensitive to match order"],
+            )
 
     def _test_specific_example(self, example_file, expected_output_contains):
         """Helper method to test a specific example with expected output."""

@@ -1,9 +1,11 @@
 import unittest
 import os
 import tempfile
-import matplotlib.pyplot as plt
-from elote.arenas.base import Bout, History
-from elote.visualization import (
+import pytest
+
+plt = pytest.importorskip("matplotlib.pyplot")
+from elote.arenas.base import Bout, History  # noqa: E402
+from elote.visualization import (  # noqa: E402
     plot_rating_system_comparison,
     plot_optimized_accuracy_comparison,
     plot_accuracy_by_prior_bouts,

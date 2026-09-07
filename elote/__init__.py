@@ -39,7 +39,7 @@ Datasets (require optional dependencies):
 
 Analysis and Benchmarking:
 - Benchmarking: Tools for comparing different rating systems
-- Visualization: Tools for visualizing rating system performance
+- Visualization: Tools for visualizing rating system performance (requires matplotlib)
 """
 
 # Core competitors - always available
@@ -75,11 +75,6 @@ from elote.evaluation import (
     group_by_period,
     walk_forward,
     tune,
-)
-from elote.visualization import (
-    plot_rating_system_comparison,
-    plot_optimized_accuracy_comparison,
-    plot_accuracy_by_prior_bouts,
 )
 
 # Make logging easily accessible
@@ -156,23 +151,44 @@ except ImportError as e:
     # Store the import error for later reference
     _optional_imports["CollegeFootballDataset"] = e
 
+# Optional visualization functions - only import if matplotlib is available
+_VIZ_EXPORTS = (
+    "plot_rating_system_comparison",
+    "plot_optimized_accuracy_comparison",
+    "plot_accuracy_by_prior_bouts",
+)
 
-def _get_missing_dependency_error(dataset_name: str, import_error: ImportError) -> str:
+try:
+    from elote import visualization as _visualization
+
+    _optional_imports.update({name: getattr(_visualization, name) for name in _VIZ_EXPORTS})
+except ImportError as e:
+    # Store the import error for later reference
+    _optional_imports.update({name: e for name in _VIZ_EXPORTS})
+
+
+def _get_missing_dependency_error(component_name: str, import_error: ImportError) -> str:
     """Generate a helpful error message for missing optional dependencies."""
-    if dataset_name == "ChessDataset":
+    if component_name in _VIZ_EXPORTS:
+        return (
+            f"{component_name} requires matplotlib, which is not installed.\n"
+            f"Install it with: pip install 'elote[viz]' or pip install matplotlib\n"
+            f"Original error: {import_error}"
+        )
+    elif component_name == "ChessDataset":
         return (
             f"ChessDataset requires optional dependencies that are not installed.\n"
             f"Install them with: pip install 'elote[datasets]' or pip install python-chess pyzstd\n"
             f"Original error: {import_error}"
         )
-    elif dataset_name == "CollegeFootballDataset":
+    elif component_name == "CollegeFootballDataset":
         return (
             f"CollegeFootballDataset requires optional dependencies that are not installed.\n"
             f"Install them with: pip install 'elote[datasets]' or pip install 'sportsdataverse[all]'\n"
             f"Original error: {import_error}"
         )
     else:
-        return f"Optional component {dataset_name} is not available: {import_error}"
+        return f"Optional component {component_name} is not available: {import_error}"
 
 
 def __getattr__(name: str) -> Any:
