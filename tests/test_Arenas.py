@@ -560,7 +560,13 @@ class TestArenaStateRoundTrip(unittest.TestCase):
 
                 restored_ratings = self._ratings(restored)
                 fresh_ratings = self._ratings(fresh)
-                self.assertEqual(restored_ratings, fresh_ratings)
+                # A deferred fit is rooted at whoever reads first, and a linear solve's
+                # last bits depend on the group's discovery order, so two independently
+                # fitted arenas can differ in the final ULP over an identical graph.
+                # places=12 still pins "only rebuilt results feed the fit".
+                self.assertEqual(set(restored_ratings), set(fresh_ratings))
+                for key, value in restored_ratings.items():
+                    self.assertAlmostEqual(value, fresh_ratings[key], places=12)
 
                 ratings = list(restored_ratings.values())
                 if competitor_cls is ColleyMatrixCompetitor:
