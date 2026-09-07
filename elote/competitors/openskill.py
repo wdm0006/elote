@@ -2,8 +2,17 @@
 
 A native implementation of the Weng-Lin family of online ranking algorithms
 (Weng & Lin, "A Bayesian Approximation Method for Online Ranking", JMLR 2011),
-exposing the Plackett-Luce model (Algorithm 4) behind elote's unified
-competitor interface.
+exposing all four models of the paper behind elote's unified competitor
+interface via the ``model`` parameter:
+
+- ``plackett_luce`` -- Algorithm 4 (default), the recommended general-purpose
+  variant and the only one that generalizes to full orderings natively.
+- ``bradley_terry_full`` -- Algorithm 1, logistic performance model, every
+  participant compared against every other.
+- ``bradley_terry_partial`` -- Algorithm 2, logistic model over a bounded
+  pairing window; cheaper and more local than full pairing.
+- ``thurstone`` -- Algorithm 3, Gaussian (Thurstone-Mosteller) performance
+  model with an explicit draw margin ``epsilon``.
 
 Unlike Elo or Glicko, whose updates are defined over a pair of competitors,
 Weng-Lin updates are defined over the ordered participant set of a whole bout
@@ -21,6 +30,7 @@ mu-approx-25 scale this family uses.
 
 import math
 import numbers
+import sys
 from statistics import NormalDist
 from typing import Any, ClassVar, Dict, List, Optional, Sequence, Tuple, Type, TypeVar
 
@@ -42,8 +52,67 @@ def _phi_major(x: float) -> float:
     return _normal.cdf(x)
 
 
+def _phi_minor(x: float) -> float:
+    """Standard normal probability density function."""
+    return _normal.pdf(x)
+
+
+def _truncated_v(x: float, t: float) -> float:
+    """The paper's ``V(x, t)`` (Weng-Lin 2011, Appendix E): the first
+    derivative of the log of the normal tail probability.
+
+    Used by the Thurstone-Mosteller update for a decisive pairwise result.
+    The ``t`` argument is the draw margin expressed on the standardized
+    scale. Mirrors the reference implementation's numerical guards.
+    """
+    xt = x - t
+    denominator = _phi_major(xt)
+    if denominator < sys.float_info.epsilon:
+        return -xt
+    return _phi_minor(xt) / denominator
+
+
+def _truncated_w(x: float, t: float) -> float:
+    """The paper's ``W(x, t)``: the second-moment companion of :func:`_truncated_v`.
+
+    Used by the Thurstone-Mosteller update for a decisive pairwise result.
+    """
+    xt = x - t
+    denominator = _phi_major(xt)
+    if denominator < sys.float_info.epsilon:
+        return 1.0 if x < 0 else 0.0
+    v_value = _truncated_v(x, t)
+    return v_value * (v_value + xt)
+
+
+def _truncated_v_tie(x: float, t: float) -> float:
+    """The paper's ``V-tilde(x, t)``: the tie analogue of :func:`_truncated_v`
+    for a pairwise result inside the draw margin.
+    """
+    xx = abs(x)
+    b = _phi_major(t - xx) - _phi_major(-t - xx)
+    if b < 1e-5:
+        if x < 0:
+            return -x - t
+        return -x + t
+    a = _phi_minor(-t - xx) - _phi_minor(t - xx)
+    return (-a if x < 0 else a) / b
+
+
+def _truncated_w_tie(x: float, t: float) -> float:
+    """The paper's ``W-tilde(x, t)``: the tie analogue of :func:`_truncated_w`
+    for a pairwise result inside the draw margin.
+    """
+    xx = abs(x)
+    b = _phi_major(t - xx) - _phi_major(-t - xx)
+    if b < sys.float_info.epsilon:
+        return 1.0
+    v_tie = _truncated_v_tie(x, t)
+    return ((t - xx) * _phi_minor(t - xx) + (t + xx) * _phi_minor(-t - xx)) / b + v_tie * v_tie
+
+
 class OpenSkillCompetitor(BaseCompetitor):
-    """OpenSkill rating system competitor (Weng-Lin, Algorithm 4: Plackett-Luce).
+    """OpenSkill rating system competitor (Weng-Lin family, Algorithms 1-4).
 
     Each competitor carries a Gaussian belief about its own skill: a mean
     ``mu`` and a standard deviation ``sigma``. The displayed :attr:`rating` is
@@ -60,20 +129,31 @@ class OpenSkillCompetitor(BaseCompetitor):
             Default: 25/300.
         _kappa (float): Floor on the variance multiplier of a posterior,
             keeping ``sigma`` strictly positive. Default: 0.0001.
+        _epsilon (float): Draw margin for the Thurstone-Mosteller variant,
+            expressed on the raw skill scale. Default: 0.1.
+        _partial_pairing_window (int): Pairing window (in sorted finishing
+            positions on either side) for the ``bradley_terry_partial``
+            variant. Default: 4.
         _default_mu (float): Default prior mean. Default: 25.0.
         _default_sigma (float): Default prior standard deviation. Default: 25/3.
         _supported_models (tuple of str): Model variants accepted by the
-            ``model`` parameter. Only ``plackett_luce`` is implemented; the
-            Bradley-Terry and Thurstone-Mosteller variants of the family will
-            join this selector in a follow-up.
+            ``model`` parameter: ``plackett_luce``, ``bradley_terry_full``,
+            ``bradley_terry_partial`` and ``thurstone``.
     """
 
     _beta: ClassVar[float] = 25.0 / 6.0
     _tau: ClassVar[float] = 25.0 / 300.0
     _kappa: ClassVar[float] = 0.0001
+    _epsilon: ClassVar[float] = 0.1
+    _partial_pairing_window: ClassVar[int] = 4
     _default_mu: ClassVar[float] = 25.0
     _default_sigma: ClassVar[float] = 25.0 / 3.0
-    _supported_models: ClassVar[Tuple[str, ...]] = ("plackett_luce",)
+    _supported_models: ClassVar[Tuple[str, ...]] = (
+        "plackett_luce",
+        "bradley_terry_full",
+        "bradley_terry_partial",
+        "thurstone",
+    )
 
     def __init__(self, initial_mu: Optional[float] = None, initial_sigma: Optional[float] = None, model: str = "plackett_luce"):
         """Initialize an OpenSkill competitor.
@@ -84,7 +164,12 @@ class OpenSkillCompetitor(BaseCompetitor):
             initial_sigma (float, optional): The prior skill standard deviation.
                 Default: _default_sigma.
             model (str, optional): Model variant from the Weng-Lin family.
-                Default: ``plackett_luce``.
+                One of ``plackett_luce`` (Algorithm 4, default),
+                ``bradley_terry_full`` (Algorithm 1), ``bradley_terry_partial``
+                (Algorithm 2) or ``thurstone`` (Algorithm 3,
+                Thurstone-Mosteller). All variants share the belief state,
+                serialization and bout plumbing; only the closed-form update
+                differs.
 
         Raises:
             InvalidParameterException: If the model variant is unknown or the
@@ -265,6 +350,7 @@ class OpenSkillCompetitor(BaseCompetitor):
                 raise MissMatchedCompetitorTypesException(
                     f"{cls.__name__}.apply_bout only accepts {cls.__name__} competitors, got {type(competitor).__name__}"
                 )
+        cls._check_model_homogeneity(bout)
 
         if ranks is None:
             bout_ranks: List[int] = list(range(len(bout)))
@@ -279,8 +365,69 @@ class OpenSkillCompetitor(BaseCompetitor):
         cls._solve_bout(bout, bout_ranks)
 
     @classmethod
+    def _check_model_homogeneity(cls, bout: List["OpenSkillCompetitor"]) -> None:
+        """Refuse bouts that mix Weng-Lin variants.
+
+        A bout's update is defined by exactly one model of the family, so a
+        bout mixing e.g. ``plackett_luce`` and ``thurstone`` participants is
+        ambiguous and is rejected before any belief is touched.
+
+        Raises:
+            ValueError: If the bout's participants do not share one variant.
+        """
+        models = {competitor._model for competitor in bout}
+        if len(models) > 1:
+            raise ValueError(f"a bout cannot mix Weng-Lin model variants, got {sorted(models)!r}")
+
+    @staticmethod
+    def _average_tied_mu_changes(ranks: Sequence[int], mus: Sequence[float], updates: List[Tuple[float, float]]) -> List[Tuple[float, float]]:
+        """Apply the documented tie rule: every participant tied at a rank
+        receives the average mu change of its rank group, preserving each
+        participant's own prior.
+
+        The reference ``openskill.py`` 6.2.0 implementation intends this rule
+        but its mu adjustment is a no-op (upstream issue #201, fix in PR #203);
+        see the module notes. Sigma is always per-participant.
+        """
+        rank_groups: Dict[float, List[int]] = {}
+        for i, rank in enumerate(ranks):
+            rank_groups.setdefault(rank, []).append(i)
+        averaged = list(updates)
+        for indices in rank_groups.values():
+            if len(indices) > 1:
+                average_change = sum(updates[i][0] - mus[i] for i in indices) / len(indices)
+                for i in indices:
+                    averaged[i] = (mus[i] + average_change, updates[i][1])
+        return averaged
+
+    @classmethod
     def _solve_bout(cls, participants: List["OpenSkillCompetitor"], ranks: Sequence[int]) -> None:
-        """Run the closed-form Weng-Lin update over one bout's participant set.
+        """Dispatch one bout to the closed-form update of its model variant.
+
+        Every variant of the family shares the bout shape, the belief state
+        and the writeback discipline; only the per-participant update
+        equations differ (Weng-Lin 2011, Algorithms 1-4).
+
+        Args:
+            participants (list of OpenSkillCompetitor): The bout's participants.
+            ranks (sequence of int): Finishing ranks per participant, lower is
+                better, equal ranks are ties.
+        """
+        model = participants[0]._model
+        if model == "plackett_luce":
+            cls._solve_bout_plackett_luce(participants, ranks)
+        elif model == "bradley_terry_full":
+            cls._solve_bout_bradley_terry_full(participants, ranks)
+        elif model == "bradley_terry_partial":
+            cls._solve_bout_bradley_terry_partial(participants, ranks)
+        elif model == "thurstone":
+            cls._solve_bout_thurstone(participants, ranks)
+        else:  # pragma: no cover - the constructor rejects unknown variants
+            raise InvalidParameterException(f"unknown model variant: {model!r}")
+
+    @classmethod
+    def _solve_bout_plackett_luce(cls, participants: List["OpenSkillCompetitor"], ranks: Sequence[int]) -> None:
+        """Run the Plackett-Luce update (Weng-Lin 2011, Algorithm 4).
 
         Single-player teams only: each participant is its own team, so team
         strength aggregates reduce to the member's own belief. Every factor of
@@ -353,15 +500,186 @@ class OpenSkillCompetitor(BaseCompetitor):
 
         # Tied teams share an outcome, so their average mu change is applied to
         # every member of every tied team; sigma stays per-team.
-        rank_groups: Dict[float, List[int]] = {}
-        for i, rank in enumerate(ranks):
-            rank_groups.setdefault(rank, []).append(i)
-        for indices in rank_groups.values():
-            if len(indices) > 1:
-                average_change = sum(updates[i][0] - mus[i] for i in indices) / len(indices)
-                for i in indices:
-                    updates[i] = (mus[i] + average_change, updates[i][1])
+        updates = cls._average_tied_mu_changes(ranks, mus, updates)
 
+        for participant, (new_mu, new_sigma) in zip(participants, updates, strict=True):
+            participant._mu = new_mu
+            participant._sigma = new_sigma
+
+    @classmethod
+    def _solve_bout_bradley_terry_full(cls, participants: List["OpenSkillCompetitor"], ranks: Sequence[int]) -> None:
+        """Run the Bradley-Terry full-pairing update (Weng-Lin 2011, Algorithm 1).
+
+        Every participant is compared against every other participant: the
+        pairwise logistic expectation and its variance contribution are summed
+        over the whole bout. Writeback discipline matches the Plackett-Luce
+        solver (pre-update snapshot, direct ``_mu``/``_sigma`` assignment).
+
+        Args:
+            participants (list of OpenSkillCompetitor): The bout's participants.
+            ranks (sequence of int): Finishing ranks per participant, lower is
+                better, equal ranks are ties.
+        """
+        # Pre-update snapshot; additive dynamics inflate sigma by tau first.
+        mus = [competitor._mu for competitor in participants]
+        inflated_sigmas = [math.sqrt(competitor._sigma**2 + cls._tau**2) for competitor in participants]
+        team_sigma_squares = [sigma**2 for sigma in inflated_sigmas]
+
+        updates: List[Tuple[float, float]] = []
+        for i in range(len(participants)):
+            omega = 0.0
+            delta = 0.0
+            for q, _ in enumerate(participants):
+                if q == i:
+                    continue
+                c_iq = math.sqrt(team_sigma_squares[i] + team_sigma_squares[q] + 2 * cls._beta**2)
+                sigma_squared_to_ciq = team_sigma_squares[i] / c_iq
+                # Logistic win expectation of i against q (paper eq. 41),
+                # algebraically exp(mu_i/c)/[exp(mu_i/c)+exp(mu_q/c)].
+                p_iq = 1.0 / (1.0 + math.exp((mus[q] - mus[i]) / c_iq))
+                if ranks[q] > ranks[i]:
+                    score = 1.0
+                elif ranks[q] == ranks[i]:
+                    score = 0.5
+                else:
+                    score = 0.0
+                omega += sigma_squared_to_ciq * (score - p_iq)
+                # Paper Algorithm 1: eta_q = gamma_q * (sigma_i/c_iq)^2 * p * (1-p).
+                gamma = math.sqrt(team_sigma_squares[i]) / c_iq
+                delta += (gamma * sigma_squared_to_ciq / c_iq) * p_iq * (1.0 - p_iq)
+
+            # One-player teams distribute the full team update to the member.
+            new_mu = mus[i] + omega
+            new_sigma = inflated_sigmas[i] * math.sqrt(max(1.0 - delta, cls._kappa))
+            updates.append((new_mu, new_sigma))
+
+        updates = cls._average_tied_mu_changes(ranks, mus, updates)
+        for participant, (new_mu, new_sigma) in zip(participants, updates, strict=True):
+            participant._mu = new_mu
+            participant._sigma = new_sigma
+
+    @classmethod
+    def _solve_bout_bradley_terry_partial(cls, participants: List["OpenSkillCompetitor"], ranks: Sequence[int]) -> None:
+        """Run the Bradley-Terry partial-pairing update (Weng-Lin 2011, Algorithm 2).
+
+        Each participant is compared only against neighbours within
+        ``_partial_pairing_window`` finishing positions on either side of the
+        rank-sorted bout, and the pairwise contributions are averaged over the
+        comparisons instead of summed. This follows the reference
+        implementation's bounded-window reading of Algorithm 2 (the paper
+        itself pairs adjacent ranks and sums); it agrees with the paper's
+        update for every bout no larger than the window.
+
+        Args:
+            participants (list of OpenSkillCompetitor): The bout's participants.
+            ranks (sequence of int): Finishing ranks per participant, lower is
+                better, equal ranks are ties.
+        """
+        # Pre-update snapshot; additive dynamics inflate sigma by tau first.
+        mus = [competitor._mu for competitor in participants]
+        inflated_sigmas = [math.sqrt(competitor._sigma**2 + cls._tau**2) for competitor in participants]
+        team_sigma_squares = [sigma**2 for sigma in inflated_sigmas]
+
+        # Window positions follow the rank-sorted bout (stable within ties),
+        # matching the reference implementation's partial-pairing pass.
+        count = len(participants)
+        order = sorted(range(count), key=lambda index: ranks[index])
+        position_of = {index: position for position, index in enumerate(order)}
+        window = cls._partial_pairing_window
+
+        updates = []
+        for i in range(count):
+            start = max(0, position_of[i] - window)
+            end = min(count, position_of[i] + window + 1)
+            omega_sum = 0.0
+            delta_sum = 0.0
+            comparisons = 0
+            for position in range(start, end):
+                q = order[position]
+                if q == i:
+                    continue
+                c_iq = math.sqrt(team_sigma_squares[i] + team_sigma_squares[q] + 2 * cls._beta**2)
+                sigma_squared_to_ciq = team_sigma_squares[i] / c_iq
+                p_iq = 1.0 / (1.0 + math.exp((mus[q] - mus[i]) / c_iq))
+                if ranks[q] > ranks[i]:
+                    score = 1.0
+                elif ranks[q] == ranks[i]:
+                    score = 0.5
+                else:
+                    score = 0.0
+                omega_sum += sigma_squared_to_ciq * (score - p_iq)
+                # Paper Algorithm 1: eta_q = gamma_q * (sigma_i/c_iq)^2 * p * (1-p).
+                gamma = math.sqrt(team_sigma_squares[i]) / c_iq
+                delta_sum += (gamma * sigma_squared_to_ciq / c_iq) * p_iq * (1.0 - p_iq)
+                comparisons += 1
+
+            if comparisons > 0:
+                omega = omega_sum / comparisons
+                delta = delta_sum / comparisons
+            else:  # pragma: no cover - every bout has at least one comparison
+                omega = 0.0
+                delta = 0.0
+
+            new_mu = mus[i] + omega
+            new_sigma = inflated_sigmas[i] * math.sqrt(max(1.0 - delta, cls._kappa))
+            updates.append((new_mu, new_sigma))
+
+        updates = cls._average_tied_mu_changes(ranks, mus, updates)
+        for participant, (new_mu, new_sigma) in zip(participants, updates, strict=True):
+            participant._mu = new_mu
+            participant._sigma = new_sigma
+
+    @classmethod
+    def _solve_bout_thurstone(cls, participants: List["OpenSkillCompetitor"], ranks: Sequence[int]) -> None:
+        """Run the Thurstone-Mosteller update (Weng-Lin 2011, Algorithm 3).
+
+        A Gaussian (Thurstone-Mosteller) performance model with an explicit
+        draw margin: decisive pairwise results use the truncated-normal
+        ``V``/``W`` functions, results inside the draw margin use the tie
+        functions ``V-tilde``/``W-tilde`` (see the module helpers, which mirror
+        the reference implementation's numerics).
+
+        Args:
+            participants (list of OpenSkillCompetitor): The bout's participants.
+            ranks (sequence of int): Finishing ranks per participant, lower is
+                better, equal ranks are ties.
+        """
+        # Pre-update snapshot; additive dynamics inflate sigma by tau first.
+        mus = [competitor._mu for competitor in participants]
+        inflated_sigmas = [math.sqrt(competitor._sigma**2 + cls._tau**2) for competitor in participants]
+        team_sigma_squares = [sigma**2 for sigma in inflated_sigmas]
+
+        updates = []
+        for i in range(len(participants)):
+            omega = 0.0
+            delta = 0.0
+            for q, _ in enumerate(participants):
+                if q == i:
+                    continue
+                c_iq = math.sqrt(team_sigma_squares[i] + team_sigma_squares[q] + 2 * cls._beta**2)
+                delta_mu = (mus[i] - mus[q]) / c_iq
+                sigma_squared_to_ciq = team_sigma_squares[i] / c_iq
+                gamma = math.sqrt(team_sigma_squares[i]) / c_iq
+                draw_margin_over_c = cls._epsilon / c_iq
+
+                if ranks[q] > ranks[i]:
+                    # i beat q: truncated-normal evidence of a decisive result.
+                    omega += sigma_squared_to_ciq * _truncated_v(delta_mu, draw_margin_over_c)
+                    delta += (gamma * sigma_squared_to_ciq / c_iq) * _truncated_w(delta_mu, draw_margin_over_c)
+                elif ranks[q] < ranks[i]:
+                    # i lost to q: symmetric, evaluated from the winner side.
+                    omega -= sigma_squared_to_ciq * _truncated_v(-delta_mu, draw_margin_over_c)
+                    delta += (gamma * sigma_squared_to_ciq / c_iq) * _truncated_w(-delta_mu, draw_margin_over_c)
+                else:
+                    # Tie inside the draw margin.
+                    omega += sigma_squared_to_ciq * _truncated_v_tie(delta_mu, draw_margin_over_c)
+                    delta += (gamma * sigma_squared_to_ciq / c_iq) * _truncated_w_tie(delta_mu, draw_margin_over_c)
+
+            new_mu = mus[i] + omega
+            new_sigma = inflated_sigmas[i] * math.sqrt(max(1.0 - delta, cls._kappa))
+            updates.append((new_mu, new_sigma))
+
+        updates = cls._average_tied_mu_changes(ranks, mus, updates)
         for participant, (new_mu, new_sigma) in zip(participants, updates, strict=True):
             participant._mu = new_mu
             participant._sigma = new_sigma
@@ -395,6 +713,11 @@ class OpenSkillCompetitor(BaseCompetitor):
             if not isinstance(competitor_a, cls) or not isinstance(competitor_b, cls):
                 raise MissMatchedCompetitorTypesException(
                     f"{cls.__name__}.apply_rating_period only accepts {cls.__name__} competitors"
+                )
+            if competitor_a._model != competitor_b._model:
+                raise ValueError(
+                    f"a rating period row cannot mix Weng-Lin model variants, "
+                    f"got {competitor_a._model!r} and {competitor_b._model!r}"
                 )
             validate_scores(scores, outcome)
 
