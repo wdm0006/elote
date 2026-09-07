@@ -25,6 +25,29 @@ from elote.competitors.base import (
 class TestUnifiedInterface(unittest.TestCase):
     """Test the unified interface for all competitor types."""
 
+    def _configure_class_and_restore(self, competitor_cls, **kwargs):
+        """Apply ``configure_class`` and auto-restore the class attributes it sets.
+
+        ``configure_class`` mutates class-level state that would otherwise leak
+        into other tests; snapshot the attributes before configuring and register
+        an ``addCleanup`` to restore them on teardown.
+        """
+        snapshot = {}
+        for key in kwargs:
+            attr = f"_{key}"
+            if hasattr(competitor_cls, attr):
+                snapshot[attr] = (attr in vars(competitor_cls), getattr(competitor_cls, attr))
+
+        def restore():
+            for attr, (defined_on_class, value) in snapshot.items():
+                if defined_on_class:
+                    setattr(competitor_cls, attr, value)
+                else:
+                    delattr(competitor_cls, attr)
+
+        self.addCleanup(restore)
+        competitor_cls.configure_class(**kwargs)
+
     def test_base_methods_elo(self):
         """Test that the Elo competitor implements all required methods."""
         competitor = EloCompetitor(initial_rating=1200)
@@ -43,8 +66,8 @@ class TestUnifiedInterface(unittest.TestCase):
         competitor.reset()
         self.assertEqual(competitor.rating, 1200)
 
-        # Test configure
-        EloCompetitor.configure_class(base_rating=500)
+        # Test configure (class-level config is restored on teardown)
+        self._configure_class_and_restore(EloCompetitor, base_rating=500)
         self.assertEqual(EloCompetitor._base_rating, 500)
 
         # Test comparison operators
