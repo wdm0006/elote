@@ -140,6 +140,11 @@ class MasseyExpectedScoreTest(unittest.TestCase):
     def test_rating_scale_floored_for_degenerate_groups(self):
         a, b = MasseyCompetitor(), MasseyCompetitor()
         a.tied(b)
+        # The fit is lazy: recording the tie only marks the group stale, and the floored
+        # scale is recorded by that deferred re-fit. Reading the ratings forces it; a tied
+        # pair fits to equal (zero) ratings, so the spread floors at _minimum_rating_scale.
+        self.assertAlmostEqual(a.rating, 0.0, places=12)
+        self.assertAlmostEqual(b.rating, 0.0, places=12)
         self.assertEqual(a._rating_scale, 1e-9)
         self.assertEqual(b._rating_scale, 1e-9)
 
