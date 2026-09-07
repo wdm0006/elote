@@ -109,6 +109,9 @@ class MasseyCompetitor(BaseCompetitor):
         self._rating_scale = 1.0
         self._opponents: Dict["MasseyCompetitor", int] = {}  # Opponent -> num games
         self._margins_for: Dict["MasseyCompetitor", float] = {}
+        # True when recorded games are not yet reflected in _rating: the least-squares
+        # solve is deferred to the first rating read that needs it (dirty-flag caching).
+        self._ratings_dirty = False
         # Unique ID for hashing (instances are used as dict keys in the match graph).
         self._id = id(self)
         logger.debug("Initialized MasseyCompetitor %d with initial rating %.3f", self._id, self._initial_rating)
@@ -117,9 +120,13 @@ class MasseyCompetitor(BaseCompetitor):
     def rating(self) -> float:
         """Get the current rating of this competitor.
 
+        Reading the rating is where deferred least-squares solves happen: if games have
+        been recorded since the last read, the connected group is re-fit first.
+
         Returns:
             float: The current rating.
         """
+        self._ensure_current_ratings()
         return self._rating
 
     @rating.setter
@@ -147,6 +154,26 @@ class MasseyCompetitor(BaseCompetitor):
             int: The total number of games played.
         """
         return self._wins + self._losses + self._ties
+
+    def _ensure_current_ratings(self) -> None:
+        """Re-fit the connected group's ratings if recorded games are not yet reflected.
+
+        Recording a game only marks the fit stale; the O(n^3) solve runs once on the first
+        read that needs it, so repeated reads with no new games are O(1) amortized.
+        """
+        if self._ratings_dirty:
+            self._recalculate_ratings()
+
+    def _mark_group_stale(self) -> None:
+        """Mark every competitor in the connected group stale after a recorded game.
+
+        A new game changes the least-squares fit of the whole connected component, not just
+        the two endpoints' cached ratings: endpoint-only flags would let a clean member
+        serve a rating that predates the game whenever it is read first, making output
+        depend on read order. One O(component) walk per recorded game keeps reads O(1).
+        """
+        for comp in self._get_connected_competitors():
+            comp._ratings_dirty = True
 
     def expected_score(self, competitor: "BaseCompetitor") -> float:
         """Calculate the expected score against another competitor.
@@ -183,7 +210,8 @@ class MasseyCompetitor(BaseCompetitor):
     def beat(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has won against the given competitor.
 
-        The result is recorded in the match graph and the whole connected group is re-fit.
+        The result is recorded in the match graph and the whole connected group is re-fit
+        lazily, on the next rating read.
 
         Args:
             competitor (BaseCompetitor): The opponent competitor that lost.
@@ -212,7 +240,9 @@ class MasseyCompetitor(BaseCompetitor):
         opponent._margins_for[self] = opponent._margins_for.get(self, 0.0) - margin
 
         logger.debug("Recorded win for %d, loss for %d", self._id, opponent._id)
-        self._recalculate_ratings()
+        # The whole connected group's fit is stale now; the re-fit is deferred to the first
+        # rating read that needs it. The opponent is already in self's group.
+        self._mark_group_stale()
 
     def tied(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has tied with the given competitor.
@@ -243,7 +273,7 @@ class MasseyCompetitor(BaseCompetitor):
         opponent._margins_for.setdefault(self, 0.0)
 
         logger.debug("Recorded tie for %d and %d", self._id, opponent._id)
-        self._recalculate_ratings()
+        self._mark_group_stale()
 
     def lost_to(self, competitor: BaseCompetitor, *, scores: Optional[Sequence[float]] = None) -> None:
         """Update ratings after this competitor has lost to the given competitor.
@@ -298,6 +328,7 @@ class MasseyCompetitor(BaseCompetitor):
         n = len(competitors)
         if n <= 1:
             logger.debug("Only one competitor in network, skipping recalculation.")
+            self._ratings_dirty = False
             return
 
         idx = {comp: i for i, comp in enumerate(competitors)}
@@ -341,6 +372,10 @@ class MasseyCompetitor(BaseCompetitor):
 
         self._update_rating_scale(competitors)
 
+        # The solve above is a completed fit: every connected competitor is current.
+        for comp in competitors:
+            comp._ratings_dirty = False
+
     @classmethod
     def _update_rating_scale(cls, competitors: List["MasseyCompetitor"]) -> None:
         """Record the fitted group's rating spread on every member of the group.
@@ -356,7 +391,9 @@ class MasseyCompetitor(BaseCompetitor):
         Args:
             competitors: The connected group that was just fitted.
         """
-        spread = np.sqrt(2.0) * np.std([comp.rating for comp in competitors])
+        # Reads _rating directly: this runs inside an in-progress fit, where the public
+        # getter would re-enter _ensure_current_ratings on still-uncleared members.
+        spread = np.sqrt(2.0) * np.std([comp._rating for comp in competitors])
         scale = max(float(np.round(spread, decimals=cls._round_decimals)), cls._minimum_rating_scale)
         for comp in competitors:
             comp._rating_scale = scale
@@ -371,6 +408,11 @@ class MasseyCompetitor(BaseCompetitor):
         mean_rating = sum(ratings) / len(ratings)
         for comp, value in zip(competitors, ratings, strict=True):
             comp.rating = value - mean_rating
+
+        # The fallback is itself a completed fit: every connected competitor is current.
+        # Clearing here (not at the call sites) also covers direct fallback invocations.
+        for comp in competitors:
+            comp._ratings_dirty = False
 
     def _export_parameters(self) -> Dict[str, Any]:
         """Export the parameters used to initialize this competitor.
@@ -388,6 +430,8 @@ class MasseyCompetitor(BaseCompetitor):
         Returns:
             dict: A dictionary containing the current state variables.
         """
+        # Never export a rating older than the recorded games.
+        self._ensure_current_ratings()
         return {
             "rating": self._rating,
             "wins": self._wins,
@@ -423,6 +467,9 @@ class MasseyCompetitor(BaseCompetitor):
         self._rating_scale = state.get("rating_scale", 1.0)
         self._opponents = {}
         self._margins_for = {}
+        # The imported rating is current for the imported (edge-less) state; reset the
+        # deferred-fit cache rather than marking it stale.
+        self._ratings_dirty = False
 
     @classmethod
     def _create_from_parameters(cls: Type[T], parameters: Dict[str, Any]) -> T:
@@ -447,6 +494,7 @@ class MasseyCompetitor(BaseCompetitor):
         self._rating_scale = 1.0
         self._opponents = {}
         self._margins_for = {}
+        self._ratings_dirty = False
 
     @classmethod
     def configure_class(cls, **kwargs: Any) -> None:

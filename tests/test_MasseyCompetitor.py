@@ -416,6 +416,8 @@ class TestMasseyRatingScale(unittest.TestCase):
         a.beat(b, scores=(31.0, 17.0))
         b.beat(c, scores=(24.0, 20.0))
 
+        # The fit (and with it the rating scale) is deferred to the first rating read.
+        _ = a.rating
         self.assertGreater(a._rating_scale, 1.0)
 
         restored = MasseyCompetitor.from_state(json.loads(json.dumps(a.export_state())))
@@ -425,6 +427,7 @@ class TestMasseyRatingScale(unittest.TestCase):
     def test_reset_restores_the_unfitted_scale(self):
         a, b = MasseyCompetitor(), MasseyCompetitor()
         a.beat(b, scores=(31.0, 17.0))
+        _ = a.rating  # the fit (and with it the rating scale) is deferred to the first read
         self.assertNotEqual(a._rating_scale, 1.0)
 
         a.reset()
