@@ -71,6 +71,17 @@ package-data = {"elote" = ["py.typed"]}
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 
+[tool.mutmut]
+# Canonical campaign configuration (mutmut 3.7.0).
+# tests/test_examples.py is excluded: it spawns subprocesses against the installed
+# (unmutated) package and cannot kill mutants.
+tests_dir = ["tests/"]
+paths_to_mutate = ["elote/"]
+pytest_add_cli_args = [
+    "--benchmark-disable",
+    "--ignore=tests/test_examples.py",
+]
+
 [tool.ruff]
 # Same as Black.
 line-length = 120
