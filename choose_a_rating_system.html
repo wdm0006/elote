@@ -178,8 +178,9 @@
 <p class="admonition-title">Note</p>
 <p>The measured tables and code output below come from a snapshot verified on
 2026-08-09 against ten of Elote’s rating systems. The library has since
-added two more concrete systems, <a class="reference internal" href="rating_systems/pythagorean.html"><span class="doc">Pythagorean</span></a>
-and <a class="reference internal" href="rating_systems/whr.html"><span class="doc">Whole-History Rating</span></a>, which are not covered
+added three more concrete systems, <a class="reference internal" href="rating_systems/pythagorean.html"><span class="doc">Pythagorean</span></a>,
+<a class="reference internal" href="rating_systems/whr.html"><span class="doc">Whole-History Rating</span></a>, and
+<a class="reference internal" href="rating_systems/openskill.html"><span class="doc">OpenSkill</span></a>, which are not covered
 by this comparison. The runnable examples were re-checked against a current
 install and produce the same qualitative results; a handful of measured
 figures (noted inline) differ from this snapshot in later decimal places
@@ -229,33 +230,39 @@ seventh of ten on Brier score.</p>
 <td><p>Glicko-Boost</p></td>
 <td><p><a class="reference internal" href="rating_systems/glicko_boost.html"><span class="doc">Glicko-Boost</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p>Teams facing teams, or more than two sides per result</p></td>
-<td><p>Team-vs-team: any system wrapped in <code class="docutils literal notranslate"><span class="pre">TeamCompetitor</span></code>. More than two sides in one
-result: not yet supported – member-level team updates arrive with the planned
-OpenSkill N-way bouts.</p></td>
-<td><p><a class="reference internal" href="api/competitors.html#elote.competitors.team.TeamCompetitor" title="elote.competitors.team.TeamCompetitor"><code class="xref py py-class docutils literal notranslate"><span class="pre">TeamCompetitor</span></code></a></p></td>
+<tr class="row-even"><td><p>Three or more sides settle in one result and you want the field ranked without
+TrueSkill’s cost</p></td>
+<td><p>OpenSkill</p></td>
+<td><p><a class="reference internal" href="rating_systems/openskill.html"><span class="doc">OpenSkill</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p>Draws are common and carry information</p></td>
+<tr class="row-odd"><td><p>Teams facing teams, or more than two sides per result</p></td>
+<td><p>Team-vs-team: any system wrapped in <code class="docutils literal notranslate"><span class="pre">TeamCompetitor</span></code>. More than two sides in one
+result: <a class="reference internal" href="rating_systems/openskill.html"><span class="doc">OpenSkill</span></a> ranks the whole field in one bout
+(single-member rosters; member-level team updates remain planned).</p></td>
+<td><p><a class="reference internal" href="api/competitors.html#elote.competitors.team.TeamCompetitor" title="elote.competitors.team.TeamCompetitor"><code class="xref py py-class docutils literal notranslate"><span class="pre">TeamCompetitor</span></code></a>,
+<a class="reference internal" href="rating_systems/openskill.html"><span class="doc">OpenSkill</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>Draws are common and carry information</p></td>
 <td><p>Glicko-1, Glicko-2, or TrueSkill</p></td>
 <td><p><a class="reference internal" href="#draws">Draws</a></p></td>
 </tr>
-<tr class="row-even"><td><p>Results carry real scores and the margin matters</p></td>
+<tr class="row-odd"><td><p>Results carry real scores and the margin matters</p></td>
 <td><p>Massey or Keener</p></td>
 <td><p><a class="reference internal" href="#score-margins">Score margins</a></p></td>
 </tr>
-<tr class="row-odd"><td><p>A fixed season of results, ranked once, order must not matter</p></td>
+<tr class="row-even"><td><p>A fixed season of results, ranked once, order must not matter</p></td>
 <td><p>Colley, Massey, Keener, or Bradley-Terry</p></td>
 <td><p><a class="reference internal" href="#incremental-updates-or-a-global-fit">Incremental updates or a global fit</a></p></td>
 </tr>
-<tr class="row-even"><td><p>You want predicted point spreads, not just probabilities</p></td>
+<tr class="row-odd"><td><p>You want predicted point spreads, not just probabilities</p></td>
 <td><p>Massey</p></td>
 <td><p><a class="reference internal" href="rating_systems/massey.html"><span class="doc">Massey</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p>A national chess federation’s published formula</p></td>
+<tr class="row-even"><td><p>A national chess federation’s published formula</p></td>
 <td><p>ECF or DWZ</p></td>
 <td><p><a class="reference internal" href="rating_systems/ecf.html"><span class="doc">ECF</span></a>, <a class="reference internal" href="rating_systems/dwz.html"><span class="doc">DWZ</span></a></p></td>
 </tr>
-<tr class="row-even"><td><p>You genuinely do not know</p></td>
+<tr class="row-odd"><td><p>You genuinely do not know</p></td>
 <td><p>Any two rows above, then measure</p></td>
 <td><p><a class="reference internal" href="#run-it-on-your-own-data">Run it on your own data</a></p></td>
 </tr>

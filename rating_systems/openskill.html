@@ -197,7 +197,9 @@ ranks are ties). For participant <code class="docutils literal notranslate"><spa
 over the whole bout: the collective skill-plus-chance scale</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}c = \\sqrt{\\sum_i (\\sigma_i^2 + \\tau^2) + k \\beta^2}\end{split}\]</div>
-<p>the Plackett-Luce win expectation <code class="docutils literal notranslate"><span class="pre">exp(mu_i</span> <span class="pre">/</span> <span class="pre">c)</span> <span class="pre">/</span> <span class="pre">sum_q</span></code>, and the number of teams
+<p>the likelihood model’s win expectation <code class="docutils literal notranslate"><span class="pre">exp(mu_i</span> <span class="pre">/</span> <span class="pre">c)</span> <span class="pre">/</span> <span class="pre">sum_q</span></code> for the default
+Plackett-Luce pairing (the other models swap in their own likelihood, see
+<a class="reference internal" href="#model-variants">Model variants</a>), and the number of teams
 sharing each rank. The closed-form update then shifts every <code class="docutils literal notranslate"><span class="pre">mu</span></code> by its expected
 surplus and shrinks every <code class="docutils literal notranslate"><span class="pre">sigma</span></code> in one step. Uncertainty is inflated by an
 additive dynamics parameter <code class="docutils literal notranslate"><span class="pre">tau</span></code> before every update so beliefs never fully
@@ -208,6 +210,35 @@ tied participants share the average rank change. Elote exposes this through the
 unified competitor interface: pairwise methods route a single result through the
 period hook as a one-bout period, so every caller gets the same formulas, and the
 walk-forward evaluation machinery applies results period-by-period as usual.</p>
+</section>
+<section id="model-variants">
+<h2>Model variants<a class="headerlink" href="#model-variants" title="Link to this heading">¶</a></h2>
+<p>The Weng-Lin paper derives one update skeleton for four likelihood models, and
+<code class="docutils literal notranslate"><span class="pre">OpenSkillCompetitor</span></code> implements all of them behind the <code class="docutils literal notranslate"><span class="pre">model</span></code> constructor
+selector. All four share the same Gaussian beliefs, the same ordinal, and the same
+bout-native surface; they differ only in the pairwise win model that drives the
+update terms.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">plackett_luce</span></code> (default) – Algorithm 4. The full ranking is read as a
+Plackett-Luce distribution over orderings; every participant is compared against
+the whole field above it. The usual choice, and the richest model for wide fields.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bradley_terry_full</span></code> – Algorithm 1. Every participant is compared against
+every other participant once (winner-vs-loser pairs share one logistic term),
+using the Bradley-Terry logistic likelihood.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bradley_terry_partial</span></code> – Algorithm 2. Instead of the all-pairs comparison,
+each participant is compared only against nearby ranks within a bounded window,
+with the comparisons averaged over the pair set. Cheaper on very wide fields,
+and less sensitive to rank noise far away in the field.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">thurstone</span></code> – Algorithm 3. Thurstone-Mosteller full pairing: win probabilities
+come from the Gaussian CDF (via a draw margin <code class="docutils literal notranslate"><span class="pre">epsilon</span></code>) rather than the
+logistic, which some prefer when outcome noise feels more Gaussian than
+Gumbel-like.</p></li>
+</ul>
+<p>All four were verified to 1e-6 against the <code class="docutils literal notranslate"><span class="pre">openskill.py</span></code> dev extra over 1v1,
+N-way, tie and 12-player bouts; see the notes below. Pick the default unless you
+have a reason: <code class="docutils literal notranslate"><span class="pre">bradley_terry_full</span></code> and <code class="docutils literal notranslate"><span class="pre">thurstone</span></code> mostly differ in tail
+behaviour, and <code class="docutils literal notranslate"><span class="pre">bradley_terry_partial</span></code> trades a little accuracy for bounded
+work on very large fields.</p>
 </section>
 <section id="advantages">
 <h2>Advantages<a class="headerlink" href="#advantages" title="Link to this heading">¶</a></h2>
@@ -266,9 +297,9 @@ payloads are validated for consistency with the outcome but do not change the re
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">initial_mu</span></code> – prior mean skill value (default <code class="docutils literal notranslate"><span class="pre">25.0</span></code>).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">initial_sigma</span></code> – prior skill standard deviation (default <code class="docutils literal notranslate"><span class="pre">25/3</span></code>).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">model</span></code> – Weng-Lin variant selector, defaulting to <code class="docutils literal notranslate"><span class="pre">plackett_luce</span></code>. Only the
-Plackett-Luce update is implemented; the Bradley-Terry and Thurstone-Mosteller
-variants of the family will join this selector later.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">model</span></code> – Weng-Lin variant selector: <code class="docutils literal notranslate"><span class="pre">plackett_luce</span></code> (default),
+<code class="docutils literal notranslate"><span class="pre">bradley_terry_full</span></code>, <code class="docutils literal notranslate"><span class="pre">bradley_terry_partial</span></code>, or <code class="docutils literal notranslate"><span class="pre">thurstone</span></code>; see
+<a class="reference internal" href="#model-variants">Model variants</a> above. Bouts and rating periods refuse to mix variants.</p></li>
 </ul>
 <p>Class-level constants (<code class="docutils literal notranslate"><span class="pre">_beta</span></code>, <code class="docutils literal notranslate"><span class="pre">_tau</span></code>, <code class="docutils literal notranslate"><span class="pre">_kappa</span></code>) can be tuned with
 <code class="docutils literal notranslate"><span class="pre">configure_class</span></code>: <code class="docutils literal notranslate"><span class="pre">beta</span></code> is the skill-vs-chance deviation baked into every
@@ -278,13 +309,26 @@ the posterior variance multiplier.</p>
 <section id="notes-on-the-reference-implementation">
 <h2>Notes on the reference implementation<a class="headerlink" href="#notes-on-the-reference-implementation" title="Link to this heading">¶</a></h2>
 <p>Elote’s implementation follows the Weng-Lin update as documented for the
-<code class="docutils literal notranslate"><span class="pre">openskill.py</span></code> reference package. In <code class="docutils literal notranslate"><span class="pre">openskill.py</span></code> 6.2.0 the mu tie adjustment
-is a no-op (upstream <a class="reference external" href="https://github.com/vivekjoshy/openskill.py/issues/201">issue #201</a>,
+<code class="docutils literal notranslate"><span class="pre">openskill.py</span></code> reference package, for every variant in the <code class="docutils literal notranslate"><span class="pre">model</span></code> selector.
+Two fidelity notes, both pinned in the reference-value test suite
+(<code class="docutils literal notranslate"><span class="pre">tests/test_OpenSkillCompetitor_known_values.py</span></code>, which runs the full battery
+for all four variants against the installed <code class="docutils literal notranslate"><span class="pre">openskill.py</span></code>):</p>
+<ul class="simple">
+<li><p>In <code class="docutils literal notranslate"><span class="pre">openskill.py</span></code> 6.2.0 the mu tie adjustment is a no-op (upstream
+<a class="reference external" href="https://github.com/vivekjoshy/openskill.py/issues/201">issue #201</a>,
 fix in <a class="reference external" href="https://github.com/vivekjoshy/openskill.py/pull/203">PR #203</a>): tied
-players keep their raw per-player changes instead of the documented average. Elote
-implements the documented rule – every tied player receives the average mu change of
-its rank group, preserving each player’s own prior – and the reference-value test
-suite pins both the agreement and this documented deviation.</p>
+players keep their raw per-player changes instead of the documented average.
+Elote implements the documented rule – every tied player receives the average mu
+change of its rank group, preserving each player’s own prior – and the tests
+pin both the agreement (sigmas and untied mus to 1e-6) and this documented
+deviation.</p></li>
+<li><p>For <code class="docutils literal notranslate"><span class="pre">bradley_terry_partial</span></code>, elote follows <code class="docutils literal notranslate"><span class="pre">openskill.py</span></code> 6.2.0’s
+implementation rather than the paper’s literal Algorithm 2: a stable rank-sorted
+window of four positions on each side, with the pairwise terms averaged over
+comparison counts. On fields of up to nine participants this coincides with the
+paper’s adjacent-rank summation; on wider fields the window bounds the work.
+The reference battery exercises the window on 12-player fields.</p></li>
+</ul>
 </section>
 <section id="real-world-applications">
 <h2>Real-World Applications<a class="headerlink" href="#real-world-applications" title="Link to this heading">¶</a></h2>

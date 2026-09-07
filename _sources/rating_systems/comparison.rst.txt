@@ -54,6 +54,12 @@ Overview Comparison
      - Yes (sigma)
      - No
      - Teams and multiplayer
+   * - **OpenSkill**
+     - Microsoft/academic (2011)
+     - Medium
+     - Yes (sigma)
+     - No
+     - Multiplayer fields with a tunable likelihood
    * - **ECF**
      - England (1950s)
      - Low
@@ -137,6 +143,8 @@ Mathematical Formulation
      - :math:`E_A = \frac{1}{1 + 10^{-g\left(\sqrt{RD_A^2 + RD_B^2}\right)(r_A + \eta - r_B)/400}}` where :math:`\eta` is the advantage to white
    * - **TrueSkill**
      - :math:`E_A = \Phi\!\left(\frac{\mu_A - \mu_B}{\sqrt{2\beta^2 + \sigma_A^2 + \sigma_B^2}}\right)` where :math:`\Phi` is the normal CDF
+   * - **OpenSkill**
+     - Same Gaussian expected-score form as TrueSkill; bout updates follow Weng--Lin Algorithms 1--4, with the likelihood selected by ``model`` (Plackett-Luce, Bradley-Terry full/partial, Thurstone-Mosteller)
    * - **ECF**
      - :math:`E_A = 0.5 + \frac{R_A - R_B}{F}` where F is typically 120
    * - **DWZ**
@@ -175,6 +183,8 @@ Key Parameters
      - Initial rating, Initial RD, White advantage (eta), Boost factors (B1, B2, k), RD-increase coefficients
    * - **TrueSkill**
      - Initial mu, Initial sigma, Beta, Tau, Draw probability
+   * - **OpenSkill**
+     - Initial mu, Initial sigma, Model variant (``plackett_luce``, ``bradley_terry_full``, ``bradley_terry_partial``, ``thurstone``), Beta, Tau, Kappa
    * - **ECF**
      - Delta (max rating difference), Number of periods
    * - **DWZ**
@@ -271,6 +281,21 @@ TrueSkill
 - Rating is derived from mu and sigma (no direct setter)
 - Works on a mu/sigma scale rather than the chess scale
 - Sensitive to beta, tau, and draw-probability settings
+
+OpenSkill
+^^^^^^^^^
+
+**Strengths:**
+- Gaussian skill and uncertainty tracking at TrueSkill's core quality
+- Approximate Bayesian updates are far cheaper than factor-graph inference
+- Multi-competitor bouts and ties without extra machinery
+- Four interchangeable likelihoods behind one ``model`` selector
+
+**Weaknesses:**
+- Single-member bouts only (no member-level team updates)
+- Works on a mu/sigma scale rather than the chess scale
+- Approximation quality depends on the pairing model chosen
+- Fewer tuning knobs than TrueSkill (no draw probability)
 
 ECF
 ^^^
@@ -458,6 +483,7 @@ Here's a quick comparison of how to use each system in Elote:
         Glicko2Competitor,
         GlickoBoostCompetitor,
         TrueSkillCompetitor,
+        OpenSkillCompetitor,
         ECFCompetitor,
         DWZCompetitor,
         ColleyMatrixCompetitor,
@@ -483,6 +509,9 @@ Here's a quick comparison of how to use each system in Elote:
 
     # TrueSkill (mu/sigma scale)
     trueskill_player = TrueSkillCompetitor(initial_mu=25.0, initial_sigma=8.333)
+
+    # OpenSkill (mu/sigma scale; model picks the Weng-Lin likelihood)
+    openskill_player = OpenSkillCompetitor(initial_mu=25.0, initial_sigma=25.0 / 3, model="plackett_luce")
 
     # ECF
     ecf_player = ECFCompetitor(initial_rating=100)

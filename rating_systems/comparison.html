@@ -238,63 +238,70 @@ see <a class="reference internal" href="comparison_benchmark.html"><span class="
 <td><p>No</p></td>
 <td><p>Teams and multiplayer</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>ECF</strong></p></td>
+<tr class="row-odd"><td><p><strong>OpenSkill</strong></p></td>
+<td><p>Microsoft/academic (2011)</p></td>
+<td><p>Medium</p></td>
+<td><p>Yes (sigma)</p></td>
+<td><p>No</p></td>
+<td><p>Multiplayer fields with a tunable likelihood</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>ECF</strong></p></td>
 <td><p>England (1950s)</p></td>
 <td><p>Low</p></td>
 <td><p>No</p></td>
 <td><p>No</p></td>
 <td><p>English chess</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>DWZ</strong></p></td>
+<tr class="row-odd"><td><p><strong>DWZ</strong></p></td>
 <td><p>Germany (1990s)</p></td>
 <td><p>Medium</p></td>
 <td><p>Partial</p></td>
 <td><p>No</p></td>
 <td><p>Youth development</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Colley Matrix</strong></p></td>
+<tr class="row-even"><td><p><strong>Colley Matrix</strong></p></td>
 <td><p>Sports (2002)</p></td>
 <td><p>Medium</p></td>
 <td><p>No</p></td>
 <td><p>Yes</p></td>
 <td><p>Bias-free sports ranking</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Massey</strong></p></td>
+<tr class="row-odd"><td><p><strong>Massey</strong></p></td>
 <td><p>Sports (1997)</p></td>
 <td><p>Medium</p></td>
 <td><p>No</p></td>
 <td><p>Yes</p></td>
 <td><p>Margin-scale sports ranking</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Keener</strong></p></td>
+<tr class="row-even"><td><p><strong>Keener</strong></p></td>
 <td><p>Sports (1993)</p></td>
 <td><p>Medium</p></td>
 <td><p>No</p></td>
 <td><p>Yes</p></td>
 <td><p>Score-based eigenvector ranking</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Pythagorean</strong></p></td>
+<tr class="row-odd"><td><p><strong>Pythagorean</strong></p></td>
 <td><p>Baseball (1980s)</p></td>
 <td><p>Low</p></td>
 <td><p>No</p></td>
 <td><p>Yes</p></td>
 <td><p>Points-based win expectation</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Bradley-Terry</strong></p></td>
+<tr class="row-even"><td><p><strong>Bradley-Terry</strong></p></td>
 <td><p>Statistics (1952)</p></td>
 <td><p>Medium</p></td>
 <td><p>No</p></td>
 <td><p>Yes</p></td>
 <td><p>Maximum-likelihood ranking</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Whole-History Rating</strong></p></td>
+<tr class="row-odd"><td><p><strong>Whole-History Rating</strong></p></td>
 <td><p>Coulom (2008)</p></td>
 <td><p>High</p></td>
 <td><p>No</p></td>
 <td><p>Yes</p></td>
 <td><p>Time-varying strength curves</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Ensemble</strong></p></td>
+<tr class="row-even"><td><p><strong>Ensemble</strong></p></td>
 <td><p>Meta-system</p></td>
 <td><p>High</p></td>
 <td><p>Depends on components</p></td>
@@ -340,31 +347,34 @@ Pythagorean are the three that read the optional score payload; the rest use onl
 <tr class="row-even"><td><p><strong>TrueSkill</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(E_A = \Phi\!\left(\frac{\mu_A - \mu_B}{\sqrt{2\beta^2 + \sigma_A^2 + \sigma_B^2}}\right)\)</span> where <span class="math notranslate nohighlight">\(\Phi\)</span> is the normal CDF</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>ECF</strong></p></td>
+<tr class="row-odd"><td><p><strong>OpenSkill</strong></p></td>
+<td><p>Same Gaussian expected-score form as TrueSkill; bout updates follow Weng–Lin Algorithms 1–4, with the likelihood selected by <code class="docutils literal notranslate"><span class="pre">model</span></code> (Plackett-Luce, Bradley-Terry full/partial, Thurstone-Mosteller)</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>ECF</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(E_A = 0.5 + \frac{R_A - R_B}{F}\)</span> where F is typically 120</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>DWZ</strong></p></td>
+<tr class="row-odd"><td><p><strong>DWZ</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(W_e = \frac{1}{1 + 10^{-(R_A - R_B) / 400}}\)</span></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Colley Matrix</strong></p></td>
+<tr class="row-even"><td><p><strong>Colley Matrix</strong></p></td>
 <td><p>Ratings solve <span class="math notranslate nohighlight">\(C r = b\)</span>; <span class="math notranslate nohighlight">\(E_A = \frac{1}{1 + e^{-4 (r_A - r_B)}}\)</span></p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Massey</strong></p></td>
+<tr class="row-odd"><td><p><strong>Massey</strong></p></td>
 <td><p>Ratings solve <span class="math notranslate nohighlight">\(M r = p\)</span> with <span class="math notranslate nohighlight">\(M = D - A\)</span>; <span class="math notranslate nohighlight">\(E_A = \frac{1}{1 + e^{-2 (r_A - r_B) / \sigma}}\)</span>, where <span class="math notranslate nohighlight">\(\sigma\)</span> is the fitted rating spread</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Keener</strong></p></td>
+<tr class="row-even"><td><p><strong>Keener</strong></p></td>
 <td><p>Ratings are the dominant eigenvector of <span class="math notranslate nohighlight">\(H_{ij} = h(a_{ij}) / g_i + \varepsilon\)</span> with <span class="math notranslate nohighlight">\(a_{ij} = \frac{S_{ij} + 1}{S_{ij} + S_{ji} + 2}\)</span> and <span class="math notranslate nohighlight">\(h(x) = \frac{1}{2} + \frac{1}{2}\mathrm{sgn}(x - \frac{1}{2})\sqrt{|2x - 1|}\)</span>; <span class="math notranslate nohighlight">\(E_A = \frac{r_A}{r_A + r_B}\)</span></p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Pythagorean</strong></p></td>
+<tr class="row-odd"><td><p><strong>Pythagorean</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(w = \frac{PF^{k}}{PF^{k} + PA^{k}}\)</span> on prior-adjusted point totals; <span class="math notranslate nohighlight">\(E_A = \frac{w_A - w_A w_B}{w_A + w_B - 2 w_A w_B}\)</span> (log5)</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Bradley-Terry</strong></p></td>
+<tr class="row-even"><td><p><strong>Bradley-Terry</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(P(A \text{ beats } B) = \frac{p_A}{p_A + p_B} = \frac{1}{1 + e^{-(\beta_A - \beta_B)}}\)</span></p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Whole-History Rating</strong></p></td>
+<tr class="row-odd"><td><p><strong>Whole-History Rating</strong></p></td>
 <td><p>Bradley-Terry likelihood per game plus <span class="math notranslate nohighlight">\(r_{t+1}-r_t \sim N(0, w^2\Delta t)\)</span></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Ensemble</strong></p></td>
+<tr class="row-even"><td><p><strong>Ensemble</strong></p></td>
 <td><p><span class="math notranslate nohighlight">\(E_{ensemble} = \sum_{i=1}^{n} w_i \times E_i\)</span> where <span class="math notranslate nohighlight">\(w_i\)</span> are weights</p></td>
 </tr>
 </tbody>
@@ -398,31 +408,34 @@ Pythagorean are the three that read the optional score payload; the rest use onl
 <tr class="row-even"><td><p><strong>TrueSkill</strong></p></td>
 <td><p>Initial mu, Initial sigma, Beta, Tau, Draw probability</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>ECF</strong></p></td>
+<tr class="row-odd"><td><p><strong>OpenSkill</strong></p></td>
+<td><p>Initial mu, Initial sigma, Model variant (<code class="docutils literal notranslate"><span class="pre">plackett_luce</span></code>, <code class="docutils literal notranslate"><span class="pre">bradley_terry_full</span></code>, <code class="docutils literal notranslate"><span class="pre">bradley_terry_partial</span></code>, <code class="docutils literal notranslate"><span class="pre">thurstone</span></code>), Beta, Tau, Kappa</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>ECF</strong></p></td>
 <td><p>Delta (max rating difference), Number of periods</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>DWZ</strong></p></td>
+<tr class="row-odd"><td><p><strong>DWZ</strong></p></td>
 <td><p>Initial rating, Development coefficient (age-dependent)</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Colley Matrix</strong></p></td>
+<tr class="row-even"><td><p><strong>Colley Matrix</strong></p></td>
 <td><p>Initial rating (default 0.5)</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Massey</strong></p></td>
+<tr class="row-odd"><td><p><strong>Massey</strong></p></td>
 <td><p>Initial rating (default 0.0), Expected-score scale</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Keener</strong></p></td>
+<tr class="row-even"><td><p><strong>Keener</strong></p></td>
 <td><p>Initial rating (default 1.0), Perturbation, Expected-score scale</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Pythagorean</strong></p></td>
+<tr class="row-odd"><td><p><strong>Pythagorean</strong></p></td>
 <td><p>Exponent (default 2.37), Prior points (default 1.0); no initial rating</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Bradley-Terry</strong></p></td>
+<tr class="row-even"><td><p><strong>Bradley-Terry</strong></p></td>
 <td><p>Initial rating, Scale, Regularization, Max iterations</p></td>
 </tr>
-<tr class="row-even"><td><p><strong>Whole-History Rating</strong></p></td>
+<tr class="row-odd"><td><p><strong>Whole-History Rating</strong></p></td>
 <td><p>Per-day variance (w2), Initial rating, Max iterations, Precision</p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>Ensemble</strong></p></td>
+<tr class="row-even"><td><p><strong>Ensemble</strong></p></td>
 <td><p>Component systems, Weights</p></td>
 </tr>
 </tbody>
@@ -494,6 +507,19 @@ Pythagorean are the three that read the optional score payload; the rest use onl
 - Rating is derived from mu and sigma (no direct setter)
 - Works on a mu/sigma scale rather than the chess scale
 - Sensitive to beta, tau, and draw-probability settings</p>
+</section>
+<section id="openskill">
+<h3>OpenSkill<a class="headerlink" href="#openskill" title="Link to this heading">¶</a></h3>
+<p><strong>Strengths:</strong>
+- Gaussian skill and uncertainty tracking at TrueSkill’s core quality
+- Approximate Bayesian updates are far cheaper than factor-graph inference
+- Multi-competitor bouts and ties without extra machinery
+- Four interchangeable likelihoods behind one <code class="docutils literal notranslate"><span class="pre">model</span></code> selector</p>
+<p><strong>Weaknesses:</strong>
+- Single-member bouts only (no member-level team updates)
+- Works on a mu/sigma scale rather than the chess scale
+- Approximation quality depends on the pairing model chosen
+- Fewer tuning knobs than TrueSkill (no draw probability)</p>
 </section>
 <section id="ecf">
 <h3>ECF<a class="headerlink" href="#ecf" title="Link to this heading">¶</a></h3>
@@ -660,6 +686,7 @@ Pythagorean are the three that read the optional score payload; the rest use onl
     <span class="n">Glicko2Competitor</span><span class="p">,</span>
     <span class="n">GlickoBoostCompetitor</span><span class="p">,</span>
     <span class="n">TrueSkillCompetitor</span><span class="p">,</span>
+    <span class="n">OpenSkillCompetitor</span><span class="p">,</span>
     <span class="n">ECFCompetitor</span><span class="p">,</span>
     <span class="n">DWZCompetitor</span><span class="p">,</span>
     <span class="n">ColleyMatrixCompetitor</span><span class="p">,</span>
@@ -685,6 +712,9 @@ Pythagorean are the three that read the optional score payload; the rest use onl
 
 <span class="c1"># TrueSkill (mu/sigma scale)</span>
 <span class="n">trueskill_player</span> <span class="o">=</span> <span class="n">TrueSkillCompetitor</span><span class="p">(</span><span class="n">initial_mu</span><span class="o">=</span><span class="mf">25.0</span><span class="p">,</span> <span class="n">initial_sigma</span><span class="o">=</span><span class="mf">8.333</span><span class="p">)</span>
+
+<span class="c1"># OpenSkill (mu/sigma scale; model picks the Weng-Lin likelihood)</span>
+<span class="n">openskill_player</span> <span class="o">=</span> <span class="n">OpenSkillCompetitor</span><span class="p">(</span><span class="n">initial_mu</span><span class="o">=</span><span class="mf">25.0</span><span class="p">,</span> <span class="n">initial_sigma</span><span class="o">=</span><span class="mf">25.0</span> <span class="o">/</span> <span class="mi">3</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">"plackett_luce"</span><span class="p">)</span>
 
 <span class="c1"># ECF</span>
 <span class="n">ecf_player</span> <span class="o">=</span> <span class="n">ECFCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
