@@ -1,5 +1,51 @@
-Unreleased
-==========
+v1.5.0
+======
+
+Released 2026-09-07. Teams, the Weng-Lin OpenSkill family, and genuine N-player bouts: the three
+capabilities the documentation promised that the code did not yet have. Fourteen rating systems now
+ship, against thirteen in v1.4.0. This is the first published release since v1.3.2, so it also
+carries the v1.4.0 work below, including the packaging modernization.
+
+New rating systems
+
+ * Added `OpenSkillCompetitor`, the Weng-Lin (2011) OpenSkill family implemented from scratch behind
+   the uniform competitor interface (#198, #199). Beliefs are Gaussian per participant (`mu`,
+   `sigma`), the exposed `rating` is the conservative ordinal `mu - 3*sigma`, and a bout update is
+   one closed-form step over a whole ranked participant set, so a podium, race field, or bracket
+   round no longer has to be decomposed into invented 1v1s that double-count evidence. Four
+   likelihood variants share one surface through the `model` parameter: `plackett_luce` (the paper's
+   Algorithm 4), `bradley_terry_full` (Algorithm 1), `bradley_terry_partial` (Algorithm 2), and
+   `thurstone` (Algorithm 3); a bout or rating period mixing variants is rejected before any belief
+   moves. Every variant's arithmetic is pinned to 1e-6 against the `openskill.py` 6.2.0 reference
+   battery, which is a dev-extra test oracle only: the library grows no dependencies. Two deviations
+   from the reference are documented where its dead code contradicts its own documentation: tied
+   players share the average mu change of their rank group, and partial pairing follows the
+   reference's bounded pairing window rather than the paper's literal adjacent-rank summation.
+
+New features
+
+ * Added `TeamCompetitor` (#197), a composite that rates a roster of any registered competitor as a
+   single side, so team-vs-team bouts work in a plain `LambdaArena` with no arena changes. The
+   team's `rating` is derived from its members on every read, either `aggregate="mean"` (directly
+   leaderboard-comparable with individuals) or `aggregate="sum"` (total rating mass, only meaningful
+   between equal-size rosters). Member updates are positional, `expected_score` averages the member
+   pairs' own model probabilities, roster parity is enforced before any member is mutated, and
+   serialization nests each member's full state document in roster order so team state round-trips
+   through the same `export_state`/`from_json` helpers as every other competitor.
+
+ * Added `LambdaArena.match_group(participants, ranks=None, scores=None, attributes=None,
+   match_time=None)` (#200): one bout between three or more sides, or two sides carrying rosters,
+   recorded to history as a new `MultiBout` entry. Ranks and scores are validated before any rating
+   moves (whole-number ranks, non-negative finite scores, ties sharing the earliest rank), sides are
+   ordered by pre-bout predicted strength, and each rating system receives one native bout-level
+   update instead of a pairwise fan-out: an N-way bout is deliberately not equivalent to its
+   fan-out, and the difference is asserted in the tests. Systems without a native N-way hook raise
+   `NotImplementedError`; OpenSkill accepts nested rosters (summed member strength, per-member
+   variance shares) and reduces byte-identically to its single-member arithmetic. The two-sided
+   analytics (`report`, the confusion matrix, accuracy, calibration, random search) read through a
+   pairwise filter, so N-way bouts are recorded but excluded from a/b analytics. The pairwise
+   `matchup` contract is untouched, and the two-player update arithmetic is pinned by a
+   SHA-256-stable golden fixture battery.
 
 Packaging
 
