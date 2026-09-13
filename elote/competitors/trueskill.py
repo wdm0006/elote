@@ -1,4 +1,5 @@
 import math
+import numbers
 from scipy import special
 from typing import Dict, Any, ClassVar, Optional, Sequence, Tuple, Type, TypeVar, List
 
@@ -36,6 +37,14 @@ class TrueSkillCompetitor(BaseCompetitor):
     _default_mu: ClassVar[float] = 25.0
     _default_sigma: ClassVar[float] = 8.333
 
+    @staticmethod
+    def _validate_finite_real(value: float, name: str, *, positive: bool = False) -> float:
+        if isinstance(value, bool) or not isinstance(value, numbers.Real) or not math.isfinite(value):
+            raise InvalidParameterException(f"{name} must be a finite real number")
+        if positive and value <= 0:
+            raise InvalidParameterException(f"{name} must be positive")
+        return value
+
     def __init__(self, initial_mu: float = None, initial_sigma: float = None):
         """Initialize a TrueSkill competitor.
 
@@ -44,7 +53,7 @@ class TrueSkillCompetitor(BaseCompetitor):
             initial_sigma (float, optional): The initial standard deviation. Default: _default_sigma.
 
         Raises:
-            InvalidParameterException: If the initial sigma is not positive.
+            InvalidParameterException: If mu is not finite or sigma is not finite and positive.
         """
         super().__init__()  # Call base class constructor
         # Set default values if not provided
@@ -53,8 +62,8 @@ class TrueSkillCompetitor(BaseCompetitor):
         if initial_sigma is None:
             initial_sigma = self._default_sigma
 
-        if initial_sigma <= 0:
-            raise InvalidParameterException("Initial sigma must be positive")
+        initial_mu = self._validate_finite_real(initial_mu, "Initial mu")
+        initial_sigma = self._validate_finite_real(initial_sigma, "Initial sigma", positive=True)
 
         # Store initial values for reset
         self._initial_mu = initial_mu
@@ -114,13 +123,11 @@ class TrueSkillCompetitor(BaseCompetitor):
         """
         # Validate and set initial_mu
         logger.debug("Importing parameters for TrueSkillCompetitor: %s", parameters)
-        initial_mu = parameters.get("initial_mu", self._default_mu)
+        initial_mu = self._validate_finite_real(parameters.get("initial_mu", self._default_mu), "Initial mu")
+        initial_sigma = self._validate_finite_real(
+            parameters.get("initial_sigma", self._default_sigma), "Initial sigma", positive=True
+        )
         self._initial_mu = initial_mu
-
-        # Validate and set initial_sigma
-        initial_sigma = parameters.get("initial_sigma", self._default_sigma)
-        if initial_sigma <= 0:
-            raise InvalidParameterException("Initial sigma must be positive")
         self._initial_sigma = initial_sigma
 
     def _import_current_state(self, state: Dict[str, Any]) -> None:
@@ -134,14 +141,22 @@ class TrueSkillCompetitor(BaseCompetitor):
         """
         # Validate and set mu
         logger.debug("Importing current state for TrueSkillCompetitor: %s", state)
-        mu = state.get("mu", self._initial_mu)
+        mu = self._validate_finite_real(state.get("mu", self._initial_mu), "Mu")
+        sigma = self._validate_finite_real(state.get("sigma", self._initial_sigma), "Sigma", positive=True)
         self._mu = mu
-
-        # Validate and set sigma
-        sigma = state.get("sigma", self._initial_sigma)
-        if sigma <= 0:
-            raise InvalidParameterException("Sigma must be positive")
         self._sigma = sigma
+
+    def import_state(self, state: Dict[str, Any]) -> None:
+        """Import a modern state document without partially applying invalid values."""
+        self._validate_state_dict(state)
+        if state["type"] == self.__class__.__name__:
+            self._validate_finite_real(state["parameters"].get("initial_mu", self._default_mu), "Initial mu")
+            self._validate_finite_real(
+                state["parameters"].get("initial_sigma", self._default_sigma), "Initial sigma", positive=True
+            )
+            self._validate_finite_real(state["state"].get("mu", self._initial_mu), "Mu")
+            self._validate_finite_real(state["state"].get("sigma", self._initial_sigma), "Sigma", positive=True)
+        super().import_state(state)
 
     @classmethod
     def _create_from_parameters(cls: Type[T], parameters: Dict[str, Any]) -> T:
@@ -189,6 +204,14 @@ class TrueSkillCompetitor(BaseCompetitor):
         # Handle legacy state format
         if "type" not in state:
             logger.warning("Using legacy state format for TrueSkillCompetitor.from_state")
+            initial_mu = cls._validate_finite_real(state.get("initial_mu", cls._default_mu), "Initial mu")
+            initial_sigma = cls._validate_finite_real(
+                state.get("initial_sigma", cls._default_sigma), "Initial sigma", positive=True
+            )
+            current_mu = cls._validate_finite_real(state.get("current_mu", initial_mu), "Mu")
+            current_sigma = cls._validate_finite_real(
+                state.get("current_sigma", initial_sigma), "Sigma", positive=True
+            )
             # Configure class variables if provided
             if "class_vars" in state:
                 logger.debug("Applying legacy class variables: %s", state["class_vars"])
@@ -206,15 +229,15 @@ class TrueSkillCompetitor(BaseCompetitor):
 
             # Create a new competitor with the initial parameters
             competitor = cls(
-                initial_mu=state.get("initial_mu", cls._default_mu),
-                initial_sigma=state.get("initial_sigma", cls._default_sigma),
+                initial_mu=initial_mu,
+                initial_sigma=initial_sigma,
             )
 
             # Set the current state if provided
             if "current_mu" in state:
-                competitor._mu = state["current_mu"]
+                competitor.mu = current_mu
             if "current_sigma" in state:
-                competitor._sigma = state["current_sigma"]
+                competitor.sigma = current_sigma
 
             return competitor
 
@@ -280,6 +303,7 @@ class TrueSkillCompetitor(BaseCompetitor):
         Args:
             value (float): The new mean skill value.
         """
+        value = self._validate_finite_real(value, "Mu")
         self._mu = value
         logger.debug("Set TrueSkillCompetitor mu to %.2f", value)
 
@@ -302,9 +326,7 @@ class TrueSkillCompetitor(BaseCompetitor):
         Raises:
             InvalidParameterException: If the standard deviation is not positive.
         """
-        if value <= 0:
-            logger.error("Attempted to set non-positive sigma: %.2f", value)
-            raise InvalidParameterException("Sigma must be positive")
+        value = self._validate_finite_real(value, "Sigma", positive=True)
         self._sigma = value
         logger.debug("Set TrueSkillCompetitor sigma to %.2f", value)
 
