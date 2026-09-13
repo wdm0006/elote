@@ -1,5 +1,6 @@
 import unittest
 import math
+from copy import deepcopy
 from elote import TrueSkillCompetitor, EloCompetitor, BlendedCompetitor, LambdaArena
 from elote.competitors.base import MissMatchedCompetitorTypesException, InvalidParameterException
 
@@ -55,6 +56,13 @@ class TestTrueSkill(unittest.TestCase):
         with self.assertRaises(InvalidParameterException):
             TrueSkillCompetitor(initial_sigma=-1)
 
+    def test_initialization_rejects_non_finite_mu_and_sigma(self):
+        for parameter in ("initial_mu", "initial_sigma"):
+            for value in (float("nan"), float("inf"), float("-inf")):
+                with self.subTest(parameter=parameter, value=value):
+                    with self.assertRaises(InvalidParameterException):
+                        TrueSkillCompetitor(**{parameter: value})
+
     def test_rating_properties(self):
         """Test the mu and sigma properties."""
         player = TrueSkillCompetitor(initial_mu=25, initial_sigma=8.333)
@@ -76,6 +84,17 @@ class TestTrueSkill(unittest.TestCase):
             player.sigma = 0
         with self.assertRaises(InvalidParameterException):
             player.sigma = -1
+
+        player.mu = -10
+        self.assertEqual(player.mu, -10)
+
+        for attribute in ("mu", "sigma"):
+            for value in (float("nan"), float("inf"), float("-inf")):
+                before = (player._initial_mu, player._initial_sigma, player.mu, player.sigma)
+                with self.subTest(attribute=attribute, value=value):
+                    with self.assertRaises(InvalidParameterException):
+                        setattr(player, attribute, value)
+                    self.assertEqual((player._initial_mu, player._initial_sigma, player.mu, player.sigma), before)
 
         # Test that rating cannot be set directly
         with self.assertRaises(NotImplementedError):
@@ -166,6 +185,48 @@ class TestTrueSkill(unittest.TestCase):
         # Check that the new player has the same state
         self.assertEqual(new_player.mu, player.mu)
         self.assertEqual(new_player.sigma, player.sigma)
+
+    def test_modern_state_rejects_non_finite_values_atomically(self):
+        player = TrueSkillCompetitor(initial_mu=20, initial_sigma=7)
+        player.mu = 24
+        player.sigma = 4
+        valid_state = player.export_state()
+
+        for section, field in (
+            ("parameters", "initial_mu"),
+            ("parameters", "initial_sigma"),
+            ("state", "mu"),
+            ("state", "sigma"),
+        ):
+            for value in (float("nan"), float("inf"), float("-inf")):
+                bad_state = deepcopy(valid_state)
+                bad_state[section][field] = value
+                with self.subTest(section=section, field=field, value=value):
+                    with self.assertRaises(InvalidParameterException):
+                        TrueSkillCompetitor.from_state(bad_state)
+
+                    existing = TrueSkillCompetitor(initial_mu=11, initial_sigma=6)
+                    before = (existing._initial_mu, existing._initial_sigma, existing.mu, existing.sigma)
+                    with self.assertRaises(InvalidParameterException):
+                        existing.import_state(bad_state)
+                    self.assertEqual(
+                        (existing._initial_mu, existing._initial_sigma, existing.mu, existing.sigma), before
+                    )
+
+    def test_legacy_state_rejects_non_finite_values(self):
+        valid_state = {
+            "initial_mu": 20,
+            "initial_sigma": 7,
+            "current_mu": 24,
+            "current_sigma": 4,
+        }
+
+        for field in valid_state:
+            for value in (float("nan"), float("inf"), float("-inf")):
+                bad_state = dict(valid_state, **{field: value})
+                with self.subTest(field=field, value=value):
+                    with self.assertRaises(InvalidParameterException):
+                        TrueSkillCompetitor.from_state(bad_state)
 
     def test_match_quality(self):
         """Test that match quality is calculated correctly."""
