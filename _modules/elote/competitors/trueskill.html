@@ -175,6 +175,7 @@
             
   <h1>Source code for elote.competitors.trueskill</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numbers</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">special</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">List</span>
 
@@ -214,6 +215,14 @@
     <span class="n">_default_mu</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">25.0</span>
     <span class="n">_default_sigma</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">8.333</span>
 
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_finite_real</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">positive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Real</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be a finite real number"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">positive</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be positive"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span>
+
 <div class="viewcode-block" id="TrueSkillCompetitor.__init__">
 <a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_mu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">initial_sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
@@ -224,7 +233,7 @@
 <span class="sd">            initial_sigma (float, optional): The initial standard deviation. Default: _default_sigma.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            InvalidParameterException: If the initial sigma is not positive.</span>
+<span class="sd">            InvalidParameterException: If mu is not finite or sigma is not finite and positive.</span>
 <span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>  <span class="c1"># Call base class constructor</span>
         <span class="c1"># Set default values if not provided</span>
@@ -233,8 +242,8 @@
         <span class="k">if</span> <span class="n">initial_sigma</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">initial_sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_sigma</span>
 
-        <span class="k">if</span> <span class="n">initial_sigma</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">"Initial sigma must be positive"</span><span class="p">)</span>
+        <span class="n">initial_mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_finite_real</span><span class="p">(</span><span class="n">initial_mu</span><span class="p">,</span> <span class="s2">"Initial mu"</span><span class="p">)</span>
+        <span class="n">initial_sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_finite_real</span><span class="p">(</span><span class="n">initial_sigma</span><span class="p">,</span> <span class="s2">"Initial sigma"</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># Store initial values for reset</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_mu</span> <span class="o">=</span> <span class="n">initial_mu</span>
@@ -295,13 +304,11 @@
 <span class="sd">        """</span>
         <span class="c1"># Validate and set initial_mu</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Importing parameters for TrueSkillCompetitor: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
-        <span class="n">initial_mu</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_mu"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_mu</span><span class="p">)</span>
+        <span class="n">initial_mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_finite_real</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_mu"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_mu</span><span class="p">),</span> <span class="s2">"Initial mu"</span><span class="p">)</span>
+        <span class="n">initial_sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_finite_real</span><span class="p">(</span>
+            <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_sigma"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_sigma</span><span class="p">),</span> <span class="s2">"Initial sigma"</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_mu</span> <span class="o">=</span> <span class="n">initial_mu</span>
-
-        <span class="c1"># Validate and set initial_sigma</span>
-        <span class="n">initial_sigma</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_sigma"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_sigma</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">initial_sigma</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">"Initial sigma must be positive"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_sigma</span> <span class="o">=</span> <span class="n">initial_sigma</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_import_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -315,14 +322,25 @@
 <span class="sd">        """</span>
         <span class="c1"># Validate and set mu</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Importing current state for TrueSkillCompetitor: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-        <span class="n">mu</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"mu"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_mu</span><span class="p">)</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_finite_real</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"mu"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_mu</span><span class="p">),</span> <span class="s2">"Mu"</span><span class="p">)</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_finite_real</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"sigma"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_sigma</span><span class="p">),</span> <span class="s2">"Sigma"</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">=</span> <span class="n">mu</span>
-
-        <span class="c1"># Validate and set sigma</span>
-        <span class="n">sigma</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"sigma"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_sigma</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">sigma</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">"Sigma must be positive"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">sigma</span>
+
+<div class="viewcode-block" id="TrueSkillCompetitor.import_state">
+<a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.import_state">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">import_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Import a modern state document without partially applying invalid values."""</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_state_dict</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">state</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_finite_real</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s2">"parameters"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_mu"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_mu</span><span class="p">),</span> <span class="s2">"Initial mu"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_finite_real</span><span class="p">(</span>
+                <span class="n">state</span><span class="p">[</span><span class="s2">"parameters"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_sigma"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_sigma</span><span class="p">),</span> <span class="s2">"Initial sigma"</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_finite_real</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s2">"state"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"mu"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_mu</span><span class="p">),</span> <span class="s2">"Mu"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_finite_real</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s2">"state"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"sigma"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_sigma</span><span class="p">),</span> <span class="s2">"Sigma"</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">import_state</span><span class="p">(</span><span class="n">state</span><span class="p">)</span></div>
+
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_from_parameters</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
@@ -375,6 +393,14 @@
         <span class="c1"># Handle legacy state format</span>
         <span class="k">if</span> <span class="s2">"type"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Using legacy state format for TrueSkillCompetitor.from_state"</span><span class="p">)</span>
+            <span class="n">initial_mu</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_validate_finite_real</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_mu"</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_mu</span><span class="p">),</span> <span class="s2">"Initial mu"</span><span class="p">)</span>
+            <span class="n">initial_sigma</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_validate_finite_real</span><span class="p">(</span>
+                <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_sigma"</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_sigma</span><span class="p">),</span> <span class="s2">"Initial sigma"</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="n">current_mu</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_validate_finite_real</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"current_mu"</span><span class="p">,</span> <span class="n">initial_mu</span><span class="p">),</span> <span class="s2">"Mu"</span><span class="p">)</span>
+            <span class="n">current_sigma</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_validate_finite_real</span><span class="p">(</span>
+                <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"current_sigma"</span><span class="p">,</span> <span class="n">initial_sigma</span><span class="p">),</span> <span class="s2">"Sigma"</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
             <span class="c1"># Configure class variables if provided</span>
             <span class="k">if</span> <span class="s2">"class_vars"</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Applying legacy class variables: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="s2">"class_vars"</span><span class="p">])</span>
@@ -392,15 +418,15 @@
 
             <span class="c1"># Create a new competitor with the initial parameters</span>
             <span class="n">competitor</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span>
-                <span class="n">initial_mu</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_mu"</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_mu</span><span class="p">),</span>
-                <span class="n">initial_sigma</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_sigma"</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_sigma</span><span class="p">),</span>
+                <span class="n">initial_mu</span><span class="o">=</span><span class="n">initial_mu</span><span class="p">,</span>
+                <span class="n">initial_sigma</span><span class="o">=</span><span class="n">initial_sigma</span><span class="p">,</span>
             <span class="p">)</span>
 
             <span class="c1"># Set the current state if provided</span>
             <span class="k">if</span> <span class="s2">"current_mu"</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-                <span class="n">competitor</span><span class="o">.</span><span class="n">_mu</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">"current_mu"</span><span class="p">]</span>
+                <span class="n">competitor</span><span class="o">.</span><span class="n">mu</span> <span class="o">=</span> <span class="n">current_mu</span>
             <span class="k">if</span> <span class="s2">"current_sigma"</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
-                <span class="n">competitor</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s2">"current_sigma"</span><span class="p">]</span>
+                <span class="n">competitor</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="n">current_sigma</span>
 
             <span class="k">return</span> <span class="n">competitor</span>
 
@@ -470,6 +496,7 @@
 <span class="sd">        Args:</span>
 <span class="sd">            value (float): The new mean skill value.</span>
 <span class="sd">        """</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_finite_real</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">"Mu"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">=</span> <span class="n">value</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Set TrueSkillCompetitor mu to </span><span class="si">%.2f</span><span class="s2">"</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
@@ -492,9 +519,7 @@
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidParameterException: If the standard deviation is not positive.</span>
 <span class="sd">        """</span>
-        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">"Attempted to set non-positive sigma: </span><span class="si">%.2f</span><span class="s2">"</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">"Sigma must be positive"</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_finite_real</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">"Sigma"</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">value</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Set TrueSkillCompetitor sigma to </span><span class="si">%.2f</span><span class="s2">"</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 

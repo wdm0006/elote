@@ -1370,7 +1370,7 @@ _default_sigma (float): The default standard deviation for new players. Default:
 <dt>Args:</dt><dd><p>initial_mu (float, optional): The initial mean skill value. Default: _default_mu.
 initial_sigma (float, optional): The initial standard deviation. Default: _default_sigma.</p>
 </dd>
-<dt>Raises:</dt><dd><p>InvalidParameterException: If the initial sigma is not positive.</p>
+<dt>Raises:</dt><dd><p>InvalidParameterException: If mu is not finite or sigma is not finite and positive.</p>
 </dd>
 </dl>
 <dl class="py method">
@@ -1381,7 +1381,7 @@ initial_sigma (float, optional): The initial standard deviation. Default: _defau
 <dt>Args:</dt><dd><p>initial_mu (float, optional): The initial mean skill value. Default: _default_mu.
 initial_sigma (float, optional): The initial standard deviation. Default: _default_sigma.</p>
 </dd>
-<dt>Raises:</dt><dd><p>InvalidParameterException: If the initial sigma is not positive.</p>
+<dt>Raises:</dt><dd><p>InvalidParameterException: If mu is not finite or sigma is not finite and positive.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1460,6 +1460,12 @@ square root of the sum of the players’ sigma squared.</p>
 <dt>Raises:</dt><dd><p>InvalidParameterException: If any parameter in the state is invalid.</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.competitors.trueskill.TrueSkillCompetitor.import_state">
+<span class="sig-name descname"><span class="pre">import_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/elote/competitors/trueskill.html#TrueSkillCompetitor.import_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.trueskill.TrueSkillCompetitor.import_state" title="Link to this definition">¶</a></dt>
+<dd><p>Import a modern state document without partially applying invalid values.</p>
 </dd></dl>
 
 <dl class="py method">
