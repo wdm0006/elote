@@ -312,13 +312,12 @@ class BaseCompetitor(abc.ABC):
                 else:
                     competitor_a.beat(competitor_b, scores=scores)
             elif outcome == 0.0:
-                reversed_scores = None if scores is None else (scores[1], scores[0])
                 if supports_time:
-                    competitor_b.beat(  # type: ignore[call-arg]
-                        competitor_a, match_time=period_end, scores=reversed_scores
+                    competitor_a.lost_to(  # type: ignore[call-arg]
+                        competitor_b, period_end, scores=scores
                     )
                 else:
-                    competitor_b.beat(competitor_a, scores=reversed_scores)
+                    competitor_a.lost_to(competitor_b, scores=scores)
             elif supports_time:
                 competitor_a.tied(competitor_b, match_time=period_end, scores=scores)  # type: ignore[call-arg]
             else:

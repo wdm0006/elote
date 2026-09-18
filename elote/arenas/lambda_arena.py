@@ -273,10 +273,9 @@ class LambdaArena(BaseArena):
         # Check if the competitor supports time-based ratings
         supports_time = hasattr(self.competitors[a], "_last_activity")
 
-        # Scores are supplied in (a, b) order. The draw and a-wins branches call through
-        # competitor a, so they keep that order; the b-wins branch reverses the call, so the
-        # score pair has to be reversed with it.
-        reversed_scores = None if validated_scores is None else (validated_scores[1], validated_scores[0])
+        # Scores are supplied in (a, b) order, and every branch dispatches through competitor
+        # a, so that order is preserved all the way down: ``lost_to`` reverses the pair
+        # internally for the winner's ``beat``.
 
         if res is None:
             if supports_time:
@@ -295,9 +294,9 @@ class LambdaArena(BaseArena):
         else:
             if supports_time:
                 # type: ignore[call-arg]
-                self.competitors[b].beat(self.competitors[a], match_time=match_time, scores=reversed_scores)
+                self.competitors[a].lost_to(self.competitors[b], match_time, scores=validated_scores)
             else:
-                self.competitors[b].beat(self.competitors[a], scores=reversed_scores)
+                self.competitors[a].lost_to(self.competitors[b], scores=validated_scores)
             self.history.add_bout(Bout(a, b, predicted_outcome, outcome="loss", attributes=attributes))
 
     def match_group(
