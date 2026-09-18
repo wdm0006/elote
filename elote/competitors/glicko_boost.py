@@ -52,9 +52,12 @@ class GlickoBoostCompetitor(BaseCompetitor):
     ``a.tied(b)`` -- ``a`` is white. Callers with no colour information leave ``_eta`` at
     its default of ``0.0``, which removes the white-advantage term entirely.
 
-    The arena preserves that order on every path: :meth:`elote.LambdaArena.matchup`
-    dispatches a loss as the caller's ``lost_to``, so a losing row streamed through the
-    arena produces the same result as the same row given to :meth:`apply_rating_period`.
+    :meth:`elote.LambdaArena.matchup` and :meth:`elote.LambdaArena.rating_period` preserve
+    that order -- a loss is dispatched as the caller's ``lost_to`` -- so a losing row
+    streamed through the arena gives the same result as the same row handed to
+    :meth:`apply_rating_period`. :func:`elote.train_arena_with_dataset` and
+    :meth:`elote.LambdaArena.process_history` still reverse a losing row themselves, which
+    matters only when ``_eta`` is non-zero.
 
     ``beat``/``lost_to``/``tied`` apply the same algorithm to a one-game period, so a
     single result is never a different formula from a batch. Because of the two-pass

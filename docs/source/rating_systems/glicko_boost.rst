@@ -94,7 +94,7 @@ Elote's result API carries no colour argument, and Glicko-Boost does not get one
 
 Callers who have no colour information should leave ``_eta`` at its default of ``0.0``, which is why that -- rather than the paper's 30.0 -- is Elote's default. The update then depends only on rating differences and is invariant to the order in which each row is written.
 
-Argument order is preserved on every arena path, so a row written white-first stays that way whether it is streamed through :meth:`~elote.LambdaArena.matchup` or handed to :meth:`~elote.LambdaArena.rating_period` -- a loss is dispatched as the caller's ``lost_to``, which reverses internally.
+Argument order is preserved through :meth:`~elote.LambdaArena.matchup` (and therefore :meth:`~elote.LambdaArena.tournament`) and :meth:`~elote.LambdaArena.rating_period`: a loss is dispatched as the caller's ``lost_to``, which reverses internally, so a row written white-first stays that way. Two older paths still reverse a losing row themselves and are best avoided when :math:`\eta` is non-zero: :func:`~elote.train_arena_with_dataset`, which swaps the row before calling ``matchup``, and :meth:`~elote.LambdaArena.process_history`.
 
 Key Parameters
 --------------
