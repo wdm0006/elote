@@ -465,10 +465,9 @@
         <span class="c1"># Check if the competitor supports time-based ratings</span>
         <span class="n">supports_time</span> <span class="o">=</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">],</span> <span class="s2">"_last_activity"</span><span class="p">)</span>
 
-        <span class="c1"># Scores are supplied in (a, b) order. The draw and a-wins branches call through</span>
-        <span class="c1"># competitor a, so they keep that order; the b-wins branch reverses the call, so the</span>
-        <span class="c1"># score pair has to be reversed with it.</span>
-        <span class="n">reversed_scores</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">validated_scores</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="n">validated_scores</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">validated_scores</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="c1"># Scores are supplied in (a, b) order, and every branch dispatches through competitor</span>
+        <span class="c1"># a, so that order is preserved all the way down: ``lost_to`` reverses the pair</span>
+        <span class="c1"># internally for the winner's ``beat``.</span>
 
         <span class="k">if</span> <span class="n">res</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">supports_time</span><span class="p">:</span>
@@ -487,9 +486,9 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">supports_time</span><span class="p">:</span>
                 <span class="c1"># type: ignore[call-arg]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">],</span> <span class="n">match_time</span><span class="o">=</span><span class="n">match_time</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="n">reversed_scores</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">.</span><span class="n">lost_to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">],</span> <span class="n">match_time</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="n">validated_scores</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">]</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">],</span> <span class="n">scores</span><span class="o">=</span><span class="n">reversed_scores</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">.</span><span class="n">lost_to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">competitors</span><span class="p">[</span><span class="n">b</span><span class="p">],</span> <span class="n">scores</span><span class="o">=</span><span class="n">validated_scores</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">add_bout</span><span class="p">(</span><span class="n">Bout</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">predicted_outcome</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="s2">"loss"</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="n">attributes</span><span class="p">))</span></div>
 
 

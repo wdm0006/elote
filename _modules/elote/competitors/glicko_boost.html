@@ -230,10 +230,12 @@
 <span class="sd">    ``a.tied(b)`` -- ``a`` is white. Callers with no colour information leave ``_eta`` at</span>
 <span class="sd">    its default of ``0.0``, which removes the white-advantage term entirely.</span>
 
-<span class="sd">    :meth:`elote.LambdaArena.matchup` is the exception: it dispatches a loss by calling</span>
-<span class="sd">    ``beat`` on the winner, so the losing row's colours are reversed relative to the same</span>
-<span class="sd">    row given to :meth:`apply_rating_period`. That only matters when ``_eta`` is non-zero;</span>
-<span class="sd">    drive colour-bearing data through :meth:`elote.LambdaArena.rating_period` instead.</span>
+<span class="sd">    :meth:`elote.LambdaArena.matchup` and :meth:`elote.LambdaArena.rating_period` preserve</span>
+<span class="sd">    that order -- a loss is dispatched as the caller's ``lost_to`` -- so a losing row</span>
+<span class="sd">    streamed through the arena gives the same result as the same row handed to</span>
+<span class="sd">    :meth:`apply_rating_period`. :func:`elote.train_arena_with_dataset` and</span>
+<span class="sd">    :meth:`elote.LambdaArena.process_history` still reverse a losing row themselves, which</span>
+<span class="sd">    matters only when ``_eta`` is non-zero.</span>
 
 <span class="sd">    ``beat``/``lost_to``/``tied`` apply the same algorithm to a one-game period, so a</span>
 <span class="sd">    single result is never a different formula from a batch. Because of the two-pass</span>
