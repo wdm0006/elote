@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "elote"
 version = "1.5.1"
-description = "Python module for rating bouts (like with Elo Rating)"
+description = "Compare Elo, Glicko, TrueSkill, Bradley-Terry, and other rating systems behind one Python interface"
 readme = "README.md"
 authors = [
     {name = "Will McGinnis", email = "will@helton.io"},
@@ -14,14 +14,32 @@ license = {text = "MIT"}
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Typing :: Typed",
 ]
-keywords = ["elo", "scoring", "rating"]
+keywords = [
+    "elo",
+    "glicko",
+    "glicko-2",
+    "trueskill",
+    "openskill",
+    "bradley-terry",
+    "whole-history-rating",
+    "rating-system",
+    "ranking",
+    "pairwise-comparison",
+    "scoring",
+    "rating",
+]
 dependencies = [
     "tqdm>=4.66,<5",
     "numpy>=1.20.0",
@@ -32,6 +50,8 @@ requires-python = ">=3.10"
 
 [project.urls]
 Homepage = "https://github.com/wdm0006/elote"
+Documentation = "https://elote.mcginniscommawill.com/"
+Changelog = "https://github.com/wdm0006/elote/blob/master/CHANGELOG.md"
 "Bug Tracker" = "https://github.com/wdm0006/elote/issues"
 
 [project.optional-dependencies]
