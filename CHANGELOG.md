@@ -1,3 +1,36 @@
+v1.5.1
+======
+
+Released 2026-10-03. Two correctness fixes: losing rows streamed through the arena now keep the
+caller's argument order, and TrueSkill refuses non-finite rating state.
+
+Bug fixes
+
+ * `LambdaArena.matchup` (and therefore `tournament`) and the default sequential replay behind
+   `apply_rating_period` / `LambdaArena.rating_period` now dispatch a loss as the caller's
+   `a.lost_to(b, ...)` instead of the winner's `b.beat(a, ...)` (#204). Argument order is the colour
+   convention for `GlickoBoostCompetitor`, so with a non-zero white advantage (`_eta > 0`) a losing
+   row was previously applied with the colours reversed, and the recorded prediction disagreed with
+   the update applied within the same bout. Ratings and predictions for Glicko-Boost at `_eta > 0`
+   on streamed losing rows change to match `apply_rating_period`. Every other rating system, and
+   Glicko-Boost at the default `_eta = 0.0`, is numerically unchanged (verified across all
+   registered types).
+
+ * `TrueSkillCompetitor` now rejects non-finite or non-real `mu` and `sigma` (NaN, infinity,
+   booleans, non-numbers) with `InvalidParameterException` at construction, on property assignment,
+   and when restoring modern or legacy state (#203). Sigma must still be positive; finite negative
+   `mu` remains valid. A bad modern state document is rejected before any value is applied, so a
+   failed `import_state` no longer leaves a competitor partially updated.
+
+Compatibility notes
+
+ * `GlickoBoostCompetitor` users who set `_eta > 0` and stream losses through `matchup` or
+   `tournament` will see different ratings from 1.5.0; the new values are the ones
+   `apply_rating_period` already produced.
+ * `train_arena_with_dataset` and `LambdaArena.process_history` still reverse a losing row
+   themselves, so they remain colour-reversed when `_eta` is non-zero; prefer `rating_period` for
+   colour-bearing data.
+
 v1.5.0
 ======
 
