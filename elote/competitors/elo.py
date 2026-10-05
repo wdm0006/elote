@@ -1,3 +1,4 @@
+import math
 from typing import Dict, Any, ClassVar, Optional, Sequence, Type, TypeVar, cast
 
 from elote.competitors.base import BaseCompetitor, InvalidRatingValueException, InvalidParameterException
@@ -20,18 +21,25 @@ class EloCompetitor(BaseCompetitor):
     Class Attributes:
         _base_rating (float): Base rating divisor used in the transformed rating calculation. Default: 400.
         _k_factor (float): Factor that determines how much ratings change after each match. Default: 32.
+        _margin_of_victory (bool): When True, ``beat``/``lost_to`` calls that carry ``scores=`` scale the
+            K-factor by ``ln(|margin| + 1)`` and an autocorrelation damper. Default: False.
     """
 
     _base_rating: ClassVar[float] = 400
     _k_factor: ClassVar[float] = 32
+    _margin_of_victory: ClassVar[bool] = False
 
-    def __init__(self, initial_rating: float = 400, k_factor: Optional[float] = None):
+    def __init__(
+        self, initial_rating: float = 400, k_factor: Optional[float] = None, margin_of_victory: Optional[bool] = None
+    ):
         """Initialize an Elo competitor.
 
         Args:
             initial_rating (float, optional): The initial rating of this competitor. Default: 400.
             k_factor (float, optional): The K-factor to use for this competitor. If None,
                                        the class K-factor will be used. Default: None.
+            margin_of_victory (bool, optional): Scale updates by the score margin when ``scores=`` is
+                                       given. If None, the class setting is used. Default: None.
 
         Raises:
             InvalidRatingValueException: If the initial rating is below the minimum rating.
@@ -49,6 +57,9 @@ class EloCompetitor(BaseCompetitor):
         self._initial_rating = initial_rating
         self._rating = initial_rating
         self._k_factor = k_factor if k_factor is not None else EloCompetitor._k_factor
+        self._margin_of_victory = (
+            bool(margin_of_victory) if margin_of_victory is not None else EloCompetitor._margin_of_victory
+        )
         logger.debug(
             "Initialized EloCompetitor with initial rating %.1f, k_factor=%.1f", self._initial_rating, self._k_factor
         )
@@ -75,10 +86,13 @@ class EloCompetitor(BaseCompetitor):
         Returns:
             dict: A dictionary containing the initialization parameters.
         """
-        return {
+        parameters: Dict[str, Any] = {
             "initial_rating": self._initial_rating,
             "k_factor": self._k_factor if self._k_factor != self.__class__._k_factor else None,
         }
+        if self._margin_of_victory != self.__class__._margin_of_victory:
+            parameters["margin_of_victory"] = self._margin_of_victory
+        return parameters
 
     def _export_current_state(self) -> Dict[str, Any]:
         """Export the current state variables of this competitor.
@@ -115,6 +129,11 @@ class EloCompetitor(BaseCompetitor):
             raise InvalidParameterException("K-factor must be positive")
         self._k_factor = k_factor if k_factor is not None else EloCompetitor._k_factor
 
+        margin_of_victory = parameters.get("margin_of_victory", None)
+        self._margin_of_victory = (
+            bool(margin_of_victory) if margin_of_victory is not None else EloCompetitor._margin_of_victory
+        )
+
     def _import_current_state(self, state: Dict[str, Any]) -> None:
         """Import current state variables from a state dictionary.
 
@@ -148,6 +167,7 @@ class EloCompetitor(BaseCompetitor):
         return cls(
             initial_rating=parameters.get("initial_rating", 400),
             k_factor=parameters.get("k_factor", None),
+            margin_of_victory=parameters.get("margin_of_victory", None),
         )
 
     def export_state(self) -> Dict[str, Any]:
@@ -157,8 +177,11 @@ class EloCompetitor(BaseCompetitor):
             dict: A dictionary containing all necessary information to recreate
                  this competitor's current state.
         """
-        # Use the new standardized format
-        return super().export_state()
+        state = super().export_state()
+        # Omit the default-off flag so pre-existing serialized output stays byte-identical.
+        if not self.__class__._margin_of_victory:
+            state["class_vars"].pop("margin_of_victory", None)
+        return state
 
     @classmethod
     def from_state(cls: Type[T], state: Dict[str, Any]) -> T:
@@ -240,20 +263,33 @@ class EloCompetitor(BaseCompetitor):
             raise InvalidRatingValueException(f"Rating cannot be below the minimum rating of {self._minimum_rating}")
         self._rating = value
 
-    def _new_rating(self, actual_score: float, expected_score: float) -> float:
+    def _new_rating(self, actual_score: float, expected_score: float, k_scale: float = 1.0) -> float:
         """Calculate this competitor's new rating after a match.
 
         Args:
             actual_score (float): The score achieved in the match (1.0, 0.5, or 0.0).
             expected_score (float): The expected score against the opponent.
+            k_scale (float): Multiplier applied to the K-factor. Default: 1.0.
 
         Returns:
             float: The new rating, saturated at the minimum rating.
         """
-        new_rating = self._rating + self._k_factor * (actual_score - expected_score)
+        new_rating = self._rating + self._k_factor * k_scale * (actual_score - expected_score)
         new_rating_clamped = max(self._minimum_rating, new_rating)
         logger.debug("New rating calculated: %.1f (Clamped: %.1f)", new_rating, new_rating_clamped)
         return float(new_rating_clamped)
+
+    def _margin_multiplier(self, scores: Optional[Sequence[float]], rating_diff: float) -> float:
+        """K-factor multiplier for a win by the margin in ``scores`` (1.0 when not applicable).
+
+        ``rating_diff`` is winner minus loser, before the update. It is floored at -2000 so the
+        damper denominator stays positive.
+        """
+        if not self._margin_of_victory or scores is None:
+            return 1.0
+        margin = abs(float(scores[0]) - float(scores[1]))
+        damper = 2.2 / (0.001 * max(rating_diff, -2000.0) + 2.2)
+        return math.log(margin + 1.0) * damper
 
     def expected_score(self, competitor: "BaseCompetitor") -> float:
         """Calculate the expected score against another competitor.
@@ -276,8 +312,8 @@ class EloCompetitor(BaseCompetitor):
         Args:
             competitor (BaseCompetitor): The opponent competitor that lost.
             scores (sequence of float, optional): The two scores in caller order,
-                ``(self_score, competitor_score)``. Validated but not otherwise used by
-                this rating system.
+                ``(self_score, competitor_score)``. Validated; used only when
+                ``margin_of_victory`` is enabled.
 
         Raises:
             MissMatchedCompetitorTypesException: If the competitor types don't match.
@@ -292,8 +328,9 @@ class EloCompetitor(BaseCompetitor):
         win_es = self.expected_score(competitor_elo)
         lose_es = 1.0 - win_es
 
-        my_new_rating = self._new_rating(1, win_es)
-        opponent_new_rating = competitor_elo._new_rating(0, lose_es)
+        k_scale = self._margin_multiplier(scores, self._rating - competitor_elo._rating)
+        my_new_rating = self._new_rating(1, win_es, k_scale)
+        opponent_new_rating = competitor_elo._new_rating(0, lose_es, k_scale)
 
         self.rating = my_new_rating
         competitor_elo.rating = opponent_new_rating

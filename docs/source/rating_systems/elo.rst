@@ -100,6 +100,35 @@ A higher K-factor makes ratings change more quickly, while a lower K-factor make
 - 20: For players with ratings under 2400 (FIDE standard)
 - 10: For elite players with ratings over 2400 (FIDE standard)
 
+Margin of victory
+-----------------
+
+Sports Elo models scale the update by how decisively a game was won. ``EloCompetitor`` supports this
+as an opt-in, default-off setting (``margin_of_victory=True``, or the class variable
+``EloCompetitor._margin_of_victory``). When a ``beat`` or ``lost_to`` call carries ``scores=``, the
+K-factor is multiplied by
+
+.. math::
+
+   M = \ln(|\Delta| + 1) \cdot \frac{2.2}{0.001 \, (R_W - R_L) + 2.2}
+
+where :math:`\Delta` is the score margin and :math:`R_W - R_L` is the winner's rating minus the
+loser's, before the update. The logarithm gives diminishing returns for blowouts; the second factor
+damps the update when a favourite wins big, which would otherwise inflate favourites' ratings. Without
+``scores=`` the update is the ordinary Elo update. Drawn games (``tied``) are unchanged.
+
+.. code-block:: python
+
+    a = EloCompetitor(initial_rating=1500, margin_of_victory=True)
+    b = EloCompetitor(initial_rating=1500, margin_of_victory=True)
+    a.beat(b, scores=(24, 4))  # K is scaled by ln(21)
+
+This is the multiplier of FiveThirtyEight's NFL Elo model (Silver, "How Our NFL Predictions Work").
+That page is no longer retrievable, so its worked numbers could not be re-derived here; the
+implementation follows the formula as stated in the issue, and the known-value tests use values
+computed independently from it. Deviations: the rating difference is floored at -2000 so the
+denominator stays positive, and no home-field adjustment is included in the difference.
+
 Real-World Applications
 ---------------------
 
@@ -116,3 +145,4 @@ References
 1. Elo, Arpad (1978). *The Rating of Chessplayers, Past and Present*. Arco. ISBN 0-668-04721-6.
 2. Glickman, Mark E. (1995). "A Comprehensive Guide to Chess Ratings". American Chess Journal, 3, 59-102.
 3. Silver, Nate (2015). "How We Calculate NBA Elo Ratings". FiveThirtyEight. 
+4. Silver, Nate (2014). "How Our NFL Predictions Work". FiveThirtyEight (margin-of-victory multiplier).
