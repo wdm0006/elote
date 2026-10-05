@@ -28,7 +28,7 @@ from elote.competitors.base import BaseCompetitor, InvalidParameterException
 from elote.datasets.utils import _scores_from_attributes, train_arena_with_dataset
 from elote.logging import logger
 
-__all__ = ["WalkForwardReport", "TuningResult", "group_by_period", "walk_forward", "tune"]
+__all__ = ["ReliabilityBin", "WalkForwardReport", "TuningResult", "group_by_period", "walk_forward", "tune"]
 
 # A dataset row, as produced by every dataset in :mod:`elote.datasets`.
 Row = Tuple[Any, Any, float, Optional[datetime], Optional[Dict[str, Any]]]
@@ -56,6 +56,58 @@ def _validate_competitor_params(competitor_class: Type[BaseCompetitor], names: I
 
 
 @dataclass(frozen=True)
+class ReliabilityBin:
+    """One equal-width probability bin of a reliability table.
+
+    The bin covers ``[lower, upper)``; the final bin of a table also includes 1.0.
+
+    Attributes:
+        lower: Inclusive lower bound.
+        upper: Exclusive upper bound (inclusive for the final bin).
+        count: Scored predictions whose probability fell in the bin.
+        mean_predicted: Mean predicted probability that the first side wins, or ``None`` if empty.
+        observed_rate: Fraction of the bin's bouts the first side actually won, or ``None`` if empty.
+    """
+
+    lower: float
+    upper: float
+    count: int
+    mean_predicted: Optional[float]
+    observed_rate: Optional[float]
+
+
+def _validate_calibration_bins(calibration_bins: Any) -> None:
+    if isinstance(calibration_bins, bool) or not isinstance(calibration_bins, int):
+        raise ValueError(f"calibration_bins must be a positive integer, got {calibration_bins!r}")
+    if calibration_bins <= 0:
+        raise ValueError(f"calibration_bins must be a positive integer, got {calibration_bins!r}")
+
+
+def _bin_index(probability: float, bins: int) -> int:
+    index = min(int(probability * bins), bins - 1)
+    if index + 1 < bins and probability >= (index + 1) / bins:
+        index += 1
+    elif index > 0 and probability < index / bins:
+        index -= 1
+    return index
+
+
+def _build_reliability(
+    bins: int, counts: List[int], predicted_sums: List[float], wins: List[int]
+) -> Tuple[ReliabilityBin, ...]:
+    return tuple(
+        ReliabilityBin(
+            lower=i / bins,
+            upper=(i + 1) / bins,
+            count=counts[i],
+            mean_predicted=predicted_sums[i] / counts[i] if counts[i] else None,
+            observed_rate=wins[i] / counts[i] if counts[i] else None,
+        )
+        for i in range(bins)
+    )
+
+
+@dataclass(frozen=True)
 class WalkForwardReport:
     """Metrics from a walk-forward run.
 
@@ -67,6 +119,9 @@ class WalkForwardReport:
         log_loss: Mean negative log likelihood. Sees calibration; accuracy does not.
         brier: Mean squared error of the predicted probability.
         by_period: ``(period_index, predictions, accuracy)`` per scored period.
+        reliability: Equal-width :class:`ReliabilityBin` records over exactly the
+            ``predictions`` population (decisive, predictable, post-warmup bouts; draws are
+            excluded). Binned on the original prediction, before the log-loss clamp.
     """
 
     predictions: int
@@ -76,6 +131,7 @@ class WalkForwardReport:
     log_loss: float
     brier: float
     by_period: Tuple[Tuple[int, int, float], ...] = field(default=())
+    reliability: Tuple[ReliabilityBin, ...] = field(default=())
 
     def __str__(self) -> str:
         return (
@@ -141,6 +197,7 @@ def walk_forward(
     comparison_function: Optional[Callable[..., Any]] = None,
     score_keys: Optional[Tuple[str, str]] = None,
     warmup: int = 0,
+    calibration_bins: int = 10,
 ) -> WalkForwardReport:
     """Predict each period from everything before it, then learn that period.
 
@@ -165,13 +222,16 @@ def walk_forward(
             the margin-aware systems.
         warmup: Leading periods used for fitting but not scored, so a system is not judged
             on predictions made with no history.
+        calibration_bins: Number of equal-width bins for ``WalkForwardReport.reliability``.
 
     Returns:
         WalkForwardReport: Metrics over every scored, predictable bout.
 
     Raises:
-        ValueError: If ``warmup`` is negative or not smaller than the number of periods.
+        ValueError: If ``warmup`` is negative or not smaller than the number of periods, or
+            ``calibration_bins`` is not a positive integer.
     """
+    _validate_calibration_bins(calibration_bins)
     if warmup < 0:
         raise ValueError("warmup must be non-negative")
     if periods and warmup >= len(periods):
@@ -193,6 +253,9 @@ def walk_forward(
     log_loss_total = brier_total = 0.0
     correct = 0
     by_period: List[Tuple[int, int, float]] = []
+    bin_counts = [0] * calibration_bins
+    bin_predicted = [0.0] * calibration_bins
+    bin_wins = [0] * calibration_bins
 
     try:
         for name, value in overrides.items():
@@ -212,10 +275,14 @@ def walk_forward(
                     if a not in arena.competitors or b not in arena.competitors:
                         skipped += 1
                         continue
-                    probability = arena.expected_score(a, b)
-                    probability = min(max(probability, _PROBABILITY_EPS), 1.0 - _PROBABILITY_EPS)
+                    raw_probability = arena.expected_score(a, b)
+                    slot = _bin_index(raw_probability, calibration_bins)
+                    probability = min(max(raw_probability, _PROBABILITY_EPS), 1.0 - _PROBABILITY_EPS)
                     actual = 1.0 if outcome > 0.5 else 0.0
                     hit = (probability > 0.5) == (actual > 0.5)
+                    bin_counts[slot] += 1
+                    bin_predicted[slot] += raw_probability
+                    bin_wins[slot] += int(actual)
                     predictions += 1
                     correct += hit
                     period_correct += hit
@@ -247,7 +314,16 @@ def walk_forward(
 
     if not predictions:
         logger.warning("Walk-forward produced no scored predictions (skipped %d, draws %d).", skipped, draws)
-        return WalkForwardReport(0, skipped, draws, float("nan"), float("nan"), float("nan"), ())
+        return WalkForwardReport(
+            0,
+            skipped,
+            draws,
+            float("nan"),
+            float("nan"),
+            float("nan"),
+            (),
+            _build_reliability(calibration_bins, bin_counts, bin_predicted, bin_wins),
+        )
 
     return WalkForwardReport(
         predictions=predictions,
@@ -257,6 +333,7 @@ def walk_forward(
         log_loss=log_loss_total / predictions,
         brier=brier_total / predictions,
         by_period=tuple(by_period),
+        reliability=_build_reliability(calibration_bins, bin_counts, bin_predicted, bin_wins),
     )
 
 

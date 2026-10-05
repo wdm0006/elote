@@ -73,6 +73,7 @@ from elote.datasets.utils import train_arena_with_dataset, evaluate_arena_with_d
 # Core analysis modules - always available
 from elote.benchmark import evaluate_competitor, benchmark_competitors
 from elote.evaluation import (
+    ReliabilityBin,
     WalkForwardReport,
     TuningResult,
     group_by_period,
@@ -119,6 +120,7 @@ __all__ = [
     # Benchmarking
     "evaluate_competitor",
     "benchmark_competitors",
+    "ReliabilityBin",
     "WalkForwardReport",
     "TuningResult",
     "group_by_period",
