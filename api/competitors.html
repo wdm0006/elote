@@ -536,7 +536,7 @@ payload was supplied.</p>
 <h2>Elo Competitor<a class="headerlink" href="#elo-competitor" title="Link to this heading">¶</a></h2>
 <dl class="py class" id="module-elote.competitors.elo">
 <dt class="sig sig-object py" id="elote.competitors.elo.EloCompetitor">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">elote.competitors.elo.</span></span><span class="sig-name descname"><span class="pre">EloCompetitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">400</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/competitors/elo.html#EloCompetitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.elo.EloCompetitor" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">elote.competitors.elo.</span></span><span class="sig-name descname"><span class="pre">EloCompetitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">400</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">margin_of_victory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/competitors/elo.html#EloCompetitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.elo.EloCompetitor" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCompetitor</span></code></a></p>
 <p>Elo rating system competitor.</p>
 <p>The Elo rating system is a method for calculating the relative skill levels of players
@@ -545,9 +545,13 @@ physics professor and chess master.</p>
 <p>In the Elo system, each player’s rating changes based on the outcome of games and the
 rating of their opponents. The difference in ratings between two players determines
 the expected outcome of a match, and the actual outcome is used to update the ratings.</p>
-<dl class="simple">
+<dl>
 <dt>Class Attributes:</dt><dd><p>_base_rating (float): Base rating divisor used in the transformed rating calculation. Default: 400.
-_k_factor (float): Factor that determines how much ratings change after each match. Default: 32.</p>
+_k_factor (float): Factor that determines how much ratings change after each match. Default: 32.
+_margin_of_victory (bool): When True, <code class="docutils literal notranslate"><span class="pre">beat</span></code>/<code class="docutils literal notranslate"><span class="pre">lost_to</span></code> calls that carry <code class="docutils literal notranslate"><span class="pre">scores=</span></code> scale the</p>
+<blockquote>
+<div><p>K-factor by <code class="docutils literal notranslate"><span class="pre">ln(|margin|</span> <span class="pre">+</span> <span class="pre">1)</span></code> and an autocorrelation damper. Default: False.</p>
+</div></blockquote>
 </dd>
 </dl>
 <p>Initialize an Elo competitor.</p>
@@ -557,6 +561,10 @@ k_factor (float, optional): The K-factor to use for this competitor. If None,</p
 <blockquote>
 <div><p>the class K-factor will be used. Default: None.</p>
 </div></blockquote>
+<dl class="simple">
+<dt>margin_of_victory (bool, optional): Scale updates by the score margin when <code class="docutils literal notranslate"><span class="pre">scores=</span></code> is</dt><dd><p>given. If None, the class setting is used. Default: None.</p>
+</dd>
+</dl>
 </dd>
 <dt>Raises:</dt><dd><p>InvalidRatingValueException: If the initial rating is below the minimum rating.
 InvalidParameterException: If the k_factor is negative.</p>
@@ -564,7 +572,7 @@ InvalidParameterException: If the k_factor is negative.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="elote.competitors.elo.EloCompetitor.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">400</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/competitors/elo.html#EloCompetitor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.elo.EloCompetitor.__init__" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_rating</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">400</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">margin_of_victory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/competitors/elo.html#EloCompetitor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.competitors.elo.EloCompetitor.__init__" title="Link to this definition">¶</a></dt>
 <dd><p>Initialize an Elo competitor.</p>
 <dl>
 <dt>Args:</dt><dd><p>initial_rating (float, optional): The initial rating of this competitor. Default: 400.
@@ -572,6 +580,10 @@ k_factor (float, optional): The K-factor to use for this competitor. If None,</p
 <blockquote>
 <div><p>the class K-factor will be used. Default: None.</p>
 </div></blockquote>
+<dl class="simple">
+<dt>margin_of_victory (bool, optional): Scale updates by the score margin when <code class="docutils literal notranslate"><span class="pre">scores=</span></code> is</dt><dd><p>given. If None, the class setting is used. Default: None.</p>
+</dd>
+</dl>
 </dd>
 <dt>Raises:</dt><dd><p>InvalidRatingValueException: If the initial rating is below the minimum rating.
 InvalidParameterException: If the k_factor is negative.</p>
@@ -589,8 +601,8 @@ based on the match outcome where this competitor won.</p>
 <dt>Args:</dt><dd><p>competitor (BaseCompetitor): The opponent competitor that lost.
 scores (sequence of float, optional): The two scores in caller order,</p>
 <blockquote>
-<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Validated but not otherwise used by
-this rating system.</p>
+<div><p><code class="docutils literal notranslate"><span class="pre">(self_score,</span> <span class="pre">competitor_score)</span></code>. Validated; used only when
+<code class="docutils literal notranslate"><span class="pre">margin_of_victory</span></code> is enabled.</p>
 </div></blockquote>
 </dd>
 <dt>Raises:</dt><dd><p>MissMatchedCompetitorTypesException: If the competitor types don’t match.</p>

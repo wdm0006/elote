@@ -174,7 +174,8 @@
           <div class="body" role="main">
             
   <h1>Source code for elote.competitors.elo</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">cast</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote.competitors.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="n">InvalidRatingValueException</span><span class="p">,</span> <span class="n">InvalidParameterException</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">elote.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>  <span class="c1"># Import directly from the logging submodule</span>
@@ -198,20 +199,27 @@
 <span class="sd">    Class Attributes:</span>
 <span class="sd">        _base_rating (float): Base rating divisor used in the transformed rating calculation. Default: 400.</span>
 <span class="sd">        _k_factor (float): Factor that determines how much ratings change after each match. Default: 32.</span>
+<span class="sd">        _margin_of_victory (bool): When True, ``beat``/``lost_to`` calls that carry ``scores=`` scale the</span>
+<span class="sd">            K-factor by ``ln(|margin| + 1)`` and an autocorrelation damper. Default: False.</span>
 <span class="sd">    """</span>
 
     <span class="n">_base_rating</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mi">400</span>
     <span class="n">_k_factor</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mi">32</span>
+    <span class="n">_margin_of_victory</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
 <div class="viewcode-block" id="EloCompetitor.__init__">
 <a class="viewcode-back" href="../../../api/competitors.html#elote.competitors.elo.EloCompetitor.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_rating</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span> <span class="n">k_factor</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">initial_rating</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span> <span class="n">k_factor</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">margin_of_victory</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">"""Initialize an Elo competitor.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            initial_rating (float, optional): The initial rating of this competitor. Default: 400.</span>
 <span class="sd">            k_factor (float, optional): The K-factor to use for this competitor. If None,</span>
 <span class="sd">                                       the class K-factor will be used. Default: None.</span>
+<span class="sd">            margin_of_victory (bool, optional): Scale updates by the score margin when ``scores=`` is</span>
+<span class="sd">                                       given. If None, the class setting is used. Default: None.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            InvalidRatingValueException: If the initial rating is below the minimum rating.</span>
@@ -229,6 +237,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">initial_rating</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">=</span> <span class="n">k_factor</span> <span class="k">if</span> <span class="n">k_factor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">EloCompetitor</span><span class="o">.</span><span class="n">_k_factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_margin_of_victory</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">bool</span><span class="p">(</span><span class="n">margin_of_victory</span><span class="p">)</span> <span class="k">if</span> <span class="n">margin_of_victory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">EloCompetitor</span><span class="o">.</span><span class="n">_margin_of_victory</span>
+        <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
             <span class="s2">"Initialized EloCompetitor with initial rating </span><span class="si">%.1f</span><span class="s2">, k_factor=</span><span class="si">%.1f</span><span class="s2">"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span>
         <span class="p">)</span></div>
@@ -256,10 +267,13 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: A dictionary containing the initialization parameters.</span>
 <span class="sd">        """</span>
-        <span class="k">return</span> <span class="p">{</span>
+        <span class="n">parameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">"initial_rating"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_rating</span><span class="p">,</span>
             <span class="s2">"k_factor"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">_k_factor</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_margin_of_victory</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">_margin_of_victory</span><span class="p">:</span>
+            <span class="n">parameters</span><span class="p">[</span><span class="s2">"margin_of_victory"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_margin_of_victory</span>
+        <span class="k">return</span> <span class="n">parameters</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_export_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">"""Export the current state variables of this competitor.</span>
@@ -296,6 +310,11 @@
             <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">"K-factor must be positive"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">=</span> <span class="n">k_factor</span> <span class="k">if</span> <span class="n">k_factor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">EloCompetitor</span><span class="o">.</span><span class="n">_k_factor</span>
 
+        <span class="n">margin_of_victory</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"margin_of_victory"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_margin_of_victory</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">bool</span><span class="p">(</span><span class="n">margin_of_victory</span><span class="p">)</span> <span class="k">if</span> <span class="n">margin_of_victory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">EloCompetitor</span><span class="o">.</span><span class="n">_margin_of_victory</span>
+        <span class="p">)</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">_import_current_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Import current state variables from a state dictionary.</span>
 
@@ -329,6 +348,7 @@
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">initial_rating</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"initial_rating"</span><span class="p">,</span> <span class="mi">400</span><span class="p">),</span>
             <span class="n">k_factor</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"k_factor"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+            <span class="n">margin_of_victory</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"margin_of_victory"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="EloCompetitor.export_state">
@@ -340,8 +360,11 @@
 <span class="sd">            dict: A dictionary containing all necessary information to recreate</span>
 <span class="sd">                 this competitor's current state.</span>
 <span class="sd">        """</span>
-        <span class="c1"># Use the new standardized format</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">export_state</span><span class="p">()</span></div>
+        <span class="n">state</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">export_state</span><span class="p">()</span>
+        <span class="c1"># Omit the default-off flag so pre-existing serialized output stays byte-identical.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">_margin_of_victory</span><span class="p">:</span>
+            <span class="n">state</span><span class="p">[</span><span class="s2">"class_vars"</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"margin_of_victory"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">state</span></div>
 
 
 <div class="viewcode-block" id="EloCompetitor.from_state">
@@ -430,20 +453,33 @@
             <span class="k">raise</span> <span class="n">InvalidRatingValueException</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Rating cannot be below the minimum rating of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">=</span> <span class="n">value</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_new_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actual_score</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">expected_score</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_new_rating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actual_score</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">expected_score</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">k_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Calculate this competitor's new rating after a match.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            actual_score (float): The score achieved in the match (1.0, 0.5, or 0.0).</span>
 <span class="sd">            expected_score (float): The expected score against the opponent.</span>
+<span class="sd">            k_scale (float): Multiplier applied to the K-factor. Default: 1.0.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            float: The new rating, saturated at the minimum rating.</span>
 <span class="sd">        """</span>
-        <span class="n">new_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">*</span> <span class="p">(</span><span class="n">actual_score</span> <span class="o">-</span> <span class="n">expected_score</span><span class="p">)</span>
+        <span class="n">new_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_factor</span> <span class="o">*</span> <span class="n">k_scale</span> <span class="o">*</span> <span class="p">(</span><span class="n">actual_score</span> <span class="o">-</span> <span class="n">expected_score</span><span class="p">)</span>
         <span class="n">new_rating_clamped</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimum_rating</span><span class="p">,</span> <span class="n">new_rating</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"New rating calculated: </span><span class="si">%.1f</span><span class="s2"> (Clamped: </span><span class="si">%.1f</span><span class="s2">)"</span><span class="p">,</span> <span class="n">new_rating</span><span class="p">,</span> <span class="n">new_rating_clamped</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">new_rating_clamped</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_margin_multiplier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span> <span class="n">rating_diff</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""K-factor multiplier for a win by the margin in ``scores`` (1.0 when not applicable).</span>
+
+<span class="sd">        ``rating_diff`` is winner minus loser, before the update. It is floored at -2000 so the</span>
+<span class="sd">        damper denominator stays positive.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_margin_of_victory</span> <span class="ow">or</span> <span class="n">scores</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">1.0</span>
+        <span class="n">margin</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">damper</span> <span class="o">=</span> <span class="mf">2.2</span> <span class="o">/</span> <span class="p">(</span><span class="mf">0.001</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">rating_diff</span><span class="p">,</span> <span class="o">-</span><span class="mf">2000.0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">2.2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">margin</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">damper</span>
 
 <div class="viewcode-block" id="EloCompetitor.expected_score">
 <a class="viewcode-back" href="../../../competitors.html#elote.competitors.elo.EloCompetitor.expected_score">[docs]</a>
@@ -471,8 +507,8 @@
 <span class="sd">        Args:</span>
 <span class="sd">            competitor (BaseCompetitor): The opponent competitor that lost.</span>
 <span class="sd">            scores (sequence of float, optional): The two scores in caller order,</span>
-<span class="sd">                ``(self_score, competitor_score)``. Validated but not otherwise used by</span>
-<span class="sd">                this rating system.</span>
+<span class="sd">                ``(self_score, competitor_score)``. Validated; used only when</span>
+<span class="sd">                ``margin_of_victory`` is enabled.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            MissMatchedCompetitorTypesException: If the competitor types don't match.</span>
@@ -487,8 +523,9 @@
         <span class="n">win_es</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">competitor_elo</span><span class="p">)</span>
         <span class="n">lose_es</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">win_es</span>
 
-        <span class="n">my_new_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_rating</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">win_es</span><span class="p">)</span>
-        <span class="n">opponent_new_rating</span> <span class="o">=</span> <span class="n">competitor_elo</span><span class="o">.</span><span class="n">_new_rating</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">lose_es</span><span class="p">)</span>
+        <span class="n">k_scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_margin_multiplier</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rating</span> <span class="o">-</span> <span class="n">competitor_elo</span><span class="o">.</span><span class="n">_rating</span><span class="p">)</span>
+        <span class="n">my_new_rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_rating</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">win_es</span><span class="p">,</span> <span class="n">k_scale</span><span class="p">)</span>
+        <span class="n">opponent_new_rating</span> <span class="o">=</span> <span class="n">competitor_elo</span><span class="o">.</span><span class="n">_new_rating</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">lose_es</span><span class="p">,</span> <span class="n">k_scale</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">my_new_rating</span>
         <span class="n">competitor_elo</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">opponent_new_rating</span></div>

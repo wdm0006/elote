@@ -260,6 +260,29 @@
 <li><p>10: For elite players with ratings over 2400 (FIDE standard)</p></li>
 </ul>
 </section>
+<section id="margin-of-victory">
+<h2>Margin of victory<a class="headerlink" href="#margin-of-victory" title="Link to this heading">¶</a></h2>
+<p>Sports Elo models scale the update by how decisively a game was won. <code class="docutils literal notranslate"><span class="pre">EloCompetitor</span></code> supports this
+as an opt-in, default-off setting (<code class="docutils literal notranslate"><span class="pre">margin_of_victory=True</span></code>, or the class variable
+<code class="docutils literal notranslate"><span class="pre">EloCompetitor._margin_of_victory</span></code>). When a <code class="docutils literal notranslate"><span class="pre">beat</span></code> or <code class="docutils literal notranslate"><span class="pre">lost_to</span></code> call carries <code class="docutils literal notranslate"><span class="pre">scores=</span></code>, the
+K-factor is multiplied by</p>
+<div class="math notranslate nohighlight">
+\[M = \ln(|\Delta| + 1) \cdot \frac{2.2}{0.001 \, (R_W - R_L) + 2.2}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Delta\)</span> is the score margin and <span class="math notranslate nohighlight">\(R_W - R_L\)</span> is the winner’s rating minus the
+loser’s, before the update. The logarithm gives diminishing returns for blowouts; the second factor
+damps the update when a favourite wins big, which would otherwise inflate favourites’ ratings. Without
+<code class="docutils literal notranslate"><span class="pre">scores=</span></code> the update is the ordinary Elo update. Drawn games (<code class="docutils literal notranslate"><span class="pre">tied</span></code>) are unchanged.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">margin_of_victory</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">EloCompetitor</span><span class="p">(</span><span class="n">initial_rating</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">margin_of_victory</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">a</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">scores</span><span class="o">=</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>  <span class="c1"># K is scaled by ln(21)</span>
+</pre></div>
+</div>
+<p>This is the multiplier of FiveThirtyEight’s NFL Elo model (Silver, “How Our NFL Predictions Work”).
+That page is no longer retrievable, so its worked numbers could not be re-derived here; the
+implementation follows the formula as stated in the issue, and the known-value tests use values
+computed independently from it. Deviations: the rating difference is floored at -2000 so the
+denominator stays positive, and no home-field adjustment is included in the difference.</p>
+</section>
 <section id="real-world-applications">
 <h2>Real-World Applications<a class="headerlink" href="#real-world-applications" title="Link to this heading">¶</a></h2>
 <p>The Elo rating system is used in many domains:</p>
@@ -276,6 +299,7 @@
 <li><p>Elo, Arpad (1978). <em>The Rating of Chessplayers, Past and Present</em>. Arco. ISBN 0-668-04721-6.</p></li>
 <li><p>Glickman, Mark E. (1995). “A Comprehensive Guide to Chess Ratings”. American Chess Journal, 3, 59-102.</p></li>
 <li><p>Silver, Nate (2015). “How We Calculate NBA Elo Ratings”. FiveThirtyEight.</p></li>
+<li><p>Silver, Nate (2014). “How Our NFL Predictions Work”. FiveThirtyEight (margin-of-victory multiplier).</p></li>
 </ol>
 </section>
 </section>
