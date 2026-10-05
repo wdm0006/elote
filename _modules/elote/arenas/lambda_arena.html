@@ -16,7 +16,7 @@
     
     <title>elote.arenas.lambda_arena &#8212; elote 1.5.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=30d13653" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/css/wabi.css?v=c49ddd0e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/wabi.css?v=3eeb95f0" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=71d92741" />
     <script src="../../../_static/documentation_options.js?v=44dfd65d"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -752,7 +752,7 @@
                 <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="n">c_a</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">c_b</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">c_b</span><span class="o">.</span><span class="n">beat</span><span class="p">(</span><span class="n">c_a</span><span class="p">)</span>
+                    <span class="n">c_a</span><span class="o">.</span><span class="n">lost_to</span><span class="p">(</span><span class="n">c_b</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">c_a</span><span class="o">.</span><span class="n">tied</span><span class="p">(</span><span class="n">c_b</span><span class="p">)</span>
                 <span class="n">new_bout</span> <span class="o">=</span> <span class="n">Bout</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">outcome</span><span class="o">=</span><span class="n">outcome</span><span class="p">,</span> <span class="n">predicted_outcome</span><span class="o">=</span><span class="n">predicted_outcome</span><span class="p">)</span>
@@ -917,7 +917,10 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
-<h3><a href="../../../index.html">Table of Contents</a></h3>
+
+
+<h3 class="sr-only">Table of Contents</h3>
+
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
