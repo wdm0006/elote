@@ -28,7 +28,16 @@ from elote.competitors.base import BaseCompetitor, InvalidParameterException
 from elote.datasets.utils import _scores_from_attributes, train_arena_with_dataset
 from elote.logging import logger
 
-__all__ = ["ReliabilityBin", "WalkForwardReport", "TuningResult", "group_by_period", "walk_forward", "tune"]
+__all__ = [
+    "ReliabilityBin",
+    "WalkForwardReport",
+    "TuningResult",
+    "WalkForwardComparison",
+    "group_by_period",
+    "walk_forward",
+    "compare_walk_forward",
+    "tune",
+]
 
 # A dataset row, as produced by every dataset in :mod:`elote.datasets`.
 Row = Tuple[Any, Any, float, Optional[datetime], Optional[Dict[str, Any]]]
@@ -334,6 +343,139 @@ def walk_forward(
         brier=brier_total / predictions,
         by_period=tuple(by_period),
         reliability=_build_reliability(calibration_bins, bin_counts, bin_predicted, bin_wins),
+    )
+
+
+@dataclass(frozen=True)
+class WalkForwardComparison:
+    """Walk-forward reports for several systems run over the same periods and warmup.
+
+    Attributes:
+        reports: Label to :class:`WalkForwardReport`, in the order the systems were given.
+        warmup: Leading periods used for fitting but not scored, shared by every system.
+        periods: Number of periods every system was run over.
+        same_population: ``True`` when every system scored the same number of bouts and
+            skipped and drew the same numbers. When ``False`` the figures describe different
+            row populations and should not be compared as-is.
+    """
+
+    reports: Dict[str, WalkForwardReport]
+    warmup: int
+    periods: int
+    same_population: bool
+
+    def ranking(self) -> List[Dict[str, Any]]:
+        """Rows sorted by log loss, best first; systems with no scored bouts (NaN) come last.
+
+        Every row carries the protocol (``warmup``, ``periods``) and the scored-row counts.
+        """
+        rows = [
+            {
+                "system": label,
+                "log_loss": report.log_loss,
+                "brier": report.brier,
+                "accuracy": report.accuracy,
+                "predictions": report.predictions,
+                "skipped": report.skipped,
+                "draws": report.draws,
+                "warmup": self.warmup,
+                "periods": self.periods,
+            }
+            for label, report in self.reports.items()
+        ]
+        return sorted(rows, key=lambda row: (math.isnan(row["log_loss"]), row["log_loss"]))
+
+    def __str__(self) -> str:
+        rows = self.ranking()
+        width = max([len("system"), *(len(row["system"]) for row in rows)])
+        header = f"{'system':<{width}}  {'log loss':>9}  {'Brier':>7}  {'accuracy':>8}  {'scored':>6}  {'skipped':>7}  {'warmup':>6}"
+        lines = [header, "-" * len(header)]
+        for row in rows:
+            lines.append(
+                f"{row['system']:<{width}}  {row['log_loss']:>9.4f}  {row['brier']:>7.4f}  "
+                f"{row['accuracy']:>8.4f}  {row['predictions']:>6}  {row['skipped']:>7}  {row['warmup']:>6}"
+            )
+        if not self.same_population:
+            lines.append("WARNING: systems scored different row populations; figures are not directly comparable.")
+        return "\n".join(lines)
+
+
+_SYSTEM_SPEC_KEYS = frozenset({"competitor_params", "base_competitor_kwargs"})
+
+
+def _parse_system(label: Any, spec: Any) -> Tuple[Type[BaseCompetitor], Dict[str, Any], Dict[str, Any]]:
+    if isinstance(spec, tuple):
+        if len(spec) != 2 or not isinstance(spec[1], dict):
+            raise InvalidParameterException(f"system {label!r} must be a class or a (class, options dict) pair")
+        competitor_class, options = spec
+        unknown = set(options) - _SYSTEM_SPEC_KEYS
+        if unknown:
+            raise InvalidParameterException(
+                f"system {label!r} has unknown options {sorted(unknown)}; "
+                f"expected only {sorted(_SYSTEM_SPEC_KEYS)}"
+            )
+    else:
+        competitor_class, options = spec, {}
+    if not (isinstance(competitor_class, type) and issubclass(competitor_class, BaseCompetitor)):
+        raise InvalidParameterException(f"system {label!r} is not a BaseCompetitor subclass: {competitor_class!r}")
+    params = dict(options.get("competitor_params") or {})
+    kwargs = dict(options.get("base_competitor_kwargs") or {})
+    _validate_competitor_params(competitor_class, params.keys())
+    return competitor_class, params, kwargs
+
+
+def compare_walk_forward(
+    systems: Dict[str, Any],
+    periods: Sequence[Sequence[Row]],
+    *,
+    warmup: int = 0,
+    score_keys: Optional[Tuple[str, str]] = None,
+) -> WalkForwardComparison:
+    """Run :func:`walk_forward` for each system on the same periods and warmup.
+
+    Args:
+        systems: Label to a competitor class, or to a ``(class, options)`` pair where
+            ``options`` may hold ``competitor_params`` and ``base_competitor_kwargs`` exactly
+            as :func:`walk_forward` takes them.
+        periods: Ordered periods of dataset rows, as produced by :func:`group_by_period`.
+        warmup: Leading periods used for fitting but not scored, applied to every system.
+        score_keys: ``(a_score_key, b_score_key)`` naming each row's two point scores.
+
+    Returns:
+        WalkForwardComparison: Each system's report, a log-loss ranking and a printable table.
+
+    Raises:
+        InvalidParameterException: If ``systems`` is empty or any entry is malformed, is not a
+            competitor class, or names a parameter its class does not have. Raised before any
+            system is evaluated.
+        ValueError: If ``warmup`` is negative or not smaller than the number of periods.
+    """
+    if not systems:
+        raise InvalidParameterException("systems must contain at least one entry")
+    if warmup < 0:
+        raise ValueError("warmup must be non-negative")
+    if periods and warmup >= len(periods):
+        raise ValueError(f"warmup ({warmup}) leaves no periods to score (have {len(periods)})")
+
+    parsed = {label: _parse_system(label, spec) for label, spec in systems.items()}
+
+    reports = {
+        label: walk_forward(
+            competitor_class,
+            periods,
+            competitor_params=params,
+            base_competitor_kwargs=kwargs,
+            score_keys=score_keys,
+            warmup=warmup,
+        )
+        for label, (competitor_class, params, kwargs) in parsed.items()
+    }
+    populations = {(r.predictions, r.skipped, r.draws) for r in reports.values()}
+    return WalkForwardComparison(
+        reports=reports,
+        warmup=warmup,
+        periods=len(periods),
+        same_population=len(populations) == 1,
     )
 
 

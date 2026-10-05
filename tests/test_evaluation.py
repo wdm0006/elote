@@ -371,3 +371,91 @@ class TestReliabilityTable(unittest.TestCase):
             (a.predictions, a.accuracy, a.log_loss, a.brier, a.by_period),
             (b.predictions, b.accuracy, b.log_loss, b.brier, b.by_period),
         )
+
+
+def _synthetic_periods(seed, chunk=40):
+    from elote import SyntheticDataset
+
+    rows = SyntheticDataset(num_competitors=8, num_matchups=400, draw_probability=0.0, seed=seed).load()
+    return [rows[i : i + chunk] for i in range(0, len(rows), chunk)]
+
+
+class TestCompareWalkForward(unittest.TestCase):
+    def setUp(self):
+        from elote import GlickoBoostCompetitor
+
+        self.systems = {
+            "elo": EloCompetitor,
+            "elo_k64": (EloCompetitor, {"competitor_params": {"k_factor": 64}}),
+            "boost": GlickoBoostCompetitor,
+        }
+        self.periods = _synthetic_periods(1)
+
+    def test_each_report_equals_direct_walk_forward(self):
+        from elote import GlickoBoostCompetitor, compare_walk_forward
+
+        result = compare_walk_forward(self.systems, self.periods, warmup=2)
+        direct = {
+            "elo": walk_forward(EloCompetitor, self.periods, warmup=2),
+            "elo_k64": walk_forward(
+                EloCompetitor, self.periods, warmup=2, competitor_params={"k_factor": 64}
+            ),
+            "boost": walk_forward(GlickoBoostCompetitor, self.periods, warmup=2),
+        }
+        for label, report in direct.items():
+            self.assertEqual(result.reports[label], report)
+            self.assertTrue(0.0 < report.accuracy < 1.0)
+        self.assertNotEqual(result.reports["elo"].log_loss, result.reports["elo_k64"].log_loss)
+        self.assertTrue(result.same_population)
+        self.assertEqual(result.warmup, 2)
+
+    def test_ranking_orders_by_log_loss_and_carries_protocol(self):
+        from elote import compare_walk_forward
+
+        # A K-factor of 1 barely learns, so it must rank behind a normal Elo.
+        systems = {"weak": (EloCompetitor, {"competitor_params": {"k_factor": 0.01}}), "elo": EloCompetitor}
+        ranking = {}
+        for seed in (1, 2):
+            result = compare_walk_forward(systems, _synthetic_periods(seed), warmup=2)
+            rows = result.ranking()
+            self.assertEqual([r["system"] for r in rows], ["elo", "weak"])
+            self.assertTrue(all(r["warmup"] == 2 and r["predictions"] > 0 for r in rows))
+            self.assertLessEqual(rows[0]["log_loss"], rows[1]["log_loss"])
+            ranking[seed] = rows[0]["log_loss"]
+        self.assertNotEqual(ranking[1], ranking[2])
+        self.assertIn("weak", str(result))
+        self.assertIn("warmup", str(result))
+
+    def test_population_mismatch_is_recorded(self):
+        from elote import compare_walk_forward
+        from elote.evaluation import WalkForwardComparison
+
+        report_a = walk_forward(EloCompetitor, self.periods, warmup=1)
+        report_b = walk_forward(EloCompetitor, self.periods, warmup=3)
+        mismatched = WalkForwardComparison({"a": report_a, "b": report_b}, 1, len(self.periods), False)
+        self.assertIn("WARNING", str(mismatched))
+        self.assertNotIn("WARNING", str(compare_walk_forward({"a": EloCompetitor}, self.periods)))
+
+    def test_invalid_systems_raise_before_any_evaluation(self):
+        from elote import compare_walk_forward
+
+        bad = [
+            {},
+            {"ok": EloCompetitor, "bad": (EloCompetitor, {"competitor_params": {"nope": 1}})},
+            {"ok": EloCompetitor, "bad": (EloCompetitor, {"competitor_params": {"initial_rating": 1}})},
+            {"ok": EloCompetitor, "bad": (EloCompetitor, {"wrong_key": {}})},
+            {"ok": EloCompetitor, "bad": dict},
+            {"ok": EloCompetitor, "bad": "EloCompetitor"},
+            {"ok": EloCompetitor, "bad": (EloCompetitor,)},
+        ]
+        for systems in bad:
+            with self.subTest(systems=list(systems)), patch("elote.evaluation.walk_forward") as mocked:
+                with self.assertRaises(InvalidParameterException):
+                    compare_walk_forward(systems, self.periods)
+                mocked.assert_not_called()
+        with patch("elote.evaluation.walk_forward") as mocked:
+            with self.assertRaises(ValueError):
+                compare_walk_forward({"elo": EloCompetitor}, self.periods, warmup=-1)
+            with self.assertRaises(ValueError):
+                compare_walk_forward({"elo": EloCompetitor}, self.periods, warmup=len(self.periods))
+            mocked.assert_not_called()
