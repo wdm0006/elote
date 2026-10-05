@@ -119,14 +119,9 @@ def train_arena_with_dataset(
                 else:
                     arena.matchup(a, b, attributes=attributes, match_time=when, outcome=1.0, scores=scores)
             elif outcome == 0.0:
-                # B wins. The call is reversed so b is the winner, so the score pair has to
-                # be reversed with it to stay in the arena's caller order.
-                if scores is None:
-                    arena.matchup(b, a, attributes=attributes, match_time=when)
-                else:
-                    arena.matchup(
-                        b, a, attributes=attributes, match_time=when, outcome=1.0, scores=(scores[1], scores[0])
-                    )
+                # B wins. Dispatched in caller order so a colour-aware system reads (a, b) the
+                # same way it predicted them; the arena reverses the scores for the winner.
+                arena.matchup(a, b, attributes=attributes, match_time=when, outcome=0.0, scores=scores)
             else:
                 # Draw
                 arena.matchup(a, b, attributes=attributes, match_time=when, outcome=0.5, scores=scores)

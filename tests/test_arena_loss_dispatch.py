@@ -138,9 +138,7 @@ class TestLossDispatchIsBehaviourPreserving:
     @pytest.mark.parametrize("type_name", sorted(BaseCompetitor.list_competitor_types()))
     def test_arena_loss_matches_the_winner_side_beat(self, type_name):
         competitor_class = BaseCompetitor.get_competitor_class(type_name)
-        assert _arena_loss_ratings(competitor_class) == pytest.approx(
-            _direct_beat_ratings(competitor_class), abs=1e-9
-        )
+        assert _arena_loss_ratings(competitor_class) == pytest.approx(_direct_beat_ratings(competitor_class), abs=1e-9)
 
 
 class TestScoreChannelStillReverses:
@@ -169,3 +167,114 @@ class TestScoreChannelStillReverses:
 
         with pytest.raises(ValueError):
             arena.matchup("c", "d", outcome=0.0, scores=(3, 1))
+
+
+def _dataset_rows(with_scores):
+    rows = [
+        ("a", "b", 1.0, MATCH_TIME, {"s": (3, 1)}),
+        ("c", "a", 0.0, MATCH_TIME, {"s": (1, 4)}),
+        ("b", "d", 0.0, MATCH_TIME, {"s": (0, 2)}),
+        ("d", "c", 0.5, MATCH_TIME, {"s": (2, 2)}),
+        ("a", "d", 0.0, MATCH_TIME, {"s": (1, 2)}),
+    ]
+    return rows
+
+
+def _a_wins(a, b, attributes=None):
+    return True
+
+
+def _train_new(competitor_class, with_scores):
+    from elote.datasets.utils import train_arena_with_dataset
+
+    arena = LambdaArena(_a_wins, base_competitor=competitor_class)
+    kwargs = {"score_keys": ("x", "y")} if with_scores else {}
+    rows = [(a, b, o, t, {"x": at["s"][0], "y": at["s"][1]}) for a, b, o, t, at in _dataset_rows(True)]
+    train_arena_with_dataset(arena, rows, **kwargs)
+    return {k: v.rating for k, v in arena.competitors.items()}
+
+
+def _train_old(competitor_class, with_scores):
+    """The pre-change dispatch: the winner's ``beat``, ids swapped."""
+    arena = LambdaArena(_a_wins, base_competitor=competitor_class)
+    for a, b, o, t, at in _dataset_rows(True):
+        s = at["s"] if with_scores else None
+        if o == 1.0:
+            arena.matchup(a, b, match_time=t, outcome=1.0, scores=s)
+        elif o == 0.0:
+            arena.matchup(b, a, match_time=t, outcome=1.0, scores=None if s is None else (s[1], s[0]))
+        else:
+            arena.matchup(a, b, match_time=t, outcome=0.5, scores=s)
+    return {k: v.rating for k, v in arena.competitors.items()}
+
+
+def _history_new(competitor_class, with_scores):
+    arena = LambdaArena(None, base_competitor=competitor_class)
+    rows = [(a, b, o, None) for a, b, o, t, at in _dataset_rows(True)]
+    if with_scores:
+        rows = [(a, b, o, at["s"]) for a, b, o, t, at in _dataset_rows(True)]
+    arena.process_history([(a, b, o) for a, b, o, *_ in rows], progress_bar=False)
+    return {k: v.rating for k, v in arena.competitors.items()}
+
+
+def _history_old(competitor_class):
+    arena = LambdaArena(None, base_competitor=competitor_class)
+    for a, b, o, *_ in _dataset_rows(True):
+        c_a, c_b = arena._get_or_create_competitor(a), arena._get_or_create_competitor(b)
+        if o == 1:
+            c_a.beat(c_b)
+        elif o == 0:
+            c_b.beat(c_a)
+        else:
+            c_a.tied(c_b)
+    return {k: v.rating for k, v in arena.competitors.items()}
+
+
+def _approx_map(actual, expected, abs_tol=1e-9):
+    assert actual.keys() == expected.keys()
+    for k, v in actual.items():
+        assert v == pytest.approx(expected[k], abs=abs_tol)
+
+
+class TestDatasetAndHistoryPathsKeepColourConvention:
+    """Colour-aware tests carry the behaviour for train_arena_with_dataset and process_history."""
+
+    def test_train_arena_with_dataset_matches_matchup_at_eta_30(self, boost_eta_30):
+        from elote.datasets.utils import train_arena_with_dataset
+
+        arena = LambdaArena(None, base_competitor=GlickoBoostCompetitor)
+        train_arena_with_dataset(arena, [("a", "b", 0.0, MATCH_TIME, None)])
+        assert (arena.competitors["a"].rating, arena.competitors["b"].rating) == pytest.approx(
+            CANONICAL_LOSS_AT_ETA_30, abs=1e-4
+        )
+        bout = arena.history.bouts[0]
+        assert (bout.a, bout.b, bout.outcome) == ("a", "b", "loss")
+
+    def test_process_history_matches_rating_period_at_eta_30(self, boost_eta_30):
+        arena = LambdaArena(None, base_competitor=GlickoBoostCompetitor)
+        arena.process_history([("a", "b", 0)], progress_bar=False)
+        assert (arena.competitors["a"].rating, arena.competitors["b"].rating) == pytest.approx(
+            CANONICAL_LOSS_AT_ETA_30, abs=1e-4
+        )
+
+
+class TestDatasetAndHistoryRegressionNet:
+    """Passes on the unfixed code too, by design: colour-blind classes are unchanged."""
+
+    @pytest.mark.parametrize("with_scores", [False, True])
+    @pytest.mark.parametrize("type_name", sorted(BaseCompetitor.list_competitor_types()))
+    def test_train_arena_with_dataset(self, type_name, with_scores):
+        cls = BaseCompetitor.get_competitor_class(type_name)
+        if _construct_kwargs(cls):
+            pytest.skip("composite needs kwargs")
+        # WHR is an iterative fit and the old path swapped ids, so it converges to within
+        # its solver tolerance rather than to 1e-9.
+        tol = 1e-4 if type_name == "WholeHistoryRatingCompetitor" else 1e-9
+        _approx_map(_train_new(cls, with_scores), _train_old(cls, with_scores), abs_tol=tol)
+
+    @pytest.mark.parametrize("type_name", sorted(BaseCompetitor.list_competitor_types()))
+    def test_process_history(self, type_name):
+        cls = BaseCompetitor.get_competitor_class(type_name)
+        if _construct_kwargs(cls):
+            pytest.skip("composite needs kwargs")
+        _approx_map(_history_new(cls, False), _history_old(cls), abs_tol=1e-4)

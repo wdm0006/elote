@@ -542,7 +542,7 @@ class LambdaArena(BaseArena):
                 if outcome == 1:
                     c_a.beat(c_b)
                 elif outcome == 0:
-                    c_b.beat(c_a)
+                    c_a.lost_to(c_b)
                 else:
                     c_a.tied(c_b)
                 new_bout = Bout(a=a, b=b, outcome=outcome, predicted_outcome=predicted_outcome)
