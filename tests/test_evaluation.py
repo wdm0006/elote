@@ -275,3 +275,99 @@ class TestTune(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def _probabilities(table):
+    return lambda self, a, b: table.get((a, b), 0.5)
+
+
+class TestReliabilityTable(unittest.TestCase):
+    """Reliability bins built by the real ``walk_forward`` over scripted probabilities."""
+
+    def _run(self, periods, table, **kwargs):
+        with patch("elote.evaluation.LambdaArena.expected_score", _probabilities(table)):
+            return walk_forward(EloCompetitor, periods, **kwargs)
+
+    def test_exact_bins_boundaries_and_endpoints(self):
+        warm = [_row("A", "B", 1.0, None), _row("C", "D", 1.0, None)]
+        # (a, b) -> scripted probability; outcome 1.0 = first side won
+        scored = [
+            ("A", "B", 1.0, 0.0),  # endpoint 0 -> bin 0
+            ("C", "D", 0.0, 0.05),  # bin 0
+            ("A", "C", 1.0, 0.1),  # interior boundary -> bin 1, not bin 0
+            ("B", "D", 0.0, 0.29),  # bin 2
+            ("A", "D", 1.0, 0.3),  # boundary -> bin 3
+            ("B", "C", 1.0, 0.7),  # boundary -> bin 7
+            ("C", "A", 1.0, 0.99),  # bin 9
+            ("D", "B", 1.0, 1.0),  # endpoint 1 -> final bin
+        ]
+        table = {(a, b): p for a, b, _o, p in scored}
+        period = [_row(a, b, o, None) for a, b, o, _p in scored]
+        report = self._run([warm, period], table, warmup=1)
+
+        self.assertEqual(report.predictions, 8)
+        bins = report.reliability
+        self.assertEqual(len(bins), 10)
+        self.assertEqual(sum(b.count for b in bins), report.predictions)
+        self.assertEqual([b.count for b in bins], [2, 1, 1, 1, 0, 0, 0, 1, 0, 2])
+        self.assertAlmostEqual(bins[0].mean_predicted, 0.025)
+        self.assertAlmostEqual(bins[0].observed_rate, 0.5)
+        self.assertAlmostEqual(bins[1].mean_predicted, 0.1)
+        self.assertEqual(bins[1].observed_rate, 1.0)
+        self.assertEqual(bins[2].observed_rate, 0.0)
+        self.assertAlmostEqual(bins[3].mean_predicted, 0.3)
+        self.assertAlmostEqual(bins[7].mean_predicted, 0.7)
+        self.assertAlmostEqual(bins[9].mean_predicted, 0.995)
+        self.assertEqual(bins[9].observed_rate, 1.0)
+        self.assertEqual((bins[4].mean_predicted, bins[4].observed_rate), (None, None))
+        self.assertEqual((bins[3].lower, bins[3].upper), (0.3, 0.4))
+
+    def test_excludes_warmup_unseen_draws_and_missing(self):
+        warm = [_row("A", "B", 1.0, None)]
+        period = [
+            _row("A", "B", 1.0, None),
+            _row("A", "B", 0.5, None),
+            _row("A", "B", None, None),
+            _row("A", "Z", 1.0, None),
+        ]
+        report = self._run([warm, period], {("A", "B"): 0.65}, warmup=1)
+        self.assertEqual((report.predictions, report.draws, report.skipped), (1, 1, 1))
+        counts = [b.count for b in report.reliability]
+        self.assertEqual(counts, [0, 0, 0, 0, 0, 0, 1, 0, 0, 0])
+        self.assertAlmostEqual(report.reliability[6].mean_predicted, 0.65)
+
+    def test_binned_on_unclamped_prediction(self):
+        report = self._run([[_row("A", "B", 1.0, None)], [_row("A", "B", 1.0, None)]], {("A", "B"): 1.0}, warmup=1)
+        self.assertEqual(report.reliability[-1].count, 1)
+        self.assertEqual(report.reliability[-1].mean_predicted, 1.0)
+
+    def test_custom_bin_count(self):
+        report = walk_forward(EloCompetitor, _season(), calibration_bins=4, warmup=1)
+        self.assertEqual(len(report.reliability), 4)
+        self.assertEqual(sum(b.count for b in report.reliability), report.predictions)
+
+    def test_no_predictions_have_undefined_means(self):
+        report = walk_forward(EloCompetitor, [[_row("A", "B", 0.5, None)]], calibration_bins=5)
+        self.assertEqual(report.predictions, 0)
+        self.assertEqual(len(report.reliability), 5)
+        for b in report.reliability:
+            self.assertEqual((b.count, b.mean_predicted, b.observed_rate), (0, None, None))
+
+    def test_invalid_bin_counts_fail_even_for_empty_periods(self):
+        for bad in (0, -1, True, 2.0, "10", None):
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                walk_forward(EloCompetitor, [], calibration_bins=bad)
+
+    def test_positional_report_construction_still_valid(self):
+        from elote import WalkForwardReport
+
+        report = WalkForwardReport(1, 0, 0, 1.0, 0.1, 0.1, ((0, 1, 1.0),))
+        self.assertEqual(report.reliability, ())
+
+    def test_existing_metrics_unchanged_by_binning(self):
+        a = walk_forward(EloCompetitor, _season(), warmup=1, calibration_bins=1)
+        b = walk_forward(EloCompetitor, _season(), warmup=1, calibration_bins=20)
+        self.assertEqual(
+            (a.predictions, a.accuracy, a.log_loss, a.brier, a.by_period),
+            (b.predictions, b.accuracy, b.log_loss, b.brier, b.by_period),
+        )

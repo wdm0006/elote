@@ -34,6 +34,7 @@ Elote makes implementing these systems simple and intuitive, with a clean API th
    choose_a_rating_system
    arenas
    serialization
+   evaluation
 
 .. toctree::
    :maxdepth: 1
