@@ -1,0 +1,631 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z43R9PWW0B"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-Z43R9PWW0B');
+    </script>
+    
+    <title>Evaluation API Reference &#8212; elote 1.5.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=30d13653" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/wabi.css?v=3eeb95f0" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=71d92741" />
+    <script src="../_static/documentation_options.js?v=44dfd65d"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Blog Posts" href="../blog_posts.html" />
+    <link rel="prev" title="Arenas API Reference" href="arenas.html" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+
+
+
+<meta name="description" content="Evaluation API Reference - elote documentation">
+
+
+
+
+
+
+
+
+
+<meta property="og:title" content="Evaluation API Reference">
+<meta property="og:description" content="Evaluation API Reference - elote documentation">
+<meta property="og:type" content="website">
+
+<meta property="og:url" content="https://elote.mcginniscommawill.com/api/evaluation.html">
+
+
+<meta property="og:site_name" content="elote">
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Evaluation API Reference">
+<meta name="twitter:description" content="Evaluation API Reference - elote documentation">
+
+<meta name="twitter:site" content="@willmcginniser">
+
+
+
+
+
+<link rel="canonical" href="https://elote.mcginniscommawill.com/api/evaluation.html">
+
+
+ 
+
+  </head><body>
+<header class="header">
+  <div class="header__inner">
+    
+    <a href="https://mcginniscommawill.com" class="header__logo">
+      McGinnis, Will
+    </a>
+
+    
+    <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+      </svg>
+    </button>
+
+    
+    <nav class="nav" role="navigation">
+      
+      
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/guides/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Guides
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/topics/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Topics
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/posts/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Blog
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/about/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            About
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/coffee/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Free Coffee
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/oss/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            OSS
+          </a>
+        
+      
+
+      
+      
+      <a href="../index.html" class="nav__link nav__link--active">
+        Docs
+      </a>
+      
+    </nav>
+  </div>
+</header>
+
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <div class="breadcrumbs__inner">
+    
+    <a href="https://mcginniscommawill.com">Home</a>
+    <span class="breadcrumbs__separator">/</span>
+    
+    <a href="../index.html">Docs</a>
+    
+    
+    <span class="breadcrumbs__separator">/</span>
+    <span>Evaluation API Reference</span>
+    
+  </div>
+</nav>
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="evaluation-api-reference">
+<h1>Evaluation API Reference<a class="headerlink" href="#evaluation-api-reference" title="Link to this heading">¶</a></h1>
+<section id="walk-forward-evaluation">
+<h2>Walk-forward evaluation<a class="headerlink" href="#walk-forward-evaluation" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">benchmark_competitors</span></code> compares systems on one frozen train/test split. Walk-forward
+evaluation predicts each period from everything before it and then learns that period, and it
+reports log loss and Brier score alongside accuracy. <code class="docutils literal notranslate"><span class="pre">compare_walk_forward</span></code> runs that
+protocol for several systems over the same periods and warmup, so the numbers are comparable.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">EloCompetitor</span><span class="p">,</span> <span class="n">GlickoBoostCompetitor</span><span class="p">,</span> <span class="n">SyntheticDataset</span><span class="p">,</span>
+    <span class="n">compare_walk_forward</span><span class="p">,</span> <span class="n">group_by_period</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">periods</span> <span class="o">=</span> <span class="n">group_by_period</span><span class="p">(</span><span class="n">SyntheticDataset</span><span class="p">(</span><span class="n">num_competitors</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">num_matchups</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">())</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">compare_walk_forward</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">"elo"</span><span class="p">:</span> <span class="n">EloCompetitor</span><span class="p">,</span>
+        <span class="s2">"elo_k32"</span><span class="p">:</span> <span class="p">(</span><span class="n">EloCompetitor</span><span class="p">,</span> <span class="p">{</span><span class="s2">"competitor_params"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"k_factor"</span><span class="p">:</span> <span class="mi">32</span><span class="p">}}),</span>
+        <span class="s2">"glicko_boost"</span><span class="p">:</span> <span class="n">GlickoBoostCompetitor</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">periods</span><span class="p">,</span>
+    <span class="n">warmup</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<span class="n">result</span><span class="o">.</span><span class="n">ranking</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="s2">"system"</span><span class="p">]</span>  <span class="c1"># best log loss</span>
+</pre></div>
+</div>
+<p>Each system is a class, or a <code class="docutils literal notranslate"><span class="pre">(class,</span> <span class="pre">options)</span></code> pair where <code class="docutils literal notranslate"><span class="pre">options</span></code> may hold
+<code class="docutils literal notranslate"><span class="pre">competitor_params</span></code> and <code class="docutils literal notranslate"><span class="pre">base_competitor_kwargs</span></code>. Invalid systems raise before anything is
+evaluated. Walk-forward numbers are not interchangeable with frozen-split numbers: they score
+a different population of bouts, and <code class="docutils literal notranslate"><span class="pre">warmup</span></code> decides how much early history is excluded.
+<code class="docutils literal notranslate"><span class="pre">same_population</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code> when systems scored different bout counts.</p>
+<p id="module-elote.evaluation">Walk-forward evaluation and hyperparameter search for rating systems.</p>
+<p><code class="xref py py-func docutils literal notranslate"><span class="pre">evaluate_competitor()</span></code> trains on one split and then predicts a held-out
+split with <strong>frozen</strong> ratings. That answers “how well do these ratings survive going stale”,
+which is a real question but rarely the one being asked. The usual question is how a system
+performs in the way it would actually be used: predict the next round of results from
+everything that has happened so far, then fold those results in and step forward.</p>
+<p>This module provides that protocol, the metrics that can see a system’s calibration as well
+as its picks, and a grid search over competitor parameters.</p>
+<dl>
+<dt>Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span><span class="p">,</span> <span class="n">walk_forward</span><span class="p">,</span> <span class="n">group_by_period</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">periods</span> <span class="o">=</span> <span class="n">group_by_period</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">report</span> <span class="o">=</span> <span class="n">walk_forward</span><span class="p">(</span><span class="n">EloCompetitor</span><span class="p">,</span> <span class="n">periods</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">report</span><span class="o">.</span><span class="n">accuracy</span><span class="p">,</span> <span class="n">report</span><span class="o">.</span><span class="n">log_loss</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="elote.evaluation.ReliabilityBin">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">elote.evaluation.</span></span><span class="sig-name descname"><span class="pre">ReliabilityBin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_predicted</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observed_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/evaluation.html#ReliabilityBin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.evaluation.ReliabilityBin" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>One equal-width probability bin of a reliability table.</p>
+<p>The bin covers <code class="docutils literal notranslate"><span class="pre">[lower,</span> <span class="pre">upper)</span></code>; the final bin of a table also includes 1.0.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>lower: Inclusive lower bound.
+upper: Exclusive upper bound (inclusive for the final bin).
+count: Scored predictions whose probability fell in the bin.
+mean_predicted: Mean predicted probability that the first side wins, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if empty.
+observed_rate: Fraction of the bin’s bouts the first side actually won, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if empty.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="elote.evaluation.ReliabilityBin.count">
+<span class="sig-name descname"><span class="pre">count</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#elote.evaluation.ReliabilityBin.count" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="elote.evaluation.ReliabilityBin.lower">
+<span class="sig-name descname"><span class="pre">lower</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#elote.evaluation.ReliabilityBin.lower" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="elote.evaluation.ReliabilityBin.mean_predicted">
+<span class="sig-name descname"><span class="pre">mean_predicted</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#elote.evaluation.ReliabilityBin.mean_predicted" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="elote.evaluation.ReliabilityBin.observed_rate">
+<span class="sig-name descname"><span class="pre">observed_rate</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#elote.evaluation.ReliabilityBin.observed_rate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="elote.evaluation.ReliabilityBin.upper">
+<span class="sig-name descname"><span class="pre">upper</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#elote.evaluation.ReliabilityBin.upper" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="elote.evaluation.TuningResult">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">elote.evaluation.</span></span><span class="sig-name descname"><span class="pre">TuningResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#elote.evaluation.WalkForwardReport" title="elote.evaluation.WalkForwardReport"><span class="pre">WalkForwardReport</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/evaluation.html#TuningResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.evaluation.TuningResult" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>One point of a <a class="reference internal" href="#elote.evaluation.tune" title="elote.evaluation.tune"><code class="xref py py-func docutils literal notranslate"><span class="pre">tune()</span></code></a> grid search.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="elote.evaluation.TuningResult.params">
+<span class="sig-name descname"><span class="pre">params</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#elote.evaluation.TuningResult.params" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="elote.evaluation.TuningResult.report">
+<span class="sig-name descname"><span class="pre">report</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#elote.evaluation.WalkForwardReport" title="elote.evaluation.WalkForwardReport"><span class="pre">WalkForwardReport</span></a></span><a class="headerlink" href="#elote.evaluation.TuningResult.report" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="elote.evaluation.WalkForwardComparison">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">elote.evaluation.</span></span><span class="sig-name descname"><span class="pre">WalkForwardComparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reports</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#elote.evaluation.WalkForwardReport" title="elote.evaluation.WalkForwardReport"><span class="pre">WalkForwardReport</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warmup</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periods</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">same_population</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/evaluation.html#WalkForwardComparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.evaluation.WalkForwardComparison" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Walk-forward reports for several systems run over the same periods and warmup.</p>
+<dl>
+<dt>Attributes:</dt><dd><p>reports: Label to <a class="reference internal" href="#elote.evaluation.WalkForwardReport" title="elote.evaluation.WalkForwardReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">WalkForwardReport</span></code></a>, in the order the systems were given.
+warmup: Leading periods used for fitting but not scored, shared by every system.
+periods: Number of periods every system was run over.
+same_population: <code class="docutils literal notranslate"><span class="pre">True</span></code> when every system scored the same number of bouts and</p>
+<blockquote>
+<div><p>skipped and drew the same numbers. When <code class="docutils literal notranslate"><span class="pre">False</span></code> the figures describe different
+row populations and should not be compared as-is.</p>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="elote.evaluation.WalkForwardComparison.periods">
+<span class="sig-name descname"><span class="pre">periods</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#elote.evaluation.WalkForwardComparison.periods" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="elote.evaluation.WalkForwardComparison.ranking">
+<span class="sig-name descname"><span class="pre">ranking</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/elote/evaluation.html#WalkForwardComparison.ranking"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.evaluation.WalkForwardComparison.ranking" title="Link to this definition">¶</a></dt>
+<dd><p>Rows sorted by log loss, best first; systems with no scored bouts (NaN) come last.</p>
+<p>Every row carries the protocol (<code class="docutils literal notranslate"><span class="pre">warmup</span></code>, <code class="docutils literal notranslate"><span class="pre">periods</span></code>) and the scored-row counts.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="elote.evaluation.WalkForwardComparison.reports">
+<span class="sig-name descname"><span class="pre">reports</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#elote.evaluation.WalkForwardReport" title="elote.evaluation.WalkForwardReport"><span class="pre">WalkForwardReport</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#elote.evaluation.WalkForwardComparison.reports" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="elote.evaluation.WalkForwardComparison.same_population">
+<span class="sig-name descname"><span class="pre">same_population</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#elote.evaluation.WalkForwardComparison.same_population" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="elote.evaluation.WalkForwardComparison.warmup">
+<span class="sig-name descname"><span class="pre">warmup</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#elote.evaluation.WalkForwardComparison.warmup" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="elote.evaluation.WalkForwardReport">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">elote.evaluation.</span></span><span class="sig-name descname"><span class="pre">WalkForwardReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skipped</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">draws</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accuracy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_loss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">by_period</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reliability</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#elote.evaluation.ReliabilityBin" title="elote.evaluation.ReliabilityBin"><span class="pre">ReliabilityBin</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/elote/evaluation.html#WalkForwardReport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.evaluation.WalkForwardReport" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Metrics from a walk-forward run.</p>
+<dl>
+<dt>Attributes:</dt><dd><p>predictions: Bouts that were both scored and predictable.
+skipped: Bouts skipped because a competitor had not been seen yet.
+draws: Drawn bouts, excluded from every metric below.
+accuracy: Fraction of predictions on the correct side of 0.5.
+log_loss: Mean negative log likelihood. Sees calibration; accuracy does not.
+brier: Mean squared error of the predicted probability.
+by_period: <code class="docutils literal notranslate"><span class="pre">(period_index,</span> <span class="pre">predictions,</span> <span class="pre">accuracy)</span></code> per scored period.
+reliability: Equal-width <a class="reference internal" href="#elote.evaluation.ReliabilityBin" title="elote.evaluation.ReliabilityBin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReliabilityBin</span></code></a> records over exactly the</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">predictions</span></code> population (decisive, predictable, post-warmup bouts; draws are
+excluded). Binned on the original prediction, before the log-loss clamp.</p>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="elote.evaluation.WalkForwardReport.accuracy">
+<span class="sig-name descname"><span class="pre">accuracy</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#elote.evaluation.WalkForwardReport.accuracy" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="elote.evaluation.WalkForwardReport.brier">
+<span class="sig-name descname"><span class="pre">brier</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#elote.evaluation.WalkForwardReport.brier" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="elote.evaluation.WalkForwardReport.by_period">
+<span class="sig-name descname"><span class="pre">by_period</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">()</span></span><a class="headerlink" href="#elote.evaluation.WalkForwardReport.by_period" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="elote.evaluation.WalkForwardReport.draws">
+<span class="sig-name descname"><span class="pre">draws</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#elote.evaluation.WalkForwardReport.draws" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="elote.evaluation.WalkForwardReport.log_loss">
+<span class="sig-name descname"><span class="pre">log_loss</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#elote.evaluation.WalkForwardReport.log_loss" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="elote.evaluation.WalkForwardReport.predictions">
+<span class="sig-name descname"><span class="pre">predictions</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#elote.evaluation.WalkForwardReport.predictions" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="elote.evaluation.WalkForwardReport.reliability">
+<span class="sig-name descname"><span class="pre">reliability</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#elote.evaluation.ReliabilityBin" title="elote.evaluation.ReliabilityBin"><span class="pre">ReliabilityBin</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">()</span></span><a class="headerlink" href="#elote.evaluation.WalkForwardReport.reliability" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="elote.evaluation.WalkForwardReport.skipped">
+<span class="sig-name descname"><span class="pre">skipped</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#elote.evaluation.WalkForwardReport.skipped" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="elote.evaluation.compare_walk_forward">
+<span class="sig-prename descclassname"><span class="pre">elote.evaluation.</span></span><span class="sig-name descname"><span class="pre">compare_walk_forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">systems</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periods</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">warmup</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#elote.evaluation.WalkForwardComparison" title="elote.evaluation.WalkForwardComparison"><span class="pre">WalkForwardComparison</span></a></span></span><a class="reference internal" href="../_modules/elote/evaluation.html#compare_walk_forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.evaluation.compare_walk_forward" title="Link to this definition">¶</a></dt>
+<dd><p>Run <a class="reference internal" href="#elote.evaluation.walk_forward" title="elote.evaluation.walk_forward"><code class="xref py py-func docutils literal notranslate"><span class="pre">walk_forward()</span></code></a> for each system on the same periods and warmup.</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>systems: Label to a competitor class, or to a <code class="docutils literal notranslate"><span class="pre">(class,</span> <span class="pre">options)</span></code> pair where</dt><dd><p><code class="docutils literal notranslate"><span class="pre">options</span></code> may hold <code class="docutils literal notranslate"><span class="pre">competitor_params</span></code> and <code class="docutils literal notranslate"><span class="pre">base_competitor_kwargs</span></code> exactly
+as <a class="reference internal" href="#elote.evaluation.walk_forward" title="elote.evaluation.walk_forward"><code class="xref py py-func docutils literal notranslate"><span class="pre">walk_forward()</span></code></a> takes them.</p>
+</dd>
+</dl>
+<p>periods: Ordered periods of dataset rows, as produced by <a class="reference internal" href="#elote.evaluation.group_by_period" title="elote.evaluation.group_by_period"><code class="xref py py-func docutils literal notranslate"><span class="pre">group_by_period()</span></code></a>.
+warmup: Leading periods used for fitting but not scored, applied to every system.
+score_keys: <code class="docutils literal notranslate"><span class="pre">(a_score_key,</span> <span class="pre">b_score_key)</span></code> naming each row’s two point scores.</p>
+</dd>
+<dt>Returns:</dt><dd><p>WalkForwardComparison: Each system’s report, a log-loss ranking and a printable table.</p>
+</dd>
+<dt>Raises:</dt><dd><dl class="simple">
+<dt>InvalidParameterException: If <code class="docutils literal notranslate"><span class="pre">systems</span></code> is empty or any entry is malformed, is not a</dt><dd><p>competitor class, or names a parameter its class does not have. Raised before any
+system is evaluated.</p>
+</dd>
+</dl>
+<p>ValueError: If <code class="docutils literal notranslate"><span class="pre">warmup</span></code> is negative or not smaller than the number of periods.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="elote.evaluation.group_by_period">
+<span class="sig-prename descclassname"><span class="pre">elote.evaluation.</span></span><span class="sig-name descname"><span class="pre">group_by_period</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/elote/evaluation.html#group_by_period"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.evaluation.group_by_period" title="Link to this definition">¶</a></dt>
+<dd><p>Group dataset rows into chronologically ordered periods.</p>
+<p>A period is the unit of “predict, then learn”: everything inside one is predicted before
+any of it is used for fitting, which is what stops a result informing a bet placed on the
+same afternoon.</p>
+<dl>
+<dt>Args:</dt><dd><p>rows: Dataset rows, in any order.
+key: Maps a row to its period. Defaults to the ISO calendar week of the row’s</p>
+<blockquote>
+<div><p>timestamp, which suits weekly league sports. Rows without a usable timestamp are
+collected into one leading period.</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>A list of periods, each a list of rows, ordered by period key.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="elote.evaluation.tune">
+<span class="sig-prename descclassname"><span class="pre">elote.evaluation.</span></span><span class="sig-name descname"><span class="pre">tune</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor_class</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periods</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'log_loss'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">walk_forward_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#elote.evaluation.TuningResult" title="elote.evaluation.TuningResult"><span class="pre">TuningResult</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/elote/evaluation.html#tune"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.evaluation.tune" title="Link to this definition">¶</a></dt>
+<dd><p>Grid-search competitor parameters against a walk-forward run.</p>
+<p><code class="docutils literal notranslate"><span class="pre">metric</span></code> defaults to <code class="docutils literal notranslate"><span class="pre">log_loss</span></code> deliberately. Accuracy is a rank statistic: it only
+asks which side of 0.5 a prediction landed on, so any parameter that changes confidence
+without changing order is invisible to it. Pythagorean’s exponent is exactly such a
+parameter, and tuning it on accuracy reports every value as equally good.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>competitor_class: The rating system to tune.
+param_grid: Parameter names (without the leading underscore) to sequences of values.
+periods: Ordered periods, as for <a class="reference internal" href="#elote.evaluation.walk_forward" title="elote.evaluation.walk_forward"><code class="xref py py-func docutils literal notranslate"><span class="pre">walk_forward()</span></code></a>.
+metric: <code class="docutils literal notranslate"><span class="pre">&quot;log_loss&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;brier&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;accuracy&quot;</span></code>.
+<a href="#id1"><span class="problematic" id="id2">**</span></a>walk_forward_kwargs: Forwarded to <a class="reference internal" href="#elote.evaluation.walk_forward" title="elote.evaluation.walk_forward"><code class="xref py py-func docutils literal notranslate"><span class="pre">walk_forward()</span></code></a>.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Every combination, best first.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If <code class="docutils literal notranslate"><span class="pre">metric</span></code> is unknown or <code class="docutils literal notranslate"><span class="pre">param_grid</span></code> is empty.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="elote.evaluation.walk_forward">
+<span class="sig-prename descclassname"><span class="pre">elote.evaluation.</span></span><span class="sig-name descname"><span class="pre">walk_forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">competitor_class</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="competitors.html#elote.competitors.base.BaseCompetitor" title="elote.competitors.base.BaseCompetitor"><span class="pre">BaseCompetitor</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periods</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">datetime</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">competitor_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_competitor_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comparison_function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warmup</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calibration_bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#elote.evaluation.WalkForwardReport" title="elote.evaluation.WalkForwardReport"><span class="pre">WalkForwardReport</span></a></span></span><a class="reference internal" href="../_modules/elote/evaluation.html#walk_forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#elote.evaluation.walk_forward" title="Link to this definition">¶</a></dt>
+<dd><p>Predict each period from everything before it, then learn that period.</p>
+<p>Systems that override <code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseCompetitor.apply_rating_period()</span></code> learn through
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">LambdaArena.rating_period()</span></code>; systems that inherit the default implementation keep
+the existing sequential dataset-training path. A period-native system receives the
+maximum usable row timestamp as <code class="docutils literal notranslate"><span class="pre">period_end</span></code> (or <code class="docutils literal notranslate"><span class="pre">None</span></code> when there is none), so time
+is resolved per period rather than per row. Sequential systems continue to receive each
+row’s timestamp individually.</p>
+<dl>
+<dt>Args:</dt><dd><p>competitor_class: The rating system to evaluate.
+periods: Ordered periods of dataset rows, as produced by <a class="reference internal" href="#elote.evaluation.group_by_period" title="elote.evaluation.group_by_period"><code class="xref py py-func docutils literal notranslate"><span class="pre">group_by_period()</span></code></a>.
+competitor_params: Existing class-level knobs to set for the duration of the run,</p>
+<blockquote>
+<div><p>without the leading underscore. <code class="docutils literal notranslate"><span class="pre">{&quot;default_w2&quot;:</span> <span class="pre">100.0}</span></code> sets
+<code class="docutils literal notranslate"><span class="pre">_default_w2</span></code>. Constructor arguments instead belong in
+<code class="docutils literal notranslate"><span class="pre">base_competitor_kwargs</span></code>.</p>
+</div></blockquote>
+<p>base_competitor_kwargs: Constructor keyword arguments for every competitor.
+comparison_function: Arena comparison function. Defaults to one that reports the</p>
+<blockquote>
+<div><p>recorded outcome, which is what a dataset row already carries.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>score_keys: <code class="docutils literal notranslate"><span class="pre">(a_score_key,</span> <span class="pre">b_score_key)</span></code> naming each row’s two point scores, for</dt><dd><p>the margin-aware systems.</p>
+</dd>
+<dt>warmup: Leading periods used for fitting but not scored, so a system is not judged</dt><dd><p>on predictions made with no history.</p>
+</dd>
+</dl>
+<p>calibration_bins: Number of equal-width bins for <code class="docutils literal notranslate"><span class="pre">WalkForwardReport.reliability</span></code>.</p>
+</dd>
+<dt>Returns:</dt><dd><p>WalkForwardReport: Metrics over every scored, predictable bout.</p>
+</dd>
+<dt>Raises:</dt><dd><dl class="simple">
+<dt>ValueError: If <code class="docutils literal notranslate"><span class="pre">warmup</span></code> is negative or not smaller than the number of periods, or</dt><dd><p><code class="docutils literal notranslate"><span class="pre">calibration_bins</span></code> is not a positive integer.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+
+
+<h3 class="sr-only">Table of Contents</h3>
+
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick Start Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../competitors.html">Competitors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../choose_a_rating_system.html">How to choose a rating system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../arenas.html">Arenas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../serialization.html">Serialization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../evaluation.html">Walk-Forward Evaluation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/elo.html">Elo Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/glicko2.html">Glicko-2 Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/glicko_boost.html">Glicko-Boost Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/trueskill.html">TrueSkill Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/ecf.html">ECF Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/dwz.html">DWZ Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/colley.html">Colley Matrix Method</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/massey.html">Massey Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/keener.html">Keener Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/pythagorean.html">Pythagorean Expectation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/openskill.html">OpenSkill (Weng-Lin Plackett-Luce)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/whr.html">Whole-History Rating</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/ensemble.html">Ensemble Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/elo_vs_glicko_vs_trueskill.html">Elo vs Glicko vs TrueSkill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/elote_vs_other_packages.html">Elote vs single-algorithm packages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/comparison.html">Comparing Rating Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rating_systems/comparison_benchmark.html">Rating-system comparison benchmark</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advance_example.html">Advanced Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use_cases/product_ranking.html">Product Ranking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use_cases/matchmaking.html">Matchmaking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../use_cases/feature_prioritization.html">Feature Prioritization with Elote</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="competitors.html">Competitors API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arenas.html">Arenas API Reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Evaluation API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../blog_posts.html">Blog Posts</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to Elote</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <div class="footer__inner">
+    
+    
+    <div class="footer__links">
+      
+        <a href="https://github.com/wdm0006" class="footer__link" target="_blank" rel="noopener noreferrer">
+          GitHub
+        </a>
+      
+        <a href="https://www.linkedin.com/in/wmcginnis/" class="footer__link" target="_blank" rel="noopener noreferrer">
+          LinkedIn
+        </a>
+      
+        <a href="https://x.com/willmcginniser" class="footer__link" target="_blank" rel="noopener noreferrer">
+          Twitter
+        </a>
+      
+    </div>
+    
+
+    
+    <p class="footer__copy">
+      
+        &copy; 2020, Will McGinnis
+      
+    </p>
+  </div>
+</footer>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggle = document.querySelector('.nav-toggle');
+    const nav = document.querySelector('.nav');
+    if (toggle && nav) {
+      toggle.addEventListener('click', function() {
+        nav.classList.toggle('is-open');
+        const isOpen = nav.classList.contains('is-open');
+        toggle.setAttribute('aria-expanded', isOpen);
+      });
+    }
+  });
+</script>
+
+  </body>
+</html>

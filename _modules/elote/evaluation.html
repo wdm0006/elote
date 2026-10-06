@@ -1,0 +1,862 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z43R9PWW0B"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-Z43R9PWW0B');
+    </script>
+    
+    <title>elote.evaluation &#8212; elote 1.5.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=30d13653" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/wabi.css?v=3eeb95f0" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=71d92741" />
+    <script src="../../_static/documentation_options.js?v=44dfd65d"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+
+
+
+<meta name="description" content="elote.evaluation - elote documentation">
+
+
+
+
+
+
+
+
+
+<meta property="og:title" content="elote.evaluation">
+<meta property="og:description" content="elote.evaluation - elote documentation">
+<meta property="og:type" content="website">
+
+<meta property="og:url" content="https://elote.mcginniscommawill.com/_modules/elote/evaluation.html">
+
+
+<meta property="og:site_name" content="elote">
+
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="elote.evaluation">
+<meta name="twitter:description" content="elote.evaluation - elote documentation">
+
+<meta name="twitter:site" content="@willmcginniser">
+
+
+
+
+
+<link rel="canonical" href="https://elote.mcginniscommawill.com/_modules/elote/evaluation.html">
+
+
+ 
+
+  </head><body>
+<header class="header">
+  <div class="header__inner">
+    
+    <a href="https://mcginniscommawill.com" class="header__logo">
+      McGinnis, Will
+    </a>
+
+    
+    <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+      </svg>
+    </button>
+
+    
+    <nav class="nav" role="navigation">
+      
+      
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/guides/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Guides
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/topics/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Topics
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/posts/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Blog
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/about/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            About
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/coffee/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            Free Coffee
+          </a>
+        
+          
+          
+          
+          <a href="https://mcginniscommawill.com/oss/" class="nav__link"
+             target="_blank" rel="noopener noreferrer">
+            OSS
+          </a>
+        
+      
+
+      
+      
+      <a href="../../index.html" class="nav__link nav__link--active">
+        Docs
+      </a>
+      
+    </nav>
+  </div>
+</header>
+
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <div class="breadcrumbs__inner">
+    
+    <a href="https://mcginniscommawill.com">Home</a>
+    <span class="breadcrumbs__separator">/</span>
+    
+    <a href="../../index.html">Docs</a>
+    
+      
+      <span class="breadcrumbs__separator">/</span>
+      <a href="../index.html">Module code</a>
+      
+    
+    
+    <span class="breadcrumbs__separator">/</span>
+    <span>elote.evaluation</span>
+    
+  </div>
+</nav>
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for elote.evaluation</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Walk-forward evaluation and hyperparameter search for rating systems.</span>
+
+<span class="sd">:func:`~elote.benchmark.evaluate_competitor` trains on one split and then predicts a held-out</span>
+<span class="sd">split with **frozen** ratings. That answers "how well do these ratings survive going stale",</span>
+<span class="sd">which is a real question but rarely the one being asked. The usual question is how a system</span>
+<span class="sd">performs in the way it would actually be used: predict the next round of results from</span>
+<span class="sd">everything that has happened so far, then fold those results in and step forward.</span>
+
+<span class="sd">This module provides that protocol, the metrics that can see a system's calibration as well</span>
+<span class="sd">as its picks, and a grid search over competitor parameters.</span>
+
+<span class="sd">Example:</span>
+<span class="sd">    &gt;&gt;&gt; from elote import EloCompetitor, walk_forward, group_by_period</span>
+<span class="sd">    &gt;&gt;&gt; periods = group_by_period(rows)                       # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; report = walk_forward(EloCompetitor, periods)         # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; report.accuracy, report.log_loss                      # doctest: +SKIP</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">product</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote.arenas.lambda_arena</span><span class="w"> </span><span class="kn">import</span> <span class="n">LambdaArena</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote.competitors.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCompetitor</span><span class="p">,</span> <span class="n">InvalidParameterException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote.datasets.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_scores_from_attributes</span><span class="p">,</span> <span class="n">train_arena_with_dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">elote.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">"ReliabilityBin"</span><span class="p">,</span>
+    <span class="s2">"WalkForwardReport"</span><span class="p">,</span>
+    <span class="s2">"TuningResult"</span><span class="p">,</span>
+    <span class="s2">"WalkForwardComparison"</span><span class="p">,</span>
+    <span class="s2">"group_by_period"</span><span class="p">,</span>
+    <span class="s2">"walk_forward"</span><span class="p">,</span>
+    <span class="s2">"compare_walk_forward"</span><span class="p">,</span>
+    <span class="s2">"tune"</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="c1"># A dataset row, as produced by every dataset in :mod:`elote.datasets`.</span>
+<span class="n">Row</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span>
+
+<span class="n">_PROBABILITY_EPS</span> <span class="o">=</span> <span class="mf">1e-12</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_competitor_params</span><span class="p">(</span><span class="n">competitor_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BaseCompetitor</span><span class="p">],</span> <span class="n">names</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">class_variable</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">competitor_class</span><span class="p">,</span> <span class="n">class_variable</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="n">default_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"default_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">competitor_class</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"_</span><span class="si">{</span><span class="n">default_name</span><span class="si">}</span><span class="s2">"</span><span class="p">):</span>
+            <span class="n">route</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"use </span><span class="si">{</span><span class="n">default_name</span><span class="si">!r}</span><span class="s2"> to tune its class-level default; "</span>
+                <span class="sa">f</span><span class="s2">"fixed constructor arguments such as </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> go in base_competitor_kwargs"</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">route</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"constructor arguments such as </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> go in base_competitor_kwargs"</span>
+        <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">competitor_class</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> has no class variable </span><span class="si">{</span><span class="n">class_variable</span><span class="si">!r}</span><span class="s2">; "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">route</span><span class="si">}</span><span class="s2">, not competitor_params"</span>
+        <span class="p">)</span>
+
+
+<div class="viewcode-block" id="ReliabilityBin">
+<a class="viewcode-back" href="../../api/evaluation.html#elote.evaluation.ReliabilityBin">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ReliabilityBin</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""One equal-width probability bin of a reliability table.</span>
+
+<span class="sd">    The bin covers ``[lower, upper)``; the final bin of a table also includes 1.0.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        lower: Inclusive lower bound.</span>
+<span class="sd">        upper: Exclusive upper bound (inclusive for the final bin).</span>
+<span class="sd">        count: Scored predictions whose probability fell in the bin.</span>
+<span class="sd">        mean_predicted: Mean predicted probability that the first side wins, or ``None`` if empty.</span>
+<span class="sd">        observed_rate: Fraction of the bin's bouts the first side actually won, or ``None`` if empty.</span>
+<span class="sd">    """</span>
+
+    <span class="n">lower</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">upper</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">count</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">mean_predicted</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="n">observed_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_calibration_bins</span><span class="p">(</span><span class="n">calibration_bins</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">calibration_bins</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">calibration_bins</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"calibration_bins must be a positive integer, got </span><span class="si">{</span><span class="n">calibration_bins</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">calibration_bins</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"calibration_bins must be a positive integer, got </span><span class="si">{</span><span class="n">calibration_bins</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_bin_index</span><span class="p">(</span><span class="n">probability</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">probability</span> <span class="o">*</span> <span class="n">bins</span><span class="p">),</span> <span class="n">bins</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="n">bins</span> <span class="ow">and</span> <span class="n">probability</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">bins</span><span class="p">:</span>
+        <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">probability</span> <span class="o">&lt;</span> <span class="n">index</span> <span class="o">/</span> <span class="n">bins</span><span class="p">:</span>
+        <span class="n">index</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">index</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_reliability</span><span class="p">(</span>
+    <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">counts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">predicted_sums</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">wins</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ReliabilityBin</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span>
+        <span class="n">ReliabilityBin</span><span class="p">(</span>
+            <span class="n">lower</span><span class="o">=</span><span class="n">i</span> <span class="o">/</span> <span class="n">bins</span><span class="p">,</span>
+            <span class="n">upper</span><span class="o">=</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">bins</span><span class="p">,</span>
+            <span class="n">count</span><span class="o">=</span><span class="n">counts</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+            <span class="n">mean_predicted</span><span class="o">=</span><span class="n">predicted_sums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">counts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="n">counts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">observed_rate</span><span class="o">=</span><span class="n">wins</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">counts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="n">counts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="WalkForwardReport">
+<a class="viewcode-back" href="../../api/evaluation.html#elote.evaluation.WalkForwardReport">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">WalkForwardReport</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Metrics from a walk-forward run.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        predictions: Bouts that were both scored and predictable.</span>
+<span class="sd">        skipped: Bouts skipped because a competitor had not been seen yet.</span>
+<span class="sd">        draws: Drawn bouts, excluded from every metric below.</span>
+<span class="sd">        accuracy: Fraction of predictions on the correct side of 0.5.</span>
+<span class="sd">        log_loss: Mean negative log likelihood. Sees calibration; accuracy does not.</span>
+<span class="sd">        brier: Mean squared error of the predicted probability.</span>
+<span class="sd">        by_period: ``(period_index, predictions, accuracy)`` per scored period.</span>
+<span class="sd">        reliability: Equal-width :class:`ReliabilityBin` records over exactly the</span>
+<span class="sd">            ``predictions`` population (decisive, predictable, post-warmup bouts; draws are</span>
+<span class="sd">            excluded). Binned on the original prediction, before the log-loss clamp.</span>
+<span class="sd">    """</span>
+
+    <span class="n">predictions</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">skipped</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">draws</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">accuracy</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">log_loss</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">brier</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">by_period</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">())</span>
+    <span class="n">reliability</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ReliabilityBin</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">())</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">predictions</span><span class="si">}</span><span class="s2"> predictions: accuracy </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">accuracy</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, "</span>
+            <span class="sa">f</span><span class="s2">"log loss </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">log_loss</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, Brier </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">brier</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">"</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TuningResult">
+<a class="viewcode-back" href="../../api/evaluation.html#elote.evaluation.TuningResult">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TuningResult</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""One point of a :func:`tune` grid search."""</span>
+
+    <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="n">report</span><span class="p">:</span> <span class="n">WalkForwardReport</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">rendered</span> <span class="o">=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">rendered</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">report</span><span class="si">}</span><span class="s2">"</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_period_key</span><span class="p">(</span><span class="n">when</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">when</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">day</span> <span class="o">=</span> <span class="n">when</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">when</span><span class="p">,</span> <span class="n">datetime</span><span class="p">)</span> <span class="k">else</span> <span class="n">when</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">day</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">iso</span> <span class="o">=</span> <span class="n">day</span><span class="o">.</span><span class="n">isocalendar</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">iso</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">iso</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="group_by_period">
+<a class="viewcode-back" href="../../api/evaluation.html#elote.evaluation.group_by_period">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">group_by_period</span><span class="p">(</span>
+    <span class="n">rows</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Row</span><span class="p">],</span>
+    <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Row</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Row</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""Group dataset rows into chronologically ordered periods.</span>
+
+<span class="sd">    A period is the unit of "predict, then learn": everything inside one is predicted before</span>
+<span class="sd">    any of it is used for fitting, which is what stops a result informing a bet placed on the</span>
+<span class="sd">    same afternoon.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rows: Dataset rows, in any order.</span>
+<span class="sd">        key: Maps a row to its period. Defaults to the ISO calendar week of the row's</span>
+<span class="sd">            timestamp, which suits weekly league sports. Rows without a usable timestamp are</span>
+<span class="sd">            collected into one leading period.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A list of periods, each a list of rows, ordered by period key.</span>
+<span class="sd">    """</span>
+    <span class="n">grouping</span> <span class="o">=</span> <span class="n">key</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">_period_key</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+    <span class="n">buckets</span><span class="p">:</span> <span class="s2">"OrderedDict[Any, List[Row]]"</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="n">buckets</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">grouping</span><span class="p">(</span><span class="n">row</span><span class="p">),</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">buckets</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">buckets</span><span class="p">)]</span></div>
+
+
+
+<div class="viewcode-block" id="walk_forward">
+<a class="viewcode-back" href="../../api/evaluation.html#elote.evaluation.walk_forward">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">walk_forward</span><span class="p">(</span>
+    <span class="n">competitor_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BaseCompetitor</span><span class="p">],</span>
+    <span class="n">periods</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="n">Row</span><span class="p">]],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">competitor_params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">base_competitor_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">comparison_function</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">score_keys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">warmup</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">calibration_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WalkForwardReport</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Predict each period from everything before it, then learn that period.</span>
+
+<span class="sd">    Systems that override :meth:`BaseCompetitor.apply_rating_period` learn through</span>
+<span class="sd">    :meth:`LambdaArena.rating_period`; systems that inherit the default implementation keep</span>
+<span class="sd">    the existing sequential dataset-training path. A period-native system receives the</span>
+<span class="sd">    maximum usable row timestamp as ``period_end`` (or ``None`` when there is none), so time</span>
+<span class="sd">    is resolved per period rather than per row. Sequential systems continue to receive each</span>
+<span class="sd">    row's timestamp individually.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        competitor_class: The rating system to evaluate.</span>
+<span class="sd">        periods: Ordered periods of dataset rows, as produced by :func:`group_by_period`.</span>
+<span class="sd">        competitor_params: Existing class-level knobs to set for the duration of the run,</span>
+<span class="sd">            without the leading underscore. ``{"default_w2": 100.0}`` sets</span>
+<span class="sd">            ``_default_w2``. Constructor arguments instead belong in</span>
+<span class="sd">            ``base_competitor_kwargs``.</span>
+<span class="sd">        base_competitor_kwargs: Constructor keyword arguments for every competitor.</span>
+<span class="sd">        comparison_function: Arena comparison function. Defaults to one that reports the</span>
+<span class="sd">            recorded outcome, which is what a dataset row already carries.</span>
+<span class="sd">        score_keys: ``(a_score_key, b_score_key)`` naming each row's two point scores, for</span>
+<span class="sd">            the margin-aware systems.</span>
+<span class="sd">        warmup: Leading periods used for fitting but not scored, so a system is not judged</span>
+<span class="sd">            on predictions made with no history.</span>
+<span class="sd">        calibration_bins: Number of equal-width bins for ``WalkForwardReport.reliability``.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        WalkForwardReport: Metrics over every scored, predictable bout.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If ``warmup`` is negative or not smaller than the number of periods, or</span>
+<span class="sd">            ``calibration_bins`` is not a positive integer.</span>
+<span class="sd">    """</span>
+    <span class="n">_validate_calibration_bins</span><span class="p">(</span><span class="n">calibration_bins</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">warmup</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"warmup must be non-negative"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">periods</span> <span class="ow">and</span> <span class="n">warmup</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">periods</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"warmup (</span><span class="si">{</span><span class="n">warmup</span><span class="si">}</span><span class="s2">) leaves no periods to score (have </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">periods</span><span class="p">)</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+
+    <span class="n">_validate_competitor_params</span><span class="p">(</span><span class="n">competitor_class</span><span class="p">,</span> <span class="p">(</span><span class="n">competitor_params</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+    <span class="n">comparison</span> <span class="o">=</span> <span class="n">comparison_function</span> <span class="k">if</span> <span class="n">comparison_function</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">:</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">arena</span> <span class="o">=</span> <span class="n">LambdaArena</span><span class="p">(</span>
+        <span class="n">comparison</span><span class="p">,</span>
+        <span class="n">base_competitor</span><span class="o">=</span><span class="n">competitor_class</span><span class="p">,</span>
+        <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">base_competitor_kwargs</span> <span class="ow">or</span> <span class="p">{}),</span>
+    <span class="p">)</span>
+
+    <span class="n">overrides</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">"_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">(</span><span class="n">competitor_params</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">originals</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">competitor_class</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">overrides</span><span class="p">}</span>
+
+    <span class="n">predictions</span> <span class="o">=</span> <span class="n">skipped</span> <span class="o">=</span> <span class="n">draws</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">log_loss_total</span> <span class="o">=</span> <span class="n">brier_total</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">correct</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">by_period</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">bin_counts</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">calibration_bins</span>
+    <span class="n">bin_predicted</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">calibration_bins</span>
+    <span class="n">bin_wins</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">calibration_bins</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">overrides</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">competitor_class</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">period</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">periods</span><span class="p">):</span>
+            <span class="n">scored</span> <span class="o">=</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="n">warmup</span>
+            <span class="n">period_correct</span> <span class="o">=</span> <span class="n">period_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">if</span> <span class="n">scored</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">_when</span><span class="p">,</span> <span class="n">_attributes</span> <span class="ow">in</span> <span class="n">period</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">outcome</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="k">if</span> <span class="n">outcome</span> <span class="o">==</span> <span class="mf">0.5</span><span class="p">:</span>
+                        <span class="n">draws</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="k">continue</span>
+                    <span class="k">if</span> <span class="n">a</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">arena</span><span class="o">.</span><span class="n">competitors</span> <span class="ow">or</span> <span class="n">b</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">arena</span><span class="o">.</span><span class="n">competitors</span><span class="p">:</span>
+                        <span class="n">skipped</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="k">continue</span>
+                    <span class="n">raw_probability</span> <span class="o">=</span> <span class="n">arena</span><span class="o">.</span><span class="n">expected_score</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+                    <span class="n">slot</span> <span class="o">=</span> <span class="n">_bin_index</span><span class="p">(</span><span class="n">raw_probability</span><span class="p">,</span> <span class="n">calibration_bins</span><span class="p">)</span>
+                    <span class="n">probability</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">raw_probability</span><span class="p">,</span> <span class="n">_PROBABILITY_EPS</span><span class="p">),</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">_PROBABILITY_EPS</span><span class="p">)</span>
+                    <span class="n">actual</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="k">if</span> <span class="n">outcome</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="k">else</span> <span class="mf">0.0</span>
+                    <span class="n">hit</span> <span class="o">=</span> <span class="p">(</span><span class="n">probability</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="n">actual</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span>
+                    <span class="n">bin_counts</span><span class="p">[</span><span class="n">slot</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">bin_predicted</span><span class="p">[</span><span class="n">slot</span><span class="p">]</span> <span class="o">+=</span> <span class="n">raw_probability</span>
+                    <span class="n">bin_wins</span><span class="p">[</span><span class="n">slot</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span>
+                    <span class="n">predictions</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">correct</span> <span class="o">+=</span> <span class="n">hit</span>
+                    <span class="n">period_correct</span> <span class="o">+=</span> <span class="n">hit</span>
+                    <span class="n">period_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">log_loss_total</span> <span class="o">-=</span> <span class="n">actual</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">probability</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">actual</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">probability</span><span class="p">)</span>
+                    <span class="n">brier_total</span> <span class="o">+=</span> <span class="p">(</span><span class="n">probability</span> <span class="o">-</span> <span class="n">actual</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+
+            <span class="k">if</span> <span class="n">competitor_class</span><span class="o">.</span><span class="n">apply_rating_period</span><span class="o">.</span><span class="vm">__func__</span> <span class="ow">is</span> <span class="n">BaseCompetitor</span><span class="o">.</span><span class="n">apply_rating_period</span><span class="o">.</span><span class="vm">__func__</span><span class="p">:</span>
+                <span class="n">train_arena_with_dataset</span><span class="p">(</span><span class="n">arena</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">period</span><span class="p">),</span> <span class="n">score_keys</span><span class="o">=</span><span class="n">score_keys</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">period_rows</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="p">(</span>
+                        <span class="n">a</span><span class="p">,</span>
+                        <span class="n">b</span><span class="p">,</span>
+                        <span class="n">outcome</span><span class="p">,</span>
+                        <span class="kc">None</span> <span class="k">if</span> <span class="n">score_keys</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_scores_from_attributes</span><span class="p">(</span><span class="n">attributes</span><span class="p">,</span> <span class="n">score_keys</span><span class="p">),</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">outcome</span><span class="p">,</span> <span class="n">_when</span><span class="p">,</span> <span class="n">attributes</span> <span class="ow">in</span> <span class="n">period</span>
+                    <span class="k">if</span> <span class="n">outcome</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="p">]</span>
+                <span class="n">timestamps</span> <span class="o">=</span> <span class="p">[</span><span class="n">when</span> <span class="k">for</span> <span class="n">_a</span><span class="p">,</span> <span class="n">_b</span><span class="p">,</span> <span class="n">_outcome</span><span class="p">,</span> <span class="n">when</span><span class="p">,</span> <span class="n">_attributes</span> <span class="ow">in</span> <span class="n">period</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">when</span><span class="p">,</span> <span class="n">datetime</span><span class="p">)]</span>
+                <span class="n">arena</span><span class="o">.</span><span class="n">rating_period</span><span class="p">(</span><span class="n">period_rows</span><span class="p">,</span> <span class="n">period_end</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">timestamps</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">scored</span> <span class="ow">and</span> <span class="n">period_count</span><span class="p">:</span>
+                <span class="n">by_period</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">index</span><span class="p">,</span> <span class="n">period_count</span><span class="p">,</span> <span class="n">period_correct</span> <span class="o">/</span> <span class="n">period_count</span><span class="p">))</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">originals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">competitor_class</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">predictions</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Walk-forward produced no scored predictions (skipped </span><span class="si">%d</span><span class="s2">, draws </span><span class="si">%d</span><span class="s2">)."</span><span class="p">,</span> <span class="n">skipped</span><span class="p">,</span> <span class="n">draws</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">WalkForwardReport</span><span class="p">(</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="n">skipped</span><span class="p">,</span>
+            <span class="n">draws</span><span class="p">,</span>
+            <span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">),</span>
+            <span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">),</span>
+            <span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">),</span>
+            <span class="p">(),</span>
+            <span class="n">_build_reliability</span><span class="p">(</span><span class="n">calibration_bins</span><span class="p">,</span> <span class="n">bin_counts</span><span class="p">,</span> <span class="n">bin_predicted</span><span class="p">,</span> <span class="n">bin_wins</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">WalkForwardReport</span><span class="p">(</span>
+        <span class="n">predictions</span><span class="o">=</span><span class="n">predictions</span><span class="p">,</span>
+        <span class="n">skipped</span><span class="o">=</span><span class="n">skipped</span><span class="p">,</span>
+        <span class="n">draws</span><span class="o">=</span><span class="n">draws</span><span class="p">,</span>
+        <span class="n">accuracy</span><span class="o">=</span><span class="n">correct</span> <span class="o">/</span> <span class="n">predictions</span><span class="p">,</span>
+        <span class="n">log_loss</span><span class="o">=</span><span class="n">log_loss_total</span> <span class="o">/</span> <span class="n">predictions</span><span class="p">,</span>
+        <span class="n">brier</span><span class="o">=</span><span class="n">brier_total</span> <span class="o">/</span> <span class="n">predictions</span><span class="p">,</span>
+        <span class="n">by_period</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">by_period</span><span class="p">),</span>
+        <span class="n">reliability</span><span class="o">=</span><span class="n">_build_reliability</span><span class="p">(</span><span class="n">calibration_bins</span><span class="p">,</span> <span class="n">bin_counts</span><span class="p">,</span> <span class="n">bin_predicted</span><span class="p">,</span> <span class="n">bin_wins</span><span class="p">),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="WalkForwardComparison">
+<a class="viewcode-back" href="../../api/evaluation.html#elote.evaluation.WalkForwardComparison">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">WalkForwardComparison</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Walk-forward reports for several systems run over the same periods and warmup.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        reports: Label to :class:`WalkForwardReport`, in the order the systems were given.</span>
+<span class="sd">        warmup: Leading periods used for fitting but not scored, shared by every system.</span>
+<span class="sd">        periods: Number of periods every system was run over.</span>
+<span class="sd">        same_population: ``True`` when every system scored the same number of bouts and</span>
+<span class="sd">            skipped and drew the same numbers. When ``False`` the figures describe different</span>
+<span class="sd">            row populations and should not be compared as-is.</span>
+<span class="sd">    """</span>
+
+    <span class="n">reports</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">WalkForwardReport</span><span class="p">]</span>
+    <span class="n">warmup</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">periods</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">same_population</span><span class="p">:</span> <span class="nb">bool</span>
+
+<div class="viewcode-block" id="WalkForwardComparison.ranking">
+<a class="viewcode-back" href="../../api/evaluation.html#elote.evaluation.WalkForwardComparison.ranking">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ranking</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">"""Rows sorted by log loss, best first; systems with no scored bouts (NaN) come last.</span>
+
+<span class="sd">        Every row carries the protocol (``warmup``, ``periods``) and the scored-row counts.</span>
+<span class="sd">        """</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">"system"</span><span class="p">:</span> <span class="n">label</span><span class="p">,</span>
+                <span class="s2">"log_loss"</span><span class="p">:</span> <span class="n">report</span><span class="o">.</span><span class="n">log_loss</span><span class="p">,</span>
+                <span class="s2">"brier"</span><span class="p">:</span> <span class="n">report</span><span class="o">.</span><span class="n">brier</span><span class="p">,</span>
+                <span class="s2">"accuracy"</span><span class="p">:</span> <span class="n">report</span><span class="o">.</span><span class="n">accuracy</span><span class="p">,</span>
+                <span class="s2">"predictions"</span><span class="p">:</span> <span class="n">report</span><span class="o">.</span><span class="n">predictions</span><span class="p">,</span>
+                <span class="s2">"skipped"</span><span class="p">:</span> <span class="n">report</span><span class="o">.</span><span class="n">skipped</span><span class="p">,</span>
+                <span class="s2">"draws"</span><span class="p">:</span> <span class="n">report</span><span class="o">.</span><span class="n">draws</span><span class="p">,</span>
+                <span class="s2">"warmup"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">warmup</span><span class="p">,</span>
+                <span class="s2">"periods"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">periods</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">report</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reports</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">"log_loss"</span><span class="p">]),</span> <span class="n">row</span><span class="p">[</span><span class="s2">"log_loss"</span><span class="p">]))</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ranking</span><span class="p">()</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="s2">"system"</span><span class="p">),</span> <span class="o">*</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">"system"</span><span class="p">])</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">)])</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'system'</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">width</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="s1">'log loss'</span><span class="si">:</span><span class="s2">&gt;9</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="s1">'Brier'</span><span class="si">:</span><span class="s2">&gt;7</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="s1">'accuracy'</span><span class="si">:</span><span class="s2">&gt;8</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="s1">'scored'</span><span class="si">:</span><span class="s2">&gt;6</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="s1">'skipped'</span><span class="si">:</span><span class="s2">&gt;7</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="s1">'warmup'</span><span class="si">:</span><span class="s2">&gt;6</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">header</span><span class="p">,</span> <span class="s2">"-"</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'system'</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">width</span><span class="si">}}</span><span class="s2">  </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'log_loss'</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;9.4f</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'brier'</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;7.4f</span><span class="si">}</span><span class="s2">  "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'accuracy'</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;8.4f</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'predictions'</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;6</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'skipped'</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;7</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'warmup'</span><span class="p">]</span><span class="si">:</span><span class="s2">&gt;6</span><span class="si">}</span><span class="s2">"</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">same_population</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"WARNING: systems scored different row populations; figures are not directly comparable."</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+
+
+
+<span class="n">_SYSTEM_SPEC_KEYS</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">"competitor_params"</span><span class="p">,</span> <span class="s2">"base_competitor_kwargs"</span><span class="p">})</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_system</span><span class="p">(</span><span class="n">label</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">spec</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">BaseCompetitor</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="sa">f</span><span class="s2">"system </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2"> must be a class or a (class, options dict) pair"</span><span class="p">)</span>
+        <span class="n">competitor_class</span><span class="p">,</span> <span class="n">options</span> <span class="o">=</span> <span class="n">spec</span>
+        <span class="n">unknown</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">options</span><span class="p">)</span> <span class="o">-</span> <span class="n">_SYSTEM_SPEC_KEYS</span>
+        <span class="k">if</span> <span class="n">unknown</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"system </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2"> has unknown options </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">unknown</span><span class="p">)</span><span class="si">}</span><span class="s2">; "</span>
+                <span class="sa">f</span><span class="s2">"expected only </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">_SYSTEM_SPEC_KEYS</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+            <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">competitor_class</span><span class="p">,</span> <span class="n">options</span> <span class="o">=</span> <span class="n">spec</span><span class="p">,</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">competitor_class</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">competitor_class</span><span class="p">,</span> <span class="n">BaseCompetitor</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="sa">f</span><span class="s2">"system </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2"> is not a BaseCompetitor subclass: </span><span class="si">{</span><span class="n">competitor_class</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"competitor_params"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"base_competitor_kwargs"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span>
+    <span class="n">_validate_competitor_params</span><span class="p">(</span><span class="n">competitor_class</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">competitor_class</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">kwargs</span>
+
+
+<div class="viewcode-block" id="compare_walk_forward">
+<a class="viewcode-back" href="../../api/evaluation.html#elote.evaluation.compare_walk_forward">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compare_walk_forward</span><span class="p">(</span>
+    <span class="n">systems</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">periods</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="n">Row</span><span class="p">]],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">warmup</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">score_keys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WalkForwardComparison</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Run :func:`walk_forward` for each system on the same periods and warmup.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        systems: Label to a competitor class, or to a ``(class, options)`` pair where</span>
+<span class="sd">            ``options`` may hold ``competitor_params`` and ``base_competitor_kwargs`` exactly</span>
+<span class="sd">            as :func:`walk_forward` takes them.</span>
+<span class="sd">        periods: Ordered periods of dataset rows, as produced by :func:`group_by_period`.</span>
+<span class="sd">        warmup: Leading periods used for fitting but not scored, applied to every system.</span>
+<span class="sd">        score_keys: ``(a_score_key, b_score_key)`` naming each row's two point scores.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        WalkForwardComparison: Each system's report, a log-loss ranking and a printable table.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        InvalidParameterException: If ``systems`` is empty or any entry is malformed, is not a</span>
+<span class="sd">            competitor class, or names a parameter its class does not have. Raised before any</span>
+<span class="sd">            system is evaluated.</span>
+<span class="sd">        ValueError: If ``warmup`` is negative or not smaller than the number of periods.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">systems</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">InvalidParameterException</span><span class="p">(</span><span class="s2">"systems must contain at least one entry"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">warmup</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"warmup must be non-negative"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">periods</span> <span class="ow">and</span> <span class="n">warmup</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">periods</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"warmup (</span><span class="si">{</span><span class="n">warmup</span><span class="si">}</span><span class="s2">) leaves no periods to score (have </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">periods</span><span class="p">)</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+
+    <span class="n">parsed</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="n">_parse_system</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">spec</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">systems</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="n">reports</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">label</span><span class="p">:</span> <span class="n">walk_forward</span><span class="p">(</span>
+            <span class="n">competitor_class</span><span class="p">,</span>
+            <span class="n">periods</span><span class="p">,</span>
+            <span class="n">competitor_params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+            <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="n">score_keys</span><span class="o">=</span><span class="n">score_keys</span><span class="p">,</span>
+            <span class="n">warmup</span><span class="o">=</span><span class="n">warmup</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="p">(</span><span class="n">competitor_class</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span> <span class="ow">in</span> <span class="n">parsed</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">}</span>
+    <span class="n">populations</span> <span class="o">=</span> <span class="p">{(</span><span class="n">r</span><span class="o">.</span><span class="n">predictions</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">skipped</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">draws</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">reports</span><span class="o">.</span><span class="n">values</span><span class="p">()}</span>
+    <span class="k">return</span> <span class="n">WalkForwardComparison</span><span class="p">(</span>
+        <span class="n">reports</span><span class="o">=</span><span class="n">reports</span><span class="p">,</span>
+        <span class="n">warmup</span><span class="o">=</span><span class="n">warmup</span><span class="p">,</span>
+        <span class="n">periods</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">periods</span><span class="p">),</span>
+        <span class="n">same_population</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">populations</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="tune">
+<a class="viewcode-back" href="../../api/evaluation.html#elote.evaluation.tune">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">tune</span><span class="p">(</span>
+    <span class="n">competitor_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BaseCompetitor</span><span class="p">],</span>
+    <span class="n">param_grid</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
+    <span class="n">periods</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="n">Row</span><span class="p">]],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"log_loss"</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">walk_forward_kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">TuningResult</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Grid-search competitor parameters against a walk-forward run.</span>
+
+<span class="sd">    ``metric`` defaults to ``log_loss`` deliberately. Accuracy is a rank statistic: it only</span>
+<span class="sd">    asks which side of 0.5 a prediction landed on, so any parameter that changes confidence</span>
+<span class="sd">    without changing order is invisible to it. Pythagorean's exponent is exactly such a</span>
+<span class="sd">    parameter, and tuning it on accuracy reports every value as equally good.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        competitor_class: The rating system to tune.</span>
+<span class="sd">        param_grid: Parameter names (without the leading underscore) to sequences of values.</span>
+<span class="sd">        periods: Ordered periods, as for :func:`walk_forward`.</span>
+<span class="sd">        metric: ``"log_loss"``, ``"brier"`` or ``"accuracy"``.</span>
+<span class="sd">        **walk_forward_kwargs: Forwarded to :func:`walk_forward`.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Every combination, best first.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If ``metric`` is unknown or ``param_grid`` is empty.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">"log_loss"</span><span class="p">,</span> <span class="s2">"brier"</span><span class="p">,</span> <span class="s2">"accuracy"</span><span class="p">}:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"unknown metric </span><span class="si">{</span><span class="n">metric</span><span class="si">!r}</span><span class="s2">; expected 'log_loss', 'brier' or 'accuracy'"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">param_grid</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"param_grid must not be empty"</span><span class="p">)</span>
+
+    <span class="n">_validate_competitor_params</span><span class="p">(</span><span class="n">competitor_class</span><span class="p">,</span> <span class="n">param_grid</span><span class="p">)</span>
+
+    <span class="n">names</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">param_grid</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TuningResult</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">param_grid</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">)):</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="n">report</span> <span class="o">=</span> <span class="n">walk_forward</span><span class="p">(</span><span class="n">competitor_class</span><span class="p">,</span> <span class="n">periods</span><span class="p">,</span> <span class="n">competitor_params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="o">**</span><span class="n">walk_forward_kwargs</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"tune </span><span class="si">%s</span><span class="s2"> -&gt; </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">report</span><span class="p">)</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">TuningResult</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">))</span>
+
+    <span class="n">higher_is_better</span> <span class="o">=</span> <span class="n">metric</span> <span class="o">==</span> <span class="s2">"accuracy"</span>
+    <span class="n">results</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">report</span><span class="p">,</span> <span class="n">metric</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="n">higher_is_better</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">results</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+
+
+<h3 class="sr-only">Table of Contents</h3>
+
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick Start Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Core Concepts</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../competitors.html">Competitors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../choose_a_rating_system.html">How to choose a rating system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../arenas.html">Arenas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../serialization.html">Serialization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../evaluation.html">Walk-Forward Evaluation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rating Systems</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../rating_systems/elo.html">Elo Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rating_systems/glicko.html">Glicko Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rating_systems/glicko2.html">Glicko-2 Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rating_systems/glicko_boost.html">Glicko-Boost Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rating_systems/trueskill.html">TrueSkill Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rating_systems/ecf.html">ECF Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rating_systems/dwz.html">DWZ Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rating_systems/colley.html">Colley Matrix Method</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rating_systems/massey.html">Massey Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rating_systems/keener.html">Keener Ratings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rating_systems/pythagorean.html">Pythagorean Expectation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rating_systems/bradley_terry.html">Bradley-Terry Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rating_systems/openskill.html">OpenSkill (Weng-Lin Plackett-Luce)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rating_systems/whr.html">Whole-History Rating</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rating_systems/ensemble.html">Ensemble Rating System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rating_systems/elo_vs_glicko_vs_trueskill.html">Elo vs Glicko vs TrueSkill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rating_systems/elote_vs_other_packages.html">Elote vs single-algorithm packages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rating_systems/comparison.html">Comparing Rating Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rating_systems/comparison_benchmark.html">Rating-system comparison benchmark</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advance_example.html">Advanced Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../use_cases/product_ranking.html">Product Ranking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../use_cases/matchmaking.html">Matchmaking with Elote</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../use_cases/feature_prioritization.html">Feature Prioritization with Elote</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/competitors.html">Competitors API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/arenas.html">Arenas API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/evaluation.html">Evaluation API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../blog_posts.html">Blog Posts</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to Elote</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <div class="footer__inner">
+    
+    
+    <div class="footer__links">
+      
+        <a href="https://github.com/wdm0006" class="footer__link" target="_blank" rel="noopener noreferrer">
+          GitHub
+        </a>
+      
+        <a href="https://www.linkedin.com/in/wmcginnis/" class="footer__link" target="_blank" rel="noopener noreferrer">
+          LinkedIn
+        </a>
+      
+        <a href="https://x.com/willmcginniser" class="footer__link" target="_blank" rel="noopener noreferrer">
+          Twitter
+        </a>
+      
+    </div>
+    
+
+    
+    <p class="footer__copy">
+      
+        &copy; 2020, Will McGinnis
+      
+    </p>
+  </div>
+</footer>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggle = document.querySelector('.nav-toggle');
+    const nav = document.querySelector('.nav');
+    if (toggle && nav) {
+      toggle.addEventListener('click', function() {
+        nav.classList.toggle('is-open');
+        const isOpen = nav.classList.contains('is-open');
+        toggle.setAttribute('aria-expanded', isOpen);
+      });
+    }
+  });
+</script>
+
+  </body>
+</html>

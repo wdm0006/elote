@@ -247,6 +247,8 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/evaluation.html#elote.evaluation.WalkForwardReport.accuracy">accuracy (elote.evaluation.WalkForwardReport attribute)</a>
+</li>
       <li><a href="api/arenas.html#elote.arenas.base.History.accuracy_by_prior_bouts">accuracy_by_prior_bouts() (elote.arenas.base.History method)</a>, <a href="arenas.html#elote.arenas.base.History.accuracy_by_prior_bouts">[1]</a>
 </li>
       <li><a href="api/arenas.html#elote.arenas.base.Bout.actual_winner">actual_winner() (elote.arenas.base.Bout method)</a>, <a href="arenas.html#elote.arenas.base.Bout.actual_winner">[1]</a>
@@ -313,6 +315,10 @@
 </li>
       <li><a href="api/competitors.html#elote.competitors.bradley_terry.BradleyTerryCompetitor">BradleyTerryCompetitor (class in elote.competitors.bradley_terry)</a>, <a href="competitors.html#elote.competitors.bradley_terry.BradleyTerryCompetitor">[1]</a>
 </li>
+      <li><a href="api/evaluation.html#elote.evaluation.WalkForwardReport.brier">brier (elote.evaluation.WalkForwardReport attribute)</a>
+</li>
+      <li><a href="api/evaluation.html#elote.evaluation.WalkForwardReport.by_period">by_period (elote.evaluation.WalkForwardReport attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -326,6 +332,8 @@
       <li><a href="api/arenas.html#elote.arenas.lambda_arena.LambdaArena.clear_history">clear_history() (elote.arenas.lambda_arena.LambdaArena method)</a>, <a href="arenas.html#elote.arenas.lambda_arena.LambdaArena.clear_history">[1]</a>
 </li>
       <li><a href="api/competitors.html#elote.competitors.colley.ColleyMatrixCompetitor">ColleyMatrixCompetitor (class in elote.competitors.colley)</a>, <a href="competitors.html#elote.competitors.colley.ColleyMatrixCompetitor">[1]</a>
+</li>
+      <li><a href="api/evaluation.html#elote.evaluation.compare_walk_forward">compare_walk_forward() (in module elote.evaluation)</a>
 </li>
       <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.configure">configure() (elote.competitors.base.BaseCompetitor method)</a>
 
@@ -351,6 +359,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/arenas.html#elote.arenas.base.History.confusion_matrix">confusion_matrix() (elote.arenas.base.History method)</a>, <a href="arenas.html#elote.arenas.base.History.confusion_matrix">[1]</a>
 </li>
+      <li><a href="api/evaluation.html#elote.evaluation.ReliabilityBin.count">count (elote.evaluation.ReliabilityBin attribute)</a>
+</li>
       <li><a href="api/competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.create_team">create_team() (elote.competitors.trueskill.TrueSkillCompetitor class method)</a>
 </li>
   </ul></td>
@@ -358,6 +368,10 @@
 
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/evaluation.html#elote.evaluation.WalkForwardReport.draws">draws (elote.evaluation.WalkForwardReport attribute)</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/competitors.html#elote.competitors.dwz.DWZCompetitor">DWZCompetitor (class in elote.competitors.dwz)</a>, <a href="competitors.html#elote.competitors.dwz.DWZCompetitor">[1]</a>
 </li>
@@ -492,13 +506,20 @@
         <li><a href="api/competitors.html#module-elote.competitors.trueskill">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     elote.competitors.whr
 
       <ul>
         <li><a href="api/competitors.html#module-elote.competitors.whr">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    elote.evaluation
+
+      <ul>
+        <li><a href="api/evaluation.html#module-elote.evaluation">module</a>
 </li>
       </ul></li>
       <li><a href="api/arenas.html#elote.arenas.lambda_arena.LambdaArena.evaluate_performance">evaluate_performance() (elote.arenas.lambda_arena.LambdaArena method)</a>, <a href="arenas.html#elote.arenas.lambda_arena.LambdaArena.evaluate_performance">[1]</a>
@@ -651,15 +672,17 @@
 </li>
       <li><a href="api/arenas.html#elote.arenas.lambda_arena.LambdaArena.get_competitor_by_id">get_competitor_by_id() (elote.arenas.lambda_arena.LambdaArena method)</a>, <a href="arenas.html#elote.arenas.lambda_arena.LambdaArena.get_competitor_by_id">[1]</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.get_competitor_class">get_competitor_class() (elote.competitors.base.BaseCompetitor class method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/competitors.html#elote.competitors.glicko2.Glicko2Competitor">Glicko2Competitor (class in elote.competitors.glicko2)</a>, <a href="competitors.html#elote.competitors.glicko2.Glicko2Competitor">[1]</a>
 </li>
       <li><a href="api/competitors.html#elote.competitors.glicko_boost.GlickoBoostCompetitor">GlickoBoostCompetitor (class in elote.competitors.glicko_boost)</a>, <a href="competitors.html#elote.competitors.glicko_boost.GlickoBoostCompetitor">[1]</a>
 </li>
       <li><a href="api/competitors.html#elote.competitors.glicko.GlickoCompetitor">GlickoCompetitor (class in elote.competitors.glicko)</a>, <a href="competitors.html#elote.competitors.glicko.GlickoCompetitor">[1]</a>
+</li>
+      <li><a href="api/evaluation.html#elote.evaluation.group_by_period">group_by_period() (in module elote.evaluation)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -713,6 +736,8 @@
       </ul></li>
       <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.list_competitor_types">list_competitor_types() (elote.competitors.base.BaseCompetitor class method)</a>
 </li>
+      <li><a href="api/evaluation.html#elote.evaluation.WalkForwardReport.log_loss">log_loss (elote.evaluation.WalkForwardReport attribute)</a>
+</li>
       <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.lost_to">lost_to() (elote.competitors.base.BaseCompetitor method)</a>
 
       <ul>
@@ -734,6 +759,10 @@
 </li>
       </ul></li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/evaluation.html#elote.evaluation.ReliabilityBin.lower">lower (elote.evaluation.ReliabilityBin attribute)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="M">M</h2>
@@ -751,6 +780,8 @@
         <li><a href="api/arenas.html#elote.arenas.lambda_arena.LambdaArena.matchup">(elote.arenas.lambda_arena.LambdaArena method)</a>, <a href="arenas.html#elote.arenas.lambda_arena.LambdaArena.matchup">[1]</a>
 </li>
       </ul></li>
+      <li><a href="api/evaluation.html#elote.evaluation.ReliabilityBin.mean_predicted">mean_predicted (elote.evaluation.ReliabilityBin attribute)</a>
+</li>
       <li><a href="api/competitors.html#elote.competitors.base.MissMatchedCompetitorTypesException">MissMatchedCompetitorTypesException</a>
 </li>
       <li>
@@ -793,6 +824,8 @@
 </li>
         <li><a href="api/competitors.html#module-elote.competitors.whr">elote.competitors.whr</a>
 </li>
+        <li><a href="api/evaluation.html#module-elote.evaluation">elote.evaluation</a>
+</li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -826,6 +859,10 @@
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/evaluation.html#elote.evaluation.ReliabilityBin.observed_rate">observed_rate (elote.evaluation.ReliabilityBin attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/arenas.html#elote.arenas.base.History.optimize_thresholds">optimize_thresholds() (elote.arenas.base.History method)</a>, <a href="arenas.html#elote.arenas.base.History.optimize_thresholds">[1]</a>
 </li>
   </ul></td>
@@ -834,12 +871,18 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/arenas.html#elote.arenas.base.Bout.predicted_loser">predicted_loser() (elote.arenas.base.Bout method)</a>, <a href="arenas.html#elote.arenas.base.Bout.predicted_loser">[1]</a>
+      <li><a href="api/evaluation.html#elote.evaluation.TuningResult.params">params (elote.evaluation.TuningResult attribute)</a>
 </li>
-      <li><a href="api/arenas.html#elote.arenas.base.Bout.predicted_winner">predicted_winner() (elote.arenas.base.Bout method)</a>, <a href="arenas.html#elote.arenas.base.Bout.predicted_winner">[1]</a>
+      <li><a href="api/evaluation.html#elote.evaluation.WalkForwardComparison.periods">periods (elote.evaluation.WalkForwardComparison attribute)</a>
+</li>
+      <li><a href="api/arenas.html#elote.arenas.base.Bout.predicted_loser">predicted_loser() (elote.arenas.base.Bout method)</a>, <a href="arenas.html#elote.arenas.base.Bout.predicted_loser">[1]</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/arenas.html#elote.arenas.base.Bout.predicted_winner">predicted_winner() (elote.arenas.base.Bout method)</a>, <a href="arenas.html#elote.arenas.base.Bout.predicted_winner">[1]</a>
+</li>
+      <li><a href="api/evaluation.html#elote.evaluation.WalkForwardReport.predictions">predictions (elote.evaluation.WalkForwardReport attribute)</a>
+</li>
       <li><a href="api/arenas.html#elote.arenas.lambda_arena.LambdaArena.process_history">process_history() (elote.arenas.lambda_arena.LambdaArena method)</a>
 </li>
       <li><a href="api/competitors.html#elote.competitors.pythagorean.PythagoreanCompetitor">PythagoreanCompetitor (class in elote.competitors.pythagorean)</a>, <a href="competitors.html#elote.competitors.pythagorean.PythagoreanCompetitor">[1]</a>
@@ -851,6 +894,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/arenas.html#elote.arenas.base.History.random_search">random_search() (elote.arenas.base.History method)</a>, <a href="arenas.html#elote.arenas.base.History.random_search">[1]</a>
+</li>
+      <li><a href="api/evaluation.html#elote.evaluation.WalkForwardComparison.ranking">ranking() (elote.evaluation.WalkForwardComparison method)</a>
 </li>
       <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.rating">rating (elote.competitors.base.BaseCompetitor property)</a>
 
@@ -890,13 +935,21 @@
 </li>
       <li><a href="api/competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.rating_history">rating_history() (elote.competitors.whr.WholeHistoryRatingCompetitor method)</a>, <a href="competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor.rating_history">[1]</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/arenas.html#elote.arenas.lambda_arena.LambdaArena.rating_period">rating_period() (elote.arenas.lambda_arena.LambdaArena method)</a>, <a href="arenas.html#elote.arenas.lambda_arena.LambdaArena.rating_period">[1]</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/competitors.html#elote.competitors.glicko2.Glicko2Competitor.rd">rd (elote.competitors.glicko2.Glicko2Competitor property)</a>
 </li>
+      <li><a href="api/evaluation.html#elote.evaluation.WalkForwardReport.reliability">reliability (elote.evaluation.WalkForwardReport attribute)</a>
+</li>
+      <li><a href="api/evaluation.html#elote.evaluation.ReliabilityBin">ReliabilityBin (class in elote.evaluation)</a>
+</li>
+      <li><a href="api/evaluation.html#elote.evaluation.TuningResult.report">report (elote.evaluation.TuningResult attribute)</a>
+</li>
       <li><a href="api/arenas.html#elote.arenas.base.History.report_results">report_results() (elote.arenas.base.History method)</a>, <a href="arenas.html#elote.arenas.base.History.report_results">[1]</a>
+</li>
+      <li><a href="api/evaluation.html#elote.evaluation.WalkForwardComparison.reports">reports (elote.evaluation.WalkForwardComparison attribute)</a>
 </li>
       <li><a href="api/competitors.html#elote.competitors.base.BaseCompetitor.reset">reset() (elote.competitors.base.BaseCompetitor method)</a>
 
@@ -938,6 +991,8 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/evaluation.html#elote.evaluation.WalkForwardComparison.same_population">same_population (elote.evaluation.WalkForwardComparison attribute)</a>
+</li>
       <li><a href="api/arenas.html#elote.arenas.base.BaseArena.set_competitor_class_var">set_competitor_class_var() (elote.arenas.base.BaseArena method)</a>
 
       <ul>
@@ -947,6 +1002,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.sigma">sigma (elote.competitors.trueskill.TrueSkillCompetitor property)</a>
+</li>
+      <li><a href="api/evaluation.html#elote.evaluation.WalkForwardReport.skipped">skipped (elote.evaluation.WalkForwardReport attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1042,6 +1099,10 @@
 </li>
       <li><a href="api/competitors.html#elote.competitors.trueskill.TrueSkillCompetitor">TrueSkillCompetitor (class in elote.competitors.trueskill)</a>, <a href="competitors.html#elote.competitors.trueskill.TrueSkillCompetitor">[1]</a>
 </li>
+      <li><a href="api/evaluation.html#elote.evaluation.tune">tune() (in module elote.evaluation)</a>
+</li>
+      <li><a href="api/evaluation.html#elote.evaluation.TuningResult">TuningResult (class in elote.evaluation)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -1052,15 +1113,17 @@
 </li>
       <li><a href="api/competitors.html#elote.competitors.glicko2.Glicko2Competitor.update_ratings">update_ratings() (elote.competitors.glicko2.Glicko2Competitor method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/competitors.html#elote.competitors.glicko.GlickoCompetitor.update_rd_for_inactivity">update_rd_for_inactivity() (elote.competitors.glicko.GlickoCompetitor method)</a>
 
       <ul>
         <li><a href="api/competitors.html#elote.competitors.glicko2.Glicko2Competitor.update_rd_for_inactivity">(elote.competitors.glicko2.Glicko2Competitor method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/competitors.html#elote.competitors.trueskill.TrueSkillCompetitor.update_team">update_team() (elote.competitors.trueskill.TrueSkillCompetitor class method)</a>
+</li>
+      <li><a href="api/evaluation.html#elote.evaluation.ReliabilityBin.upper">upper (elote.evaluation.ReliabilityBin attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1090,6 +1153,16 @@
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/evaluation.html#elote.evaluation.walk_forward">walk_forward() (in module elote.evaluation)</a>
+</li>
+      <li><a href="api/evaluation.html#elote.evaluation.WalkForwardComparison">WalkForwardComparison (class in elote.evaluation)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/evaluation.html#elote.evaluation.WalkForwardReport">WalkForwardReport (class in elote.evaluation)</a>
+</li>
+      <li><a href="api/evaluation.html#elote.evaluation.WalkForwardComparison.warmup">warmup (elote.evaluation.WalkForwardComparison attribute)</a>
+</li>
       <li><a href="api/competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor">WholeHistoryRatingCompetitor (class in elote.competitors.whr)</a>, <a href="competitors.html#elote.competitors.whr.WholeHistoryRatingCompetitor">[1]</a>
 </li>
   </ul></td>
@@ -1155,6 +1228,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="api/competitors.html">Competitors API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/arenas.html">Arenas API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/evaluation.html">Evaluation API Reference</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Resources</span></p>
 <ul>
