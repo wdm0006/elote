@@ -76,6 +76,7 @@ Elote makes implementing these systems simple and intuitive, with a clean API th
 
    api/competitors
    api/arenas
+   api/evaluation
 
 .. toctree::
    :maxdepth: 1

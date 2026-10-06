@@ -77,7 +77,9 @@ from elote.evaluation import (
     WalkForwardReport,
     TuningResult,
     group_by_period,
+    WalkForwardComparison,
     walk_forward,
+    compare_walk_forward,
     tune,
 )
 
@@ -124,7 +126,9 @@ __all__ = [
     "WalkForwardReport",
     "TuningResult",
     "group_by_period",
+    "WalkForwardComparison",
     "walk_forward",
+    "compare_walk_forward",
     "tune",
     # Visualization
     "plot_rating_system_comparison",
