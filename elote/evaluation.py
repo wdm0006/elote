@@ -31,6 +31,8 @@ from elote.logging import logger
 __all__ = [
     "ReliabilityBin",
     "WalkForwardReport",
+    "ExpandingWindowFold",
+    "expanding_window_evaluate",
     "TuningResult",
     "WalkForwardComparison",
     "group_by_period",
@@ -343,6 +345,99 @@ def walk_forward(
         brier=brier_total / predictions,
         by_period=tuple(by_period),
         reliability=_build_reliability(calibration_bins, bin_counts, bin_predicted, bin_wins),
+    )
+
+
+@dataclass(frozen=True)
+class ExpandingWindowFold:
+    """One expanding-window replay and its scoring report.
+
+    Training covers ``[0, train_end)`` and scoring covers ``[train_end, test_end)``.
+    Indexes in ``report.by_period`` retain their positions in the supplied schedule.
+    Bout counts (predictions, skips and draws) are carried by ``report``.
+    """
+
+    train_end: int
+    test_end: int
+    report: WalkForwardReport
+
+    @property
+    def training_periods(self) -> int:
+        """Number of leading periods used only for training."""
+        return self.train_end
+
+    @property
+    def scoring_periods(self) -> int:
+        """Number of periods scored with adaptive predict-then-learn updates."""
+        return self.test_end - self.train_end
+
+
+def expanding_window_evaluate(
+    competitor_class: Type[BaseCompetitor],
+    periods: Sequence[Sequence[Row]],
+    folds: Sequence[Tuple[int, int]],
+    *,
+    competitor_params: Optional[Dict[str, Any]] = None,
+    base_competitor_kwargs: Optional[Dict[str, Any]] = None,
+    comparison_function: Optional[Callable[..., Any]] = None,
+    score_keys: Optional[Tuple[str, str]] = None,
+    calibration_bins: int = 10,
+) -> Tuple[ExpandingWindowFold, ...]:
+    """Evaluate a fixed configuration across explicit expanding development windows.
+
+    Each fold starts a fresh :func:`walk_forward` replay of ``periods[:test_end]``
+    with ``warmup=train_end``. Scoring is adaptive: each complete period is predicted
+    before learning its results. Earlier scoring windows can become training history
+    in later folds, so folds are dependent rather than independent trials.
+
+    :param competitor_class: The rating system to evaluate.
+    :param periods: Ordered development periods. Keep reserved final data outside.
+    :param folds: Non-empty sequence of exclusive ``(train_end, test_end)`` indexes.
+        Require ``0 < train_end < test_end <= len(periods)`` and ordered,
+        non-overlapping scoring windows. Gaps between scoring windows are allowed.
+    :param competitor_params: Fixed class knobs, forwarded to :func:`walk_forward`.
+    :param base_competitor_kwargs: Fixed constructor options, forwarded to :func:`walk_forward`.
+    :param comparison_function: Arena comparison function, forwarded to :func:`walk_forward`.
+    :param score_keys: Point-score attribute names, forwarded to :func:`walk_forward`.
+    :param calibration_bins: Reliability bin count, forwarded to :func:`walk_forward`.
+    :returns: Immutable fold records in supplied order. No pooled aggregate, model
+        selection, confidence intervals or other uncertainty claims are computed.
+    :raises ValueError: If folds are empty, malformed, use non-integer indexes (including
+        booleans), violate bounds, or have unordered/overlapping scoring windows.
+        Every boundary is validated before any fold is evaluated.
+    """
+    boundaries = tuple(folds)
+    if not boundaries:
+        raise ValueError("folds must contain at least one scoring window")
+    previous_end = 0
+    for boundary in boundaries:
+        if not isinstance(boundary, (tuple, list)) or len(boundary) != 2:
+            raise ValueError("each fold must be a (train_end, test_end) pair")
+        train_end, test_end = boundary
+        if any(isinstance(index, bool) or not isinstance(index, int) for index in boundary):
+            raise ValueError("fold boundaries must be integers, excluding booleans")
+        if not 0 < train_end < test_end <= len(periods):
+            raise ValueError("fold boundaries must satisfy 0 < train_end < test_end <= len(periods)")
+        if train_end < previous_end:
+            raise ValueError("scoring windows must be ordered and non-overlapping")
+        previous_end = test_end
+
+    return tuple(
+        ExpandingWindowFold(
+            train_end,
+            test_end,
+            walk_forward(
+                competitor_class,
+                periods[:test_end],
+                warmup=train_end,
+                competitor_params=competitor_params,
+                base_competitor_kwargs=base_competitor_kwargs,
+                comparison_function=comparison_function,
+                score_keys=score_keys,
+                calibration_bins=calibration_bins,
+            ),
+        )
+        for train_end, test_end in boundaries
     )
 
 
