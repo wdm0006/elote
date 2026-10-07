@@ -32,6 +32,7 @@ Elote makes implementing these systems simple and intuitive, with a clean API th
 
    competitors
    choose_a_rating_system
+   chronological_selection
    arenas
    serialization
    evaluation
