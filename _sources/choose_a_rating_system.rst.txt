@@ -641,3 +641,7 @@ Where to go next
   :doc:`Bradley-Terry <rating_systems/bradley_terry>`,
   :doc:`Pythagorean <rating_systems/pythagorean>`,
   :doc:`Whole-History Rating <rating_systems/whr>`.
+
+For parameter selection followed by a separate evaluation on later periods,
+see :doc:`chronological_selection`. It demonstrates development-only tuning
+and a final predict-then-learn replay with the development prefix as warmup.
