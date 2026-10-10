@@ -36,3 +36,43 @@ positive integer, booleans and non-integers raise ``ValueError``).
                  f"predicted={b.mean_predicted:.3f} observed={b.observed_rate:.3f}")
 
 A bin whose ``mean_predicted`` is well above its ``observed_rate`` is overconfident.
+
+Expanding development windows
+-----------------------------
+
+Use :func:`elote.expanding_window_evaluate` to inspect a fixed configuration across
+seasons or other explicit windows. Supply only development periods; keep a separately
+reserved final population outside this helper. Boundaries are exclusive period indexes:
+training is ``[0, train_end)`` and scoring is ``[train_end, test_end)``.
+
+.. code-block:: python
+
+   from elote import EloCompetitor, expanding_window_evaluate, group_by_period
+
+   development_periods = group_by_period(development_rows)
+   # This example requires at least six development periods.
+   folds = expanding_window_evaluate(
+       EloCompetitor,
+       development_periods,
+       [(2, 4), (4, 6)],
+       competitor_params={"k_factor": 32},
+       calibration_bins=5,
+   )
+   for fold in folds:
+       print(f"train=[0,{fold.train_end}) score=[{fold.train_end},{fold.test_end}) "
+             f"training_periods={fold.training_periods} scoring_periods={fold.scoring_periods}")
+       print(fold.report)  # Includes the scored prediction count.
+       print(fold.report.skipped, fold.report.draws, fold.report.reliability)
+
+Every fold starts with fresh arena state and replays its training prefix. All boundaries
+are validated before evaluation: require integer indexes (excluding booleans),
+``0 < train_end < test_end <= len(periods)``, and ordered, non-overlapping scoring
+windows. Gaps are allowed; empty fold lists are rejected. ``warmup`` is reserved for the
+training boundary. Configuration, constructor, comparison, score and calibration options
+have the same meanings as in :func:`elote.walk_forward`.
+
+Learning remains adaptive within each scoring window: predict a complete period, then
+learn its results before predicting the next. Earlier scoring results become training
+history in later folds, making the folds dependent. Inspect individual reports for poor
+later windows; this helper performs no search, automatic model choice, pooled aggregate,
+final-holdout management or confidence intervals, and makes no uncertainty claims.

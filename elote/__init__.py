@@ -75,6 +75,8 @@ from elote.benchmark import evaluate_competitor, benchmark_competitors
 from elote.evaluation import (
     ReliabilityBin,
     WalkForwardReport,
+    ExpandingWindowFold,
+    expanding_window_evaluate,
     TuningResult,
     group_by_period,
     WalkForwardComparison,
@@ -124,6 +126,8 @@ __all__ = [
     "benchmark_competitors",
     "ReliabilityBin",
     "WalkForwardReport",
+    "ExpandingWindowFold",
+    "expanding_window_evaluate",
     "TuningResult",
     "group_by_period",
     "WalkForwardComparison",
