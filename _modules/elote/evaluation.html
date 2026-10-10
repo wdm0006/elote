@@ -16,7 +16,7 @@
     
     <title>elote.evaluation &#8212; elote 1.5.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=30d13653" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/wabi.css?v=3eeb95f0" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/wabi.css?v=9adde7c3" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=71d92741" />
     <script src="../../_static/documentation_options.js?v=44dfd65d"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -207,6 +207,8 @@
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">"ReliabilityBin"</span><span class="p">,</span>
     <span class="s2">"WalkForwardReport"</span><span class="p">,</span>
+    <span class="s2">"ExpandingWindowFold"</span><span class="p">,</span>
+    <span class="s2">"expanding_window_evaluate"</span><span class="p">,</span>
     <span class="s2">"TuningResult"</span><span class="p">,</span>
     <span class="s2">"WalkForwardComparison"</span><span class="p">,</span>
     <span class="s2">"group_by_period"</span><span class="p">,</span>
@@ -533,6 +535,105 @@
         <span class="n">brier</span><span class="o">=</span><span class="n">brier_total</span> <span class="o">/</span> <span class="n">predictions</span><span class="p">,</span>
         <span class="n">by_period</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">by_period</span><span class="p">),</span>
         <span class="n">reliability</span><span class="o">=</span><span class="n">_build_reliability</span><span class="p">(</span><span class="n">calibration_bins</span><span class="p">,</span> <span class="n">bin_counts</span><span class="p">,</span> <span class="n">bin_predicted</span><span class="p">,</span> <span class="n">bin_wins</span><span class="p">),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ExpandingWindowFold">
+<a class="viewcode-back" href="../../api/evaluation.html#elote.evaluation.ExpandingWindowFold">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExpandingWindowFold</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""One expanding-window replay and its scoring report.</span>
+
+<span class="sd">    Training covers ``[0, train_end)`` and scoring covers ``[train_end, test_end)``.</span>
+<span class="sd">    Indexes in ``report.by_period`` retain their positions in the supplied schedule.</span>
+<span class="sd">    Bout counts (predictions, skips and draws) are carried by ``report``.</span>
+<span class="sd">    """</span>
+
+    <span class="n">train_end</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">test_end</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">report</span><span class="p">:</span> <span class="n">WalkForwardReport</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">training_periods</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Number of leading periods used only for training."""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_end</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scoring_periods</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Number of periods scored with adaptive predict-then-learn updates."""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_end</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_end</span></div>
+
+
+
+<div class="viewcode-block" id="expanding_window_evaluate">
+<a class="viewcode-back" href="../../api/evaluation.html#elote.evaluation.expanding_window_evaluate">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">expanding_window_evaluate</span><span class="p">(</span>
+    <span class="n">competitor_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">BaseCompetitor</span><span class="p">],</span>
+    <span class="n">periods</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="n">Row</span><span class="p">]],</span>
+    <span class="n">folds</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">competitor_params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">base_competitor_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">comparison_function</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">score_keys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">calibration_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ExpandingWindowFold</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Evaluate a fixed configuration across explicit expanding development windows.</span>
+
+<span class="sd">    Each fold starts a fresh :func:`walk_forward` replay of ``periods[:test_end]``</span>
+<span class="sd">    with ``warmup=train_end``. Scoring is adaptive: each complete period is predicted</span>
+<span class="sd">    before learning its results. Earlier scoring windows can become training history</span>
+<span class="sd">    in later folds, so folds are dependent rather than independent trials.</span>
+
+<span class="sd">    :param competitor_class: The rating system to evaluate.</span>
+<span class="sd">    :param periods: Ordered development periods. Keep reserved final data outside.</span>
+<span class="sd">    :param folds: Non-empty sequence of exclusive ``(train_end, test_end)`` indexes.</span>
+<span class="sd">        Require ``0 &lt; train_end &lt; test_end &lt;= len(periods)`` and ordered,</span>
+<span class="sd">        non-overlapping scoring windows. Gaps between scoring windows are allowed.</span>
+<span class="sd">    :param competitor_params: Fixed class knobs, forwarded to :func:`walk_forward`.</span>
+<span class="sd">    :param base_competitor_kwargs: Fixed constructor options, forwarded to :func:`walk_forward`.</span>
+<span class="sd">    :param comparison_function: Arena comparison function, forwarded to :func:`walk_forward`.</span>
+<span class="sd">    :param score_keys: Point-score attribute names, forwarded to :func:`walk_forward`.</span>
+<span class="sd">    :param calibration_bins: Reliability bin count, forwarded to :func:`walk_forward`.</span>
+<span class="sd">    :returns: Immutable fold records in supplied order. No pooled aggregate, model</span>
+<span class="sd">        selection, confidence intervals or other uncertainty claims are computed.</span>
+<span class="sd">    :raises ValueError: If folds are empty, malformed, use non-integer indexes (including</span>
+<span class="sd">        booleans), violate bounds, or have unordered/overlapping scoring windows.</span>
+<span class="sd">        Every boundary is validated before any fold is evaluated.</span>
+<span class="sd">    """</span>
+    <span class="n">boundaries</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">folds</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">boundaries</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"folds must contain at least one scoring window"</span><span class="p">)</span>
+    <span class="n">previous_end</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">boundary</span> <span class="ow">in</span> <span class="n">boundaries</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">boundary</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">boundary</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"each fold must be a (train_end, test_end) pair"</span><span class="p">)</span>
+        <span class="n">train_end</span><span class="p">,</span> <span class="n">test_end</span> <span class="o">=</span> <span class="n">boundary</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">boundary</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"fold boundaries must be integers, excluding booleans"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">train_end</span> <span class="o">&lt;</span> <span class="n">test_end</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">periods</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"fold boundaries must satisfy 0 &lt; train_end &lt; test_end &lt;= len(periods)"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">train_end</span> <span class="o">&lt;</span> <span class="n">previous_end</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"scoring windows must be ordered and non-overlapping"</span><span class="p">)</span>
+        <span class="n">previous_end</span> <span class="o">=</span> <span class="n">test_end</span>
+
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span>
+        <span class="n">ExpandingWindowFold</span><span class="p">(</span>
+            <span class="n">train_end</span><span class="p">,</span>
+            <span class="n">test_end</span><span class="p">,</span>
+            <span class="n">walk_forward</span><span class="p">(</span>
+                <span class="n">competitor_class</span><span class="p">,</span>
+                <span class="n">periods</span><span class="p">[:</span><span class="n">test_end</span><span class="p">],</span>
+                <span class="n">warmup</span><span class="o">=</span><span class="n">train_end</span><span class="p">,</span>
+                <span class="n">competitor_params</span><span class="o">=</span><span class="n">competitor_params</span><span class="p">,</span>
+                <span class="n">base_competitor_kwargs</span><span class="o">=</span><span class="n">base_competitor_kwargs</span><span class="p">,</span>
+                <span class="n">comparison_function</span><span class="o">=</span><span class="n">comparison_function</span><span class="p">,</span>
+                <span class="n">score_keys</span><span class="o">=</span><span class="n">score_keys</span><span class="p">,</span>
+                <span class="n">calibration_bins</span><span class="o">=</span><span class="n">calibration_bins</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">train_end</span><span class="p">,</span> <span class="n">test_end</span> <span class="ow">in</span> <span class="n">boundaries</span>
     <span class="p">)</span></div>
 
 

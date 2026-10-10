@@ -17,7 +17,7 @@
     
     <title>Walk-Forward Evaluation &#8212; elote 1.5.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=30d13653" />
-    <link rel="stylesheet" type="text/css" href="_static/css/wabi.css?v=3eeb95f0" />
+    <link rel="stylesheet" type="text/css" href="_static/css/wabi.css?v=9adde7c3" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=71d92741" />
     <script src="_static/documentation_options.js?v=44dfd65d"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
@@ -205,6 +205,42 @@ bouts, not a three-outcome draw-probability model.</p></li>
 </pre></div>
 </div>
 <p>A bin whose <code class="docutils literal notranslate"><span class="pre">mean_predicted</span></code> is well above its <code class="docutils literal notranslate"><span class="pre">observed_rate</span></code> is overconfident.</p>
+</section>
+<section id="expanding-development-windows">
+<h2>Expanding development windows<a class="headerlink" href="#expanding-development-windows" title="Link to this heading">¶</a></h2>
+<p>Use <code class="xref py py-func docutils literal notranslate"><span class="pre">elote.expanding_window_evaluate()</span></code> to inspect a fixed configuration across
+seasons or other explicit windows. Supply only development periods; keep a separately
+reserved final population outside this helper. Boundaries are exclusive period indexes:
+training is <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">train_end)</span></code> and scoring is <code class="docutils literal notranslate"><span class="pre">[train_end,</span> <span class="pre">test_end)</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">elote</span><span class="w"> </span><span class="kn">import</span> <span class="n">EloCompetitor</span><span class="p">,</span> <span class="n">expanding_window_evaluate</span><span class="p">,</span> <span class="n">group_by_period</span>
+
+<span class="n">development_periods</span> <span class="o">=</span> <span class="n">group_by_period</span><span class="p">(</span><span class="n">development_rows</span><span class="p">)</span>
+<span class="c1"># This example requires at least six development periods.</span>
+<span class="n">folds</span> <span class="o">=</span> <span class="n">expanding_window_evaluate</span><span class="p">(</span>
+    <span class="n">EloCompetitor</span><span class="p">,</span>
+    <span class="n">development_periods</span><span class="p">,</span>
+    <span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">)],</span>
+    <span class="n">competitor_params</span><span class="o">=</span><span class="p">{</span><span class="s2">"k_factor"</span><span class="p">:</span> <span class="mi">32</span><span class="p">},</span>
+    <span class="n">calibration_bins</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">for</span> <span class="n">fold</span> <span class="ow">in</span> <span class="n">folds</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"train=[0,</span><span class="si">{</span><span class="n">fold</span><span class="o">.</span><span class="n">train_end</span><span class="si">}</span><span class="s2">) score=[</span><span class="si">{</span><span class="n">fold</span><span class="o">.</span><span class="n">train_end</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">fold</span><span class="o">.</span><span class="n">test_end</span><span class="si">}</span><span class="s2">) "</span>
+          <span class="sa">f</span><span class="s2">"training_periods=</span><span class="si">{</span><span class="n">fold</span><span class="o">.</span><span class="n">training_periods</span><span class="si">}</span><span class="s2"> scoring_periods=</span><span class="si">{</span><span class="n">fold</span><span class="o">.</span><span class="n">scoring_periods</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">fold</span><span class="o">.</span><span class="n">report</span><span class="p">)</span>  <span class="c1"># Includes the scored prediction count.</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">fold</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">skipped</span><span class="p">,</span> <span class="n">fold</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">draws</span><span class="p">,</span> <span class="n">fold</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">reliability</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Every fold starts with fresh arena state and replays its training prefix. All boundaries
+are validated before evaluation: require integer indexes (excluding booleans),
+<code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">&lt;</span> <span class="pre">train_end</span> <span class="pre">&lt;</span> <span class="pre">test_end</span> <span class="pre">&lt;=</span> <span class="pre">len(periods)</span></code>, and ordered, non-overlapping scoring
+windows. Gaps are allowed; empty fold lists are rejected. <code class="docutils literal notranslate"><span class="pre">warmup</span></code> is reserved for the
+training boundary. Configuration, constructor, comparison, score and calibration options
+have the same meanings as in <code class="xref py py-func docutils literal notranslate"><span class="pre">elote.walk_forward()</span></code>.</p>
+<p>Learning remains adaptive within each scoring window: predict a complete period, then
+learn its results before predicting the next. Earlier scoring results become training
+history in later folds, making the folds dependent. Inspect individual reports for poor
+later windows; this helper performs no search, automatic model choice, pooled aggregate,
+final-holdout management or confidence intervals, and makes no uncertainty claims.</p>
 </section>
 </section>
 
