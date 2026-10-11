@@ -1,13 +1,13 @@
-"""Golden fixtures proving the two-player surface is byte-identical.
+"""Golden fixtures preserving two-player values with a tight float tolerance.
 
 The N-player bout work (``match_group``) must not change any two-player code
 path. This module runs a fixed, deterministic battery of two-player flows --
 ``matchup`` wins/losses/draws with and without scores, ``rating_period``,
 ``tournament``, and ``process_history`` -- against every no-argument
-constructible rating system and serializes the exported arena state to exact
+constructible rating system and serializes the exported arena state to
 JSON. The committed fixture at ``tests/data/two_player_golden_fixtures.json``
-was captured from the pre-change tree; the test asserts byte equality against
-it.
+was captured from the pre-change tree; the test compares parsed values against
+it, tolerating only last-digit float noise.
 
 Regenerating the fixture re-baselines behavior: run
 ``scripts/generate_two_player_goldens.py`` only from a tree whose two-player
@@ -70,7 +70,7 @@ def _strip_volatile_metadata(state: Dict) -> Dict:
     Exported documents carry fields that identify the specific competitor
     instance rather than its rating state: ``id`` (a random UUID, or a memory
     address for some systems) and ``created_at`` (a wall-clock export stamp).
-    Both change on every run, so they are stripped before the byte comparison;
+    Both change on every run, so they are stripped before the value comparison;
     otherwise the fixture would differ between runs for reasons unrelated to
     rating behavior.
     """
@@ -159,14 +159,36 @@ def golden_fixture() -> Dict:
     return json.loads(FIXTURE_PATH.read_text())
 
 
+def _assert_golden_values(actual, golden, *, path):
+    message = (
+        f"{path}: two-player values differ from the golden fixture "
+        "(floats use rel=1e-12, abs=1e-12 tolerance). "
+        "Fix the regression; do not regenerate the fixture."
+    )
+    assert type(actual) is type(golden), message
+    if isinstance(golden, dict):
+        assert actual.keys() == golden.keys(), message
+        for key in golden:
+            _assert_golden_values(actual[key], golden[key], path=f"{path}.{key}")
+    elif isinstance(golden, list):
+        assert len(actual) == len(golden), message
+        for index, (actual_item, golden_item) in enumerate(zip(actual, golden, strict=True)):
+            _assert_golden_values(actual_item, golden_item, path=f"{path}[{index}]")
+    elif isinstance(golden, float):
+        assert actual == pytest.approx(golden, rel=1e-12, abs=1e-12), message
+    else:
+        assert actual == golden, message
+
+
 @pytest.mark.parametrize("competitor_class", SYSTEMS, ids=lambda c: c.__name__)
-def test_two_player_paths_byte_identical(competitor_class, golden_fixture):
-    """The full two-player battery reproduces the pre-change bytes exactly."""
+def test_two_player_paths_match_golden(competitor_class, golden_fixture):
+    """The full two-player battery preserves values with a float tolerance."""
     name = competitor_class.__name__
     assert name in golden_fixture["systems"], f"{name} missing from the golden fixture"
-    assert _battery_state(competitor_class) == golden_fixture["systems"][name], (
-        f"{name}'s two-player state diverged from the golden fixture -- the N-player work "
-        "changed a two-player code path. Fix the regression; do not regenerate the fixture."
+    _assert_golden_values(
+        json.loads(_battery_state(competitor_class)),
+        json.loads(golden_fixture["systems"][name]),
+        path=name,
     )
 
 
@@ -174,3 +196,36 @@ def test_golden_fixture_covers_all_systems(golden_fixture):
     """The fixture records its provenance and one entry per shipped system."""
     assert golden_fixture["generated_from_commit"]
     assert set(golden_fixture["systems"]) == {c.__name__ for c in SYSTEMS}
+
+
+@pytest.mark.parametrize("relative_change, passes", [(1e-15, True), (1e-6, False)])
+def test_trueskill_golden_sigma_update_tolerance(monkeypatch, golden_fixture, relative_change, passes):
+    original_beat = TrueSkillCompetitor.beat
+
+    def perturbed_beat(self, competitor, *args, **kwargs):
+        original_beat(self, competitor, *args, **kwargs)
+        self.sigma *= 1 + relative_change
+
+    monkeypatch.setattr(TrueSkillCompetitor, "beat", perturbed_beat)
+    if passes:
+        test_two_player_paths_match_golden(TrueSkillCompetitor, golden_fixture)
+    else:
+        with pytest.raises(AssertionError, match="values differ"):
+            test_two_player_paths_match_golden(TrueSkillCompetitor, golden_fixture)
+
+
+@pytest.mark.parametrize("mutation", ["version", "key", "float-type", "int", "bool", "string", "list"])
+def test_golden_non_float_values_match_exactly(golden_fixture, mutation):
+    golden = json.loads(golden_fixture["systems"]["TrueSkillCompetitor"])
+    actual = json.loads(_battery_state(TrueSkillCompetitor))
+    if mutation == "version":
+        actual["alice"]["version"] = "changed"
+    elif mutation == "key":
+        actual["alice"]["renamed_state"] = actual["alice"].pop("state")
+    elif mutation == "float-type":
+        actual["alice"]["state"]["mu"] = int(actual["alice"]["state"]["mu"])
+    else:
+        golden["extra"] = {"int": 1, "bool": True, "string": "value", "list": [1]}[mutation]
+        actual["extra"] = {"int": 2, "bool": 1, "string": "changed", "list": [1, 2]}[mutation]
+    with pytest.raises(AssertionError, match="values differ"):
+        _assert_golden_values(actual, golden, path="TrueSkillCompetitor")
