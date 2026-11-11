@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "elote"
-version = "1.5.1"
+version = "1.6.0"
 description = "Compare Elo, Glicko, TrueSkill, Bradley-Terry, and other rating systems behind one Python interface"
 readme = "README.md"
 authors = [

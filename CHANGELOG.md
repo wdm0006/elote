@@ -1,3 +1,46 @@
+v1.6.0
+======
+
+Released 2026-11-10. Elo margin-of-victory, multi-system and expanding-window temporal evaluation,
+reliability tables, and a fix that keeps losing rows in caller order on the history and dataset paths.
+
+New features
+
+ * `EloCompetitor` gains an opt-in `margin_of_victory` option (constructor argument and class
+   variable, default `False`) that scales decisive updates passed `scores=` by `ln(|margin| + 1)`
+   with an autocorrelation damper (#218). Default behavior is unchanged, and the option round-trips
+   through `export_state` / `from_state`.
+ * `elote.compare_walk_forward` ranks several named rating systems by log loss under one
+   walk-forward protocol and warmup, reporting whether they scored the same population (#217).
+ * `elote.expanding_window_evaluate` replays a fixed configuration over explicit expanding prefixes
+   of a chronological schedule, exposing seasonal variation across folds (#222).
+ * `WalkForwardReport` now carries `reliability`, dependency-free equal-width probability bins
+   (`ReliabilityBin`: bounds, count, mean predicted, observed rate), with a `calibration_bins`
+   option on `walk_forward` (#220).
+
+Documentation
+
+ * New chronological-selection tutorial (`examples/chronological_selection.py`) showing tuning on a
+   development prefix followed by a separate final evaluation (#223).
+ * PyPI discovery metadata: keywords, Topic/License/Typing classifiers, Documentation and Changelog
+   URLs (#208).
+
+Bug fixes
+
+ * `LambdaArena.process_history` and `train_arena_with_dataset` now dispatch a loss in caller order
+   (`a.lost_to(b)` / `matchup(a, b, outcome=0.0)`) instead of reversing the row (#213). This
+   completes the v1.5.1 fix: `GlickoBoostCompetitor` with `_eta > 0` now gives different ratings
+   on these two paths for losing rows, matching `rating_period`. Every other system is numerically
+   unchanged.
+
+Compatibility notes
+
+ * Glicko-Boost users with `_eta > 0` who replay history through `process_history` or
+   `train_arena_with_dataset` will see different ratings from 1.5.1. The "still reverse a losing
+   row" note in the v1.5.1 section below no longer applies.
+ * Maintenance: dependency refreshes (certifi 2026.10.19, urllib3, virtualenv) and a tolerance fix
+   to the two-player golden tests; no runtime behavior change.
+
 v1.5.1
 ======
 
